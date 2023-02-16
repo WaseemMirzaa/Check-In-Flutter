@@ -1,14 +1,25 @@
+import 'dart:async';
+import 'package:checkinmod/auth_service.dart';
+import 'package:checkinmod/modal/user_modal.dart';
+import 'package:checkinmod/search_location.dart';
 import 'package:checkinmod/ui/screens/contact_us.dart';
 import 'package:checkinmod/ui/screens/player.dart';
 import 'package:checkinmod/ui/screens/privacy_policy.dart';
+import 'package:checkinmod/ui/screens/start.dart';
 import 'package:checkinmod/ui/screens/terms_conditions.dart';
 import 'package:checkinmod/ui/widgets/common_button.dart';
 import 'package:checkinmod/utils/colors.dart';
 import 'package:checkinmod/utils/styles.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_typeahead/flutter_typeahead.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:google_maps_webservice/places.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
-
+import 'package:shared_preferences/shared_preferences.dart';
 import 'Players.dart';
 
 class CheckIn extends StatefulWidget {
@@ -23,6 +34,19 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
 
   GlobalKey<ScaffoldState> _scaffoldState = GlobalKey<ScaffoldState>();
 
+  BitmapDescriptor sourceIcon = BitmapDescriptor.defaultMarker;
+  BitmapDescriptor destinationIcon = BitmapDescriptor.defaultMarker;
+  BitmapDescriptor currentLocationIcon = BitmapDescriptor.defaultMarker;
+
+  static const LatLng court1 = LatLng(33.6296, 73.1123);
+  static const LatLng court2 = LatLng(33.713335, 73.061926);
+
+  TextEditingController typeAheadController = TextEditingController();
+
+  final _places =
+      GoogleMapsPlaces(apiKey: 'AIzaSyAWfUP79VGyEn-89MFapzNHNiYfT92zdBs');
+  String _selectedPlace = '';
+
   changeIndex() {
     if (index == 0) {
       index = 1;
@@ -31,6 +55,101 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
     }
     setState(() {});
     print(index);
+  }
+
+  Position? currentLocation;
+  final Completer<GoogleMapController> _controller = Completer();
+  late GoogleMapController googleController;
+
+  Future<Position> getCurrentLocation() async {
+    Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high);
+    _checkIfWithinRadius(position);
+    print(currentLocation?.longitude);
+    setState(() {
+      currentLocation = position;
+    });
+    // GoogleMapController googleMapController = await _controller.future;
+
+    // location.onLocationChanged.listen((newLoc) {
+    //   currentLocation = newLoc;
+
+    //   googleMapController.animateCamera(
+    //     CameraUpdate.newCameraPosition(
+    //       CameraPosition(
+    //         zoom: 16,
+    //         target: LatLng(newLoc.latitude!, newLoc.longitude!),
+    //       ),
+    //     ),
+    //   );
+    //   setState(() {});
+    // }
+    // );
+
+    return Future.value(currentLocation);
+  }
+
+  Future<Position> goCurrentLoc() async {
+    GoogleMapController googleMapController = await _controller.future;
+
+    googleMapController.animateCamera(
+      CameraUpdate.newCameraPosition(
+        CameraPosition(
+          zoom: 16,
+          target: LatLng(currentLocation!.latitude, currentLocation!.longitude),
+        ),
+      ),
+    );
+    setState(() {});
+
+    return Future.value(currentLocation);
+  }
+
+  bool _checkIfWithinRadius(Position p) {
+    double distanceInMeters = Geolocator.distanceBetween(
+        p.latitude, p.longitude, court1.latitude, court1.longitude);
+    if (distanceInMeters <= 200) {
+      print("user in radius");
+      return true;
+    } else {
+      print("user not in radius");
+      return false;
+    }
+  }
+
+  // void _updateLocation() {
+  //   bool withinRadius = _checkIfWithinRadius();
+  //   FirebaseFirestore.instance
+  //       .collection("USER")
+  //       .doc(FirebaseAuth.instance.currentUser!.uid)
+  //       .update({});
+  // }
+
+  // void setCustomMarkerIcon() {
+  //   BitmapDescriptor.fromAssetImage(
+  //           ImageConfiguration.empty, "assets/images/Icon feather-edit-2.png")
+  //       .then(
+  //     (icon) => sourceIcon = icon,
+  //   );
+  //   BitmapDescriptor.fromAssetImage(
+  //           ImageConfiguration.empty, "assets/images/Icon feather-edit-2.png")
+  //       .then(
+  //     (icon) => destinationIcon = icon,
+  //   );
+  //   BitmapDescriptor.fromAssetImage(
+  //           ImageConfiguration.empty, "assets/images/Icon feather-map-pin.png")
+  //       .then(
+  //     (icon) => currentLocationIcon = icon,
+  //   );
+  //   setState(() {});
+  // }
+
+  @override
+  void initState() {
+    // setCustomMarkerIcon();
+    getCurrentLocation();
+    // _checkIfWithinRadius();
+    super.initState();
   }
 
   @override
@@ -45,11 +164,13 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
             // Important: Remove any padding from the ListView.
             padding: EdgeInsets.zero,
             children: [
-               DrawerHeader(
+              DrawerHeader(
                 decoration: BoxDecoration(
                   color: whiteColor,
                 ),
-                child:  Image.asset("assets/images/logo.jpeg",),
+                child: Image.asset(
+                  "assets/images/logo.jpeg",
+                ),
               ),
               const SizedBox(
                 height: 20,
@@ -84,6 +205,25 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
                       screen: const TermsAndConditions(), withNavBar: false);
                 },
               ),
+              ListTile(
+                leading: const Icon(
+                  Icons.logout_outlined,
+                ),
+                title: const Text('LogOut'),
+                onTap: () async {
+                  logout(context);
+                  userController.userModel.value = UserModel();
+                },
+              ),
+              ListTile(
+                leading: const Icon(
+                  Icons.delete_forever_outlined,
+                ),
+                title: const Text('Delete Acc'),
+                onTap: () {
+                  delAcc(context);
+                },
+              ),
             ],
           ),
         ),
@@ -99,8 +239,39 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
                   pushNewScreen(context,
                       screen: const PlayersView(), withNavBar: false);
                 },
-                child: Image.asset("assets/images/Group 12584.png",
-                    fit: BoxFit.fitHeight),
+                child: currentLocation == null
+                    ? const Center(child: Text("Loading..."))
+                    : GoogleMap(
+                        mapToolbarEnabled: false,
+                        zoomControlsEnabled: false,
+                        initialCameraPosition: CameraPosition(
+                          target: LatLng(currentLocation!.latitude,
+                              currentLocation!.longitude),
+                          zoom: 16,
+                        ),
+                        markers: {
+                          Marker(
+                            markerId: const MarkerId("current location"),
+                            icon: currentLocationIcon,
+                            position: LatLng(currentLocation!.latitude,
+                                currentLocation!.longitude),
+                          ),
+                          Marker(
+                            markerId: const MarkerId("source"),
+                            icon: sourceIcon,
+                            position: court1,
+                          ),
+                          Marker(
+                            markerId: const MarkerId("destination"),
+                            icon: destinationIcon,
+                            position: court2,
+                          ),
+                        },
+                        onMapCreated: (mapController) {
+                          googleController = mapController;
+                          _controller.complete(mapController);
+                        },
+                      ),
               ),
             ),
             Positioned(
@@ -124,7 +295,9 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
                               height: 40,
                               width: 40,
                               decoration: BoxDecoration(
-                                  color: greenColor, shape: BoxShape.circle),
+                                color: greenColor,
+                                shape: BoxShape.circle,
+                              ),
                               child: Icon(
                                 Icons.menu,
                                 color: whiteColor,
@@ -136,13 +309,15 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
                           height: 20,
                         ),
                         Material(
-                          borderRadius:  BorderRadius.circular(10),
+                          borderRadius: BorderRadius.circular(10),
                           elevation: 2,
                           shadowColor: Colors.grey,
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(10),
-                            child: TextField(
-                              decoration: InputDecoration(
+                            child: TypeAheadField(
+                              textFieldConfiguration: TextFieldConfiguration(
+                                controller: this.typeAheadController,
+                                decoration: InputDecoration(
                                   contentPadding:
                                       const EdgeInsets.only(left: 20, top: 15),
                                   filled: true,
@@ -172,22 +347,128 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
                                       ),
                                       const SizedBox(
                                         width: 20,
-                                      )
+                                      ),
                                     ],
-                                  )),
+                                  ),
+                                ),
+                              ),
+                              suggestionsCallback: (pattern) async {
+                                return await _places
+                                    .autocomplete(pattern)
+                                    .then((response) {
+                                  return response.predictions;
+                                });
+                              },
+                              itemBuilder: (context, prediction) {
+                                return ListTile(
+                                  title: Text(prediction.description as String),
+                                );
+                              },
+                              onSuggestionSelected: (prediction) async {
+                                setState(() {
+                                  _selectedPlace =
+                                      prediction.description as String;
+                                });
+                                typeAheadController.text = _selectedPlace;
+
+                                var placeId = prediction.placeId;
+                                var detail = await _places
+                                    .getDetailsByPlaceId(placeId as String);
+                                var location = detail.result.geometry!.location;
+                                var lat = location.lat;
+                                var lng = location.lng;
+
+                                final GoogleMapController controller =
+                                    await _controller.future;
+                                controller.animateCamera(
+                                  CameraUpdate.newCameraPosition(
+                                    CameraPosition(
+                                      target: LatLng(lat, lng),
+                                      zoom: 15.0,
+                                    ),
+                                  ),
+                                );
+                              },
+                              transitionBuilder:
+                                  (context, suggestionsBox, controller) {
+                                return suggestionsBox;
+                              },
                             ),
+
+                            // TextField(
+                            //             onChanged: (value) {
+                            //   if (value.isNotEmpty) {
+                            //     _places.autocomplete(value).then((response) {
+                            //       print(response.predictions);
+                            //       // Use the `response.predictions` list to show autocomplete suggestions in your textfield
+                            //     });
+                            //   }
+                            // },
+                            //             decoration: InputDecoration(
+                            //               contentPadding:
+                            //                   const EdgeInsets.only(left: 20, top: 15),
+                            //               filled: true,
+                            //               border: InputBorder.none,
+                            //               disabledBorder: InputBorder.none,
+                            //               enabledBorder: InputBorder.none,
+                            //               errorBorder: InputBorder.none,
+                            //               focusedBorder: InputBorder.none,
+                            //               focusedErrorBorder: InputBorder.none,
+                            //               fillColor: Colors.white,
+                            //               hintText: "Find Courts Near You",
+                            //               hintStyle: GoogleFonts.poppins(
+                            //                   fontSize: 12,
+                            //                   fontWeight: medium,
+                            //                   color: greyColor),
+                            //               suffixIcon: Row(
+                            //                 mainAxisAlignment: MainAxisAlignment.end,
+                            //                 mainAxisSize: MainAxisSize.min,
+                            //                 children: [
+                            //                   SizedBox(
+                            //                     height: 17,
+                            //                     width: 17,
+                            //                     child: Image.asset(
+                            //                       "assets/images/Icon ionic-ios-search.png",
+                            //                       fit: BoxFit.fill,
+                            //                     ),
+                            //                   ),
+                            //                   const SizedBox(
+                            //                     width: 20,
+                            //                   ),
+                            //                 ],
+                            //               ),
+                            //             ),
+                            //           ),
                           ),
                         ),
                       ],
                     ),
+                    // if (_checkIfWithinRadius())
                     fullWidthButton(index == 0 ? "CHECK IN" : "CHECK OUT", () {
                       changeIndex();
+                      if (index == 1)
+                        pushNewScreen(context,
+                            screen: const PlayersView(), withNavBar: false);
                       print(index);
-                    })
+                    }),
                   ],
                 ),
               ),
-            )
+            ),
+            Positioned(
+              bottom: 100,
+              right: 20,
+              child: FloatingActionButton(
+                onPressed: () {
+                  goCurrentLoc();
+                },
+                backgroundColor: Colors.blueAccent,
+                child: const Icon(
+                  Icons.gps_fixed,
+                  color: Colors.white,
+                ),
+              ),
+            ),
           ],
         ),
       ),

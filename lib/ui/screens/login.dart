@@ -1,9 +1,15 @@
+import 'package:checkinmod/auth_service.dart';
 import 'package:checkinmod/ui/screens/persistent_nav_bar.dart';
 import 'package:checkinmod/ui/screens/start.dart';
 import 'package:checkinmod/ui/widgets/common_button.dart';
 import 'package:checkinmod/utils/gaps.dart';
+import 'package:checkinmod/val.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sizer/sizer.dart';
 
 class LoginView extends StatefulWidget {
@@ -14,6 +20,24 @@ class LoginView extends StatefulWidget {
 }
 
 class _LoginViewState extends State<LoginView> {
+  String email = '';
+  String password = '';
+
+
+  final auth = FirebaseAuth.instance;
+  final snap = FirebaseFirestore.instance;
+
+  int index = 0;
+  void changeIndex() {
+    if (index == 0) {
+      index = 1;
+    } else {
+      index = 0;
+    }
+    setState(() {});
+    print(index);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -22,12 +46,13 @@ class _LoginViewState extends State<LoginView> {
         backgroundColor: Colors.white,
         leading: Row(
           children: [
-            SizedBox(
+            const SizedBox(
               width: 30,
             ),
             GestureDetector(
               onTap: () {
-                pushNewScreen(context, screen: StartView(), withNavBar: false);
+                pushNewScreen(context,
+                    screen: const StartView(), withNavBar: false);
               },
               child: SizedBox(
                 height: 2.1.h,
@@ -41,78 +66,113 @@ class _LoginViewState extends State<LoginView> {
       ),
       body: Padding(
         padding: EdgeInsets.all(horizontalPadding),
-          child: SizedBox(
-            height: MediaQuery.of(context).size.height,
-            child: SingleChildScrollView(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Image.asset("assets/images/logo.jpeg",),
-                  SizedBox(height: 12.h,),
-                  SizedBox(
-                    child: Column(
-                      children: [
-                        Padding(
-                          padding: EdgeInsets.only(top: 0.9.h, bottom: 0.9.h),
-                          child: TextField(
-                            enableSuggestions: false,
-                            autocorrect: false,
-                            decoration: InputDecoration(
-                              enabledBorder: UnderlineInputBorder(
-                                borderSide: BorderSide(color: Color(0xff707070)),
-                              ),
-                              focusedBorder: UnderlineInputBorder(
-                                borderSide: BorderSide(color: Color(0xff707070)),
-                              ),
-                              hintText: 'Username',
-                              hintStyle: TextStyle(
-                                fontFamily: 'Poppins',
-                                fontSize: 1.7.h,
-                                color: const Color(0xff707070),
-                                fontWeight: FontWeight.w600,
-                                height: 1.2142857142857142,
-                              ),
+        child: SizedBox(
+          height: MediaQuery.of(context).size.height,
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Image.asset(
+                  "assets/images/logo.jpeg",
+                ),
+                SizedBox(
+                  height: 12.h,
+                ),
+                SizedBox(
+                  child: Column(
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.only(top: 0.9.h, bottom: 0.9.h),
+                        child: TextFormField(
+                          enableSuggestions: false,
+                          autocorrect: false,
+                          validator: (v) {
+                            if (v == null ||
+                                v.isEmpty ||
+                                v.length < 6 ||
+                                !Validate(email)) {
+                              return 'Please enter Valid Email Address';
+                            }
+                          },
+                          onChanged: (val) {
+                            setState(() {
+                              email = val;
+                            });
+                          },
+                          decoration: InputDecoration(
+                            enabledBorder: const UnderlineInputBorder(
+                              borderSide: BorderSide(color: Color(0xff707070)),
+                            ),
+                            focusedBorder: const UnderlineInputBorder(
+                              borderSide: BorderSide(color: Color(0xff707070)),
+                            ),
+                            hintText: 'Email',
+                            hintStyle: TextStyle(
+                              fontFamily: 'Poppins',
+                              fontSize: 1.7.h,
+                              color: const Color(0xff707070),
+                              fontWeight: FontWeight.w600,
+                              height: 1.2142857142857142,
                             ),
                           ),
                         ),
-                        Padding(
-                          padding: EdgeInsets.only(top: 0.9.h, bottom: 0.9.h),
-                          child: TextField(
-                            enableSuggestions: false,
-                            autocorrect: false,
-                            obscureText: true,
-                            decoration: InputDecoration(
-                              enabledBorder: UnderlineInputBorder(
-                                borderSide: BorderSide(color: Color(0xff707070)),
-                              ),
-                              focusedBorder: UnderlineInputBorder(
-                                borderSide: BorderSide(color: Color(0xff707070)),
-                              ),
-                              hintText: 'Password',
-                              hintStyle: TextStyle(
-                                fontFamily: 'Poppins',
-                                fontSize: 1.7.h,
-                                color: const Color(0xff707070),
-                                fontWeight: FontWeight.w600,
-                                height: 1.2142857142857142,
-                              ),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.only(top: 0.9.h, bottom: 0.9.h),
+                        child: TextFormField(
+                          enableSuggestions: false,
+                          autocorrect: false,
+                          obscureText: index == 0 ? true : false,
+                          validator: (v) {
+                            if (v == null || v.isEmpty || v.length < 6) {
+                              return 'Password must be 6 digits long';
+                            }
+                            return null;
+                          },
+                          onChanged: (v) {
+                            setState(() {
+                              password = v;
+                            });
+                          },
+                          decoration: InputDecoration(
+                            enabledBorder: const UnderlineInputBorder(
+                              borderSide: BorderSide(color: Color(0xff707070)),
+                            ),
+                            focusedBorder: const UnderlineInputBorder(
+                              borderSide: BorderSide(color: Color(0xff707070)),
+                            ),
+                            hintText: 'Password',
+                            hintStyle: TextStyle(
+                              fontFamily: 'Poppins',
+                              fontSize: 1.7.h,
+                              color: const Color(0xff707070),
+                              fontWeight: FontWeight.w600,
+                              height: 1.2142857142857142,
                             ),
                           ),
                         ),
-                        Padding(
-                            padding: EdgeInsets.only(top: 3.6.h),
-                            child: fullWidthButton('Log in', () {
-                              pushNewScreen(context,
-                                  screen: Home(), withNavBar: false);
-                            })),
-                      ],
-                    ),
+                      ),
+                      Padding(
+                          padding: EdgeInsets.only(top: 3.6.h),
+                          child: fullWidthButton('Log in', () async {
+                            if (password != "" && email != "") {
+                              login(email, password, context);
+                            } else if (password == "") {
+                              Get.snackbar("Error", "Enter Password",
+                                  snackPosition: SnackPosition.BOTTOM);
+                            } else if (email == "") {
+                              Get.snackbar("Error", "Enter Email",
+                                  snackPosition: SnackPosition.BOTTOM);
+                            }
+                          })),
+                    ],
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         ),
+      ),
     );
   }
 }

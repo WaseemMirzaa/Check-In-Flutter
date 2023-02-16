@@ -1,11 +1,16 @@
+import 'package:checkinmod/controllers/user_controller.dart';
+import 'package:checkinmod/main.dart';
+import 'package:checkinmod/modal/user_modal.dart';
 import 'package:checkinmod/ui/screens/add_home_court.dart';
 import 'package:checkinmod/utils/colors.dart';
 import 'package:checkinmod/utils/styles.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
 import 'package:sizer/sizer.dart';
-
 import '../../utils/gaps.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -15,9 +20,67 @@ class ProfileScreen extends StatefulWidget {
   State<ProfileScreen> createState() => _ProfileScreenState();
 }
 
+class User {
+  final String name;
+  final String email;
+  final String about;
+  final String court;
+
+  User(
+      {required this.name,
+      required this.email,
+      required this.about,
+      required this.court});
+}
+
+class UserService {
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
+  Stream<List<User>> get users {
+    return _firestore.collection('USER').snapshots().map((snapshot) {
+      return snapshot.docs
+          .where((d) => d.get("uid") == FirebaseAuth.instance.currentUser!.uid)
+          .map((doc) => User(
+              name: doc.data()['user name'],
+              email: doc.data()['email'],
+              about: doc.data()['about me'] ?? "",
+              court: doc.data()['home court'] ?? ""))
+          .toList();
+    });
+  }
+}
+
 class _ProfileScreenState extends State<ProfileScreen> {
+  UserController userController = Get.put(UserController());
+
+  UserModel userd = UserModel();
+  getUser() async {
+    DocumentSnapshot snapshot = await FirebaseFirestore.instance
+        .collection("USER")
+        .doc(userController.userModel.value.uid)
+        .get();
+    UserModel currentUser =
+        UserModel.fromMap(snapshot.data() as Map<String, dynamic>);
+    userd = currentUser;
+    setState(() {});
+  }
+
+  String mail = FirebaseAuth.instance.currentUser?.email as String;
+  bool tapped = false;
+  String? aboutMe;
+
+  @override
+  void initState() {
+    // getUser();
+    // UserService();
+    // TODO: implement initState
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
+    String nmail = mail.substring(0, mail.indexOf('@'));
+
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
@@ -28,160 +91,215 @@ class _ProfileScreenState extends State<ProfileScreen> {
       body: SingleChildScrollView(
         child: SizedBox(
           height: MediaQuery.of(context).size.height * 0.8,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Column(
-                children: [
-                  verticalGap(3.h),
-                  Container(
-                    width: 35.9.w,
-                    //   padding: EdgeInsets.all(10),
-                    child: Stack(
-                      //  clipBehavior: Clip.antiAliasWithSaveLayer,
-                      alignment: Alignment.bottomCenter,
-                      children: [
-                        Container(
-                          height: 15.h,
-                          width: 32.9.w,
-                          decoration: BoxDecoration(
-                              color: Colors.red,
-                              shape: BoxShape.circle,
-                              image: DecorationImage(
-                                  image: AssetImage(
-                                      "assets/images/Mask Group 1.png"))),
-                        ),
-                        Align(
-                          alignment: Alignment.bottomRight,
-                          child: Container(
-                            height: 5.5.h,
-                            width: 12.1.w,
-                            decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                image: DecorationImage(
-                                    image: AssetImage(
-                                        "assets/images/instagram-verification-badge.png"))),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  verticalGap(0.5.h),
-                  poppinsText("Benjamin", 32, FontWeight.bold, blackColor),
-                  poppinsText(
-                      "@Alexhales", 12, FontWeight.normal, blackColor),
-                ],
-              ),
-              Column(
-                children: [
-                  poppinsText("Home Court", 14, semiBold, greenColor),
-                  verticalGap(0.8.h),
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 30),
-                    child: Column(
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            poppinsText("Morse Kelley Park - Somerville Ma", 14,
-                                semiBold, blackColor),
-                            GestureDetector(
-                              onTap: () {
-                                pushNewScreen(context,
-                                    screen: AddHomeCourt(), withNavBar: false);
-                              },
-                              child: SizedBox(
-                                height: 2.3.h,
-                                width: 4.47.w,
-                                child: Image.asset(
-                                    "assets/images/Icon feather-map-pin.png"),
+          child: StreamBuilder<List<User>>(
+              stream: UserService().users,
+              builder: (context, snapshot) {
+                if (!snapshot.hasData) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+                final users = snapshot.data;
+
+                return (users!.isNotEmpty && users != null)
+                    ? Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Column(
+                            children: [
+                              verticalGap(3.h),
+                              Container(
+                                width: 35.9.w,
+                                //   padding: EdgeInsets.all(10),
+                                child: Stack(
+                                  //  clipBehavior: Clip.antiAliasWithSaveLayer,
+                                  alignment: Alignment.bottomCenter,
+                                  children: [
+                                    Container(
+                                      height: 15.h,
+                                      width: 32.9.w,
+                                      decoration: const BoxDecoration(
+                                          color: Colors.red,
+                                          shape: BoxShape.circle,
+                                          image: DecorationImage(
+                                              image: AssetImage(
+                                                  "assets/images/Mask Group 1.png"))),
+                                    ),
+                                    Align(
+                                      alignment: Alignment.bottomRight,
+                                      child: Container(
+                                        height: 5.5.h,
+                                        width: 12.1.w,
+                                        decoration: const BoxDecoration(
+                                            shape: BoxShape.circle,
+                                            image: DecorationImage(
+                                                image: AssetImage(
+                                                    "assets/images/instagram-verification-badge.png"))),
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
-                            )
-                          ],
-                        ),
-                        verticalGap(1.3.h),
-                        Container(
-                          height: 1,
-                          color: greyColor,
-                        ),
-                      ],
-                    ),
-                  ),
-                  SizedBox(
-                    height: 3.5.h,
-                  ),
-                  Stack(
-                    alignment: Alignment.topCenter,
-                    children: [
-                      Container(
-                        padding: EdgeInsets.only(left: 30, right: 30, top: 30),
-                        height: 200,
-                        decoration: BoxDecoration(
-                          color: whiteColor,
-                          borderRadius: BorderRadius.only(
-                              topLeft: Radius.circular(10),
-                              topRight: Radius.circular(10)),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.grey.withOpacity(0.2),
-                              blurRadius: 1,
-                              //   spreadRadius: -12,
-                              offset:
-                                  Offset(0, -3), // changes position of shadow
-                            ),
-                          ],
-                        ),
-                        child: Column(
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                poppinsText(
-                                    "About me", 14, semiBold, blackColor),
-                                SizedBox(
-                                  height: 1.8.h,
-                                  width: 4.w,
-                                  child: Image.asset(
-                                      "assets/images/Icon feather-edit-2.png"),
-                                )
-                              ],
-                            ),
-                            TextFormField(
-                              maxLines: 5,
-                              decoration: InputDecoration(
-                                  border: InputBorder.none,
-                                  enabledBorder: InputBorder.none,
-                                  disabledBorder: InputBorder.none,
-                                  errorBorder: InputBorder.none,
-                                  focusedBorder: InputBorder.none,
-                                  focusedErrorBorder: InputBorder.none,
-                                  hintText:
-                                      "617 Real G’s move in silence like lasagna.",
-                                  helperStyle: GoogleFonts.poppins(
-                                      fontSize: 14,
-                                      fontWeight: regular,
-                                      color: Color(0xff777777))),
-                            ),
-                            verticalGap(15),
-                            Container(
-                              height: 1,
-                              color: greyColor,
-                            )
-                          ],
-                        ),
-                      ),
-                      Container(
-                        width: 100,
-                        color: greenColor,
-                        height: 2,
-                      ),
-                    ],
-                  )
-                ],
-              ),
-            ],
-          ),
+                              verticalGap(0.5.h),
+                              poppinsText(
+                                  // FirebaseAuth.instance.currentUser?.displayName
+                                  //     as String,
+                                  users[0].name,
+                                  32,
+                                  FontWeight.bold,
+                                  blackColor),
+                              poppinsText(
+                                  "@${users[0].email.substring(0, users[0].email.indexOf('@'))}",
+                                  12,
+                                  FontWeight.normal,
+                                  blackColor),
+                            ],
+                          ),
+                          Column(
+                            children: [
+                              poppinsText(
+                                  "Home Court", 14, semiBold, greenColor),
+                              verticalGap(0.8.h),
+                              Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 30),
+                                child: Column(
+                                  children: [
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        poppinsText(
+                                            (users[0].court == "")
+                                                ? "Morse Kelly Park - Somerville Ma"
+                                                : users[0].court,
+                                            14,
+                                            semiBold,
+                                            blackColor),
+                                        GestureDetector(
+                                          onTap: () {
+                                            pushNewScreen(context,
+                                                screen: const AddHomeCourt(),
+                                                withNavBar: false);
+                                          },
+                                          child: SizedBox(
+                                            height: 2.3.h,
+                                            width: 4.47.w,
+                                            child: Image.asset(
+                                                "assets/images/Icon feather-map-pin.png"),
+                                          ),
+                                        )
+                                      ],
+                                    ),
+                                    verticalGap(1.3.h),
+                                    Container(
+                                      height: 1,
+                                      color: greyColor,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              SizedBox(
+                                height: 3.5.h,
+                              ),
+                              Stack(
+                                alignment: Alignment.topCenter,
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.only(
+                                        left: 30, right: 30, top: 30),
+                                    height: 200,
+                                    decoration: BoxDecoration(
+                                      color: whiteColor,
+                                      borderRadius: const BorderRadius.only(
+                                          topLeft: Radius.circular(10),
+                                          topRight: Radius.circular(10)),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.grey.withOpacity(0.2),
+                                          blurRadius: 1,
+                                          //   spreadRadius: -12,
+                                          offset: const Offset(0,
+                                              -3), // changes position of shadow
+                                        ),
+                                      ],
+                                    ),
+                                    child: Column(
+                                      children: [
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            poppinsText("About me", 14,
+                                                semiBold, blackColor),
+                                            InkWell(
+                                              onTap: () => setState(() {
+                                                tapped = !tapped;
+                                              }),
+                                              child: Padding(
+                                                padding: const EdgeInsets.only(
+                                                    left: 8),
+                                                child: SizedBox(
+                                                  height: 1.8.h,
+                                                  width: 4.w,
+                                                  child: Image.asset(
+                                                      "assets/images/Icon feather-edit-2.png"),
+                                                ),
+                                              ),
+                                            )
+                                          ],
+                                        ),
+                                        TextField(
+                                          maxLines: 5,
+                                          onChanged: (val) {
+                                            setState(() {
+                                              aboutMe = val;
+                                              FirebaseFirestore.instance
+                                                  .collection("USER")
+                                                  .doc(FirebaseAuth.instance
+                                                      .currentUser!.uid)
+                                                  .update(
+                                                      {"about me": aboutMe});
+                                            });
+                                          },
+                                          decoration: InputDecoration(
+                                              border: InputBorder.none,
+                                              enabled: tapped,
+                                              enabledBorder: InputBorder.none,
+                                              disabledBorder: InputBorder.none,
+                                              errorBorder: InputBorder.none,
+                                              focusedBorder: InputBorder.none,
+                                              focusedErrorBorder:
+                                                  InputBorder.none,
+                                              hintText: (users[0].about == "")
+                                                  ? "617 Real G’s move in silence like lasagna."
+                                                  : users[0].about,
+                                              helperStyle: GoogleFonts.poppins(
+                                                  fontSize: 14,
+                                                  fontWeight: regular,
+                                                  color:
+                                                      const Color(0xff777777))),
+                                        ),
+                                        verticalGap(15),
+                                        Container(
+                                          height: 1,
+                                          color: greyColor,
+                                        )
+                                      ],
+                                    ),
+                                  ),
+                                  Container(
+                                    width: 100,
+                                    color: greenColor,
+                                    height: 2,
+                                  ),
+                                ],
+                              )
+                            ],
+                          ),
+                        ],
+                      )
+                    : const Center(child: Text("Loading..."));
+              }),
         ),
       ),
     );

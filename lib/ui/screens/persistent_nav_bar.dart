@@ -2,6 +2,7 @@ import 'package:checkinmod/ui/screens/check_in.dart';
 import 'package:checkinmod/ui/screens/profile_screen.dart';
 import 'package:checkinmod/utils/colors.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 
@@ -10,34 +11,30 @@ import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
 import 'History.dart';
 import '../../controllers/nav_bar_controller.dart';
 
-
 class BottomNav {
   String icon;
   Color iconColor;
   Color boxColor;
 
-  BottomNav(
-      {required this.icon,
-      required this.iconColor,
-      required this.boxColor,
-      });
+  BottomNav({
+    required this.icon,
+    required this.iconColor,
+    required this.boxColor,
+  });
 
   getBottomNavItem() {
     return PersistentBottomNavBarItem(
       icon: Container(
         height: 36,
         width: 36,
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          color: boxColor
-        ),
+        decoration: BoxDecoration(shape: BoxShape.circle, color: boxColor),
         child: Center(
           child: SizedBox(
-            height: 19,width: 19,
+            height: 19,
+            width: 19,
             child: SvgPicture.asset(
               "assets/images/$icon.svg",
-               color: iconColor,
-
+              color: iconColor,
             ),
           ),
         ),
@@ -119,68 +116,72 @@ class _HomeState extends State<Home> {
   final NavBarController navBarController = Get.put(NavBarController());
 
   List<Widget> _buildScreens() {
-      return [
-          const CheckIn(),
-          const HistoryView(),
-          const ProfileScreen(),
-      ];
-    }
+    return [
+      const CheckIn(),
+      const HistoryView(),
+      const ProfileScreen(),
+    ];
+  }
 
   List<PersistentBottomNavBarItem> _navBarsItems() {
     return [
       BottomNav(
-        boxColor: navBarController.controller.index == 0 ? greenColor: whiteColor,
+        boxColor:
+            navBarController.controller.index == 0 ? greenColor : whiteColor,
         icon: "Group 12548",
-        iconColor: navBarController.controller.index == 0 ? whiteColor: blackColor,
+        iconColor:
+            navBarController.controller.index == 0 ? whiteColor : blackColor,
       ).getBottomNavItem(),
       BottomNav(
-        boxColor: navBarController.controller.index == 1 ? greenColor: whiteColor,
+        boxColor:
+            navBarController.controller.index == 1 ? greenColor : whiteColor,
         icon: "Icon awesome-history",
-        iconColor: navBarController.controller.index == 1 ? whiteColor: blackColor,
+        iconColor:
+            navBarController.controller.index == 1 ? whiteColor : blackColor,
       ).getBottomNavItem(),
       BottomNav(
-        boxColor: navBarController.controller.index == 2 ? greenColor: whiteColor,
+        boxColor:
+            navBarController.controller.index == 2 ? greenColor : whiteColor,
         icon: "Icon material-person",
-        iconColor: navBarController.controller.index == 2 ? whiteColor: blackColor,
+        iconColor:
+            navBarController.controller.index == 2 ? whiteColor : blackColor,
       ).getBottomNavItem(),
     ];
   }
 
-
   Future<bool> showExitPopup(BuildContext? context) async {
     return await showDialog(
-      context: context!,
-      builder: (context) => AlertDialog(
-        title: const Text('Exit App'),
-        content: const Text('Do you want to exit an App?'),
-        actions:[
-          ElevatedButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            //return false when click on "NO"
-            child:const Text('No'),
+          context: context!,
+          builder: (context) => AlertDialog(
+            title: const Text('Exit App'),
+            content: const Text('Do you want to exit an App?'),
+            actions: [
+              ElevatedButton(
+                onPressed: () => Navigator.of(context).pop(false),
+                //return false when click on "NO"
+                child: const Text('No'),
+              ),
+              ElevatedButton(
+                onPressed: () => SystemNavigator.pop(),
+                //return true when click on "Yes"
+                child: const Text('Yes'),
+              ),
+            ],
           ),
-
-          ElevatedButton(
-            onPressed: () => Navigator.of(context).pop(true),
-            //return true when click on "Yes"
-            child:const Text('Yes'),
-          ),
-        ],
-      ),
-    )??false; //if showDialouge had returned null, then return false
+        ) ??
+        false; //if showDialouge had returned null, then return false
   }
-
 
   @override
   Widget build(BuildContext context) {
-    return  PersistentTabView.custom(
+    return PersistentTabView.custom(
       context,
       controller: navBarController.controller,
       itemCount: _navBarsItems().length,
       // This is required in case of custom style! Pass the number of items for the nav bar.
       screens: _buildScreens(),
       navBarHeight: 60,
-      onWillPop:  (context) {
+      onWillPop: (context) {
         return showExitPopup(context);
       },
       hideNavigationBarWhenKeyboardShows: true,
@@ -199,13 +200,14 @@ class _HomeState extends State<Home> {
           onItemSelected: (index) {
             setState(() {
               navBarController.currentIndex.value = index;
-              navBarController.controller.index = index;// NOTE: THIS IS CRITICAL!! Don't miss it!
+              navBarController.controller.index =
+                  index; // NOTE: THIS IS CRITICAL!! Don't miss it!
             });
             print(navBarController.currentIndex.value);
             print(navBarController.controller.index);
           },
         ),
       ),
-      );
+    );
   }
 }

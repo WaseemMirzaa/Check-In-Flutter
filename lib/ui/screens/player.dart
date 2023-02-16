@@ -1,3 +1,4 @@
+import 'package:checkinmod/ui/screens/Players.dart';
 import 'package:checkinmod/utils/colors.dart';
 import 'package:checkinmod/utils/styles.dart';
 import 'package:flutter/material.dart';
@@ -7,7 +8,9 @@ import 'package:sizer/sizer.dart';
 import '../../utils/gaps.dart';
 
 class PlayerScreen extends StatefulWidget {
-  const PlayerScreen({Key? key}) : super(key: key);
+  final User user;
+
+  PlayerScreen({required this.user});
 
   @override
   State<PlayerScreen> createState() => _PlayerScreenState();
@@ -83,9 +86,9 @@ class _PlayerScreenState extends State<PlayerScreen> {
                     ),
                   ),
                   verticalGap(0.5.h),
-                  poppinsText("Benjamin", 32, FontWeight.bold, blackColor),
+                  poppinsText(widget.user.name, 32, FontWeight.bold, blackColor),
                   poppinsText(
-                      "@Alexhales", 12, FontWeight.normal, blackColor),
+                      "@${widget.user.email.substring(0, widget.user.email.indexOf('@'))}", 12, FontWeight.normal, blackColor),
                 ],
               ),
               Column(
@@ -99,7 +102,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            poppinsText("Morse Kelley Park - Somerville Ma", 14,
+                            poppinsText(widget.user.court == "" ? "Morse Kelley Park - Somerville Ma" : widget.user.court, 14,
                                 semiBold, blackColor),
                             SizedBox(
                               height: 2.3.h,
@@ -167,7 +170,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
                                   focusedBorder: InputBorder.none,
                                   focusedErrorBorder: InputBorder.none,
                                   hintText:
-                                      "617 Real G’s move in silence like lasagna.",
+                                       widget.user.about == "" ? "617 Real G’s move in silence like lasagna." : widget.user.about,
                                   helperStyle: GoogleFonts.poppins(
                                       fontSize: 14,
                                       fontWeight: regular,
