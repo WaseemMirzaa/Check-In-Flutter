@@ -15,6 +15,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:google_maps_webservice/places.dart';
@@ -31,6 +32,7 @@ class CheckIn extends StatefulWidget {
 
 class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
   int index = 0;
+  bool withinRadius = true;
 
   GlobalKey<ScaffoldState> _scaffoldState = GlobalKey<ScaffoldState>();
 
@@ -64,10 +66,10 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
   Future<Position> getCurrentLocation() async {
     Position position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high);
-    _checkIfWithinRadius(position);
     print(currentLocation?.longitude);
     setState(() {
       currentLocation = position;
+      withinRadius = _checkIfWithinRadius(position);
     });
     // GoogleMapController googleMapController = await _controller.future;
 
@@ -115,6 +117,13 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
       print("user not in radius");
       return false;
     }
+  }
+
+  void _buttonPress() {
+    changeIndex();
+    if (index == 1)
+      pushNewScreen(context, screen: const PlayersView(), withNavBar: false);
+    print(index);
   }
 
   // void _updateLocation() {
@@ -443,13 +452,18 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
                         ),
                       ],
                     ),
-                    // if (_checkIfWithinRadius())
                     fullWidthButton(index == 0 ? "CHECK IN" : "CHECK OUT", () {
-                      changeIndex();
-                      if (index == 1)
-                        pushNewScreen(context,
-                            screen: const PlayersView(), withNavBar: false);
-                      print(index);
+                      // changeIndex();
+                      // if (index == 1)
+                      //   pushNewScreen(context,
+                      //       screen: const PlayersView(), withNavBar: false);
+                      // print(index);
+                      withinRadius == true
+                          ? _buttonPress()
+                          : Get.snackbar("Error", "Reach court to checkin",
+                              backgroundColor: Colors.green,
+                              borderWidth: 5,
+                              borderColor: Colors.black);
                     }),
                   ],
                 ),
