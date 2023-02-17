@@ -63,13 +63,15 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
   final Completer<GoogleMapController> _controller = Completer();
   late GoogleMapController googleController;
 
+  Set<Marker> _markers = Set<Marker>.identity();
+
   Future<Position> getCurrentLocation() async {
     Position position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high);
     print(currentLocation?.longitude);
     setState(() {
       currentLocation = position;
-      withinRadius = _checkIfWithinRadius(position);
+      // withinRadius = _checkIfWithinRadius(position);
     });
     // GoogleMapController googleMapController = await _controller.future;
 
@@ -91,6 +93,46 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
     return Future.value(currentLocation);
   }
 
+  Future courtNames() async {
+    await FirebaseFirestore.instance
+        .collection('courtLocations')
+        .get()
+        .then((querySnapshot) {
+      querySnapshot.docs.forEach((doc) {
+        double latitude = doc.data()['latitude'];
+        double longitude = doc.data()['longitude'];
+        LatLng location = LatLng(latitude, longitude);
+        if (withinRadius == false) {
+          withinRadius =
+              _checkIfWithinRadius(currentLocation as Position, location);
+        }
+        print(withinRadius);
+        Marker marker = Marker(
+          markerId: MarkerId(doc.id),
+          position: location,
+          infoWindow: InfoWindow(title: doc.id),
+        );
+        _markers.add(marker);
+      });
+      if (currentLocation != null) {
+        Marker userMarker = Marker(
+          markerId: MarkerId("userLocation"),
+          position: LatLng(
+            currentLocation!.latitude,
+            currentLocation!.longitude,
+          ),
+          infoWindow: InfoWindow(title: "Your location"),
+          icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
+        );
+        _markers.add(userMarker);
+      }
+
+      setState(() {
+        _markers = _markers;
+      });
+    });
+  }
+
   Future<Position> goCurrentLoc() async {
     GoogleMapController googleMapController = await _controller.future;
 
@@ -107,9 +149,9 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
     return Future.value(currentLocation);
   }
 
-  bool _checkIfWithinRadius(Position p) {
+  bool _checkIfWithinRadius(Position user, LatLng court) {
     double distanceInMeters = Geolocator.distanceBetween(
-        p.latitude, p.longitude, court1.latitude, court1.longitude);
+        user.latitude, user.longitude, court.latitude, court.longitude);
     if (distanceInMeters <= 200) {
       print("user in radius");
       return true;
@@ -157,6 +199,7 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
   void initState() {
     // setCustomMarkerIcon();
     getCurrentLocation();
+    courtNames();
     // _checkIfWithinRadius();
     super.initState();
   }
@@ -258,24 +301,25 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
                               currentLocation!.longitude),
                           zoom: 16,
                         ),
-                        markers: {
-                          Marker(
-                            markerId: const MarkerId("current location"),
-                            icon: currentLocationIcon,
-                            position: LatLng(currentLocation!.latitude,
-                                currentLocation!.longitude),
-                          ),
-                          Marker(
-                            markerId: const MarkerId("source"),
-                            icon: sourceIcon,
-                            position: court1,
-                          ),
-                          Marker(
-                            markerId: const MarkerId("destination"),
-                            icon: destinationIcon,
-                            position: court2,
-                          ),
-                        },
+                        markers: _markers,
+                        // {
+                        //   Marker(
+                        //     markerId: const MarkerId("current location"),
+                        //     icon: currentLocationIcon,
+                        //     position: LatLng(currentLocation!.latitude,
+                        //         currentLocation!.longitude),
+                        //   ),
+                        //   Marker(
+                        //     markerId: const MarkerId("source"),
+                        //     icon: sourceIcon,
+                        //     position: court1,
+                        //   ),
+                        //   Marker(
+                        //     markerId: const MarkerId("destination"),
+                        //     icon: destinationIcon,
+                        //     position: court2,
+                        //   ),
+                        // },
                         onMapCreated: (mapController) {
                           googleController = mapController;
                           _controller.complete(mapController);
@@ -462,7 +506,7 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
                           ? _buttonPress()
                           : Get.snackbar("Error", "Reach court to checkin",
                               backgroundColor: Colors.green,
-                              borderWidth: 5,
+                              borderWidth: 4,
                               borderColor: Colors.black);
                     }),
                   ],
