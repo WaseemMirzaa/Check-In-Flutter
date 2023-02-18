@@ -31,6 +31,7 @@ Future<void> signUp(
                 "user name": auth.currentUser!.displayName,
                 "email": auth.currentUser!.email,
                 "uid": auth.currentUser!.uid,
+                "checkedIn": false,
               },
             )
                 // .then((value) async => await toModal(context))
@@ -67,8 +68,13 @@ Future<void> logout(context) async {
   // userController.userModel.value = UserModel();
   SharedPreferences prefs = await SharedPreferences.getInstance();
   prefs.remove('email');
-  auth.signOut().then((value) =>
-      pushNewScreen(context, screen: const StartView(), withNavBar: false));
+  auth.signOut().then(
+        (value) =>
+            // pushNewScreen(context, screen: const StartView(), withNavBar: false)
+            Navigator.of(context, rootNavigator: !false).pushReplacement(
+                getPageRoute(PageTransitionAnimation.cupertino,
+                    enterPage: StartView())),
+      );
 }
 
 Future<void> delAcc(context) async {
@@ -77,11 +83,14 @@ Future<void> delAcc(context) async {
       .doc(auth.currentUser!.uid)
       .delete()
       .then((value) => auth.currentUser!.delete().then((value) {
-            pushNewScreen(
-              context,
-              screen: const StartView(),
-              withNavBar: false,
-            );
+            // pushNewScreen(
+            //   context,
+            //   screen: const StartView(),
+            //   withNavBar: false,
+            // );
+            Navigator.of(context, rootNavigator: !false).pushReplacement(
+                getPageRoute(PageTransitionAnimation.cupertino,
+                    enterPage: StartView()));
           }));
 }
 

@@ -3,11 +3,13 @@ import 'package:checkinmod/utils/gaps.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
 import 'package:sizer/sizer.dart';
 
 class PlayersView extends StatefulWidget {
-  const PlayersView({super.key});
+  final LatLng courtLatLng;
+  PlayersView({required this.courtLatLng});
 
   @override
   State<PlayersView> createState() => _PlayersViewState();
@@ -19,16 +21,25 @@ class User {
   final String about;
   final String court;
 
-  User({required this.name, required this.email, required this.about, required this.court});
+  User(
+      {required this.name,
+      required this.email,
+      required this.about,
+      required this.court});
 }
 
 class UserService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-
+  final LatLng court;
+  UserService({required this.court});
   Stream<List<User>> get users {
     return _firestore.collection('USER').snapshots().map((snapshot) {
       return snapshot.docs
-          .where((d) => d.get("uid") != FirebaseAuth.instance.currentUser!.uid)
+          .where((d) =>
+              d.get("uid") != FirebaseAuth.instance.currentUser!.uid &&
+              d.get("checkedIn") == true &&
+              d.get("courtLat") == court.latitude &&
+              d.get("courtLng") == court.longitude)
           .map((doc) => User(
                 name: doc.data()['user name'],
                 email: doc.data()['email'],
@@ -233,7 +244,7 @@ class _PlayersViewState extends State<PlayersView> {
               //       }),
               // )
               StreamBuilder<List<User>>(
-                stream: UserService().users,
+                stream: UserService(court: widget.courtLatLng).users,
                 builder: (context, snapshot) {
                   if (!snapshot.hasData) {
                     return const Center(child: CircularProgressIndicator());
@@ -323,8 +334,9 @@ class _PlayersViewState extends State<PlayersView> {
                                                       ),
                                                     ),
                                                     TextSpan(
-                                                      text:
-                                                          user.court == "" ? ' Morse Kelley Park' : user.court,
+                                                      text: user.court == ""
+                                                          ? ' Morse Kelley Park'
+                                                          : user.court,
                                                       style: const TextStyle(
                                                         color:
                                                             Color(0xff9f9f9f),

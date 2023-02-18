@@ -19,6 +19,7 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:google_maps_webservice/places.dart';
+// import 'package:location/location.dart' ;
 import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'Players.dart';
@@ -32,7 +33,7 @@ class CheckIn extends StatefulWidget {
 
 class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
   int index = 0;
-  bool withinRadius = true;
+  bool withinRadius = false;
 
   GlobalKey<ScaffoldState> _scaffoldState = GlobalKey<ScaffoldState>();
 
@@ -40,14 +41,46 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
   BitmapDescriptor destinationIcon = BitmapDescriptor.defaultMarker;
   BitmapDescriptor currentLocationIcon = BitmapDescriptor.defaultMarker;
 
+  final auth = FirebaseAuth.instance;
+  final snap = FirebaseFirestore.instance;
+
+  DocumentReference docRef = FirebaseFirestore.instance
+      .collection('USER')
+      .doc(FirebaseAuth.instance.currentUser!.uid);
+
   static const LatLng court1 = LatLng(33.6296, 73.1123);
   static const LatLng court2 = LatLng(33.713335, 73.061926);
+  LatLng? loc;
+
+  dynamic data;
 
   TextEditingController typeAheadController = TextEditingController();
 
   final _places =
       GoogleMapsPlaces(apiKey: 'AIzaSyAWfUP79VGyEn-89MFapzNHNiYfT92zdBs');
   String _selectedPlace = '';
+
+  // indexValue() async {
+  //   final document = FirebaseFirestore.instance
+  //       .collection('USER')
+  //       .doc(FirebaseAuth.instance.currentUser!.uid);
+  //   document.get().then((DocumentSnapshot snapshot) {
+  //     if (snapshot.exists) {
+  //       data = snapshot.data();
+  //       print("${data['checkedIn']}Siuuu");
+  //     } else {
+  //       print('Document does not exist!');
+  //     }
+  //   });
+  //   if (data == false){setState(() {
+  //     index = 0;
+  //   });}
+      
+  //   else if (data == true) setState(() {
+  //     index = 1;
+  //   });
+  //   print(index);
+  // }
 
   changeIndex() {
     if (index == 0) {
@@ -68,10 +101,10 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
   Future<Position> getCurrentLocation() async {
     Position position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high);
+    courtNames();
     print(currentLocation?.longitude);
     setState(() {
       currentLocation = position;
-      // withinRadius = _checkIfWithinRadius(position);
     });
     // GoogleMapController googleMapController = await _controller.future;
 
@@ -94,10 +127,7 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
   }
 
   Future courtNames() async {
-    await FirebaseFirestore.instance
-        .collection('courtLocations')
-        .get()
-        .then((querySnapshot) {
+    await snap.collection('courtLocations').get().then((querySnapshot) {
       querySnapshot.docs.forEach((doc) {
         double latitude = doc.data()['latitude'];
         double longitude = doc.data()['longitude'];
@@ -105,12 +135,18 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
         if (withinRadius == false) {
           withinRadius =
               _checkIfWithinRadius(currentLocation as Position, location);
+          if (withinRadius == true) loc = location;
+          print(loc!.latitude);
         }
         print(withinRadius);
         Marker marker = Marker(
           markerId: MarkerId(doc.id),
           position: location,
           infoWindow: InfoWindow(title: doc.id),
+          onTap: () {
+            pushNewScreen(context,
+                screen: PlayersView(courtLatLng: location), withNavBar: false);
+          },
         );
         _markers.add(marker);
       });
@@ -163,9 +199,24 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
 
   void _buttonPress() {
     changeIndex();
-    if (index == 1)
-      pushNewScreen(context, screen: const PlayersView(), withNavBar: false);
-    print(index);
+    if (index == 1) {
+      snap.collection("USER").doc(auth.currentUser!.uid).update({
+        "checkedIn": true,
+        "courtLat": loc!.latitude,
+        "courtLng": loc!.longitude,
+      });
+
+      print(index);
+      // print(withinRadius);
+
+    } else if (index == 0) {
+      snap.collection("USER").doc(auth.currentUser!.uid).update({
+        "checkedIn": false,
+        "courtLat": FieldValue.delete(),
+        "courtLng": FieldValue.delete(),
+      });
+    
+    }
   }
 
   // void _updateLocation() {
@@ -199,7 +250,7 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
   void initState() {
     // setCustomMarkerIcon();
     getCurrentLocation();
-    courtNames();
+    // indexValue();
     // _checkIfWithinRadius();
     super.initState();
   }
@@ -287,10 +338,6 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
               height: MediaQuery.of(context).size.height,
               width: MediaQuery.of(context).size.width,
               child: GestureDetector(
-                onTap: () {
-                  pushNewScreen(context,
-                      screen: const PlayersView(), withNavBar: false);
-                },
                 child: currentLocation == null
                     ? const Center(child: Text("Loading..."))
                     : GoogleMap(
@@ -405,22 +452,43 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
                                   ),
                                 ),
                               ),
+                              // suggestionsCallback: (pattern) async {
+                              //   return await _places
+                              //       .autocomplete(pattern)
+                              //       .then((response) {
+                              //     return response.predictions;
+                              //   });
+                              // },
+                              // itemBuilder: (context, prediction) {
+                              //   return ListTile(
+                              //     title: Text(prediction.description as String),
+                              //   );
+                              // },
                               suggestionsCallback: (pattern) async {
-                                return await _places
-                                    .autocomplete(pattern)
-                                    .then((response) {
-                                  return response.predictions;
-                                });
+                                if (currentLocation == null) {
+                                  return [];
+                                }
+                                final placesResponse =
+                                    await _places.searchNearbyWithRadius(
+                                  Location(
+                                      lat: currentLocation!.latitude,
+                                      lng: currentLocation!.longitude),
+                                  5000, // Search radius in meters
+                                  type: 'establishment',
+                                  keyword: pattern,
+                                );
+
+                                return placesResponse.results;
                               },
                               itemBuilder: (context, prediction) {
                                 return ListTile(
-                                  title: Text(prediction.description as String),
+                                  title: Text(prediction.name),
+                                  subtitle: Text(prediction.vicinity),
                                 );
                               },
                               onSuggestionSelected: (prediction) async {
                                 setState(() {
-                                  _selectedPlace =
-                                      prediction.description as String;
+                                  _selectedPlace = prediction.name as String;
                                 });
                                 typeAheadController.text = _selectedPlace;
 
@@ -437,7 +505,7 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
                                   CameraUpdate.newCameraPosition(
                                     CameraPosition(
                                       target: LatLng(lat, lng),
-                                      zoom: 15.0,
+                                      zoom: 18.0,
                                     ),
                                   ),
                                 );
