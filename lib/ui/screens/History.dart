@@ -1,4 +1,6 @@
 import 'package:checkinmod/utils/gaps.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
 
@@ -7,6 +9,20 @@ class HistoryView extends StatefulWidget {
 
   @override
   State<HistoryView> createState() => _HistoryViewState();
+}
+
+List<dynamic> dataArray = [];
+
+Future<List<dynamic>> fetchData() async {
+  final documentSnapshot = await FirebaseFirestore.instance
+      .collection("USER")
+      .doc(FirebaseAuth.instance.currentUser!.uid)
+      .get();
+
+  dataArray =
+      List.from(documentSnapshot.data()!["checkedCourts"] as List<dynamic>);
+  print(dataArray);
+  return dataArray;
 }
 
 class _HistoryViewState extends State<HistoryView> {
@@ -19,8 +35,19 @@ class _HistoryViewState extends State<HistoryView> {
   ];
 
   List<String> courts = [
-    "Boston ","Philadelphia","Chicago","Manhattan","Los Angeles"
+    "Boston ",
+    "Philadelphia",
+    "Chicago",
+    "Manhattan",
+    "Los Angeles"
   ];
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    fetchData();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +55,7 @@ class _HistoryViewState extends State<HistoryView> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         centerTitle: true,
-        title: Text(
+        title: const Text(
           'History',
           style: TextStyle(
             fontFamily: 'Poppins',
@@ -45,7 +72,7 @@ class _HistoryViewState extends State<HistoryView> {
       body: Padding(
         padding: const EdgeInsets.only(top: 20),
         child: ListView.builder(
-            itemCount: courts.length,
+            itemCount: dataArray.length,
             itemBuilder: (context, int index) {
               return Column(
                 children: [

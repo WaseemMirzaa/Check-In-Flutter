@@ -52,7 +52,9 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
   static const LatLng court2 = LatLng(33.713335, 73.061926);
   LatLng? loc;
 
-  dynamic data;
+  var courtN;
+
+  Map<String, dynamic> courtInfo = {};
 
   TextEditingController typeAheadController = TextEditingController();
 
@@ -75,7 +77,7 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
   //   if (data == false){setState(() {
   //     index = 0;
   //   });}
-      
+
   //   else if (data == true) setState(() {
   //     index = 1;
   //   });
@@ -135,7 +137,11 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
         if (withinRadius == false) {
           withinRadius =
               _checkIfWithinRadius(currentLocation as Position, location);
-          if (withinRadius == true) loc = location;
+          if (withinRadius == true) {
+            loc = location;
+            courtN = doc.id;
+            courtInfo.addAll({"courtLat" : loc!.latitude,"courtLng": loc!.longitude,"courtName": courtN});
+          }
           print(loc!.latitude);
         }
         print(withinRadius);
@@ -211,11 +217,11 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
 
     } else if (index == 0) {
       snap.collection("USER").doc(auth.currentUser!.uid).update({
+        "checkedCourts": FieldValue.arrayUnion([courtInfo]),
         "checkedIn": false,
         "courtLat": FieldValue.delete(),
         "courtLng": FieldValue.delete(),
       });
-    
     }
   }
 
@@ -343,6 +349,8 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
                     : GoogleMap(
                         mapToolbarEnabled: false,
                         zoomControlsEnabled: false,
+                        compassEnabled: false,
+                        // tileOverlays: ,
                         initialCameraPosition: CameraPosition(
                           target: LatLng(currentLocation!.latitude,
                               currentLocation!.longitude),
