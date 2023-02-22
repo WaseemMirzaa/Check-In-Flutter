@@ -11,22 +11,23 @@ class HistoryView extends StatefulWidget {
   State<HistoryView> createState() => _HistoryViewState();
 }
 
-List<dynamic> dataArray = [];
-
-Future<List<dynamic>> fetchData() async {
-  final documentSnapshot = await FirebaseFirestore.instance
-      .collection("USER")
-      .doc(FirebaseAuth.instance.currentUser!.uid)
-      .get();
-
-  dataArray =
-      List.from(documentSnapshot.data()!["checkedCourts"] as List<dynamic>);
-  print(dataArray);
-  return dataArray;
-}
-
 class _HistoryViewState extends State<HistoryView> {
   var courtsList = [
+    'pexels-king-siberia-2277981',
+    'pexels-ricardo-esquivel-1607855',
+    'pexels-daniel-absi-680074',
+    'pexels-tom-jackson-2891884',
+    'pexels-tom-jackson-2891884',
+    'pexels-king-siberia-2277981',
+    'pexels-ricardo-esquivel-1607855',
+    'pexels-daniel-absi-680074',
+    'pexels-tom-jackson-2891884',
+    'pexels-tom-jackson-2891884',
+    'pexels-king-siberia-2277981',
+    'pexels-ricardo-esquivel-1607855',
+    'pexels-daniel-absi-680074',
+    'pexels-tom-jackson-2891884',
+    'pexels-tom-jackson-2891884',
     'pexels-king-siberia-2277981',
     'pexels-ricardo-esquivel-1607855',
     'pexels-daniel-absi-680074',
@@ -41,6 +42,24 @@ class _HistoryViewState extends State<HistoryView> {
     "Manhattan",
     "Los Angeles"
   ];
+
+  
+List<dynamic> dataArray = [];
+
+Future<List<dynamic>> fetchData() async {
+  final documentSnapshot = await FirebaseFirestore.instance
+      .collection("USER")
+      .doc(FirebaseAuth.instance.currentUser!.uid)
+      .get();
+      
+  dataArray =
+      List.from(documentSnapshot.data()!["checkedCourts"] as List<dynamic>);
+  print(dataArray);
+  print(dataArray.length);
+  setState(() {});
+  return dataArray;
+}
+
 
   @override
   void initState() {
@@ -110,7 +129,7 @@ class _HistoryViewState extends State<HistoryView> {
                             ),
                           ),
                           Text.rich(TextSpan(
-                              text: '${courts[index]}\n',
+                              text: '${dataArray[index]["courtName"]}\n',
                               style: TextStyle(
                                 fontFamily: 'Poppins',
                                 fontSize: 1.6.h,
@@ -133,7 +152,7 @@ class _HistoryViewState extends State<HistoryView> {
                                       ),
                                     ),
                                     TextSpan(
-                                      text: ' Boston\n',
+                                      text: ' ${dataArray[index]["courtName"]}\n',
                                       style: TextStyle(
                                         color: const Color(0xff9f9f9f),
                                         fontWeight: FontWeight.w500,
@@ -146,7 +165,7 @@ class _HistoryViewState extends State<HistoryView> {
                                       ),
                                     ),
                                     TextSpan(
-                                      text: ' 00:00 ',
+                                      text: ' ${dataArray[index]["checkInTime"]} ',
                                       style: TextStyle(
                                         color: const Color(0xff9f9f9f),
                                         fontWeight: FontWeight.w500,

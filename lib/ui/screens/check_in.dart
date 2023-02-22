@@ -23,6 +23,7 @@ import 'package:google_maps_webservice/places.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'Players.dart';
+import 'package:intl/intl.dart';
 
 class CheckIn extends StatefulWidget {
   const CheckIn({Key? key}) : super(key: key);
@@ -32,7 +33,7 @@ class CheckIn extends StatefulWidget {
 }
 
 class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
-  int index = 0;
+  int? index;
   bool withinRadius = false;
 
   GlobalKey<ScaffoldState> _scaffoldState = GlobalKey<ScaffoldState>();
@@ -53,6 +54,7 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
   LatLng? loc;
 
   var courtN;
+  var data;
 
   Map<String, dynamic> courtInfo = {};
 
@@ -62,27 +64,29 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
       GoogleMapsPlaces(apiKey: 'AIzaSyAWfUP79VGyEn-89MFapzNHNiYfT92zdBs');
   String _selectedPlace = '';
 
-  // indexValue() async {
-  //   final document = FirebaseFirestore.instance
-  //       .collection('USER')
-  //       .doc(FirebaseAuth.instance.currentUser!.uid);
-  //   document.get().then((DocumentSnapshot snapshot) {
-  //     if (snapshot.exists) {
-  //       data = snapshot.data();
-  //       print("${data['checkedIn']}Siuuu");
-  //     } else {
-  //       print('Document does not exist!');
-  //     }
-  //   });
-  //   if (data == false){setState(() {
-  //     index = 0;
-  //   });}
-
-  //   else if (data == true) setState(() {
-  //     index = 1;
-  //   });
-  //   print(index);
-  // }
+  indexValue() async {
+    final document = FirebaseFirestore.instance
+        .collection('USER')
+        .doc(FirebaseAuth.instance.currentUser!.uid);
+    document.get().then((DocumentSnapshot snapshot) {
+      if (snapshot.exists) {
+        dynamic pata = snapshot.data();
+        data = pata['checkedIn'];
+        print("${pata['checkedIn']}Siuuu");
+      } else {
+        print('Document does not exist!');
+      }
+    });
+    if (data == false) {
+      setState(() {
+        index = 0;
+      });
+    } else if (data == true)
+      setState(() {
+        index = 1;
+      });
+    print(index);
+  }
 
   changeIndex() {
     if (index == 0) {
@@ -140,7 +144,11 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
           if (withinRadius == true) {
             loc = location;
             courtN = doc.id;
-            courtInfo.addAll({"courtLat" : loc!.latitude,"courtLng": loc!.longitude,"courtName": courtN});
+            courtInfo.addAll({
+              "courtLat": loc!.latitude,
+              "courtLng": loc!.longitude,
+              "courtName": courtN,
+            });
           }
           print(loc!.latitude);
         }
@@ -206,7 +214,12 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
   void _buttonPress() {
     changeIndex();
     if (index == 1) {
+      setState(() {
+        courtInfo['checkInTime'] =
+            DateFormat('HH:mm:ss').format(DateTime.now());
+      });
       snap.collection("USER").doc(auth.currentUser!.uid).update({
+        "checkedCourts": FieldValue.arrayUnion([courtInfo]),
         "checkedIn": true,
         "courtLat": loc!.latitude,
         "courtLng": loc!.longitude,
@@ -217,7 +230,6 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
 
     } else if (index == 0) {
       snap.collection("USER").doc(auth.currentUser!.uid).update({
-        "checkedCourts": FieldValue.arrayUnion([courtInfo]),
         "checkedIn": false,
         "courtLat": FieldValue.delete(),
         "courtLng": FieldValue.delete(),
@@ -256,7 +268,7 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
   void initState() {
     // setCustomMarkerIcon();
     getCurrentLocation();
-    // indexValue();
+    indexValue();
     // _checkIfWithinRadius();
     super.initState();
   }
