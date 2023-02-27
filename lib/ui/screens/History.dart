@@ -43,23 +43,21 @@ class _HistoryViewState extends State<HistoryView> {
     "Los Angeles"
   ];
 
-  
-List<dynamic> dataArray = [];
+  List<dynamic> dataArray = [];
 
-Future<List<dynamic>> fetchData() async {
-  final documentSnapshot = await FirebaseFirestore.instance
-      .collection("USER")
-      .doc(FirebaseAuth.instance.currentUser!.uid)
-      .get();
-      
-  dataArray =
-      List.from(documentSnapshot.data()!["checkedCourts"] as List<dynamic>);
-  print(dataArray);
-  print(dataArray.length);
-  setState(() {});
-  return dataArray;
-}
+  Future<List<dynamic>> fetchData() async {
+    final documentSnapshot = await FirebaseFirestore.instance
+        .collection("USER")
+        .doc(FirebaseAuth.instance.currentUser!.uid)
+        .get();
 
+    dataArray =
+        List.from(documentSnapshot.data()!["checkedCourts"] as List<dynamic>);
+    print(dataArray);
+    print(dataArray.length);
+    setState(() {});
+    return dataArray;
+  }
 
   @override
   void initState() {
@@ -152,7 +150,8 @@ Future<List<dynamic>> fetchData() async {
                                       ),
                                     ),
                                     TextSpan(
-                                      text: ' ${dataArray[index]["courtName"]}\n',
+                                      text:
+                                          ' ${dataArray[index]["courtName"]}\n',
                                       style: TextStyle(
                                         color: const Color(0xff9f9f9f),
                                         fontWeight: FontWeight.w500,
@@ -165,7 +164,8 @@ Future<List<dynamic>> fetchData() async {
                                       ),
                                     ),
                                     TextSpan(
-                                      text: ' ${dataArray[index]["checkInTime"]} ',
+                                      text:
+                                          ' ${dataArray[index]["checkInTime"]} ',
                                       style: TextStyle(
                                         color: const Color(0xff9f9f9f),
                                         fontWeight: FontWeight.w500,

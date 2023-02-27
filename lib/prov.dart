@@ -7,7 +7,7 @@ import 'package:get/get.dart';
 
 class GetxMaps with ChangeNotifier {
   late LatLng _gpsactual;
-  LatLng _initialposition = LatLng(0, 0);
+  LatLng _initialposition = LatLng(33.713335, 73.061926);
   bool activegps = true;
   TextEditingController locationController = TextEditingController();
   late GoogleMapController _mapController;
@@ -18,11 +18,18 @@ class GetxMaps with ChangeNotifier {
   GoogleMapController get mapController => _mapController;
 
   void getMoveCamera() async {
-    List<Placemark> placemark = await placemarkFromCoordinates(
-        _initialposition.latitude, _initialposition.longitude,
-        localeIdentifier: "en_US");
+  List<Placemark> placemark = await placemarkFromCoordinates(
+    _initialposition.latitude,
+    _initialposition.longitude,
+    localeIdentifier: "en_US"
+  );
+
+  if (placemark.isNotEmpty) {
     locationController.text = placemark[0].name!;
+  } else {
+    locationController.text = "Unknown location";
   }
+}
 
   void getUserLocation() async {
     if (!(await Geolocator.isLocationServiceEnabled())) {

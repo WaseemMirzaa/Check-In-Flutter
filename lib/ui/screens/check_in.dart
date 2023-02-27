@@ -13,10 +13,12 @@ import 'package:checkinmod/utils/styles.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+// import 'package:flutter_heat_map/flutter_heat_map.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+// import 'package:google_maps_flutter_heatmap/google_maps_flutter_heatmap.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:google_maps_webservice/places.dart';
 // import 'package:location/location.dart' ;
@@ -54,7 +56,7 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
   LatLng? loc;
 
   var courtN;
-  var data;
+  bool? data;
 
   Map<String, dynamic> courtInfo = {};
 
@@ -64,7 +66,7 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
       GoogleMapsPlaces(apiKey: 'AIzaSyAWfUP79VGyEn-89MFapzNHNiYfT92zdBs');
   String _selectedPlace = '';
 
-  indexValue() async {
+  Future indexValue() async {
     final document = FirebaseFirestore.instance
         .collection('USER')
         .doc(FirebaseAuth.instance.currentUser!.uid);
@@ -73,19 +75,18 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
         dynamic pata = snapshot.data();
         data = pata['checkedIn'];
         print("${pata['checkedIn']}Siuuu");
+        print(data);
+        if (data == false) {
+          index = 0;
+        } else if (data == true) {
+          index = 1;
+        }
+        setState(() {});
+        print("${index} is index");
       } else {
         print('Document does not exist!');
       }
     });
-    if (data == false) {
-      setState(() {
-        index = 0;
-      });
-    } else if (data == true)
-      setState(() {
-        index = 1;
-      });
-    print(index);
   }
 
   changeIndex() {
@@ -133,6 +134,42 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
   }
 
   Future courtNames() async {
+
+     await snap.collection('goldenLocations').get().then((querySnapshot) {
+      querySnapshot.docs.forEach((doc) {
+        double latitude = doc.data()['latitude'];
+        double longitude = doc.data()['longitude'];
+        LatLng location = LatLng(latitude, longitude);
+        if (withinRadius == false) {
+          withinRadius =
+              _checkIfWithinRadius(currentLocation as Position, location);
+          if (withinRadius == true) {
+            loc = location;
+            courtN = doc.id;
+            courtInfo.addAll({
+              "courtLat": loc!.latitude,
+              "courtLng": loc!.longitude,
+              "courtName": courtN,
+            });
+          }
+          print(loc!.latitude);
+        }
+        print(withinRadius);
+        Marker marker = Marker(
+          markerId: MarkerId(doc.id),
+          position: location,
+          infoWindow: InfoWindow(title: doc.id),
+          icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueYellow),
+          onTap: () {
+            pushNewScreen(context,
+                screen: PlayersView(courtLatLng: location), withNavBar: false);
+          },
+        );
+        _markers.add(marker);
+      });
+      
+    });
+    
     await snap.collection('courtLocations').get().then((querySnapshot) {
       querySnapshot.docs.forEach((doc) {
         double latitude = doc.data()['latitude'];
@@ -157,6 +194,7 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
           markerId: MarkerId(doc.id),
           position: location,
           infoWindow: InfoWindow(title: doc.id),
+          
           onTap: () {
             pushNewScreen(context,
                 screen: PlayersView(courtLatLng: location), withNavBar: false);
@@ -493,8 +531,9 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
                                   Location(
                                       lat: currentLocation!.latitude,
                                       lng: currentLocation!.longitude),
-                                  5000, // Search radius in meters
-                                  type: 'establishment',
+                                  50000, // Search radius in meters
+                                  type: 'court',
+                                  name: 'ball court',
                                   keyword: pattern,
                                 );
 

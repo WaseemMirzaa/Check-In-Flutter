@@ -1,14 +1,17 @@
+import 'dart:io';
+
 import 'package:checkinmod/controllers/user_controller.dart';
-import 'package:checkinmod/main.dart';
 import 'package:checkinmod/modal/user_modal.dart';
 import 'package:checkinmod/ui/screens/add_home_court.dart';
 import 'package:checkinmod/utils/colors.dart';
 import 'package:checkinmod/utils/styles.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
 import 'package:sizer/sizer.dart';
 import '../../utils/gaps.dart';
@@ -25,12 +28,14 @@ class User {
   final String email;
   final String about;
   final String court;
+   final String pic;
 
   User(
       {required this.name,
       required this.email,
       required this.about,
-      required this.court});
+      required this.court,
+      required this.pic});
 }
 
 class UserService {
@@ -44,7 +49,8 @@ class UserService {
               name: doc.data()['user name'],
               email: doc.data()['email'],
               about: doc.data()['about me'] ?? "",
-              court: doc.data()['home court'] ?? ""))
+              court: doc.data()['home court'] ?? "",
+              pic: doc.data()['photoUrl'] ?? "",))
           .toList();
     });
   }
@@ -63,6 +69,32 @@ class _ProfileScreenState extends State<ProfileScreen> {
         UserModel.fromMap(snapshot.data() as Map<String, dynamic>);
     userd = currentUser;
     setState(() {});
+  }
+
+   File? _imageFile;
+  String? _downloadUrl;
+
+  Future<void> _selectImage() async {
+    final pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
+      setState(() {
+        _imageFile = File(pickedFile.path);
+      });
+
+      final storage = FirebaseStorage.instance;
+      final ref = storage.ref().child('profile/${DateTime.now().millisecondsSinceEpoch}');
+      final uploadTask = ref.putFile(_imageFile!);
+      final snapshot = await uploadTask.whenComplete(() {});
+      final downloadUrl = await snapshot.ref.getDownloadURL();
+
+      setState(() {
+        _downloadUrl = downloadUrl;
+      });
+
+      final firestore = FirebaseFirestore.instance;
+      final userId = FirebaseAuth.instance.currentUser!.uid;
+      await firestore.collection('USER').doc(userId).update({'photoUrl': downloadUrl});
+    }
   }
 
   String mail = FirebaseAuth.instance.currentUser?.email as String;
@@ -114,15 +146,31 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   //  clipBehavior: Clip.antiAliasWithSaveLayer,
                                   alignment: Alignment.bottomCenter,
                                   children: [
-                                    Container(
-                                      height: 15.h,
-                                      width: 32.9.w,
-                                      decoration: const BoxDecoration(
-                                          color: Colors.red,
-                                          shape: BoxShape.circle,
-                                          image: DecorationImage(
-                                              image: AssetImage(
-                                                  "assets/images/Mask Group 1.png"))),
+                                    GestureDetector(
+                                      onTap: _selectImage,
+                                      child: Container(
+                                        height: 15.h,
+                                        width: 32.9.w,
+                                        decoration: BoxDecoration(
+                                            color: Colors.red,
+                                            shape: BoxShape.circle,
+                                            image: (_downloadUrl != null) ?
+                                             DecorationImage(
+                                              fit: BoxFit.fill,
+                                                image: 
+                                                // AssetImage(
+                                                //     "assets/images/Mask Group 1.png")
+                                                NetworkImage(_downloadUrl as String)
+                                                    ): DecorationImage(
+                                              fit: BoxFit.fill,
+                                                image: 
+                                                // AssetImage(
+                                                //     "assets/images/Mask Group 1.png")
+                                                NetworkImage(users[0].pic)
+                                                    )
+                                            
+                                                    ) 
+                                      ),
                                     ),
                                     Align(
                                       alignment: Alignment.bottomRight,
