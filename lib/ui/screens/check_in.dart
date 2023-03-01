@@ -134,42 +134,41 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
   }
 
   Future courtNames() async {
+    //  await snap.collection('goldenLocations').get().then((querySnapshot) {
+    //   querySnapshot.docs.forEach((doc) {
+    //     double latitude = doc.data()['latitude'];
+    //     double longitude = doc.data()['longitude'];
+    //     LatLng location = LatLng(latitude, longitude);
+    //     if (withinRadius == false) {
+    //       withinRadius =
+    //           _checkIfWithinRadius(currentLocation as Position, location);
+    //       if (withinRadius == true) {
+    //         loc = location;
+    //         courtN = doc.id;
+    //         courtInfo.addAll({
+    //           "courtLat": loc!.latitude,
+    //           "courtLng": loc!.longitude,
+    //           "courtName": courtN,
+    //         });
+    //       }
+    //       print(loc!.latitude);
+    //     }
+    //     print(withinRadius);
+    //     Marker marker = Marker(
+    //       markerId: MarkerId(doc.id),
+    //       position: location,
+    //       infoWindow: InfoWindow(title: doc.id),
+    //       icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueYellow),
+    //       onTap: () {
+    //         pushNewScreen(context,
+    //             screen: PlayersView(courtLatLng: location), withNavBar: false);
+    //       },
+    //     );
+    //     _markers.add(marker);
+    //   });
 
-     await snap.collection('goldenLocations').get().then((querySnapshot) {
-      querySnapshot.docs.forEach((doc) {
-        double latitude = doc.data()['latitude'];
-        double longitude = doc.data()['longitude'];
-        LatLng location = LatLng(latitude, longitude);
-        if (withinRadius == false) {
-          withinRadius =
-              _checkIfWithinRadius(currentLocation as Position, location);
-          if (withinRadius == true) {
-            loc = location;
-            courtN = doc.id;
-            courtInfo.addAll({
-              "courtLat": loc!.latitude,
-              "courtLng": loc!.longitude,
-              "courtName": courtN,
-            });
-          }
-          print(loc!.latitude);
-        }
-        print(withinRadius);
-        Marker marker = Marker(
-          markerId: MarkerId(doc.id),
-          position: location,
-          infoWindow: InfoWindow(title: doc.id),
-          icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueYellow),
-          onTap: () {
-            pushNewScreen(context,
-                screen: PlayersView(courtLatLng: location), withNavBar: false);
-          },
-        );
-        _markers.add(marker);
-      });
-      
-    });
-    
+    // });
+
     await snap.collection('courtLocations').get().then((querySnapshot) {
       querySnapshot.docs.forEach((doc) {
         double latitude = doc.data()['latitude'];
@@ -194,7 +193,6 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
           markerId: MarkerId(doc.id),
           position: location,
           infoWindow: InfoWindow(title: doc.id),
-          
           onTap: () {
             pushNewScreen(context,
                 screen: PlayersView(courtLatLng: location), withNavBar: false);
@@ -202,6 +200,7 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
         );
         _markers.add(marker);
       });
+
       if (currentLocation != null) {
         Marker userMarker = Marker(
           markerId: MarkerId("userLocation"),
@@ -218,6 +217,26 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
       setState(() {
         _markers = _markers;
       });
+    });
+    await snap.collection('goldenLocations').get().then((querySnapshot) {
+      querySnapshot.docs.forEach((doc) {
+        double latitude = doc.data()['latitude'];
+        double longitude = doc.data()['longitude'];
+        LatLng location = LatLng(latitude, longitude);
+        Marker marker = Marker(
+          markerId: MarkerId(doc.id),
+          position: location,
+          infoWindow: InfoWindow(title: doc.id),
+          icon:
+              BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueYellow),
+          onTap: () {
+            pushNewScreen(context,
+                screen: PlayersView(courtLatLng: location), withNavBar: false);
+          },
+        );
+        _markers.add(marker);
+      });
+      setState(() {});
     });
   }
 
@@ -240,7 +259,7 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
   bool _checkIfWithinRadius(Position user, LatLng court) {
     double distanceInMeters = Geolocator.distanceBetween(
         user.latitude, user.longitude, court.latitude, court.longitude);
-    if (distanceInMeters <= 200) {
+    if (distanceInMeters <= 100) {
       print("user in radius");
       return true;
     } else {

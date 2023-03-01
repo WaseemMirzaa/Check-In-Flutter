@@ -28,7 +28,7 @@ class User {
   final String email;
   final String about;
   final String court;
-   final String pic;
+  final String pic;
 
   User(
       {required this.name,
@@ -46,11 +46,12 @@ class UserService {
       return snapshot.docs
           .where((d) => d.get("uid") == FirebaseAuth.instance.currentUser!.uid)
           .map((doc) => User(
-              name: doc.data()['user name'],
-              email: doc.data()['email'],
-              about: doc.data()['about me'] ?? "",
-              court: doc.data()['home court'] ?? "",
-              pic: doc.data()['photoUrl'] ?? "",))
+                name: doc.data()['user name'],
+                email: doc.data()['email'],
+                about: doc.data()['about me'] ?? "",
+                court: doc.data()['home court'] ?? "",
+                pic: doc.data()['photoUrl'] ?? "",
+              ))
           .toList();
     });
   }
@@ -71,18 +72,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
     setState(() {});
   }
 
-   File? _imageFile;
+  File? _imageFile;
   String? _downloadUrl;
 
   Future<void> _selectImage() async {
-    final pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery);
+    final pickedFile =
+        await ImagePicker().pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
       setState(() {
         _imageFile = File(pickedFile.path);
       });
 
       final storage = FirebaseStorage.instance;
-      final ref = storage.ref().child('profile/${DateTime.now().millisecondsSinceEpoch}');
+      final ref = storage
+          .ref()
+          .child('profile/${DateTime.now().millisecondsSinceEpoch}');
       final uploadTask = ref.putFile(_imageFile!);
       final snapshot = await uploadTask.whenComplete(() {});
       final downloadUrl = await snapshot.ref.getDownloadURL();
@@ -93,7 +97,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
       final firestore = FirebaseFirestore.instance;
       final userId = FirebaseAuth.instance.currentUser!.uid;
-      await firestore.collection('USER').doc(userId).update({'photoUrl': downloadUrl});
+      await firestore
+          .collection('USER')
+          .doc(userId)
+          .update({'photoUrl': downloadUrl});
     }
   }
 
@@ -130,7 +137,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   return const Center(child: CircularProgressIndicator());
                 }
                 final users = snapshot.data;
-
                 return (users!.isNotEmpty && users != null)
                     ? Column(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -154,22 +160,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                         decoration: BoxDecoration(
                                             color: Colors.red,
                                             shape: BoxShape.circle,
-                                            image: (_downloadUrl != null) ?
-                                             DecorationImage(
-                                              fit: BoxFit.fill,
-                                                image: 
-                                                // AssetImage(
-                                                //     "assets/images/Mask Group 1.png")
-                                                NetworkImage(_downloadUrl as String)
-                                                    ): DecorationImage(
-                                              fit: BoxFit.fill,
-                                                image: 
-                                                // AssetImage(
-                                                //     "assets/images/Mask Group 1.png")
-                                                NetworkImage(users[0].pic)
-                                                    )
-                                            
-                                                    ) 
+                                            image: (_downloadUrl != null)
+                                                ? DecorationImage(
+                                                    fit: BoxFit.fill,
+                                                    image:
+                                                        // AssetImage(
+                                                        //     "assets/images/Mask Group 1.png")
+                                                        NetworkImage(
+                                                            _downloadUrl
+                                                                as String))
+                                                : DecorationImage(
+                                                    fit: BoxFit.fill,
+                                                    image:
+                                                        // AssetImage(
+                                                        //     "assets/images/Mask Group 1.png")
+                                                        NetworkImage(
+                                                            users[0].pic))),
+                                                            child: Center(child: Image.asset('assets/images/user_icon.png',scale: 5),),
                                       ),
                                     ),
                                     Align(
