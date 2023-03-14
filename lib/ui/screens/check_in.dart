@@ -203,12 +203,12 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
 
       if (currentLocation != null) {
         Marker userMarker = Marker(
-          markerId: MarkerId("userLocation"),
+          markerId: const MarkerId("userLocation"),
           position: LatLng(
             currentLocation!.latitude,
             currentLocation!.longitude,
           ),
-          infoWindow: InfoWindow(title: "Your location"),
+          infoWindow: const InfoWindow(title: "Your location"),
           icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
         );
         _markers.add(userMarker);
@@ -284,7 +284,6 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
 
       print(index);
       // print(withinRadius);
-
     } else if (index == 0) {
       snap.collection("USER").doc(auth.currentUser!.uid).update({
         "checkedIn": false,
@@ -489,155 +488,115 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
                           borderRadius: BorderRadius.circular(10),
                           elevation: 2,
                           shadowColor: Colors.grey,
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(10),
-                            child: TypeAheadField(
-                              textFieldConfiguration: TextFieldConfiguration(
-                                controller: this.typeAheadController,
-                                decoration: InputDecoration(
-                                  contentPadding:
-                                      const EdgeInsets.only(left: 20, top: 15),
-                                  filled: true,
-                                  border: InputBorder.none,
-                                  disabledBorder: InputBorder.none,
-                                  enabledBorder: InputBorder.none,
-                                  errorBorder: InputBorder.none,
-                                  focusedBorder: InputBorder.none,
-                                  focusedErrorBorder: InputBorder.none,
-                                  fillColor: Colors.white,
-                                  hintText: "Find Courts Near You",
-                                  hintStyle: GoogleFonts.poppins(
-                                      fontSize: 12,
-                                      fontWeight: medium,
-                                      color: greyColor),
-                                  suffixIcon: Row(
-                                    mainAxisAlignment: MainAxisAlignment.end,
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      SizedBox(
-                                        height: 17,
-                                        width: 17,
-                                        child: Image.asset(
-                                          "assets/images/Icon ionic-ios-search.png",
-                                          fit: BoxFit.fill,
+                          child: SingleChildScrollView(
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(10),
+                              child: TypeAheadField(
+                                textFieldConfiguration: TextFieldConfiguration(
+                                  controller: typeAheadController,
+                                  decoration: InputDecoration(
+                                    contentPadding: const EdgeInsets.only(
+                                      left: 20,
+                                      top: 15,
+                                    ),
+                                    filled: true,
+                                    border: InputBorder.none,
+                                    disabledBorder: InputBorder.none,
+                                    enabledBorder: InputBorder.none,
+                                    errorBorder: InputBorder.none,
+                                    focusedBorder: InputBorder.none,
+                                    focusedErrorBorder: InputBorder.none,
+                                    fillColor: Colors.white,
+                                    hintText: "Find Courts Near You",
+                                    hintStyle: GoogleFonts.poppins(
+                                        fontSize: 12,
+                                        fontWeight: medium,
+                                        color: greyColor),
+                                    suffixIcon: Row(
+                                      mainAxisAlignment: MainAxisAlignment.end,
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        SizedBox(
+                                          height: 17,
+                                          width: 17,
+                                          child: Image.asset(
+                                            "assets/images/Icon ionic-ios-search.png",
+                                            fit: BoxFit.fill,
+                                          ),
                                         ),
-                                      ),
-                                      const SizedBox(
-                                        width: 20,
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                              // suggestionsCallback: (pattern) async {
-                              //   return await _places
-                              //       .autocomplete(pattern)
-                              //       .then((response) {
-                              //     return response.predictions;
-                              //   });
-                              // },
-                              // itemBuilder: (context, prediction) {
-                              //   return ListTile(
-                              //     title: Text(prediction.description as String),
-                              //   );
-                              // },
-                              suggestionsCallback: (pattern) async {
-                                if (currentLocation == null) {
-                                  return [];
-                                }
-                                final placesResponse =
-                                    await _places.searchNearbyWithRadius(
-                                  Location(
-                                      lat: currentLocation!.latitude,
-                                      lng: currentLocation!.longitude),
-                                  50000, // Search radius in meters
-                                  type: 'court',
-                                  name: 'ball court',
-                                  keyword: pattern,
-                                );
-
-                                return placesResponse.results;
-                              },
-                              itemBuilder: (context, prediction) {
-                                return ListTile(
-                                  title: Text(prediction.name),
-                                  subtitle: Text(prediction.vicinity),
-                                );
-                              },
-                              onSuggestionSelected: (prediction) async {
-                                setState(() {
-                                  _selectedPlace = prediction.name as String;
-                                });
-                                typeAheadController.text = _selectedPlace;
-
-                                var placeId = prediction.placeId;
-                                var detail = await _places
-                                    .getDetailsByPlaceId(placeId as String);
-                                var location = detail.result.geometry!.location;
-                                var lat = location.lat;
-                                var lng = location.lng;
-
-                                final GoogleMapController controller =
-                                    await _controller.future;
-                                controller.animateCamera(
-                                  CameraUpdate.newCameraPosition(
-                                    CameraPosition(
-                                      target: LatLng(lat, lng),
-                                      zoom: 18.0,
+                                        const SizedBox(
+                                          width: 20,
+                                        ),
+                                      ],
                                     ),
                                   ),
-                                );
-                              },
-                              transitionBuilder:
-                                  (context, suggestionsBox, controller) {
-                                return suggestionsBox;
-                              },
-                            ),
+                                ),
+                                // suggestionsCallback: (pattern) async {
+                                //   return await _places
+                                //       .autocomplete(pattern)
+                                //       .then((response) {
+                                //     return response.predictions;
+                                //   });
+                                // },
+                                // itemBuilder: (context, prediction) {
+                                //   return ListTile(
+                                //     title: Text(prediction.description as String),
+                                //   );
+                                // },
+                                suggestionsCallback: (pattern) async {
+                                  if (currentLocation == null) {
+                                    return [];
+                                  }
+                                  final placesResponse =
+                                      await _places.searchNearbyWithRadius(
+                                    Location(
+                                        lat: currentLocation!.latitude,
+                                        lng: currentLocation!.longitude),
+                                    50000, // Search radius in meters
+                                    type: 'court',
+                                    name: 'ball court',
+                                    keyword: pattern,
+                                  );
 
-                            // TextField(
-                            //             onChanged: (value) {
-                            //   if (value.isNotEmpty) {
-                            //     _places.autocomplete(value).then((response) {
-                            //       print(response.predictions);
-                            //       // Use the `response.predictions` list to show autocomplete suggestions in your textfield
-                            //     });
-                            //   }
-                            // },
-                            //             decoration: InputDecoration(
-                            //               contentPadding:
-                            //                   const EdgeInsets.only(left: 20, top: 15),
-                            //               filled: true,
-                            //               border: InputBorder.none,
-                            //               disabledBorder: InputBorder.none,
-                            //               enabledBorder: InputBorder.none,
-                            //               errorBorder: InputBorder.none,
-                            //               focusedBorder: InputBorder.none,
-                            //               focusedErrorBorder: InputBorder.none,
-                            //               fillColor: Colors.white,
-                            //               hintText: "Find Courts Near You",
-                            //               hintStyle: GoogleFonts.poppins(
-                            //                   fontSize: 12,
-                            //                   fontWeight: medium,
-                            //                   color: greyColor),
-                            //               suffixIcon: Row(
-                            //                 mainAxisAlignment: MainAxisAlignment.end,
-                            //                 mainAxisSize: MainAxisSize.min,
-                            //                 children: [
-                            //                   SizedBox(
-                            //                     height: 17,
-                            //                     width: 17,
-                            //                     child: Image.asset(
-                            //                       "assets/images/Icon ionic-ios-search.png",
-                            //                       fit: BoxFit.fill,
-                            //                     ),
-                            //                   ),
-                            //                   const SizedBox(
-                            //                     width: 20,
-                            //                   ),
-                            //                 ],
-                            //               ),
-                            //             ),
-                            //           ),
+                                  return placesResponse.results;
+                                },
+                                itemBuilder: (context, prediction) {
+                                  return ListTile(
+                                    title: Text(prediction.name),
+                                    subtitle: Text(prediction.vicinity),
+                                  );
+                                },
+                                onSuggestionSelected: (prediction) async {
+                                  setState(() {
+                                    _selectedPlace = prediction.name as String;
+                                  });
+                                  typeAheadController.text = _selectedPlace;
+
+                                  var placeId = prediction.placeId;
+                                  var detail = await _places
+                                      .getDetailsByPlaceId(placeId as String);
+                                  var location =
+                                      detail.result.geometry!.location;
+                                  var lat = location.lat;
+                                  var lng = location.lng;
+
+                                  final GoogleMapController controller =
+                                      await _controller.future;
+                                  controller.animateCamera(
+                                    CameraUpdate.newCameraPosition(
+                                      CameraPosition(
+                                        target: LatLng(lat, lng),
+                                        zoom: 18.0,
+                                      ),
+                                    ),
+                                  );
+                                },
+                                transitionBuilder:
+                                    (context, suggestionsBox, controller) {
+                                  return suggestionsBox;
+                                },
+                              ),
+                            ),
                           ),
                         ),
                       ],

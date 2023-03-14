@@ -176,7 +176,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                         //     "assets/images/Mask Group 1.png")
                                                         NetworkImage(
                                                             users[0].pic))),
-                                                            child: Center(child: Image.asset('assets/images/user_icon.png',scale: 5),),
+                                        child: Center(
+                                          child: Image.asset(
+                                              'assets/images/Icon material-person.png',
+                                              scale: 1.5,
+                                              color: Colors.grey[850]!.withOpacity(0.5),
+                                              ),
+                                        ),
                                       ),
                                     ),
                                     Align(
