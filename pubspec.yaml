@@ -40,6 +40,7 @@ dependencies:
   sizer:
   persistent_bottom_nav_bar_v2:
   get:
+  webview_flutter: ^2.8.0
   http: any
   geolocator: ^7.1.0
   geocoding: ^2.0.0
