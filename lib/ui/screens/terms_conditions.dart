@@ -25,7 +25,7 @@ class _TermsAndConditionsState extends State<TermsAndConditions> {
       appBar: AppBar(
         leading: Row(
           children: [
-            SizedBox(
+            const SizedBox(
               width: 30,
             ),
             GestureDetector(
@@ -60,7 +60,7 @@ class _TermsAndConditionsState extends State<TermsAndConditions> {
               color: Colors.grey.withOpacity(0.2),
               blurRadius: 5,
               //   spreadRadius: -12,
-              offset: Offset(0, -3), // changes position of shadow
+              offset: Offset(0, -3),
             ),
           ],
         ),
