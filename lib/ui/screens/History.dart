@@ -51,11 +51,20 @@ class _HistoryViewState extends State<HistoryView> {
         .doc(FirebaseAuth.instance.currentUser!.uid)
         .get();
 
-    dataArray =
-        List.from(documentSnapshot.data()!["checkedCourts"] as List<dynamic>);
+    final checkedCourtsData = documentSnapshot.data()?["checkedCourts"];
+
+    if (checkedCourtsData != null && checkedCourtsData is List<dynamic>) {
+      dataArray = List.from(checkedCourtsData);
+    } else {
+      dataArray = [];
+    }
+
     print(dataArray);
     print(dataArray.length);
-    setState(() {});
+
+    setState(
+        () {}); // Assuming this method is inside a StatefulWidget, call setState to update the state
+
     return dataArray;
   }
 

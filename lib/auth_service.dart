@@ -7,6 +7,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:nb_utils/nb_utils.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -65,7 +66,6 @@ Future<void> login(email, password, context) async {
 }
 
 Future<void> logout(context) async {
-  // userController.userModel.value = UserModel();
   SharedPreferences prefs = await SharedPreferences.getInstance();
   prefs.remove('email');
   auth.signOut().then(
@@ -78,20 +78,84 @@ Future<void> logout(context) async {
 }
 
 Future<void> delAcc(context) async {
-  snap
-      .collection("USER")
-      .doc(auth.currentUser!.uid)
-      .delete()
-      .then((value) => auth.currentUser!.delete().then((value) {
-            // pushNewScreen(
-            //   context,
-            //   screen: const StartView(),
-            //   withNavBar: false,
-            // );
-            Navigator.of(context, rootNavigator: !false).pushReplacement(
-                getPageRoute(PageTransitionAnimation.cupertino,
-                    enterPage: StartView()));
-          }));
+  TextEditingController pass = TextEditingController();
+  return showDialog(
+    context: context,
+    builder: (BuildContext context) => AlertDialog(
+      title: Text('Confirmation'),
+      content: Text(
+          'Are you sure you want to delete you account?\nThese changes are irreversible'),
+      actions: <Widget>[
+        OutlinedButton(
+          child: Text('Cancel'),
+          onPressed: () {
+            Navigator.of(context).pop(false);
+          },
+        ),
+        OutlinedButton(
+          child: Text('Proceed'),
+          onPressed: () {
+            showDialog(
+                context: context,
+                barrierDismissible: false,
+                builder: (context) => AlertDialog(
+                      title: Text('Enter Password'),
+                      content: TextFormField(
+                        controller: pass,
+                        obscureText: true,
+                      ),
+                      actions: [
+                        OutlinedButton(
+                          child: Text('Cancel'),
+                          onPressed: () {
+                            Navigator.of(context).pop(false);
+                          },
+                        ),
+                        OutlinedButton(
+                          child: Text('Delete Account'),
+                          onPressed: () async {
+                            User? user = FirebaseAuth.instance.currentUser;
+                            AuthCredential credential =
+                                EmailAuthProvider.credential(
+                              email: user!.email ?? "",
+                              password: pass.text,
+                            );
+
+                            try {
+                              await user
+                                  .reauthenticateWithCredential(credential);
+                              snap
+                                  .collection("USER")
+                                  .doc(auth.currentUser!.uid)
+                                  .delete()
+                                  .then((value) => user.delete().then((value) {
+                                        Navigator.of(context,
+                                                rootNavigator: !false)
+                                            .pushReplacement(getPageRoute(
+                                                PageTransitionAnimation
+                                                    .cupertino,
+                                                enterPage: StartView()));
+                                      }));
+                              print('Account deleted successfully.');
+                            } on FirebaseAuthException catch (e) {
+                              if (e.code == 'wrong-password') {
+                                print('Invalid password. Please try again.');
+                                toast('Invalid password. Please try again.');
+                              } else {
+                                print('Error deleting account: ${e.message}');
+                              }
+                            } catch (e) {
+                              print('Error deleting account: $e');
+                            }
+                          },
+                        ),
+                      ],
+                    ));
+          },
+        ),
+      ],
+    ),
+  );
 }
 
 toModal(BuildContext context) async {

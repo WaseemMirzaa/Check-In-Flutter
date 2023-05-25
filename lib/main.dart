@@ -15,8 +15,8 @@ String? con;
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  SharedPreferences prefs = await SharedPreferences.getInstance();
-  var email = prefs.getString('email');
+  // SharedPreferences prefs = await SharedPreferences.getInstance();
+  // var email = prefs.getString('email');
   runApp(const MyApp());
 }
 
