@@ -66,6 +66,7 @@ Future<void> login(email, password, context) async {
 }
 
 Future<void> logout(context) async {
+  // userController.userModel.value = UserModel();
   SharedPreferences prefs = await SharedPreferences.getInstance();
   prefs.remove('email');
   auth.signOut().then(
@@ -115,6 +116,8 @@ Future<void> delAcc(context) async {
                           child: Text('Delete Account'),
                           onPressed: () async {
                             User? user = FirebaseAuth.instance.currentUser;
+
+                            // Prompt the user to reauthenticate
                             AuthCredential credential =
                                 EmailAuthProvider.credential(
                               email: user!.email ?? "",
@@ -124,18 +127,12 @@ Future<void> delAcc(context) async {
                             try {
                               await user
                                   .reauthenticateWithCredential(credential);
-                              snap
-                                  .collection("USER")
-                                  .doc(auth.currentUser!.uid)
-                                  .delete()
-                                  .then((value) => user.delete().then((value) {
-                                        Navigator.of(context,
-                                                rootNavigator: !false)
-                                            .pushReplacement(getPageRoute(
-                                                PageTransitionAnimation
-                                                    .cupertino,
-                                                enterPage: StartView()));
-                                      }));
+                              await user.delete().then((value) {
+                                Navigator.of(context, rootNavigator: !false)
+                                    .pushReplacement(getPageRoute(
+                                        PageTransitionAnimation.cupertino,
+                                        enterPage: StartView()));
+                              });
                               print('Account deleted successfully.');
                             } on FirebaseAuthException catch (e) {
                               if (e.code == 'wrong-password') {
@@ -151,6 +148,22 @@ Future<void> delAcc(context) async {
                         ),
                       ],
                     ));
+
+            // snap
+            //     .collection("USER")
+            //     .doc(auth.currentUser!.uid)
+            //     .delete()
+            //     .then((value) => auth.currentUser!.delete().then((value) {
+            //           // pushNewScreen(
+            //           //   context,
+            //           //   screen: const StartView(),
+            //           //   withNavBar: false,
+            //           // );
+            //           Navigator.of(context, rootNavigator: !false)
+            //               .pushReplacement(getPageRoute(
+            //                   PageTransitionAnimation.cupertino,
+            //                   enterPage: StartView()));
+            //         }));
           },
         ),
       ],
