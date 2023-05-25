@@ -77,6 +77,7 @@ class _HistoryViewState extends State<HistoryView> {
 
   @override
   Widget build(BuildContext context) {
+    fetchData();
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
