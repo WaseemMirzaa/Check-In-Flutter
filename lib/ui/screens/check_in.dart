@@ -169,55 +169,55 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
 
     // });
 
-    await snap.collection('courtLocations').get().then((querySnapshot) {
-      querySnapshot.docs.forEach((doc) {
-        double latitude = doc.data()['latitude'];
-        double longitude = doc.data()['longitude'];
-        LatLng location = LatLng(latitude, longitude);
-        if (withinRadius == false) {
-          withinRadius =
-              _checkIfWithinRadius(currentLocation as Position, location);
-          if (withinRadius == true) {
-            loc = location;
-            courtN = doc.id;
-            courtInfo.addAll({
-              "courtLat": loc!.latitude,
-              "courtLng": loc!.longitude,
-              "courtName": courtN,
-            });
-          }
-          print(loc!.latitude);
-        }
-        print(withinRadius);
-        Marker marker = Marker(
-          markerId: MarkerId(doc.id),
-          position: location,
-          infoWindow: InfoWindow(title: doc.id),
-          onTap: () {
-            pushNewScreen(context,
-                screen: PlayersView(courtLatLng: location), withNavBar: false);
-          },
-        );
-        _markers.add(marker);
-      });
+    // await snap.collection('courtLocations').get().then((querySnapshot) {
+    //   querySnapshot.docs.forEach((doc) {
+    //     double latitude = doc.data()['latitude'];
+    //     double longitude = doc.data()['longitude'];
+    //     LatLng location = LatLng(latitude, longitude);
+    //     if (withinRadius == false) {
+    //       withinRadius =
+    //           _checkIfWithinRadius(currentLocation as Position, location);
+    //       if (withinRadius == true) {
+    //         loc = location;
+    //         courtN = doc.id;
+    //         courtInfo.addAll({
+    //           "courtLat": loc!.latitude,
+    //           "courtLng": loc!.longitude,
+    //           "courtName": courtN,
+    //         });
+    //       }
+    //       print(loc!.latitude);
+    //     }
+    //     print(withinRadius);
+    //     Marker marker = Marker(
+    //       markerId: MarkerId(doc.id),
+    //       position: location,
+    //       infoWindow: InfoWindow(title: doc.id),
+    //       onTap: () {
+    //         pushNewScreen(context,
+    //             screen: PlayersView(courtLatLng: location), withNavBar: false);
+    //       },
+    //     );
+    //     _markers.add(marker);
+    //   });
 
-      if (currentLocation != null) {
-        Marker userMarker = Marker(
-          markerId: const MarkerId("userLocation"),
-          position: LatLng(
-            currentLocation!.latitude,
-            currentLocation!.longitude,
-          ),
-          infoWindow: const InfoWindow(title: "Your location"),
-          icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
-        );
-        _markers.add(userMarker);
-      }
+    //   if (currentLocation != null) {
+    //     Marker userMarker = Marker(
+    //       markerId: const MarkerId("userLocation"),
+    //       position: LatLng(
+    //         currentLocation!.latitude,
+    //         currentLocation!.longitude,
+    //       ),
+    //       infoWindow: const InfoWindow(title: "Your location"),
+    //       icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
+    //     );
+    //     _markers.add(userMarker);
+    //   }
 
-      setState(() {
-        _markers = _markers;
-      });
-    });
+    //   setState(() {
+    //     _markers = _markers;
+    //   });
+    // });
     await snap.collection('goldenLocations').get().then((querySnapshot) {
       querySnapshot.docs.forEach((doc) {
         double latitude = doc.data()['latitude'];
@@ -237,6 +237,75 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
         _markers.add(marker);
       });
       setState(() {});
+    });
+
+    if (currentLocation != null) {
+      Marker userMarker = Marker(
+        markerId: const MarkerId("userLocation"),
+        position: LatLng(
+          currentLocation!.latitude,
+          currentLocation!.longitude,
+        ),
+        infoWindow: const InfoWindow(title: "Your location"),
+        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
+      );
+      _markers.add(userMarker);
+    }
+
+    setState(() {
+      _markers = _markers;
+    });
+
+    final placesResponse = await _places.searchNearbyWithRadius(
+      Location(
+        lat: currentLocation!.latitude,
+        lng: currentLocation!.longitude,
+      ),
+      100000,
+      type: 'court',
+      name: 'ball court',
+    );
+
+    placesResponse.results.forEach((place) {
+      LatLng location = LatLng(
+        place.geometry!.location.lat,
+        place.geometry!.location.lng,
+      );
+
+      // Check if the marker is within the radius
+      bool withinRadius = _checkIfWithinRadius(currentLocation!, location);
+
+      if (withinRadius) {
+        loc = location;
+        courtN = place.name;
+        courtInfo.addAll({
+          "courtLat": loc!.latitude,
+          "courtLng": loc!.longitude,
+          "courtName": courtN,
+        });
+      }
+
+      print(withinRadius);
+      Marker marker = Marker(
+        markerId: MarkerId(place.placeId),
+        position: location,
+        infoWindow: InfoWindow(
+          title: place.name,
+          snippet: place.vicinity,
+        ),
+        onTap: () {
+          pushNewScreen(
+            context,
+            screen: PlayersView(courtLatLng: location),
+            withNavBar: false,
+          );
+        },
+      );
+      _markers.add(marker);
+    });
+
+    setState(() {
+      _markers = _markers;
     });
   }
 
