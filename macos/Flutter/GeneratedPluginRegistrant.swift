@@ -14,7 +14,7 @@ import geolocator_apple
 import location
 import nb_utils
 import package_info_plus
-import path_provider_macos
+import path_provider_foundation
 import shared_preferences_foundation
 
 func RegisterGeneratedPlugins(registry: FlutterPluginRegistry) {
