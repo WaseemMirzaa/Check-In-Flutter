@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'dart:io';
+import 'dart:math';
 import 'package:checkinmod/auth_service.dart';
 import 'package:checkinmod/modal/user_modal.dart';
 import 'package:checkinmod/search_location.dart';
@@ -13,19 +15,23 @@ import 'package:checkinmod/utils/styles.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+
 // import 'package:flutter_heat_map/flutter_heat_map.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+
 // import 'package:google_maps_flutter_heatmap/google_maps_flutter_heatmap.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:google_maps_webservice/places.dart';
+
 // import 'package:location/location.dart' ;
 import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'Players.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter/foundation.dart';
 
 class CheckIn extends StatefulWidget {
   const CheckIn({Key? key}) : super(key: key);
@@ -37,6 +43,10 @@ class CheckIn extends StatefulWidget {
 class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
   int? index;
   bool withinRadius = false;
+  double ZOOM_LEVEL_INITIAL = 12;
+  RxInt heatMapRadius = 45.obs;
+  int _previousZoomLevel = 12;
+  double heatmapZoomFactor = 2.5;
 
   GlobalKey<ScaffoldState> _scaffoldState = GlobalKey<ScaffoldState>();
 
@@ -65,6 +75,65 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
   final _places =
       GoogleMapsPlaces(apiKey: 'AIzaSyAWfUP79VGyEn-89MFapzNHNiYfT92zdBs');
   String _selectedPlace = '';
+
+  List<WeightedLatLng> enabledPoints = <WeightedLatLng>[
+    const WeightedLatLng(LatLng(37.782, -122.447), weight: 0),
+    // const WeightedLatLng(LatLng(37.782, -122.445), weight: 0.5),
+    // const WeightedLatLng(LatLng(37.782, -122.443)),
+    // const WeightedLatLng(LatLng(37.782, -122.441)),
+    // const WeightedLatLng(LatLng(37.782, -122.439)),
+    // const WeightedLatLng(LatLng(37.782, -122.437)),
+    // const WeightedLatLng(LatLng(37.782, -122.435)),
+    // const WeightedLatLng(LatLng(37.785, -122.447)),
+    // const WeightedLatLng(LatLng(37.785, -122.445)),
+    // const WeightedLatLng(LatLng(37.785, -122.443)),
+    // const WeightedLatLng(LatLng(37.785, -122.441)),
+    // const WeightedLatLng(LatLng(37.785, -122.439)),
+    // const WeightedLatLng(LatLng(37.785, -122.437)),
+    // const WeightedLatLng(LatLng(37.785, -122.435))
+  ];
+
+  List<WeightedLatLng> disabledPoints = <WeightedLatLng>[];
+
+  void _addHeatedPoint(Marker marker) {
+    int intensityLevel_1 = 0;
+    int intensityLevel_2 = 10;
+    int intensityLevel_3 = 30;
+    int intensityLevel_4 = 100;
+
+    int playersGathering = Random().nextInt(100);
+
+    double intensity = playersGathering * 0.01;
+
+    WeightedLatLng point = WeightedLatLng(marker.position, weight: intensity);
+
+    setState(() => enabledPoints.add(point));
+  }
+
+  void _removePoint() {
+    if (enabledPoints.isEmpty) {
+      return;
+    }
+
+    final WeightedLatLng point = enabledPoints.first;
+    enabledPoints.removeAt(0);
+
+    setState(() => disabledPoints.add(point));
+  }
+
+  void setHeatMapSize(int zoomLevel) {
+    heatmapZoomFactor = heatmapZoomFactor + (zoomLevel - _previousZoomLevel);
+    heatMapRadius.value = (zoomLevel * (heatmapZoomFactor)).toInt();
+    if (heatMapRadius.value < 50) {
+      heatMapRadius.value = 50;
+    }
+
+    setState(() {
+
+    });
+
+  }
+
 
   Future indexValue() async {
     final document = FirebaseFirestore.instance
@@ -101,7 +170,7 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
 
   Position? currentLocation;
   final Completer<GoogleMapController> _controller = Completer();
-  late GoogleMapController googleController;
+  GoogleMapController? _mapController = null;
 
   Set<Marker> _markers = Set<Marker>.identity();
 
@@ -218,6 +287,8 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
     //     _markers = _markers;
     //   });
     // });
+
+    // ADDING GOLDEN COURTS MARKER
     await snap.collection('goldenLocations').get().then((querySnapshot) {
       querySnapshot.docs.forEach((doc) {
         double latitude = doc.data()['latitude'];
@@ -239,6 +310,7 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
       setState(() {});
     });
 
+    // ADDING MY LOCATION MARKER
     if (currentLocation != null) {
       Marker userMarker = Marker(
         markerId: const MarkerId("userLocation"),
@@ -256,12 +328,13 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
       _markers = _markers;
     });
 
+    // ADDING PLACCES API COURTS LOCATION MARKER
     final placesResponse = await _places.searchNearbyWithRadius(
       Location(
         lat: currentLocation!.latitude,
         lng: currentLocation!.longitude,
       ),
-      100000,
+      40000,
       type: 'court',
       name: 'ball court',
     );
@@ -302,11 +375,16 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
         },
       );
       _markers.add(marker);
+      addHeatedMarkers(marker);
     });
 
     setState(() {
       _markers = _markers;
     });
+  }
+
+  void addHeatedMarkers(Marker marker) {
+    _addHeatedPoint(marker);
   }
 
   Future<Position> goCurrentLoc() async {
@@ -315,7 +393,7 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
     googleMapController.animateCamera(
       CameraUpdate.newCameraPosition(
         CameraPosition(
-          zoom: 16,
+          zoom: ZOOM_LEVEL_INITIAL,
           target: LatLng(currentLocation!.latitude, currentLocation!.longitude),
         ),
       ),
@@ -388,6 +466,15 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
   //   );
   //   setState(() {});
   // }
+
+  double getCurrentZoomLevel() {
+    if (_mapController != null) {
+      _mapController!.getZoomLevel().then((double zoomLevel) {
+        return zoomLevel;
+      });
+    }
+    return ZOOM_LEVEL_INITIAL;
+  }
 
   @override
   void initState() {
@@ -483,40 +570,79 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
               child: GestureDetector(
                 child: currentLocation == null
                     ? const Center(child: Text("Loading..."))
-                    : GoogleMap(
+                    : Obx(() => (
+                    GoogleMap(
                         mapToolbarEnabled: false,
-                        zoomControlsEnabled: false,
-                        compassEnabled: false,
+                        zoomControlsEnabled: true,
+                        zoomGesturesEnabled: true,
+                        myLocationButtonEnabled: true,
+                        myLocationEnabled: true,
+
                         // tileOverlays: ,
                         initialCameraPosition: CameraPosition(
                           target: LatLng(currentLocation!.latitude,
                               currentLocation!.longitude),
-                          zoom: 16,
+                          zoom: ZOOM_LEVEL_INITIAL,
                         ),
                         markers: _markers,
-                        // {
-                        //   Marker(
-                        //     markerId: const MarkerId("current location"),
-                        //     icon: currentLocationIcon,
-                        //     position: LatLng(currentLocation!.latitude,
-                        //         currentLocation!.longitude),
-                        //   ),
-                        //   Marker(
-                        //     markerId: const MarkerId("source"),
-                        //     icon: sourceIcon,
-                        //     position: court1,
-                        //   ),
-                        //   Marker(
-                        //     markerId: const MarkerId("destination"),
-                        //     icon: destinationIcon,
-                        //     position: court2,
-                        //   ),
-                        // },
                         onMapCreated: (mapController) {
-                          googleController = mapController;
+                          _mapController = mapController;
                           _controller.complete(mapController);
                         },
-                      ),
+                        onCameraMove: (CameraPosition position) {
+                          int currentZoomLevel = position.zoom.toInt();
+                          if (_previousZoomLevel != null && currentZoomLevel != _previousZoomLevel) {
+                            // Zoom level changed
+                            setHeatMapSize(currentZoomLevel);
+                            print('Zoom level changed: $_previousZoomLevel -> $currentZoomLevel');
+                          }
+                          _previousZoomLevel = currentZoomLevel;
+                        },
+                        heatmaps: <Heatmap>{
+                            Heatmap(
+                              heatmapId: const HeatmapId('test'),
+                              data: enabledPoints,
+                              gradient: HeatmapGradient(
+                                const <HeatmapGradientColor>[
+                                  // Web needs a first color with 0 alpha
+                                  // if (kIsWeb)
+                                  //   HeatmapGradientColor(
+                                  //     Color.fromARGB(0, 0, 255, 255),
+                                  //     0,
+                                  //   ),
+                                  HeatmapGradientColor(
+                                    Colors.yellow,
+                                    0.2,
+                                  ),
+                                  HeatmapGradientColor(
+                                    Colors.red,
+                                    0.6,
+                                  ),
+                                  // HeatmapGradientColor(
+                                  //   Colors.green,
+                                  //   0.6,
+                                  // ),
+                                  // HeatmapGradientColor(
+                                  //   Colors.purple,
+                                  //   0.8,
+                                  // ),
+                                  HeatmapGradientColor(
+                                    Colors.blue,
+                                    1,
+                                  ),
+                                ],
+                              ),
+                              maxIntensity: 1,
+                              // Radius behaves differently on web and Android/iOS.
+                              // For Android: According to documentation, radius should be between 10 to 50
+                              radius: kIsWeb
+                                  ? 10
+                                  : defaultTargetPlatform ==
+                                          TargetPlatform.android
+                                      ? heatMapRadius.value
+                                      : heatMapRadius.value,
+                            )
+                          }))),
               ),
             ),
             Positioned(
@@ -678,7 +804,7 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
                       // print(index);
                       withinRadius == true
                           ? _buttonPress()
-                          : Get.snackbar("Error", "Reach court to checkin",
+                          : Get.snackbar("Alert", "You are not at a court.",
                               backgroundColor: Colors.green,
                               borderWidth: 4,
                               borderColor: Colors.black);
@@ -688,7 +814,7 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
               ),
             ),
             Positioned(
-              bottom: 100,
+              bottom: 150,
               right: 20,
               child: FloatingActionButton(
                 onPressed: () {
@@ -706,4 +832,5 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
       ),
     );
   }
+
 }
