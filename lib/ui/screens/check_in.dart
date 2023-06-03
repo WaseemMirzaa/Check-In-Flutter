@@ -175,6 +175,8 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
           },
         );
         _markers.add(marker);
+        addHeatedMarkers(marker);
+
       });
       setState(() {});
     });
@@ -260,6 +262,7 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
       );
       _markers.add(marker);
       addHeatedMarkers(marker);
+
     });
 
     setState(() {
@@ -307,7 +310,7 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
     googleMapController.animateCamera(
       CameraUpdate.newCameraPosition(
         CameraPosition(
-          zoom: ZOOM_LEVEL_INITIAL,
+          zoom: 16,
           target: LatLng(currentLocation!.latitude, currentLocation!.longitude),
         ),
       ),
