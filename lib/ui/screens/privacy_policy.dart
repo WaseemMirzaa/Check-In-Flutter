@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:checkinmod/ui/screens/persistent_nav_bar.dart';
+import 'package:check_in/ui/screens/persistent_nav_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
 import 'package:sizer/sizer.dart';

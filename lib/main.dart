@@ -1,7 +1,9 @@
-import 'package:checkinmod/ui/screens/login.dart';
-import 'package:checkinmod/ui/screens/persistent_nav_bar.dart';
-import 'package:checkinmod/ui/screens/start.dart';
-import 'package:checkinmod/utils/colors.dart';
+import 'dart:io';
+
+import 'package:check_in/ui/screens/login.dart';
+import 'package:check_in/ui/screens/persistent_nav_bar.dart';
+import 'package:check_in/ui/screens/start.dart';
+import 'package:check_in/utils/colors.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -10,11 +12,20 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sizer/sizer.dart';
 
 import 'ui/screens/History.dart';
+import 'firebase_options.dart';
 
 String? con;
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
+
+  if(Platform.isIOS){
+    await Firebase.initializeApp(
+      // name: "check_in",// Removing this name causes exception and show white screen on ios
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+  }else {
+    await Firebase.initializeApp();
+  }
   // SharedPreferences prefs = await SharedPreferences.getInstance();
   // var email = prefs.getString('email');
   runApp(const MyApp());

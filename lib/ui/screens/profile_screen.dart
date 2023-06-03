@@ -1,10 +1,10 @@
 import 'dart:io';
 
-import 'package:checkinmod/controllers/user_controller.dart';
-import 'package:checkinmod/modal/user_modal.dart';
-import 'package:checkinmod/ui/screens/add_home_court.dart';
-import 'package:checkinmod/utils/colors.dart';
-import 'package:checkinmod/utils/styles.dart';
+import 'package:check_in/controllers/user_controller.dart';
+import 'package:check_in/modal/user_modal.dart';
+import 'package:check_in/ui/screens/add_home_court.dart';
+import 'package:check_in/utils/colors.dart';
+import 'package:check_in/utils/styles.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -231,12 +231,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                       children: [
                                         poppinsText(
                                             (users[0].court == "")
-                                                ? "Morse Kelly Park - Somerville Ma"
+                                                ? ""
                                                 : users[0].court,
                                             14,
                                             semiBold,
                                             blackColor),
-                                        GestureDetector(
+                                        InkWell(
                                           onTap: () {
                                             pushNewScreen(context,
                                                 screen: const AddHomeCourt(),

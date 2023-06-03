@@ -1,4 +1,4 @@
-import 'package:checkinmod/loc.dart';
+import 'package:check_in/loc.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:get/get.dart';
 import 'dart:convert';

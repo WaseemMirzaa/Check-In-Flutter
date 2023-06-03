@@ -1,7 +1,7 @@
-import 'package:checkinmod/ui/screens/login.dart';
-import 'package:checkinmod/ui/screens/signup.dart';
-import 'package:checkinmod/ui/widgets/common_button.dart';
-import 'package:checkinmod/utils/gaps.dart';
+import 'package:check_in/ui/screens/login.dart';
+import 'package:check_in/ui/screens/signup.dart';
+import 'package:check_in/ui/widgets/common_button.dart';
+import 'package:check_in/utils/gaps.dart';
 import 'package:flutter/material.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
 import 'package:sizer/sizer.dart';

@@ -1,6 +1,6 @@
-import 'package:checkinmod/ui/screens/check_in.dart';
-import 'package:checkinmod/ui/screens/profile_screen.dart';
-import 'package:checkinmod/utils/colors.dart';
+import 'package:check_in/ui/screens/check_in.dart';
+import 'package:check_in/ui/screens/profile_screen.dart';
+import 'package:check_in/utils/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -172,40 +172,54 @@ class _HomeState extends State<Home> {
         false; //if showDialouge had returned null, then return false
   }
 
+  Future<bool> _onWillPop() async {
+    if (navBarController.currentIndex.value == 0) {
+      // Only show exit confirmation dialog on the first screen (CheckIn)
+      final bool shouldExit = await showExitPopup(context);
+      return shouldExit;
+    } else {
+      // Allow navigating back on other screens
+      return true;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return PersistentTabView.custom(
-      context,
-      controller: navBarController.controller,
-      itemCount: _navBarsItems().length,
-      // This is required in case of custom style! Pass the number of items for the nav bar.
-      screens: _buildScreens(),
-      navBarHeight: 60,
-      onWillPop: (context) {
-        return showExitPopup(context);
-      },
-      hideNavigationBarWhenKeyboardShows: true,
-      backgroundColor: Colors.white,
-      popAllScreensOnTapOfSelectedTab: true,
-      confineInSafeArea: false,
-      handleAndroidBackButtonPress: true,
-      customWidget: (navBarEssentials) => Container(
-        decoration: const BoxDecoration(
-          borderRadius: BorderRadius.only(topLeft: Radius.circular(40)),
-        ),
-        child: CustomNavBarWidget(
-          // Your custom widget goes here
-          items: _navBarsItems(),
-          selectedIndex: navBarController.currentIndex.value,
-          onItemSelected: (index) {
-            setState(() {
-              navBarController.currentIndex.value = index;
-              navBarController.controller.index =
-                  index; // NOTE: THIS IS CRITICAL!! Don't miss it!
-            });
-            print(navBarController.currentIndex.value);
-            print(navBarController.controller.index);
-          },
+    return WillPopScope(
+      onWillPop: _onWillPop,
+      child: PersistentTabView.custom(
+        context,
+        controller: navBarController.controller,
+        itemCount: _navBarsItems().length,
+        // This is required in case of custom style! Pass the number of items for the nav bar.
+        screens: _buildScreens(),
+        navBarHeight: 60,
+        onWillPop: (context) {
+          return showExitPopup(context);
+        },
+        hideNavigationBarWhenKeyboardShows: true,
+        backgroundColor: Colors.white,
+        popAllScreensOnTapOfSelectedTab: true,
+        confineInSafeArea: false,
+        handleAndroidBackButtonPress: true,
+        customWidget: (navBarEssentials) => Container(
+          decoration: const BoxDecoration(
+            borderRadius: BorderRadius.only(topLeft: Radius.circular(40)),
+          ),
+          child: CustomNavBarWidget(
+            // Your custom widget goes here
+            items: _navBarsItems(),
+            selectedIndex: navBarController.currentIndex.value,
+            onItemSelected: (index) {
+              setState(() {
+                navBarController.currentIndex.value = index;
+                navBarController.controller.index =
+                    index; // NOTE: THIS IS CRITICAL!! Don't miss it!
+              });
+              print(navBarController.currentIndex.value);
+              print(navBarController.controller.index);
+            },
+          ),
         ),
       ),
     );

@@ -1,4 +1,4 @@
-import 'package:checkinmod/modal/user_modal.dart';
+import 'package:check_in/modal/user_modal.dart';
 import 'package:get/get.dart';
 
 

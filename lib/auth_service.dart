@@ -1,8 +1,8 @@
-import 'package:checkinmod/controllers/user_controller.dart';
-import 'package:checkinmod/modal/user_modal.dart';
-import 'package:checkinmod/ui/screens/persistent_nav_bar.dart';
-import 'package:checkinmod/ui/screens/start.dart';
-import 'package:checkinmod/user_service.dart';
+import 'package:check_in/controllers/user_controller.dart';
+import 'package:check_in/modal/user_modal.dart';
+import 'package:check_in/ui/screens/persistent_nav_bar.dart';
+import 'package:check_in/ui/screens/start.dart';
+import 'package:check_in/user_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -69,12 +69,21 @@ Future<void> logout(context) async {
   // userController.userModel.value = UserModel();
   SharedPreferences prefs = await SharedPreferences.getInstance();
   prefs.remove('email');
+
+  //Checkout
+
+  snap.collection("USER").doc(auth.currentUser!.uid).update({
+    "checkedIn": false,
+    "courtLat": FieldValue.delete(),
+    "courtLng": FieldValue.delete(),
+  });
   auth.signOut().then(
         (value) =>
             // pushNewScreen(context, screen: const StartView(), withNavBar: false)
-            Navigator.of(context, rootNavigator: !false).pushReplacement(
-                getPageRoute(PageTransitionAnimation.cupertino,
-                    enterPage: StartView())),
+        Get.offAll(StartView()),
+            // Navigator.of(context, rootNavigator: !false).pushReplacement(
+            //     getPageRoute(PageTransitionAnimation.cupertino,
+            //         enterPage: StartView())),
       );
 }
 
@@ -127,11 +136,17 @@ Future<void> delAcc(context) async {
                             try {
                               await user
                                   .reauthenticateWithCredential(credential);
+
+                              snap.collection("USER").doc(auth.currentUser!.uid).delete();
+
                               await user.delete().then((value) {
-                                Navigator.of(context, rootNavigator: !false)
-                                    .pushReplacement(getPageRoute(
-                                        PageTransitionAnimation.cupertino,
-                                        enterPage: StartView()));
+
+                                Get.offAll(StartView());
+
+                                // Navigator.of(context, rootNavigator: !false)
+                                //     .pushReplacement(getPageRoute(
+                                //         PageTransitionAnimation.cupertino,
+                                //         enterPage: StartView()));
                               });
                               print('Account deleted successfully.');
                             } on FirebaseAuthException catch (e) {

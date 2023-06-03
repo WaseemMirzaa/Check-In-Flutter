@@ -1,11 +1,13 @@
-import 'package:checkinmod/ui/screens/Players.dart';
-import 'package:checkinmod/utils/colors.dart';
-import 'package:checkinmod/utils/styles.dart';
+import 'package:check_in/ui/screens/Players.dart';
+import 'package:check_in/utils/colors.dart';
+import 'package:check_in/utils/styles.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../utils/gaps.dart';
+import 'add_home_court.dart';
 
 class PlayerScreen extends StatefulWidget {
   final User user;
@@ -17,6 +19,7 @@ class PlayerScreen extends StatefulWidget {
 }
 
 class _PlayerScreenState extends State<PlayerScreen> {
+  bool isEditableStatus = false;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -102,14 +105,22 @@ class _PlayerScreenState extends State<PlayerScreen> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            poppinsText(widget.user.court == "" ? "Morse Kelley Park - Somerville Ma" : widget.user.court, 14,
+                            poppinsText(widget.user.court == "" ? "" : widget.user.court, 14,
                                 semiBold, blackColor),
-                            SizedBox(
-                              height: 2.3.h,
-                              width: 4.47.w,
-                              child: Image.asset(
-                                  "assets/images/Icon feather-map-pin.png"),
-                            )
+                            // InkWell(
+                            //   onTap: () {
+                            //     pushNewScreen(context,
+                            //         screen: const AddHomeCourt(isMyProfile: false,),
+                            //         withNavBar: false);
+                            //   },
+                            //   child:
+                              SizedBox(
+                                height: 2.3.h,
+                                width: 4.47.w,
+                                child: Image.asset(
+                                    "assets/images/Icon feather-map-pin.png"),
+                              ),
+                            // )
                           ],
                         ),
                         verticalGap(1.3.h),
@@ -152,12 +163,6 @@ class _PlayerScreenState extends State<PlayerScreen> {
                               children: [
                                 poppinsText(
                                     "About me", 14, semiBold, blackColor),
-                                SizedBox(
-                                  height: 1.8.h,
-                                  width: 4.w,
-                                  child: Image.asset(
-                                      "assets/images/Icon feather-edit-2.png"),
-                                )
                               ],
                             ),
                             TextFormField(
@@ -169,8 +174,9 @@ class _PlayerScreenState extends State<PlayerScreen> {
                                   errorBorder: InputBorder.none,
                                   focusedBorder: InputBorder.none,
                                   focusedErrorBorder: InputBorder.none,
+                                  enabled: false,
                                   hintText:
-                                       widget.user.about == "" ? "617 Real G’s move in silence like lasagna." : widget.user.about,
+                                       widget.user.about == "" ? "" : widget.user.about,
                                   helperStyle: GoogleFonts.poppins(
                                       fontSize: 14,
                                       fontWeight: regular,
