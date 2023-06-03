@@ -53,6 +53,8 @@ class _AddHomeCourtState extends State<AddHomeCourt>
   RxInt heatMapRadius = 45.obs;
   int _previousZoomLevel = 12;
   double heatmapZoomFactor = 2.5;
+  int searchRadius = 30 * 1000;
+
   StreamSubscription<Position>? _positionStreamSubscription;
 
   GlobalKey<ScaffoldState> _scaffoldState = GlobalKey<ScaffoldState>();
@@ -106,6 +108,46 @@ class _AddHomeCourtState extends State<AddHomeCourt>
   }
 
   Future courtNames() async {
+    await snap.collection('goldenLocations').get().then((querySnapshot) {
+      querySnapshot.docs.forEach((doc) {
+        double latitude = doc.data()['lat'];
+        double longitude = doc.data()['lng'];
+        String name = doc.data()['name'];
+
+        LatLng location = LatLng(latitude, longitude);
+        Marker marker = Marker(
+          markerId: MarkerId(doc.id),
+          position: location,
+          infoWindow: InfoWindow(title: name),
+          icon:
+          BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueYellow),
+          onTap: () {
+            _selectedPlace = name;
+            // pushNewScreen(
+            //   context,
+            //   screen: PlayersView(courtLatLng: location),
+            //   withNavBar: false,
+            // );
+          },
+        );
+        _markers.add(marker);
+      });
+      setState(() {});
+    });
+
+    // // Get a reference to the Firestore collection
+    // CollectionReference collectionRef =
+    // FirebaseFirestore.instance.collection('goldenLocations');
+    //
+    // // Fetch the documents
+    // QuerySnapshot querySnapshot = await collectionRef.get();
+    //
+    // // Extract the data from the documents
+    // List<Map<String, dynamic>> documents = [];
+    // querySnapshot.docs.forEach((doc) {
+    //   documents.add(doc.data() as Map<String, dynamic>);
+    // });
+
     // // ADDING MY LOCATION MARKER
     // if (currentLocation != null) {
     //   Marker userMarker = Marker(
@@ -130,8 +172,8 @@ class _AddHomeCourtState extends State<AddHomeCourt>
         lat: currentLocation!.latitude,
         lng: currentLocation!.longitude,
       ),
-      40000,
-      // 100,
+      searchRadius,
+      // 30000,
       type: 'court',
       name: 'ball court',
     );
@@ -142,6 +184,20 @@ class _AddHomeCourtState extends State<AddHomeCourt>
         place.geometry!.location.lng,
       );
 
+      // bool isGolden = false;
+      //
+      // documents.forEach((golden) {
+      //   if(golden['name'] == place.name){
+      //     isGolden = true;
+      //   }
+      // });
+
+      BitmapDescriptor icon;
+      // if (isGolden) {
+      //   icon = BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueYellow);
+      // } else{
+      icon = BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed);
+      // }
       Marker marker = Marker(
         markerId: MarkerId(place.placeId),
         position: location,
@@ -149,6 +205,7 @@ class _AddHomeCourtState extends State<AddHomeCourt>
           title: place.name,
           snippet: place.vicinity,
         ),
+        // icon: icon,
         onTap: () {
           _selectedPlace = place.name;
           // pushNewScreen(
@@ -165,6 +222,7 @@ class _AddHomeCourtState extends State<AddHomeCourt>
       _markers = _markers;
     });
   }
+
 
   Future<Position> setCurrentLocationOnMap() async {
     GoogleMapController googleMapController = await _googleMapController.future;
@@ -467,7 +525,7 @@ class _AddHomeCourtState extends State<AddHomeCourt>
                                     Location(
                                         lat: currentLocation!.latitude,
                                         lng: currentLocation!.longitude),
-                                    50000, // Search radius in meters
+                                    searchRadius, // Search radius in meters
                                     type: 'court',
                                     name: 'ball court',
                                     keyword: pattern,

@@ -3,11 +3,12 @@
 
 import 'package:flutter/material.dart';
 
-TextField customTextField(String hint,Color hintColor){
+TextField customTextField(String hint,Color hintColor, TextEditingController controller){
   return TextField(
     enableSuggestions: false,
     autocorrect: false,
-    obscureText: true,
+    obscureText: false,
+    controller: controller,
     decoration: InputDecoration(
       enabledBorder: UnderlineInputBorder(
         borderSide: BorderSide(color: Color(0xff707070)),

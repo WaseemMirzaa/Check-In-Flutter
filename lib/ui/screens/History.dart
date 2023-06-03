@@ -54,7 +54,7 @@ class _HistoryViewState extends State<HistoryView> {
     final checkedCourtsData = documentSnapshot.data()?["checkedCourts"];
 
     if (checkedCourtsData != null && checkedCourtsData is List<dynamic>) {
-      dataArray = List.from(checkedCourtsData);
+      dataArray = List.from(checkedCourtsData).reversed.toList();
     } else {
       dataArray = [];
     }

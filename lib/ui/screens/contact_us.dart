@@ -1,7 +1,8 @@
 import 'package:check_in/ui/screens/persistent_nav_bar.dart';
 import 'package:check_in/ui/widgets/common_button.dart';
 import 'package:flutter/material.dart';
-import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
+import 'package:get/get.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../utils/colors.dart';
@@ -16,6 +17,43 @@ class ContactUs extends StatefulWidget {
 }
 
 class _ContactUsState extends State<ContactUs> {
+  final TextEditingController nameController = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
+
+  @override
+  void dispose() {
+    nameController.dispose();
+    emailController.dispose();
+    super.dispose();
+  }
+
+  void _launchEmailApp() async {
+    final Uri params = Uri(
+      scheme: 'mailto',
+      path: 'recipient@example.com',
+      query: 'subject=Contact Us Inquiry&body=Name: ${nameController.text}\nEmail: ${emailController.text}',
+    );
+
+    final String url = params.toString();
+    bool canLaunch = false;
+    try {
+      canLaunch = await canLaunchUrl(params);
+    } catch (e) {
+      print(e);
+    }
+
+    if (canLaunch) {
+      await launchUrl(params);
+    } else {
+      Get.snackbar("Alert", "Could not launch email app.",
+          backgroundColor: Colors.white,
+          borderWidth: 4,
+          borderColor: Colors.red,
+          colorText: Colors.black);
+      print('Could not launch email app.');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -49,31 +87,8 @@ class _ContactUsState extends State<ContactUs> {
             padding: EdgeInsets.symmetric(horizontal: 50, vertical: 36),
             child: Column(
               children: [
-                customTextField("Name", greenColor),
-                customTextField("Email", greenColor),
-              ],
-            ),
-          ),
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 20),
-            child: Stack(
-              alignment: Alignment.center,
-              children: [
-                Container(
-                    height: 143,
-                    width: MediaQuery.of(context).size.width,
-                    child: Image(
-                      image: AssetImage("assets/images/Group 12499.png"),
-                      fit: BoxFit.fill,
-                    )),
-                Positioned(
-                    left: 30,
-                    right: 30,
-                    child: poppinsText(
-                        "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore  et dolore magna aliquyam erat, sed diam voluptua. At vero.",
-                        14,
-                        regular,
-                        textColor))
+                customTextField("Name", greenColor,nameController),
+                customTextField("Email", greenColor, emailController),
               ],
             ),
           ),
@@ -83,7 +98,7 @@ class _ContactUsState extends State<ContactUs> {
               vertical: 15,
             ),
             child: fullWidthButton("SUBMIT", () {
-              pushNewScreen(context, screen: Home(), withNavBar: false);
+              _launchEmailApp();
             }),
           )
         ],

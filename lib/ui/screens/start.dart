@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:check_in/ui/screens/login.dart';
 import 'package:check_in/ui/screens/signup.dart';
 import 'package:check_in/ui/widgets/common_button.dart';
@@ -131,41 +133,44 @@ class _StartViewState extends State<StartView> {
                       ),
                     ),
                   ),
-                  Padding(
-                    padding: EdgeInsets.only(top: 0.9.h, bottom: 0.9.h),
-                    child: Container(
-                      height: 6.h,
-                      decoration: BoxDecoration(
-                        color: const Color(0xffffffff),
-                        borderRadius: BorderRadius.circular(6.0),
-                        boxShadow: const [
-                          BoxShadow(
-                            color: Color(0x29000000),
-                            offset: Offset(0, 1),
-                            blurRadius: 6,
-                          ),
-                        ],
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Image.asset(
-                            'assets/images/apple.png',
-                            scale: 4,
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Text(
-                              'Apple',
-                              style: TextStyle(
-                                fontFamily: 'Helvetica',
-                                fontSize: 1.8.h,
-                                color: const Color(0xff000000),
-                              ),
-                              softWrap: false,
+                  Visibility(
+                    visible:Platform.isIOS,
+                    child: Padding(
+                      padding: EdgeInsets.only(top: 0.9.h, bottom: 0.9.h),
+                      child: Container(
+                        height: 6.h,
+                        decoration: BoxDecoration(
+                          color: const Color(0xffffffff),
+                          borderRadius: BorderRadius.circular(6.0),
+                          boxShadow: const [
+                            BoxShadow(
+                              color: Color(0x29000000),
+                              offset: Offset(0, 1),
+                              blurRadius: 6,
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Image.asset(
+                              'assets/images/apple.png',
+                              scale: 4,
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text(
+                                'Apple',
+                                style: TextStyle(
+                                  fontFamily: 'Helvetica',
+                                  fontSize: 1.8.h,
+                                  color: const Color(0xff000000),
+                                ),
+                                softWrap: false,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),

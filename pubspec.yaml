@@ -58,7 +58,7 @@ dependencies:
   firebase_storage: ^11.0.14
   nb_utils: ^5.0.8
   intl: ^0.18.0
-
+  url_launcher: ^6.0.0
 
   google_maps_flutter:
       path: /Users/apple/StudioProjects/Check-In-Flutter/google_maps_flutter/google_maps_flutter
