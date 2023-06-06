@@ -28,8 +28,11 @@ class _StartViewState extends State<StartView> {
             children: [
               Container(
                 height: MediaQuery.of(context).size.height * 0.4,
-                child:  Center(
-                  child: Image.asset("assets/images/logo.jpeg",),
+                child: Center(
+                  child: Image.asset(
+                    "assets/images/Green minimalist speed check logo (1).png",
+                    scale: 3,
+                  ),
                 ),
               ),
               Column(
@@ -134,7 +137,7 @@ class _StartViewState extends State<StartView> {
                     ),
                   ),
                   Visibility(
-                    visible:Platform.isIOS,
+                    visible: Platform.isIOS,
                     child: Padding(
                       padding: EdgeInsets.only(top: 0.9.h, bottom: 0.9.h),
                       child: Container(

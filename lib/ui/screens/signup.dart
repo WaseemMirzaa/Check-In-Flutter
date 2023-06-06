@@ -23,7 +23,6 @@ class _SignupViewState extends State<SignupView> {
   String email = '';
   String password = '';
 
-  
   int index = 0;
   void changeIndex() {
     if (index == 0) {
@@ -72,8 +71,12 @@ class _SignupViewState extends State<SignupView> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
+                SizedBox(
+                  height: 4.h,
+                ),
                 Image.asset(
-                  "assets/images/logo.jpeg",
+                  "assets/images/Green minimalist speed check logo (1).png",
+                  scale: 3,
                 ),
                 SizedBox(
                   height: 12.h,
@@ -87,8 +90,8 @@ class _SignupViewState extends State<SignupView> {
                           enableSuggestions: false,
                           autocorrect: false,
                           textInputAction: TextInputAction.next,
-                          onEditingComplete: () => FocusScope.of(context).nextFocus(),
-
+                          onEditingComplete: () =>
+                              FocusScope.of(context).nextFocus(),
                           validator: (v) {
                             if (v == null || v.isEmpty) {
                               return 'Please enter your first name';
@@ -124,8 +127,8 @@ class _SignupViewState extends State<SignupView> {
                           enableSuggestions: false,
                           autocorrect: false,
                           textInputAction: TextInputAction.next,
-                          onEditingComplete: () => FocusScope.of(context).nextFocus(),
-
+                          onEditingComplete: () =>
+                              FocusScope.of(context).nextFocus(),
                           keyboardType: TextInputType.emailAddress,
                           validator: (v) {
                             if (v == null || v.isEmpty || !Validate(email)) {
@@ -196,7 +199,8 @@ class _SignupViewState extends State<SignupView> {
                           padding: EdgeInsets.only(top: 3.6.h),
                           child: fullWidthButton('Sign up', () async {
                             if (userName != '') {
-                              if (Validate(email)) signUp(email, password, userName, context);
+                              if (Validate(email))
+                                signUp(email, password, userName, context);
                             } else if (userName == '') {
                               Get.snackbar("Error", "Enter User Name");
                             }

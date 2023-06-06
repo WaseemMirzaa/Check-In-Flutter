@@ -23,7 +23,6 @@ class _LoginViewState extends State<LoginView> {
   String email = '';
   String password = '';
 
-
   final auth = FirebaseAuth.instance;
   final snap = FirebaseFirestore.instance;
 
@@ -72,8 +71,12 @@ class _LoginViewState extends State<LoginView> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
+                SizedBox(
+                  height: 4.h,
+                ),
                 Image.asset(
-                  "assets/images/logo.jpeg",
+                  "assets/images/Green minimalist speed check logo (1).png",
+                  scale: 3,
                 ),
                 SizedBox(
                   height: 12.h,
@@ -87,8 +90,8 @@ class _LoginViewState extends State<LoginView> {
                           enableSuggestions: false,
                           autocorrect: false,
                           textInputAction: TextInputAction.next,
-                          onEditingComplete: () => FocusScope.of(context).nextFocus(),
-
+                          onEditingComplete: () =>
+                              FocusScope.of(context).nextFocus(),
                           validator: (v) {
                             if (v == null ||
                                 v.isEmpty ||

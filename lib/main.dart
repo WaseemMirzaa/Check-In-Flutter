@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:check_in/ui/screens/login.dart';
 import 'package:check_in/ui/screens/persistent_nav_bar.dart';
+import 'package:check_in/ui/screens/splash.dart';
 import 'package:check_in/ui/screens/start.dart';
 import 'package:check_in/utils/colors.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -37,19 +38,19 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    Widget firstWidget;
-    if (FirebaseAuth.instance.currentUser != null) {
-      firstWidget = Home();
-    } else {
-      firstWidget = const StartView();
-    }
+    // Widget firstWidget;
+    // if (FirebaseAuth.instance.currentUser != null) {
+    //   firstWidget = Home();
+    // } else {
+    //   firstWidget = const StartView();
+    // }
     return Sizer(
       builder: (context, orientation, deviceType) {
         return GetMaterialApp(
           debugShowCheckedModeBanner: false,
           title: 'Check In',
           theme: ThemeData(scaffoldBackgroundColor: whiteColor),
-          home: firstWidget,
+          home: Splash(),
         );
       },
     );
