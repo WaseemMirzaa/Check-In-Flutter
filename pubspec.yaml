@@ -94,6 +94,8 @@ flutter_launcher_icons:
   ios: true
   remove_alpha_ios: true
   image_path: "assets/images/playstore-icon.png"
+  foreground_image_path: "assets/images/ic_launcher_foreground.png"
+  round_image_path: "assets/images/ic_launcher_round.png"
   # adaptive_icon_background: "#ffffff"
   # adaptive_icon_foreground: assets/images/foreground_logo.png
 
