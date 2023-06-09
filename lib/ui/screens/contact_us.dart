@@ -30,7 +30,7 @@ class _ContactUsState extends State<ContactUs> {
   void _launchEmailApp() async {
     final Uri params = Uri(
       scheme: 'mailto',
-      path: 'recipient@example.com',
+      path: 'support@checkinhoops.net',
       query: 'subject=Contact Us Inquiry&body=Name: ${nameController.text}\nEmail: ${emailController.text}',
     );
 

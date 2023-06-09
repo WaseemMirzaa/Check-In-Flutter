@@ -30,7 +30,7 @@ class _StartViewState extends State<StartView> {
                 height: MediaQuery.of(context).size.height * 0.4,
                 child: Center(
                   child: Image.asset(
-                    "assets/images/Green minimalist speed check logo (1).png",
+                    "assets/images/logo-new.png",
                     scale: 3,
                   ),
                 ),

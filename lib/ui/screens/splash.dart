@@ -33,12 +33,53 @@ class _SplashState extends State<Splash> {
   Widget build(BuildContext context) {
     return Container(
       color: Colors.white,
-      child: Center(
-        child: Image.asset(
-          "assets/images/Green minimalist speed check logo (1).png",
-          scale: 3,
-        ),
+      child: Stack(
+        children: [
+          Positioned.fill(
+            child: Align(
+              alignment: Alignment.bottomCenter,
+              child: Image.asset(
+                "assets/images/basketball-bro.png",
+                fit: BoxFit.cover,
+              ),
+            ),
+          ),
+          Container(
+            alignment: Alignment.topCenter,
+            height: MediaQuery.of(context).size.height / 2,
+            child: FractionallySizedBox(
+              alignment: Alignment.topCenter,
+              widthFactor: 1.0,
+              heightFactor: 1.0,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  SizedBox.fromSize(size: Size.fromHeight(20)),
+                  Expanded(
+                    flex: 2,
+                    child: Image.asset(
+                      "assets/images/logo-new.png",
+                      scale: 1,
+                    ),
+                  ),
+                  SizedBox(height: 0),
+                  Text(
+                    'Powered by',
+                    style: TextStyle(fontSize: 12, color: Colors.black),
+                  ),
+                  SizedBox(height: 4),
+                  Text(
+                    'Ville Marcos LLC',
+                    style: TextStyle(fontSize: 16, color: Colors.black, fontWeight: FontWeight.bold),
+                  ),
+                  SizedBox(height: 30),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
+
 }

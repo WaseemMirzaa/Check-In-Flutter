@@ -323,7 +323,7 @@ class _AddHomeCourtState extends State<AddHomeCourt>
                   color: whiteColor,
                 ),
                 child: Image.asset(
-                  "assets/images/logo.jpeg",
+                  "assets/images/logo-new.png",
                 ),
               ),
               const SizedBox(

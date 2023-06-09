@@ -58,7 +58,8 @@ Future<void> login(email, password, context) async {
     });
   } on FirebaseAuthException catch (e) {
     print('error message ${e.message}');
-    Get.snackbar('Error', e.message ?? '', snackPosition: SnackPosition.BOTTOM);
+    // Get.snackbar('Error', e.message ?? '', snackPosition: SnackPosition.BOTTOM);
+    Get.snackbar('Error', "Invalid username or password", snackPosition: SnackPosition.BOTTOM);
     print('Failed with error code: ${e.code}');
     print(e.message);
   }

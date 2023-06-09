@@ -487,7 +487,7 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
                   color: whiteColor,
                 ),
                 child: Image.asset(
-                  "assets/images/logo.jpeg",
+                  "assets/images/logo-new.png",
                 ),
               ),
               const SizedBox(

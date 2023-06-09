@@ -332,7 +332,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                               focusedErrorBorder:
                                                   InputBorder.none,
                                               hintText: (users[0].about == "")
-                                                  ? "617 Real G’s move in silence like lasagna."
+                                                  ? "Tell us about your game"
                                                   : users[0].about,
                                               helperStyle: GoogleFonts.poppins(
                                                   fontSize: 14,

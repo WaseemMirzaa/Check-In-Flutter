@@ -75,7 +75,7 @@ class _LoginViewState extends State<LoginView> {
                   height: 4.h,
                 ),
                 Image.asset(
-                  "assets/images/Green minimalist speed check logo (1).png",
+                  "assets/images/logo-new.png",
                   scale: 3,
                 ),
                 SizedBox(
