@@ -24,7 +24,7 @@ class _SplashState extends State<Splash> {
     } else {
       firstWidget = const StartView();
     }
-    await Future.delayed(Duration(seconds: 1), () {});
+    await Future.delayed(Duration(microseconds: 1500), () {});
     Navigator.pushReplacement(
         context, MaterialPageRoute(builder: (context) => firstWidget));
   }
