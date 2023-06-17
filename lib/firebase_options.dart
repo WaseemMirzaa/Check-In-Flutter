@@ -25,10 +25,7 @@ class DefaultFirebaseOptions {
       case TargetPlatform.iOS:
         return ios;
       case TargetPlatform.macOS:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for macos - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return macos;
       case TargetPlatform.windows:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for windows - '
@@ -47,30 +44,40 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyDp2nnK27MfSVIqevl3xGseEmoi4iVUhEc',
-    appId: '1:761797681586:web:deb932d3d941ff5f7404ab',
-    messagingSenderId: '761797681586',
-    projectId: 'player-exchange-ad78f',
-    authDomain: 'player-exchange-ad78f.firebaseapp.com',
-    storageBucket: 'player-exchange-ad78f.appspot.com',
-    measurementId: 'G-EQ31F3H5RE',
+    apiKey: 'AIzaSyB4jGvfSglGNOKcbn9iTC2Ug4a_q-ab2gI',
+    appId: '1:41160719092:web:42fa0822176ffecf463ca1',
+    messagingSenderId: '41160719092',
+    projectId: 'check-in-7ecd7',
+    authDomain: 'check-in-7ecd7.firebaseapp.com',
+    storageBucket: 'check-in-7ecd7.appspot.com',
+    measurementId: 'G-H3E3Z7TGZM',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyCC_BWxNmCby2FdZ0PKlEfl48AwVP7SGAs',
-    appId: '1:761797681586:android:44b0289d92c9bc427404ab',
-    messagingSenderId: '761797681586',
-    projectId: 'player-exchange-ad78f',
-    storageBucket: 'player-exchange-ad78f.appspot.com',
+    apiKey: 'AIzaSyArLxMF1wjbQzOw4xIqh_zfNJ8-cG7CaBY',
+    appId: '1:41160719092:android:c706181dfebd457e463ca1',
+    messagingSenderId: '41160719092',
+    projectId: 'check-in-7ecd7',
+    storageBucket: 'check-in-7ecd7.appspot.com',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyAR_ofRzSAvqJSTMHUsCir5SUIwg8hk_dA',
-    appId: '1:761797681586:ios:13593a9e24e9275c7404ab',
-    messagingSenderId: '761797681586',
-    projectId: 'player-exchange-ad78f',
-    storageBucket: 'player-exchange-ad78f.appspot.com',
-    iosClientId: '761797681586-5bm03kn1s9prgs5ffcuvmqko1gpu3ota.apps.googleusercontent.com',
-    iosBundleId: 'com.codetivelab.playerexchange',
+    apiKey: 'AIzaSyD2QKaerf5i4Mj0PN52-zhfZ8kQ6hcgz3Q',
+    appId: '1:41160719092:ios:246b5db2c7526c37463ca1',
+    messagingSenderId: '41160719092',
+    projectId: 'check-in-7ecd7',
+    storageBucket: 'check-in-7ecd7.appspot.com',
+    iosClientId: '41160719092-sdkcvbdqcrci7lso8p83nrnpkvt89dqc.apps.googleusercontent.com',
+    iosBundleId: 'com.developlogix.checkin',
+  );
+
+  static const FirebaseOptions macos = FirebaseOptions(
+    apiKey: 'AIzaSyD2QKaerf5i4Mj0PN52-zhfZ8kQ6hcgz3Q',
+    appId: '1:41160719092:ios:246b5db2c7526c37463ca1',
+    messagingSenderId: '41160719092',
+    projectId: 'check-in-7ecd7',
+    storageBucket: 'check-in-7ecd7.appspot.com',
+    iosClientId: '41160719092-sdkcvbdqcrci7lso8p83nrnpkvt89dqc.apps.googleusercontent.com',
+    iosBundleId: 'com.developlogix.checkin',
   );
 }

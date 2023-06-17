@@ -7,7 +7,7 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:41160719092:android:1b8490638ef3a497463ca1",
+        "mobilesdk_app_id": "1:41160719092:android:c706181dfebd457e463ca1",
         "android_client_info": {
           "package_name": "com.developlogix.checkin"
         }
@@ -29,6 +29,13 @@
             {
               "client_id": "41160719092-6jonc7jq3e1uvf63u0gmlnbi4fc7b210.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "41160719092-sdkcvbdqcrci7lso8p83nrnpkvt89dqc.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.developlogix.checkin"
+              }
             }
           ]
         }

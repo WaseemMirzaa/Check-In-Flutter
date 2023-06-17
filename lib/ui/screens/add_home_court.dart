@@ -31,6 +31,7 @@ import 'package:google_maps_webservice/places.dart';
 // import 'package:location/location.dart' ;
 import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../constants.dart';
 import 'Players.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/foundation.dart';
@@ -80,7 +81,7 @@ class _AddHomeCourtState extends State<AddHomeCourt>
   TextEditingController typeAheadController = TextEditingController();
 
   final _places =
-      GoogleMapsPlaces(apiKey: 'AIzaSyAWfUP79VGyEn-89MFapzNHNiYfT92zdBs');
+      GoogleMapsPlaces(apiKey: Constants.API_KEY);
   String _selectedPlace = '';
 
   Position? currentLocation;

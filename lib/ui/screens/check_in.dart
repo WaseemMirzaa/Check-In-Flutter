@@ -1,9 +1,11 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 import 'package:check_in/auth_service.dart';
 import 'package:check_in/modal/user_modal.dart';
 import 'package:check_in/search_location.dart';
+import 'package:check_in/ui/screens/History.dart';
 import 'package:check_in/ui/screens/contact_us.dart';
 import 'package:check_in/ui/screens/player.dart';
 import 'package:check_in/ui/screens/privacy_policy.dart';
@@ -29,9 +31,11 @@ import 'package:google_maps_webservice/places.dart';
 // import 'package:location/location.dart' ;
 import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../constants.dart';
 import 'Players.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/foundation.dart';
+import 'package:http/http.dart' as http;
 
 class CheckIn extends StatefulWidget {
   const CheckIn({Key? key}) : super(key: key);
@@ -73,7 +77,7 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
   TextEditingController typeAheadController = TextEditingController();
 
   final _places =
-      GoogleMapsPlaces(apiKey: 'AIzaSyAWfUP79VGyEn-89MFapzNHNiYfT92zdBs');
+      GoogleMapsPlaces(apiKey: Constants.API_KEY);
   String _selectedPlace = '';
 
   Position? currentLocation;
@@ -224,7 +228,9 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
       name: 'ball court',
     );
 
-    placesResponse.results.forEach((place) {
+    // final placesResponse = await getBasketballCourts();
+
+    placesResponse?.results.forEach((place) {
       LatLng location = LatLng(
         place.geometry!.location.lat,
         place.geometry!.location.lng,
@@ -266,9 +272,23 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
     });
 
     setState(() {
-      _markers = _markers;
+      // _markers = _markers;
       addLocationChangeListener();
     });
+  }
+
+  Future<PlacesSearchResponse?> getBasketballCourts() async {
+    final apiKey = Constants.API_KEY;
+    final url = Uri.parse(
+        'https://maps.googleapis.com/maps/api/place/textsearch/json?query=basketball+courts&key=$apiKey');
+    final response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      return PlacesSearchResponse.fromJson(json.decode(response.body));
+    } else {
+      return null;
+      // throw Exception('Failed to load basketball courts');
+    }
   }
 
   void addHeatedMarkers(Marker marker) async {
@@ -555,7 +575,7 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
               child: GestureDetector(
                 child: currentLocation == null
                     ? const Center(child: Text("Loading..."))
-                    : Obx(() => (GoogleMap(
+                    : GoogleMap(
                             mapToolbarEnabled: false,
                             zoomControlsEnabled: true,
                             zoomGesturesEnabled: true,
@@ -628,7 +648,7 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
                                         ? heatMapRadius.value
                                         : heatMapRadius.value,
                               )
-                            }))),
+                            }),
               ),
             ),
             Positioned(
@@ -669,7 +689,8 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
                                 Navigator.pushAndRemoveUntil(
                                     context,
                                     MaterialPageRoute(
-                                        builder: (context) => CheckIn()),
+                                        // builder: (context) => CheckIn()),
+                                        builder: (context) => HistoryView()),
                                     (route) => false);
                                 // Navigator.pushReplacement(
                                 //   context,
