@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:check_in/controllers/user_controller.dart';
-import 'package:check_in/modal/user_modal.dart';
+import 'package:check_in/model/user_modal.dart';
 import 'package:check_in/ui/screens/add_home_court.dart';
 import 'package:check_in/utils/colors.dart';
 import 'package:check_in/utils/styles.dart';

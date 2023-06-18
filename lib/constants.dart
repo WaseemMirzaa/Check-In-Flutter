@@ -1,3 +1,3 @@
 class Constants {
-  static String API_KEY = "AIzaSyAWfUP79VGyEn-89MFapzNHNiYfT92zdBs";
+  static String API_KEY = "AIzaSyAPG8qvZZd8VrRo9Dta-KR0xrV-Tqy8wRU";
 }

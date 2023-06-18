@@ -9,7 +9,8 @@ import 'package:sizer/sizer.dart';
 
 class PlayersView extends StatefulWidget {
   final LatLng courtLatLng;
-  PlayersView({required this.courtLatLng});
+  String courtName;
+  PlayersView({required this.courtLatLng, required this.courtName});
 
   @override
   State<PlayersView> createState() => _PlayersViewState();
@@ -99,10 +100,10 @@ class _PlayersViewState extends State<PlayersView> {
           padding: const EdgeInsets.all(20),
           child: Column(
             children: [
-              const Padding(
-                padding: EdgeInsets.only(top: 20),
+              Padding(
+                padding: EdgeInsets.only(top: 10),
                 child: Text(
-                  'Players at this court',
+                  widget.courtName ?? "",
                   style: TextStyle(
                     fontFamily: 'Poppins',
                     fontSize: 15,
@@ -113,6 +114,20 @@ class _PlayersViewState extends State<PlayersView> {
                   softWrap: false,
                 ),
               ),
+              // const Padding(
+              //   padding: EdgeInsets.only(top: 20),
+              //   child: Text(
+              //     'Players at this court',
+              //     style: TextStyle(
+              //       fontFamily: 'Poppins',
+              //       fontSize: 15,
+              //       color: Color(0xff007a33),
+              //       fontWeight: FontWeight.w500,
+              //     ),
+              //     textAlign: TextAlign.right,
+              //     softWrap: false,
+              //   ),
+              // ),
               const SizedBox(
                 height: 20,
               ),

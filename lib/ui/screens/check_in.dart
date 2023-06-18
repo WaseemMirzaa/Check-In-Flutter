@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 import 'package:check_in/auth_service.dart';
-import 'package:check_in/modal/user_modal.dart';
+import 'package:check_in/model/user_modal.dart';
 import 'package:check_in/search_location.dart';
 import 'package:check_in/ui/screens/History.dart';
 import 'package:check_in/ui/screens/contact_us.dart';
@@ -12,6 +12,7 @@ import 'package:check_in/ui/screens/privacy_policy.dart';
 import 'package:check_in/ui/screens/start.dart';
 import 'package:check_in/ui/screens/terms_conditions.dart';
 import 'package:check_in/ui/widgets/common_button.dart';
+import 'package:check_in/utils/CourtsParser.dart';
 import 'package:check_in/utils/colors.dart';
 import 'package:check_in/utils/styles.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -160,89 +161,59 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
   }
 
   Future courtNames() async {
-    await snap.collection('goldenLocations').get().then((querySnapshot) {
-      querySnapshot.docs.forEach((doc) {
-        double latitude = doc.data()['lat'];
-        double longitude = doc.data()['lng'];
-        String name = doc.data()['name'];
+    try {
+      await snap.collection('goldenLocations').get().then((querySnapshot) {
+            querySnapshot.docs.forEach((doc) {
+              double latitude = doc.data()['lat'];
+              double longitude = doc.data()['lng'];
+              String name = doc.data()['name'];
 
-        LatLng location = LatLng(latitude, longitude);
-        Marker marker = Marker(
-          markerId: MarkerId(doc.id),
-          position: location,
-          infoWindow: InfoWindow(title: name),
-          icon:
-              BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueYellow),
-          onTap: () {
-            pushNewScreen(context,
-                screen: PlayersView(courtLatLng: location), withNavBar: false);
-          },
-        );
-        _markers.add(marker);
-        addHeatedMarkers(marker);
+              LatLng location = LatLng(latitude, longitude);
+              Marker marker = Marker(
+                markerId: MarkerId(doc.id),
+                position: location,
+                infoWindow: InfoWindow(title: name),
+                icon:
+                    BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueYellow),
+                onTap: () {
+                  pushNewScreen(context,
+                      screen: PlayersView(courtLatLng: location, courtName: name,), withNavBar: false);
+                },
+              );
+              _markers.add(marker);
+              addHeatedMarkers(marker);
 
-      });
-      setState(() {});
-    });
+            });
+            setState(() {});
+          });
+    } catch (e) {
+      print(e);
+    }
 
-    // // Get a reference to the Firestore collection
-    // CollectionReference collectionRef =
-    // FirebaseFirestore.instance.collection('goldenLocations');
-    //
-    // // Fetch the documents
-    // QuerySnapshot querySnapshot = await collectionRef.get();
-    //
-    // // Extract the data from the documents
-    // List<Map<String, dynamic>> documents = [];
-    // querySnapshot.docs.forEach((doc) {
-    //   documents.add(doc.data() as Map<String, dynamic>);
-    // });
-
-    // // ADDING MY LOCATION MARKER
-    // if (currentLocation != null) {
-    //   Marker userMarker = Marker(
-    //     markerId: const MarkerId("userLocation"),
-    //     position: LatLng(
-    //       currentLocation!.latitude,
-    //       currentLocation!.longitude,
-    //     ),
-    //     infoWindow: const InfoWindow(title: "Your location"),
-    //     icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
-    //   );
-    //   _markers.add(userMarker);
-    // }
-    //
-    // setState(() {
-    //   _markers = _markers;
-    // });
 
     // ADDING PLACCES API COURTS LOCATION MARKER
-    final placesResponse = await _places.searchNearbyWithRadius(
-      Location(
-        lat: currentLocation!.latitude,
-        lng: currentLocation!.longitude,
-      ),
-      searchRadius,
-      // 30000,
-      type: 'court',
-      name: 'ball court',
-    );
+    // final placesResponse = await _places.searchNearbyWithRadius(
+    //   Location(
+    //     lat: currentLocation!.latitude,
+    //     lng: currentLocation!.longitude,
+    //   ),
+    //   searchRadius,
+    //   // 30000,
+    //   type: 'court',
+    //   name: 'ball court',
+    // );
+
+    final courts  = await CourtsParser().readAndFilterCSVFile();
 
     // final placesResponse = await getBasketballCourts();
 
-    placesResponse?.results.forEach((place) {
+    // placesResponse?.results.forEach((place) {
+    courts.forEach((place) {
       LatLng location = LatLng(
-        place.geometry!.location.lat,
-        place.geometry!.location.lng,
+        place.latitude,
+        place.longitude,
       );
 
-      // bool isGolden = false;
-      //
-      // documents.forEach((golden) {
-      //   if(golden['name'] == place.name){
-      //     isGolden = true;
-      //   }
-      // });
 
       BitmapDescriptor icon;
       // if (isGolden) {
@@ -254,14 +225,14 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
         markerId: MarkerId(place.placeId),
         position: location,
         infoWindow: InfoWindow(
-          title: place.name,
-          snippet: place.vicinity,
+          title: place.title,
+          snippet: place.address,
         ),
         // icon: icon,
         onTap: () {
           pushNewScreen(
             context,
-            screen: PlayersView(courtLatLng: location),
+            screen: PlayersView(courtLatLng: location, courtName: place.title,),
             withNavBar: false,
           );
         },
@@ -689,8 +660,7 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
                                 Navigator.pushAndRemoveUntil(
                                     context,
                                     MaterialPageRoute(
-                                        // builder: (context) => CheckIn()),
-                                        builder: (context) => HistoryView()),
+                                        builder: (context) => CheckIn()),
                                     (route) => false);
                                 // Navigator.pushReplacement(
                                 //   context,

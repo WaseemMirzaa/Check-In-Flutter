@@ -60,6 +60,7 @@ dependencies:
   intl: ^0.18.0
   url_launcher: ^6.0.0
   firebase_crashlytics: ^3.3.2
+  csv: ^5.0.2
 
   google_maps_flutter:
       path: /Users/apple/StudioProjects/Check-In-Flutter/google_maps_flutter/google_maps_flutter
@@ -114,6 +115,7 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
      - assets/images/
+     - assets/
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

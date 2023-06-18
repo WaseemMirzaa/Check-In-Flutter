@@ -1,7 +1,7 @@
 import 'dart:math';
 
 import 'package:check_in/auth_service.dart';
-import 'package:check_in/modal/user_modal.dart';
+import 'package:check_in/model/user_modal.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';

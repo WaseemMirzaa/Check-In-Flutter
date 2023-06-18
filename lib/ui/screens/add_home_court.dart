@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:math';
 import 'package:check_in/auth_service.dart';
-import 'package:check_in/modal/user_modal.dart';
+import 'package:check_in/model/user_modal.dart';
 import 'package:check_in/search_location.dart';
 import 'package:check_in/ui/screens/contact_us.dart';
 import 'package:check_in/ui/screens/persistent_nav_bar.dart';
@@ -32,6 +32,7 @@ import 'package:google_maps_webservice/places.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../constants.dart';
+import '../../utils/CourtsParser.dart';
 import 'Players.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/foundation.dart';
@@ -136,62 +137,30 @@ class _AddHomeCourtState extends State<AddHomeCourt>
       setState(() {});
     });
 
-    // // Get a reference to the Firestore collection
-    // CollectionReference collectionRef =
-    // FirebaseFirestore.instance.collection('goldenLocations');
-    //
-    // // Fetch the documents
-    // QuerySnapshot querySnapshot = await collectionRef.get();
-    //
-    // // Extract the data from the documents
-    // List<Map<String, dynamic>> documents = [];
-    // querySnapshot.docs.forEach((doc) {
-    //   documents.add(doc.data() as Map<String, dynamic>);
-    // });
-
-    // // ADDING MY LOCATION MARKER
-    // if (currentLocation != null) {
-    //   Marker userMarker = Marker(
-    //     markerId: const MarkerId("userLocation"),
-    //     position: LatLng(
-    //       currentLocation!.latitude,
-    //       currentLocation!.longitude,
-    //     ),
-    //     infoWindow: const InfoWindow(title: "Your location"),
-    //     icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
-    //   );
-    //   _markers.add(userMarker);
-    // }
-    //
-    // setState(() {
-    //   _markers = _markers;
-    // });
 
     // ADDING PLACCES API COURTS LOCATION MARKER
-    final placesResponse = await _places.searchNearbyWithRadius(
-      Location(
-        lat: currentLocation!.latitude,
-        lng: currentLocation!.longitude,
-      ),
-      searchRadius,
-      // 30000,
-      type: 'court',
-      name: 'ball court',
-    );
+    // final placesResponse = await _places.searchNearbyWithRadius(
+    //   Location(
+    //     lat: currentLocation!.latitude,
+    //     lng: currentLocation!.longitude,
+    //   ),
+    //   searchRadius,
+    //   // 30000,
+    //   type: 'court',
+    //   name: 'ball court',
+    // );
 
-    placesResponse.results.forEach((place) {
+    final courts  = await CourtsParser().readAndFilterCSVFile();
+
+    // final placesResponse = await getBasketballCourts();
+
+    // placesResponse?.results.forEach((place) {
+    courts.forEach((place) {
       LatLng location = LatLng(
-        place.geometry!.location.lat,
-        place.geometry!.location.lng,
+        place.latitude,
+        place.longitude,
       );
 
-      // bool isGolden = false;
-      //
-      // documents.forEach((golden) {
-      //   if(golden['name'] == place.name){
-      //     isGolden = true;
-      //   }
-      // });
 
       BitmapDescriptor icon;
       // if (isGolden) {
@@ -203,12 +172,12 @@ class _AddHomeCourtState extends State<AddHomeCourt>
         markerId: MarkerId(place.placeId),
         position: location,
         infoWindow: InfoWindow(
-          title: place.name,
-          snippet: place.vicinity,
+          title: place.title,
+          snippet: place.address,
         ),
         // icon: icon,
         onTap: () {
-          _selectedPlace = place.name;
+          _selectedPlace = place.title;
           // pushNewScreen(
           //   context,
           //   screen: PlayersView(courtLatLng: location),
