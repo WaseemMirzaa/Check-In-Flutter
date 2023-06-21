@@ -263,7 +263,7 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
     // int intensityLevel_4 = 100;
 
     // int playersGathering = Random().nextInt(100);
-    // int playersGathering = 1;
+    // int playersGathering = 100;
     int playersGathering = await getUsersCountOnLocation(marker.position);
 
     // debugPrint("Court Name:" +
