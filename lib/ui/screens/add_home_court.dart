@@ -89,7 +89,7 @@ class _AddHomeCourtState extends State<AddHomeCourt>
   final Completer<GoogleMapController> _googleMapController = Completer();
   GoogleMapController? _mapController = null;
 
-  Set<Marker> _markers = Set<Marker>.identity();
+  Set<Marker> markers = Set<Marker>.identity();
 
   LatLng? _selectedLocation;
 
@@ -132,7 +132,7 @@ class _AddHomeCourtState extends State<AddHomeCourt>
             // );
           },
         );
-        _markers.add(marker);
+        markers.add(marker);
       });
       setState(() {});
     });
@@ -150,7 +150,7 @@ class _AddHomeCourtState extends State<AddHomeCourt>
     //   name: 'ball court',
     // );
 
-    final courts  = await CourtsParser().readAndFilterCSVFile();
+    final courts  = await CourtsParser().getCourtsFromCSVFile();
 
     // final placesResponse = await getBasketballCourts();
 
@@ -185,11 +185,11 @@ class _AddHomeCourtState extends State<AddHomeCourt>
           // );
         },
       );
-      _markers.add(marker);
+      markers.add(marker);
     });
 
     setState(() {
-      _markers = _markers;
+      markers = markers;
     });
   }
 
@@ -222,44 +222,6 @@ class _AddHomeCourtState extends State<AddHomeCourt>
     }
   }
 
-  // Future<bool> checkIfWithinRadiusAndSetUserCourtInfo() async {
-  //   final placesResponse = await _places.searchNearbyWithRadius(
-  //     Location(
-  //       lat: currentLocation!.latitude,
-  //       lng: currentLocation!.longitude,
-  //     ),
-  //     200,
-  //     type: 'court',
-  //     name: 'ball court',
-  //   );
-  //
-  //   withinRadius = false;
-  //   placesResponse.results.forEach((place) {
-  //     LatLng location = LatLng(
-  //       place.geometry!.location.lat,
-  //       place.geometry!.location.lng,
-  //     );
-  //
-  //     // Check if the marker is within the radius
-  //     withinRadius = _checkIfWithinRadius(currentLocation!, location);
-  //
-  //     if (withinRadius) {
-  //       loc = location;
-  //       courtN = place.name;
-  //       courtInfo.addAll({
-  //         "courtLat": loc!.latitude,
-  //         "courtLng": loc!.longitude,
-  //         "courtName": courtN,
-  //       });
-  //     }
-  //
-  //     print(withinRadius);
-  //
-  //
-  //   });
-  //   return Future.value(withinRadius);
-  //
-  // }
 
   double getCurrentZoomLevel() {
     if (_mapController != null) {
@@ -370,7 +332,7 @@ class _AddHomeCourtState extends State<AddHomeCourt>
                           // onTap: (LatLng latLng) {
                           //   setState(() {
                           //     _selectedLocation = latLng;
-                          //     // _markers = {
+                          //     // markers = {
                           //     //   // Update the markers set with the selected location
                           //     //   Marker(
                           //     //     markerId: MarkerId('selectedLocation'),
@@ -385,7 +347,7 @@ class _AddHomeCourtState extends State<AddHomeCourt>
                                 currentLocation!.longitude),
                             zoom: ZOOM_LEVEL_INITIAL,
                           ),
-                          markers: _markers,
+                          markers: markers,
                           onMapCreated: (mapController) {
                             _mapController = mapController;
                             _googleMapController.complete(mapController);
@@ -490,38 +452,44 @@ class _AddHomeCourtState extends State<AddHomeCourt>
                                   if (currentLocation == null) {
                                     return [];
                                   }
-                                  final placesResponse =
-                                      await _places.searchNearbyWithRadius(
-                                    Location(
-                                        lat: currentLocation!.latitude,
-                                        lng: currentLocation!.longitude),
-                                    searchRadius, // Search radius in meters
-                                    type: 'court',
-                                    name: 'ball court',
-                                    keyword: pattern,
-                                  );
+                                  final courts = await CourtsParser()
+                                      .getCourtsByNameOrAddressFromCSVFile(
+                                      pattern);
 
-                                  return placesResponse.results;
+                                  // final placesResponse =
+                                  //     await _places.searchNearbyWithRadius(
+                                  //   Location(
+                                  //       lat: currentLocation!.latitude,
+                                  //       lng: currentLocation!.longitude),
+                                  //   searchRadius, // Search radius in meters
+                                  //   type: 'court',
+                                  //   name: 'ball court',
+                                  //   keyword: pattern,
+                                  // );
+
+                                  // return placesResponse.results;
+                                  return courts;
                                 },
                                 itemBuilder: (context, prediction) {
                                   return ListTile(
-                                    title: Text(prediction.name),
-                                    subtitle: Text(prediction.vicinity),
+                                    title: Text(prediction.title),
+                                    subtitle: Text(prediction.address),
                                   );
                                 },
                                 onSuggestionSelected: (prediction) async {
                                   setState(() {
-                                    _selectedPlace = prediction.name as String;
+                                    _selectedPlace = prediction.title as String;
                                   });
                                   typeAheadController.text = _selectedPlace;
 
-                                  var placeId = prediction.placeId;
-                                  var detail = await _places
-                                      .getDetailsByPlaceId(placeId as String);
-                                  var location =
-                                      detail.result.geometry!.location;
-                                  var lat = location.lat;
-                                  var lng = location.lng;
+                                  // var placeId = prediction.placeId;
+                                  // var detail = await _places
+                                  //     .getDetailsByPlaceId(placeId as String);
+                                  // var location =
+                                  //     detail.result.geometry!.location;
+                                  var lat = prediction.latitude;
+                                  var lng = prediction.longitude;
+
 
                                   final GoogleMapController controller =
                                       await _googleMapController.future;
@@ -533,6 +501,37 @@ class _AddHomeCourtState extends State<AddHomeCourt>
                                       ),
                                     ),
                                   );
+
+
+                                  final location = LatLng(
+                                    lat,
+                                    lng,
+                                  );
+                                  Marker marker = Marker(
+                                    markerId: MarkerId(prediction.placeId),
+                                    position: location,
+                                    infoWindow: InfoWindow(
+                                      title: prediction.title,
+                                      snippet: prediction.address,
+                                    ),
+                                    // icon: icon,
+                                    onTap: () {
+                                      _selectedPlace = prediction.title;
+
+                                    },
+                                  );
+
+                                  bool matched = false;
+                                  markers.forEach((marker1) {
+                                    if (marker1.markerId == marker.markerId) {
+                                      matched = true;
+                                    }
+                                  });
+
+                                  if (!matched) {
+                                    markers.add(marker);
+                                    setState(() {});
+                                  }
                                 },
                                 transitionBuilder:
                                     (context, suggestionsBox, controller) {

@@ -77,17 +77,16 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
 
   TextEditingController typeAheadController = TextEditingController();
 
-  final _places =
-      GoogleMapsPlaces(apiKey: Constants.API_KEY);
+  final _places = GoogleMapsPlaces(apiKey: Constants.API_KEY);
   String _selectedPlace = '';
 
   Position? currentLocation;
   final Completer<GoogleMapController> _googleMapController = Completer();
   GoogleMapController? _mapController = null;
 
-  Set<Marker> _markers = Set<Marker>.identity();
+  Set<Marker> markers = Set<Marker>.identity();
 
-  List<WeightedLatLng> enabledPoints = <WeightedLatLng>[
+  List<WeightedLatLng> heatmapPoints = <WeightedLatLng>[
     const WeightedLatLng(LatLng(37.782, -122.447), weight: 0),
     // const WeightedLatLng(LatLng(37.782, -122.445), weight: 0.5),
     // const WeightedLatLng(LatLng(37.782, -122.443)),
@@ -104,15 +103,7 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
     // const WeightedLatLng(LatLng(37.785, -122.435))
   ];
 
-  void setHeatMapSize(int zoomLevel) {
-    heatmapZoomFactor = heatmapZoomFactor + (zoomLevel - _previousZoomLevel);
-    heatMapRadius.value = (zoomLevel * (heatmapZoomFactor)).toInt();
-    if (heatMapRadius.value < 50) {
-      heatMapRadius.value = 50;
-    }
 
-    setState(() {});
-  }
 
   Future indexValue() async {
     final document = FirebaseFirestore.instance
@@ -163,33 +154,35 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
   Future courtNames() async {
     try {
       await snap.collection('goldenLocations').get().then((querySnapshot) {
-            querySnapshot.docs.forEach((doc) {
-              double latitude = doc.data()['lat'];
-              double longitude = doc.data()['lng'];
-              String name = doc.data()['name'];
+        querySnapshot.docs.forEach((doc) {
+          double latitude = doc.data()['lat'];
+          double longitude = doc.data()['lng'];
+          String name = doc.data()['name'];
 
-              LatLng location = LatLng(latitude, longitude);
-              Marker marker = Marker(
-                markerId: MarkerId(doc.id),
-                position: location,
-                infoWindow: InfoWindow(title: name),
-                icon:
-                    BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueYellow),
-                onTap: () {
-                  pushNewScreen(context,
-                      screen: PlayersView(courtLatLng: location, courtName: name,), withNavBar: false);
-                },
-              );
-              _markers.add(marker);
-              addHeatedMarkers(marker);
-
-            });
-            setState(() {});
-          });
+          LatLng location = LatLng(latitude, longitude);
+          Marker marker = Marker(
+            markerId: MarkerId(doc.id),
+            position: location,
+            infoWindow: InfoWindow(title: name),
+            icon: BitmapDescriptor.defaultMarkerWithHue(
+                BitmapDescriptor.hueYellow),
+            onTap: () {
+              pushNewScreen(context,
+                  screen: PlayersView(
+                    courtLatLng: location,
+                    courtName: name,
+                  ),
+                  withNavBar: false);
+            },
+          );
+          markers.add(marker);
+          addHeatedMarkers(marker);
+        });
+        setState(() {});
+      });
     } catch (e) {
       print(e);
     }
-
 
     // ADDING PLACCES API COURTS LOCATION MARKER
     // final placesResponse = await _places.searchNearbyWithRadius(
@@ -203,7 +196,7 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
     //   name: 'ball court',
     // );
 
-    final courts  = await CourtsParser().readAndFilterCSVFile();
+    final courts = await CourtsParser().getCourtsFromCSVFile();
 
     // final placesResponse = await getBasketballCourts();
 
@@ -213,7 +206,6 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
         place.latitude,
         place.longitude,
       );
-
 
       BitmapDescriptor icon;
       // if (isGolden) {
@@ -232,18 +224,20 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
         onTap: () {
           pushNewScreen(
             context,
-            screen: PlayersView(courtLatLng: location, courtName: place.title,),
+            screen: PlayersView(
+              courtLatLng: location,
+              courtName: place.title,
+            ),
             withNavBar: false,
           );
         },
       );
-      _markers.add(marker);
+      markers.add(marker);
       addHeatedMarkers(marker);
-
     });
 
     setState(() {
-      // _markers = _markers;
+      // markers = markers;
       addLocationChangeListener();
     });
   }
@@ -269,7 +263,7 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
     // int intensityLevel_4 = 100;
 
     // int playersGathering = Random().nextInt(100);
-    // int playersGathering = 7;
+    // int playersGathering = 1;
     int playersGathering = await getUsersCountOnLocation(marker.position);
 
     // debugPrint("Court Name:" +
@@ -281,9 +275,20 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
 
     WeightedLatLng point = WeightedLatLng(marker.position, weight: intensity);
 
-    setState(() => enabledPoints.add(point));
+    setState(() => heatmapPoints.add(point));
   }
 
+  void setHeatMapSize(int zoomLevel) {
+    heatmapZoomFactor = heatmapZoomFactor + (zoomLevel - _previousZoomLevel);
+    heatMapRadius.value = (zoomLevel * (heatmapZoomFactor)).toInt();
+    if (heatMapRadius.value < 50) {
+      heatMapRadius.value = 50;
+    }
+
+    print("Zoom Level = " + zoomLevel.toString());
+    print("heatMapRadius.value = " + heatMapRadius.value.toString());
+    setState(() {});
+  }
   Future<int> getUsersCountOnLocation(LatLng court) async {
     final QuerySnapshot snapshot = await FirebaseFirestore.instance
         .collection('USER')
@@ -346,7 +351,7 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
 
   Future<bool> checkIfWithinRadiusAndSetUserCourtInfo() async {
     withinRadius = false;
-    for (Marker marker in _markers) {
+    for (Marker marker in markers) {
       withinRadius = _checkIfWithinRadius(currentLocation!, marker.position);
 
       if (withinRadius) {
@@ -547,87 +552,86 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
                 child: currentLocation == null
                     ? const Center(child: Text("Loading..."))
                     : GoogleMap(
-                            mapToolbarEnabled: false,
-                            zoomControlsEnabled: true,
-                            zoomGesturesEnabled: true,
-                            myLocationButtonEnabled: false,
-                            myLocationEnabled: true,
+                        mapToolbarEnabled: false,
+                        zoomControlsEnabled: true,
+                        zoomGesturesEnabled: true,
+                        myLocationButtonEnabled: false,
+                        myLocationEnabled: true,
 
-                            // tileOverlays: ,
-                            initialCameraPosition: CameraPosition(
-                              target: LatLng(currentLocation!.latitude,
-                                  currentLocation!.longitude),
-                              zoom: ZOOM_LEVEL_INITIAL,
-                            ),
-                            markers: _markers,
-                            onMapCreated: (mapController) {
-                              _mapController = mapController;
-                              _googleMapController.complete(mapController);
-                            },
-                            onCameraMove: (CameraPosition position) {
-                              int currentZoomLevel = position.zoom.toInt();
-                              if (_previousZoomLevel != null &&
-                                  currentZoomLevel != _previousZoomLevel) {
-                                // Zoom level changed
-                                setHeatMapSize(currentZoomLevel);
-                                // print(
-                                //     'Zoom level changed: $_previousZoomLevel -> $currentZoomLevel');
-                              }
-                              _previousZoomLevel = currentZoomLevel;
-                            },
-                            heatmaps: <Heatmap>{
-                              Heatmap(
-                                heatmapId: const HeatmapId('test'),
-                                data: enabledPoints,
-                                gradient: HeatmapGradient(
-                                  const <HeatmapGradientColor>[
-                                    // Web needs a first color with 0 alpha
-                                    // if (kIsWeb)
-                                    //   HeatmapGradientColor(
-                                    //     Color.fromARGB(0, 0, 255, 255),
-                                    //     0,
-                                    //   ),
-                                    HeatmapGradientColor(
-                                      Colors.yellow,
-                                      0.2,
-                                    ),
-                                    HeatmapGradientColor(
-                                      Colors.red,
-                                      0.6,
-                                    ),
-                                    // HeatmapGradientColor(
-                                    //   Colors.green,
-                                    //   0.6,
-                                    // ),
-                                    // HeatmapGradientColor(
-                                    //   Colors.purple,
-                                    //   0.8,
-                                    // ),
-                                    HeatmapGradientColor(
-                                      Colors.blue,
-                                      1,
-                                    ),
-                                  ],
-                                ),
-                                maxIntensity: 1,
-                                // Radius behaves differently on web and Android/iOS.
-                                // For Android: According to documentation, radius should be between 10 to 50
-                                radius: kIsWeb
-                                    ? 10
-                                    : defaultTargetPlatform ==
-                                            TargetPlatform.android
-                                        ? heatMapRadius.value
-                                        : heatMapRadius.value,
-                              )
-                            }
-                            ),
+                        // tileOverlays: ,
+                        initialCameraPosition: CameraPosition(
+                          target: LatLng(currentLocation!.latitude,
+                              currentLocation!.longitude),
+                          zoom: ZOOM_LEVEL_INITIAL,
+                        ),
+                        markers: markers,
+                        onMapCreated: (mapController) {
+                          _mapController = mapController;
+                          _googleMapController.complete(mapController);
+                        },
+                        onCameraMove: (CameraPosition position) {
+                          int currentZoomLevel = position.zoom.toInt();
+                          if (_previousZoomLevel != null &&
+                              currentZoomLevel != _previousZoomLevel) {
+                            // Zoom level changed
+                            setHeatMapSize(currentZoomLevel);
+                            // print(
+                            //     'Zoom level changed: $_previousZoomLevel -> $currentZoomLevel');
+                          }
+                          _previousZoomLevel = currentZoomLevel;
+                        },
+                        heatmaps: <Heatmap>{
+                            Heatmap(
+                              heatmapId: const HeatmapId('test'),
+                              data: heatmapPoints,
+                              gradient: HeatmapGradient(
+                                const <HeatmapGradientColor>[
+                                  // Web needs a first color with 0 alpha
+                                  // if (kIsWeb)
+                                  //   HeatmapGradientColor(
+                                  //     Color.fromARGB(0, 0, 255, 255),
+                                  //     0,
+                                  //   ),
+                                  HeatmapGradientColor(
+                                    Colors.yellow,
+                                    0.2,
+                                  ),
+                                  HeatmapGradientColor(
+                                    Colors.red,
+                                    0.6,
+                                  ),
+                                  // HeatmapGradientColor(
+                                  //   Colors.green,
+                                  //   0.6,
+                                  // ),
+                                  // HeatmapGradientColor(
+                                  //   Colors.purple,
+                                  //   0.8,
+                                  // ),
+                                  HeatmapGradientColor(
+                                    Colors.blue,
+                                    1,
+                                  ),
+                                ],
+                              ),
+                              maxIntensity: 1,
+                              // Radius behaves differently on web and Android/iOS.
+                              // For Android: According to documentation, radius should be between 10 to 50
+                              radius: kIsWeb
+                                  ? 10
+                                  : defaultTargetPlatform ==
+                                          TargetPlatform.android
+                                      ? heatMapRadius.value
+                                      : heatMapRadius.value,
+                            )
+                          }),
               ),
             ),
             Positioned(
               top: 20,
               left: 20,
               right: 20,
-                bottom: 10,
+              bottom: 10,
               child: SizedBox(
                 height: MediaQuery.of(context).size.height * 0.84,
                 child: Column(
@@ -734,54 +738,47 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
                                     ),
                                   ),
                                 ),
-                                // suggestionsCallback: (pattern) async {
-                                //   return await _places
-                                //       .autocomplete(pattern)
-                                //       .then((response) {
-                                //     return response.predictions;
-                                //   });
-                                // },
-                                // itemBuilder: (context, prediction) {
-                                //   return ListTile(
-                                //     title: Text(prediction.description as String),
-                                //   );
-                                // },
                                 suggestionsCallback: (pattern) async {
                                   if (currentLocation == null) {
                                     return [];
                                   }
-                                  final placesResponse =
-                                      await _places.searchNearbyWithRadius(
-                                    Location(
-                                        lat: currentLocation!.latitude,
-                                        lng: currentLocation!.longitude),
-                                    searchRadius, // Search radius in meters
-                                    type: 'court',
-                                    name: 'ball court',
-                                    keyword: pattern,
-                                  );
+                                  final courts = await CourtsParser()
+                                      .getCourtsByNameOrAddressFromCSVFile(
+                                          pattern);
 
-                                  return placesResponse.results;
+                                  // final placesResponse =
+                                  //     await _places.searchNearbyWithRadius(
+                                  //   Location(
+                                  //       lat: currentLocation!.latitude,
+                                  //       lng: currentLocation!.longitude),
+                                  //   searchRadius, // Search radius in meters
+                                  //   type: 'court',
+                                  //   name: 'ball court',
+                                  //   keyword: pattern,
+                                  // );
+
+                                  // return placesResponse.results;
+                                  return courts;
                                 },
                                 itemBuilder: (context, prediction) {
                                   return ListTile(
-                                    title: Text(prediction.name),
-                                    subtitle: Text(prediction.vicinity),
+                                    title: Text(prediction.title),
+                                    subtitle: Text(prediction.address),
                                   );
                                 },
                                 onSuggestionSelected: (prediction) async {
                                   setState(() {
-                                    _selectedPlace = prediction.name as String;
+                                    _selectedPlace = prediction.title as String;
                                   });
                                   typeAheadController.text = _selectedPlace;
 
-                                  var placeId = prediction.placeId;
-                                  var detail = await _places
-                                      .getDetailsByPlaceId(placeId as String);
-                                  var location =
-                                      detail.result.geometry!.location;
-                                  var lat = location.lat;
-                                  var lng = location.lng;
+                                  // var placeId = prediction.placeId;
+                                  // var detail = await _places
+                                  //     .getDetailsByPlaceId(placeId as String);
+                                  // var location =
+                                  //     detail.result.geometry!.location;
+                                  var lat = prediction.latitude;
+                                  var lng = prediction.longitude;
 
                                   final GoogleMapController controller =
                                       await _googleMapController.future;
@@ -793,6 +790,46 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
                                       ),
                                     ),
                                   );
+
+                                  final location = LatLng(
+                                    lat,
+                                    lng,
+                                  );
+                                  Marker marker = Marker(
+                                    markerId: MarkerId(prediction.placeId),
+                                    position: location,
+                                    infoWindow: InfoWindow(
+                                      title: prediction.title,
+                                      snippet: prediction.address,
+                                    ),
+                                    // icon: icon,
+                                    onTap: () {
+                                      pushNewScreen(
+                                        context,
+                                        screen: PlayersView(
+                                          courtLatLng: location,
+                                          courtName: prediction.title,
+                                        ),
+                                        withNavBar: false,
+                                      );
+                                    },
+                                  );
+
+                                  bool matched = false;
+                                  markers.forEach((marker1) {
+                                    if (marker1.markerId == marker.markerId) {
+                                      matched = true;
+                                    }
+                                  });
+
+                                  if (!matched) {
+                                    markers.add(marker);
+                                    addHeatedMarkers(marker);
+
+                                    setState(() {});
+                                  }
+
+
                                 },
                                 transitionBuilder:
                                     (context, suggestionsBox, controller) {
