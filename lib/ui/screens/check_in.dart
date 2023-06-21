@@ -122,15 +122,15 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
       if (snapshot.exists) {
         dynamic pata = snapshot.data();
         data = pata['checkedIn'];
-        print("${pata['checkedIn']}Siuuu");
-        print(data);
+        // print("${pata['checkedIn']}Siuuu");
+        // print(data);
         if (data == false) {
           index = 0;
         } else if (data == true) {
           index = 1;
         }
         setState(() {});
-        print("${index} is index");
+        // print("${index} is index");
       } else {
         print('Document does not exist!');
       }
@@ -144,14 +144,14 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
       index = 0;
     }
     setState(() {});
-    print(index);
+    // print(index);
   }
 
   Future<Position> getCurrentLocation() async {
     Position position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high);
     // courtNames();
-    print(currentLocation?.longitude);
+    // print(currentLocation?.longitude);
     setState(() {
       currentLocation = position;
       courtNames();
@@ -272,10 +272,10 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
     // int playersGathering = 7;
     int playersGathering = await getUsersCountOnLocation(marker.position);
 
-    debugPrint("Court Name:" +
-        (marker.infoWindow.title ?? "") +
-        " | Users Count: " +
-        playersGathering.toString());
+    // debugPrint("Court Name:" +
+    //     (marker.infoWindow.title ?? "") +
+    //     " | Users Count: " +
+    //     playersGathering.toString());
 
     double intensity = playersGathering * 0.1;
 
@@ -336,10 +336,10 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
     double distanceInMeters = Geolocator.distanceBetween(
         userPos.latitude, userPos.longitude, court.latitude, court.longitude);
     if (distanceInMeters <= 100) {
-      print("user in radius");
+      // print("user in radius");
       return true;
     } else {
-      print("user not in radius");
+      // print("user not in radius");
       return false;
     }
   }
@@ -423,7 +423,7 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
           borderWidth: 4,
           borderColor: Colors.black,
           colorText: Colors.black);
-      print(index);
+      // print(index);
       // print(withinRadius);
     }
     //Checkout Pressed
@@ -570,8 +570,8 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
                                   currentZoomLevel != _previousZoomLevel) {
                                 // Zoom level changed
                                 setHeatMapSize(currentZoomLevel);
-                                print(
-                                    'Zoom level changed: $_previousZoomLevel -> $currentZoomLevel');
+                                // print(
+                                //     'Zoom level changed: $_previousZoomLevel -> $currentZoomLevel');
                               }
                               _previousZoomLevel = currentZoomLevel;
                             },
@@ -619,13 +619,15 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
                                         ? heatMapRadius.value
                                         : heatMapRadius.value,
                               )
-                            }),
+                            }
+                            ),
               ),
             ),
             Positioned(
               top: 20,
               left: 20,
               right: 20,
+                bottom: 10,
               child: SizedBox(
                 height: MediaQuery.of(context).size.height * 0.84,
                 child: Column(

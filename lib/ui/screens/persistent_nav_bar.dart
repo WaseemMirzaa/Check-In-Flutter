@@ -200,7 +200,7 @@ class _HomeState extends State<Home> {
         hideNavigationBarWhenKeyboardShows: true,
         backgroundColor: Colors.white,
         popAllScreensOnTapOfSelectedTab: true,
-        confineInSafeArea: false,
+        confineInSafeArea: true,
         handleAndroidBackButtonPress: true,
         customWidget: (navBarEssentials) => Container(
           decoration: const BoxDecoration(
