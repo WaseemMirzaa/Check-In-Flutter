@@ -30,7 +30,8 @@ class _PrivacyPolicyState extends State<PrivacyPolicy> {
             ),
             GestureDetector(
               onTap: () {
-                pushNewScreen(context, screen: Home(), withNavBar: false);
+                Navigator.pop(context);
+                // pushNewScreen(context, screen: Home(), withNavBar: false);
               },
               child: SizedBox(
                 height: 2.1.h,
@@ -66,7 +67,8 @@ class _PrivacyPolicyState extends State<PrivacyPolicy> {
         child: Builder(builder: (BuildContext context) {
           return WebView(
             initialUrl:
-                "https://www.freeprivacypolicy.com/live/fc6c8c08-7126-407d-b16b-5ac249c71a80",
+                // "https://www.freeprivacypolicy.com/live/fc6c8c08-7126-407d-b16b-5ac249c71a80",
+                "https://docs.google.com/document/d/1ILdrqJL3AYxTZ7zA-QQoPJbFafoE3FscMrKROymN4y0/edit?usp=sharing",
             javascriptMode: JavascriptMode.unrestricted,
             onWebViewCreated: (WebViewController webViewController) {
               _controller.complete(webViewController);

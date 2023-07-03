@@ -30,7 +30,8 @@ class _TermsAndConditionsState extends State<TermsAndConditions> {
             ),
             GestureDetector(
               onTap: () {
-                pushNewScreen(context, screen: Home(), withNavBar: false);
+                Navigator.pop(context);
+                // pushNewScreen(context, screen: Home(), withNavBar: false);
               },
               child: SizedBox(
                 height: 2.1.h,
@@ -67,7 +68,8 @@ class _TermsAndConditionsState extends State<TermsAndConditions> {
         child: Builder(builder: (BuildContext context) {
           return WebView(
             initialUrl:
-                "https://www.freeprivacypolicy.com/live/0ccc6661-8efc-4732-b790-0663f523ed4a",
+                // "https://www.freeprivacypolicy.com/live/0ccc6661-8efc-4732-b790-0663f523ed4a",
+                "https://docs.google.com/document/d/12-ZJ7JYdvXfObKDzwxPn5G9Ca0xaWOM4/edit?usp=sharing&ouid=106501373238887852973&rtpof=true&sd=true",
             javascriptMode: JavascriptMode.unrestricted,
             onWebViewCreated: (WebViewController webViewController) {
               _controller.complete(webViewController);

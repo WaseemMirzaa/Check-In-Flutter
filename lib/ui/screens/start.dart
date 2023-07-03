@@ -86,56 +86,59 @@ class _StartViewState extends State<StartView> {
                       ),
                     ),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Text(
-                      'or login with',
-                      style: TextStyle(
-                        fontFamily: 'Poppins',
-                        fontSize: 1.3.h,
-                        color: const Color(0xff707070),
-                        height: 1.4166666666666667,
-                      ),
-                      textHeightBehavior: const TextHeightBehavior(
-                          applyHeightToFirstAscent: false),
-                      textAlign: TextAlign.center,
-                      softWrap: false,
-                    ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.only(top: 0.9.h, bottom: 0.9.h),
-                    child: Container(
-                      height: 6.h,
-                      decoration: BoxDecoration(
-                        color: const Color(0xffffffff),
-                        borderRadius: BorderRadius.circular(6.0),
-                        boxShadow: const [
-                          BoxShadow(
-                            color: Color(0x29000000),
-                            offset: Offset(0, 1),
-                            blurRadius: 6,
-                          ),
-                        ],
-                      ),
-                      child: Center(
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            SizedBox(
-                              width: 30,
-                            ),
-                            SizedBox(
-                              width: 42.w,
-                              child: Image.asset(
-                                'assets/images/instagram.png',
-                                fit: BoxFit.fitWidth,
-                              ),
-                            ),
-                          ],
+                  Visibility(
+                    visible: Platform.isIOS,
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        'or login with',
+                        style: TextStyle(
+                          fontFamily: 'Poppins',
+                          fontSize: 1.3.h,
+                          color: const Color(0xff707070),
+                          height: 1.4166666666666667,
                         ),
+                        textHeightBehavior: const TextHeightBehavior(
+                            applyHeightToFirstAscent: false),
+                        textAlign: TextAlign.center,
+                        softWrap: false,
                       ),
                     ),
                   ),
+                  // Padding(
+                  //   padding: EdgeInsets.only(top: 0.9.h, bottom: 0.9.h),
+                  //   child: Container(
+                  //     height: 6.h,
+                  //     decoration: BoxDecoration(
+                  //       color: const Color(0xffffffff),
+                  //       borderRadius: BorderRadius.circular(6.0),
+                  //       boxShadow: const [
+                  //         BoxShadow(
+                  //           color: Color(0x29000000),
+                  //           offset: Offset(0, 1),
+                  //           blurRadius: 6,
+                  //         ),
+                  //       ],
+                  //     ),
+                  //     child: Center(
+                  //       child: Row(
+                  //         mainAxisAlignment: MainAxisAlignment.center,
+                  //         children: [
+                  //           SizedBox(
+                  //             width: 30,
+                  //           ),
+                  //           SizedBox(
+                  //             width: 42.w,
+                  //             child: Image.asset(
+                  //               'assets/images/instagram.png',
+                  //               fit: BoxFit.fitWidth,
+                  //             ),
+                  //           ),
+                  //         ],
+                  //       ),
+                  //     ),
+                  //   ),
+                  // ),
                   Visibility(
                     visible: Platform.isIOS,
                     child: Padding(
