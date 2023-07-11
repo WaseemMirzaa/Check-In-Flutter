@@ -86,7 +86,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
       final storage = FirebaseStorage.instance;
       final ref = storage
           .ref()
-          .child('profile/${DateTime.now().millisecondsSinceEpoch}');
+          // .child('profile/${DateTime.now().millisecondsSinceEpoch}');
+          .child('profile/${FirebaseAuth.instance.currentUser?.uid ?? ""}');
       final uploadTask = ref.putFile(_imageFile!);
       final snapshot = await uploadTask.whenComplete(() {});
       final downloadUrl = await snapshot.ref.getDownloadURL();
@@ -177,11 +178,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                         NetworkImage(
                                                             users[0].pic))),
                                         child: Center(
-                                          child: Image.asset(
+                                          child: users[0].pic.isEmpty ? Image.asset(
                                               'assets/images/Icon material-person.png',
                                               scale: 1.5,
                                               color: Colors.grey[850]!.withOpacity(0.5),
-                                              ),
+                                              ) : Container(),
                                         ),
                                       ),
                                     ),

@@ -10,7 +10,8 @@ import 'package:sizer/sizer.dart';
 class PlayersView extends StatefulWidget {
   final LatLng courtLatLng;
   String courtName;
-  PlayersView({required this.courtLatLng, required this.courtName});
+  bool isCheckedIn = false;
+  PlayersView({required this.courtLatLng, required this.courtName, required this.isCheckedIn});
 
   @override
   State<PlayersView> createState() => _PlayersViewState();
@@ -50,6 +51,13 @@ class UserService {
           .toList();
     });
   }
+
+  Stream<List<User>> get emptyUsers {
+    return Stream.fromIterable([<User>[]]);
+  }
+
+
+
 }
 
 class _PlayersViewState extends State<PlayersView> {
@@ -62,6 +70,30 @@ class _PlayersViewState extends State<PlayersView> {
     'six',
     'seven',
   ];
+
+  int numberOfPLayers = 0;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
+  Future<int> getNumberOfPlayers() async {
+    final snapshot = await _firestore.collection('USER').get();
+    final users = snapshot.docs.where((doc) =>
+    doc.get("checkedIn") == true &&
+        doc.get("courtLat") == widget.courtLatLng.latitude &&
+        doc.get("courtLng") == widget.courtLatLng.longitude
+    );
+    numberOfPLayers = users.length;
+    setState(() {
+
+    });
+    return users.length;
+  }
+
+  @override
+  void initState() {
+    getNumberOfPlayers();
+
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -114,6 +146,21 @@ class _PlayersViewState extends State<PlayersView> {
                   softWrap: false,
                 ),
               ),
+
+              Padding(
+                padding: EdgeInsets.only(top: 10),
+                child: Text(
+                  "Number of Players: " + numberOfPLayers.toString(),
+                  style: TextStyle(
+                    fontFamily: 'Poppins',
+                    fontSize: 15,
+                    // color: Color(0xff007a33),
+                    fontWeight: FontWeight.w500,
+                  ),
+                  textAlign: TextAlign.right,
+                  softWrap: false,
+                ),
+              ),
               // const Padding(
               //   padding: EdgeInsets.only(top: 20),
               //   child: Text(
@@ -132,7 +179,7 @@ class _PlayersViewState extends State<PlayersView> {
                 height: 20,
               ),
               StreamBuilder<List<User>>(
-                stream: UserService(court: widget.courtLatLng).users,
+                stream: widget.isCheckedIn ? UserService(court: widget.courtLatLng).users : UserService(court: widget.courtLatLng).emptyUsers,
                 builder: (context, snapshot) {
                   if (!snapshot.hasData) {
                     return const Center(child: CircularProgressIndicator());

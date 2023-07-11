@@ -24,9 +24,11 @@ class _SplashState extends State<Splash> {
     } else {
       firstWidget = const StartView();
     }
-    await Future.delayed(Duration(microseconds: 1500), () {});
-    Navigator.pushReplacement(
-        context, MaterialPageRoute(builder: (context) => firstWidget));
+    await Future.delayed(Duration(milliseconds: 1500), () {
+      Navigator.pushReplacement(
+          context, MaterialPageRoute(builder: (context) => firstWidget));
+    });
+
   }
 
   @override

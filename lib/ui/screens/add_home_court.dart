@@ -150,7 +150,7 @@ class _AddHomeCourtState extends State<AddHomeCourt>
     //   name: 'ball court',
     // );
 
-    final courts  = await CourtsParser().getCourtsFromCSVFile();
+    final courts  = await CourtsParser().getCourtsFromCSVFileAndFirestore();
 
     // final placesResponse = await getBasketballCourts();
 
@@ -217,7 +217,7 @@ class _AddHomeCourtState extends State<AddHomeCourt>
       print("user in radius");
       return true;
     } else {
-      print("user not in radius");
+      // print("user not in radius");
       return false;
     }
   }

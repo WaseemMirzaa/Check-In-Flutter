@@ -4,6 +4,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
 
+import '../../utils/DateTimeUtils.dart';
+
 class HistoryView extends StatefulWidget {
   const HistoryView({super.key});
 
@@ -59,8 +61,8 @@ class _HistoryViewState extends State<HistoryView> {
       dataArray = [];
     }
 
-    print(dataArray);
-    print(dataArray.length);
+    // print(dataArray);
+    // print(dataArray.length);
 
     setState(
         () {}); // Assuming this method is inside a StatefulWidget, call setState to update the state
@@ -175,7 +177,7 @@ class _HistoryViewState extends State<HistoryView> {
                                     ),
                                     TextSpan(
                                       text:
-                                          ' ${dataArray[index]["checkInTime"]} ',
+                                          ' ${DateTimeUtils.time24to12(dataArray[index]["checkInTime"])} ',
                                       style: TextStyle(
                                         color: const Color(0xff9f9f9f),
                                         fontWeight: FontWeight.w500,

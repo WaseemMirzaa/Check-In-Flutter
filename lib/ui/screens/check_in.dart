@@ -71,7 +71,8 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
   LatLng? loc;
 
   var courtN;
-  bool? data;
+  bool? isCheckedIn;
+  String checkedInCourtName = '';
 
   Map<String, dynamic> courtInfo = {};
 
@@ -111,13 +112,14 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
         .doc(FirebaseAuth.instance.currentUser!.uid);
     document.get().then((DocumentSnapshot snapshot) {
       if (snapshot.exists) {
-        dynamic pata = snapshot.data();
-        data = pata['checkedIn'];
+        dynamic data = snapshot.data();
+        isCheckedIn = data['checkedIn'];
         // print("${pata['checkedIn']}Siuuu");
-        // print(data);
-        if (data == false) {
+        // print(isCheckedIn);
+        if (isCheckedIn == false) {
           index = 0;
-        } else if (data == true) {
+        } else if (isCheckedIn == true) {
+          checkedInCourtName = data['checkedInCourtName'] ?? "";
           index = 1;
         }
         setState(() {});
@@ -152,6 +154,8 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
   }
 
   Future courtNames() async {
+    // Golden Location
+
     try {
       await snap.collection('goldenLocations').get().then((querySnapshot) {
         querySnapshot.docs.forEach((doc) {
@@ -171,6 +175,7 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
                   screen: PlayersView(
                     courtLatLng: location,
                     courtName: name,
+                    isCheckedIn: checkedInCourtName == name,
                   ),
                   withNavBar: false);
             },
@@ -184,6 +189,7 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
       print(e);
     }
 
+
     // ADDING PLACCES API COURTS LOCATION MARKER
     // final placesResponse = await _places.searchNearbyWithRadius(
     //   Location(
@@ -196,7 +202,7 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
     //   name: 'ball court',
     // );
 
-    final courts = await CourtsParser().getCourtsFromCSVFile();
+    final courts = await CourtsParser().getCourtsFromCSVFileAndFirestore();
 
     // final placesResponse = await getBasketballCourts();
 
@@ -227,6 +233,8 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
             screen: PlayersView(
               courtLatLng: location,
               courtName: place.title,
+              isCheckedIn: checkedInCourtName == place.title,
+
             ),
             withNavBar: false,
           );
@@ -415,15 +423,18 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
       setState(() {
         courtInfo['checkInTime'] =
             DateFormat('HH:mm:ss').format(DateTime.now());
+
+        checkedInCourtName = courtInfo['courtName'];
       });
       snap.collection("USER").doc(auth.currentUser!.uid).update({
         "checkedCourts": FieldValue.arrayUnion([courtInfo]),
         "checkedIn": true,
+        "checkedInCourtName": courtInfo['courtName'],
         "courtLat": loc!.latitude,
         "courtLng": loc!.longitude,
       });
 
-      Get.snackbar("Checked In", "You are in the court.",
+      Get.snackbar("Checked In", "You have checked into this court.",
           backgroundColor: Colors.white,
           borderWidth: 4,
           borderColor: Colors.black,
@@ -438,6 +449,8 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
         "courtLat": FieldValue.delete(),
         "courtLng": FieldValue.delete(),
       });
+
+      checkedInCourtName = '';
 
       Get.snackbar("Checked Out", "You have left the court.",
           backgroundColor: Colors.white,
@@ -809,6 +822,8 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
                                         screen: PlayersView(
                                           courtLatLng: location,
                                           courtName: prediction.title,
+                                          isCheckedIn: checkedInCourtName == prediction.title,
+
                                         ),
                                         withNavBar: false,
                                       );

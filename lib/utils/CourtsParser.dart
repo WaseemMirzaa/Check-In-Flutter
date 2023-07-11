@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:csv/csv.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -7,18 +8,17 @@ import 'package:flutter/services.dart' show rootBundle;
 import '../model/CourtModel.dart';
 
 class CourtsParser {
+
+  static final List<CourtModel> additionalLocations = [];
+
   Future<String> loadAsset() async {
     return await rootBundle.loadString('assets/check-in-data.txt');
   }
-  Future<List<CourtModel>> getCourtsFromCSVFile() async {
+  Future<List<CourtModel>> getCourtsFromCSVFileAndFirestore() async {
     final List<CourtModel> filteredLocations = [];
+    final currentLocation = await getCurrentLocation();
 
     try {
-      final currentLocation = await getCurrentLocation();
-      final currentPosition = LatLng(
-            currentLocation.latitude,
-            currentLocation.longitude,
-          );
 
       var csvString = await loadAsset();
 
@@ -49,6 +49,40 @@ class CourtsParser {
               filteredLocations.add(location);
             }
           }
+    } catch (e) {
+      print(e);
+    }
+
+
+    final snap = FirebaseFirestore.instance;
+
+    try {
+      await snap.collection('AdditionalLocations').get().then((querySnapshot) {
+        querySnapshot.docs.forEach((doc) {
+
+          final location = CourtModel(
+            city: doc.data()['city'],
+            street: doc.data()['street'],
+            placeId: doc.data()['placeId'],
+            latitude: doc.data()['latitude'],
+            longitude: doc.data()['longitude'],
+            url: doc.data()['url'],
+            state: doc.data()['state'],
+            address: doc.data()['address'],
+            title: doc.data()['title'],
+          );
+
+          additionalLocations.add(location);
+
+          final court = LatLng(location.latitude, location.longitude);
+          var isInRadius = checkIfWithinRadius(currentLocation, court);
+
+          if (isInRadius) { // Distance in meters (50km = 50000m)
+            filteredLocations.add(location);
+          }
+
+        });
+      });
     } catch (e) {
       print(e);
     }
@@ -93,6 +127,15 @@ class CourtsParser {
         }
 
       }
+
+      additionalLocations.forEach((location) {
+        // Filter courts based on address
+        if (location.title.toLowerCase().contains(search.toLowerCase()) || location.address.toLowerCase().contains(search.toLowerCase())) {
+          filteredLocations.add(location);
+
+        }
+      });
+
     } catch (e) {
       print(e);
     }
@@ -108,7 +151,7 @@ class CourtsParser {
       print("user in radius");
       return true;
     } else {
-      print("user not in radius");
+      // print("user not in radius");
       return false;
     }
   }

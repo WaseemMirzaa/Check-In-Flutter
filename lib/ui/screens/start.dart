@@ -86,25 +86,25 @@ class _StartViewState extends State<StartView> {
                       ),
                     ),
                   ),
-                  Visibility(
-                    visible: Platform.isIOS,
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Text(
-                        'or login with',
-                        style: TextStyle(
-                          fontFamily: 'Poppins',
-                          fontSize: 1.3.h,
-                          color: const Color(0xff707070),
-                          height: 1.4166666666666667,
-                        ),
-                        textHeightBehavior: const TextHeightBehavior(
-                            applyHeightToFirstAscent: false),
-                        textAlign: TextAlign.center,
-                        softWrap: false,
-                      ),
-                    ),
-                  ),
+                  // Visibility(
+                  //   visible: Platform.isIOS,
+                  //   child: Padding(
+                  //     padding: const EdgeInsets.all(8.0),
+                  //     child: Text(
+                  //       'or login with',
+                  //       style: TextStyle(
+                  //         fontFamily: 'Poppins',
+                  //         fontSize: 1.3.h,
+                  //         color: const Color(0xff707070),
+                  //         height: 1.4166666666666667,
+                  //       ),
+                  //       textHeightBehavior: const TextHeightBehavior(
+                  //           applyHeightToFirstAscent: false),
+                  //       textAlign: TextAlign.center,
+                  //       softWrap: false,
+                  //     ),
+                  //   ),
+                  // ),
                   // Padding(
                   //   padding: EdgeInsets.only(top: 0.9.h, bottom: 0.9.h),
                   //   child: Container(
@@ -139,47 +139,50 @@ class _StartViewState extends State<StartView> {
                   //     ),
                   //   ),
                   // ),
-                  Visibility(
-                    visible: Platform.isIOS,
-                    child: Padding(
-                      padding: EdgeInsets.only(top: 0.9.h, bottom: 0.9.h),
-                      child: Container(
-                        height: 6.h,
-                        decoration: BoxDecoration(
-                          color: const Color(0xffffffff),
-                          borderRadius: BorderRadius.circular(6.0),
-                          boxShadow: const [
-                            BoxShadow(
-                              color: Color(0x29000000),
-                              offset: Offset(0, 1),
-                              blurRadius: 6,
-                            ),
-                          ],
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Image.asset(
-                              'assets/images/apple.png',
-                              scale: 4,
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text(
-                                'Apple',
-                                style: TextStyle(
-                                  fontFamily: 'Helvetica',
-                                  fontSize: 1.8.h,
-                                  color: const Color(0xff000000),
-                                ),
-                                softWrap: false,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
+                  // Visibility(
+                  //   visible: Platform.isIOS,
+                  //   child: Padding(
+                  //     padding: EdgeInsets.only(top: 0.9.h, bottom: 0.9.h),
+                  //     child: Container(
+                  //       height: 6.h,
+                  //       decoration: BoxDecoration(
+                  //         color: const Color(0xffffffff),
+                  //         borderRadius: BorderRadius.circular(6.0),
+                  //         boxShadow: const [
+                  //           BoxShadow(
+                  //             color: Color(0x29000000),
+                  //             offset: Offset(0, 1),
+                  //             blurRadius: 6,
+                  //           ),
+                  //         ],
+                  //       ),
+                  //       child: Row(
+                  //         mainAxisAlignment: MainAxisAlignment.center,
+                  //         children: [
+                  //           Padding(
+                  //             padding: const EdgeInsets.all(8.0),
+                  //             child: Image.asset(
+                  //               'assets/images/apple.png',
+                  //               scale: 2,
+                  //             ),
+                  //           ),
+                  //           Padding(
+                  //             padding: const EdgeInsets.all(0.0),
+                  //             child: Text(
+                  //               'Apple',
+                  //               style: TextStyle(
+                  //                 fontFamily: 'Helvetica',
+                  //                 fontSize: 1.8.h,
+                  //                 color: const Color(0xff000000),
+                  //               ),
+                  //               softWrap: false,
+                  //             ),
+                  //           ),
+                  //         ],
+                  //       ),
+                  //     ),
+                  //   ),
+                  // ),
                   verticalGap(3.h),
                 ],
               ),
