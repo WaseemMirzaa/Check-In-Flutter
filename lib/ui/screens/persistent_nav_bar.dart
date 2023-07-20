@@ -105,12 +105,12 @@ class CustomNavBarWidget extends StatelessWidget {
                     showDialog(
                         context: context,
                         builder: (context) => AlertDialog(
-                              title: poppinsText("You are not logged in", 16,
+                              title: poppinsText("Please log in to use more features", 16,
                                   FontWeight.w500, Colors.black),
                               actions: [
                                 TextButton(
                                   onPressed: () {
-                                    Get.offAll(() => const StartView());
+                                    Get.off(() => StartView(isBack: true));
                                   },
                                   child: const Text('Login'),
                                 ),

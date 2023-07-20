@@ -4,6 +4,7 @@ import 'package:check_in/auth_service.dart';
 import 'package:check_in/model/user_modal.dart';
 import 'package:check_in/ui/screens/contact_us.dart';
 import 'package:check_in/ui/screens/privacy_policy.dart';
+import 'package:check_in/ui/screens/start.dart';
 import 'package:check_in/ui/screens/terms_conditions.dart';
 import 'package:check_in/ui/widgets/common_button.dart';
 import 'package:check_in/utils/CourtsParser.dart';
@@ -39,7 +40,7 @@ class CheckIn extends StatefulWidget {
 }
 
 class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
-  int? index;
+  int? index = 0;
   bool withinRadius = false;
   double ZOOM_LEVEL_INITIAL = 12;
   RxInt heatMapRadius = 45.obs;
@@ -64,7 +65,7 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
   LatLng? loc;
 
   var courtN;
-  bool? isCheckedIn;
+  bool? isCheckedIn = false;
   String checkedInCourtName = '';
 
   Map<String, dynamic> courtInfo = {};
@@ -852,18 +853,36 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
                           left: 40, right: 40, bottom: 10),
                       child: fullWidthButton(
                           index == 0 ? "CHECK IN" : "CHECK OUT", () {
-                        // changeIndex();
-                        // if (index == 1)
-                        //   pushNewScreen(context,
-                        //       screen: const PlayersView(), withNavBar: false);
-                        // print(index);
-                        withinRadius == true || index == 1
-                            ? _buttonPress()
-                            : Get.snackbar("Alert", "You are not at a court.",
-                                backgroundColor: Colors.white,
-                                borderWidth: 4,
-                                borderColor: Colors.black,
-                                colorText: Colors.black);
+                        if (FirebaseAuth.instance.currentUser == null) {
+                          showDialog(
+                              context: context,
+                              builder: (context) => AlertDialog(
+                                    title: poppinsText("Please log in to use more features",
+                                        16, FontWeight.w500, Colors.black),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () {
+                                          Get.off(() => StartView(isBack:true));
+                                        },
+                                        child: const Text('Login'),
+                                      ),
+                                      TextButton(
+                                        onPressed: () {
+                                          Navigator.pop(context);
+                                        },
+                                        child: const Text('Cancel'),
+                                      ),
+                                    ],
+                                  ));
+                        } else {
+                          withinRadius == true || index == 1
+                              ? _buttonPress()
+                              : Get.snackbar("Alert", "You are not at a court.",
+                                  backgroundColor: Colors.white,
+                                  borderWidth: 4,
+                                  borderColor: Colors.black,
+                                  colorText: Colors.black);
+                        }
                       }),
                     ),
                   ],

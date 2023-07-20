@@ -10,7 +10,8 @@ import 'package:sizer/sizer.dart';
 import 'package:app_tracking_transparency/app_tracking_transparency.dart';
 
 class StartView extends StatefulWidget {
-  const StartView({super.key});
+  bool isBack = false;
+  StartView({super.key, required this.isBack});
 
   @override
   State<StartView> createState() => _StartViewState();
@@ -74,6 +75,28 @@ class _StartViewState extends State<StartView> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
+      appBar: widget.isBack ? AppBar(
+        backgroundColor: Colors.white,
+        leading: Row(
+          children: [
+            const SizedBox(
+              width: 30,
+            ),
+            GestureDetector(
+              onTap: () {
+                Navigator.pop(context);
+              },
+              child: SizedBox(
+                height: 2.1.h,
+                width: 2.9.w,
+                child: Image.asset("assets/images/Path 6.png"),
+              ),
+            )
+          ],
+        ),
+        elevation: 0,
+      ) : null,
+
       body: Padding(
         padding: EdgeInsets.all(horizontalPadding),
         child: Center(

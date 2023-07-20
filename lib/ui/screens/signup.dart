@@ -55,7 +55,7 @@ class _SignupViewState extends State<SignupView> {
             GestureDetector(
               onTap: () {
                 pushNewScreen(context,
-                    screen: const StartView(), withNavBar: false);
+                    screen: StartView(isBack:false), withNavBar: false);
               },
               child: SizedBox(
                 height: 2.1.h,

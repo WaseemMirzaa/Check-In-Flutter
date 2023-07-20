@@ -79,7 +79,7 @@ Future<void> logout(context) async {
   auth.signOut().then(
         (value) =>
             // pushNewScreen(context, screen: const StartView(), withNavBar: false)
-            Get.offAll(const StartView()),
+            Get.offAll(StartView(isBack: false,)),
         // Navigator.of(context, rootNavigator: !false).pushReplacement(
         //     getPageRoute(PageTransitionAnimation.cupertino,
         //         enterPage: StartView())),
@@ -142,7 +142,7 @@ Future<void> delAcc(context) async {
                                   .delete();
 
                               await user.delete().then((value) {
-                                Get.offAll(const StartView());
+                                Get.offAll(StartView(isBack: false));
 
                                 // Navigator.of(context, rootNavigator: !false)
                                 //     .pushReplacement(getPageRoute(
