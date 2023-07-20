@@ -1,5 +1,4 @@
 import 'package:check_in/auth_service.dart';
-import 'package:check_in/ui/screens/persistent_nav_bar.dart';
 import 'package:check_in/ui/screens/privacy_policy.dart';
 import 'package:check_in/ui/screens/start.dart';
 import 'package:check_in/ui/screens/terms_conditions.dart';
@@ -9,7 +8,6 @@ import 'package:check_in/val.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:nb_utils/nb_utils.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
 import 'package:sizer/sizer.dart';
 import 'package:get/get.dart';
@@ -228,7 +226,9 @@ class _SignupViewState extends State<SignupView> {
                           GestureDetector(
                             onTap: () {
                               pushNewScreen(context,
-                                  screen: const PrivacyPolicy(), withNavBar: false);                            },
+                                  screen: const PrivacyPolicy(),
+                                  withNavBar: false);
+                            },
                             child: Text(
                               "Privacy Policy",
                               style: TextStyle(
@@ -251,7 +251,9 @@ class _SignupViewState extends State<SignupView> {
                           GestureDetector(
                             onTap: () {
                               pushNewScreen(context,
-                                  screen: const TermsAndConditions(), withNavBar: false);                              // Handle the action to open the Terms & Conditions screen
+                                  screen: const TermsAndConditions(),
+                                  withNavBar:
+                                      false); // Handle the action to open the Terms & Conditions screen
                             },
                             child: Text(
                               "Terms & Conditions",

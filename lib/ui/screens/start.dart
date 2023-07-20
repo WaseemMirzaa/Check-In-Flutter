@@ -80,7 +80,7 @@ class _StartViewState extends State<StartView> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              Container(
+              SizedBox(
                 height: MediaQuery.of(context).size.height * 0.4,
                 child: Center(
                   child: Image.asset(

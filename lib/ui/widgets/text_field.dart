@@ -1,19 +1,17 @@
-
-
-
 import 'package:flutter/material.dart';
 
-TextField customTextField(String hint,Color hintColor, TextEditingController controller){
+TextField customTextField(
+    String hint, Color hintColor, TextEditingController controller) {
   return TextField(
     enableSuggestions: false,
     autocorrect: false,
     obscureText: false,
     controller: controller,
     decoration: InputDecoration(
-      enabledBorder: UnderlineInputBorder(
+      enabledBorder: const UnderlineInputBorder(
         borderSide: BorderSide(color: Color(0xff707070)),
       ),
-      focusedBorder: UnderlineInputBorder(
+      focusedBorder: const UnderlineInputBorder(
         borderSide: BorderSide(color: Color(0xff707070)),
       ),
       hintText: hint,

@@ -89,7 +89,7 @@ class _HistoryViewState extends State<HistoryView> {
           style: TextStyle(
             fontFamily: 'Poppins',
             fontSize: 20,
-            color: const Color(0xff000000),
+            color: Color(0xff000000),
             fontWeight: FontWeight.w700,
           ),
           textAlign: TextAlign.right,
@@ -113,9 +113,9 @@ class _HistoryViewState extends State<HistoryView> {
                       decoration: BoxDecoration(
                         color: const Color(0xffffffff),
                         borderRadius: BorderRadius.circular(6.0),
-                        boxShadow: [
+                        boxShadow: const [
                           BoxShadow(
-                            color: const Color(0x29000000),
+                            color: Color(0x29000000),
                             offset: Offset(0, 1),
                             blurRadius: 6,
                           ),
@@ -155,7 +155,7 @@ class _HistoryViewState extends State<HistoryView> {
                                     height: 1.7,
                                   ),
                                   children: [
-                                    TextSpan(
+                                    const TextSpan(
                                       text: 'Court Location :',
                                       style: TextStyle(
                                         fontWeight: FontWeight.w600,
@@ -164,12 +164,12 @@ class _HistoryViewState extends State<HistoryView> {
                                     TextSpan(
                                       text:
                                           ' ${dataArray[index]["courtName"]}\n',
-                                      style: TextStyle(
-                                        color: const Color(0xff9f9f9f),
+                                      style: const TextStyle(
+                                        color: Color(0xff9f9f9f),
                                         fontWeight: FontWeight.w500,
                                       ),
                                     ),
-                                    TextSpan(
+                                    const TextSpan(
                                       text: 'Check in :',
                                       style: TextStyle(
                                         fontWeight: FontWeight.w600,
@@ -178,8 +178,8 @@ class _HistoryViewState extends State<HistoryView> {
                                     TextSpan(
                                       text:
                                           ' ${DateTimeUtils.time24to12(dataArray[index]["checkInTime"])} ',
-                                      style: TextStyle(
-                                        color: const Color(0xff9f9f9f),
+                                      style: const TextStyle(
+                                        color: Color(0xff9f9f9f),
                                         fontWeight: FontWeight.w500,
                                       ),
                                     ),
@@ -195,7 +195,7 @@ class _HistoryViewState extends State<HistoryView> {
                         horizontal: horizontalPadding + 15),
                     child: Container(
                       height: 1,
-                      color: Color(0xff9f9f9f),
+                      color: const Color(0xff9f9f9f),
                     ),
                   )
                 ],

@@ -3,16 +3,14 @@ import 'package:check_in/utils/colors.dart';
 import 'package:check_in/utils/styles.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../utils/gaps.dart';
-import 'add_home_court.dart';
 
 class PlayerScreen extends StatefulWidget {
   final User user;
 
-  PlayerScreen({required this.user});
+  const PlayerScreen({super.key, required this.user});
 
   @override
   State<PlayerScreen> createState() => _PlayerScreenState();
@@ -58,7 +56,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
               Column(
                 children: [
                   verticalGap(3.h),
-                  Container(
+                  SizedBox(
                     width: 35.9.w,
                     child: Stack(
                       alignment: Alignment.bottomCenter,
@@ -89,9 +87,13 @@ class _PlayerScreenState extends State<PlayerScreen> {
                     ),
                   ),
                   verticalGap(0.5.h),
-                  poppinsText(widget.user.name, 32, FontWeight.bold, blackColor),
                   poppinsText(
-                      "@${widget.user.email.substring(0, widget.user.email.indexOf('@'))}", 12, FontWeight.normal, blackColor),
+                      widget.user.name, 32, FontWeight.bold, blackColor),
+                  poppinsText(
+                      "@${widget.user.email.substring(0, widget.user.email.indexOf('@'))}",
+                      12,
+                      FontWeight.normal,
+                      blackColor),
                 ],
               ),
               Column(
@@ -105,8 +107,13 @@ class _PlayerScreenState extends State<PlayerScreen> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            poppinsText(widget.user.court == "" ? "" : widget.user.court, 14,
-                                semiBold, blackColor),
+                            poppinsText(
+                                widget.user.court == ""
+                                    ? ""
+                                    : widget.user.court,
+                                14,
+                                semiBold,
+                                blackColor),
                             // InkWell(
                             //   onTap: () {
                             //     pushNewScreen(context,
@@ -114,12 +121,12 @@ class _PlayerScreenState extends State<PlayerScreen> {
                             //         withNavBar: false);
                             //   },
                             //   child:
-                              SizedBox(
-                                height: 2.3.h,
-                                width: 4.47.w,
-                                child: Image.asset(
-                                    "assets/images/Icon feather-map-pin.png"),
-                              ),
+                            SizedBox(
+                              height: 2.3.h,
+                              width: 4.47.w,
+                              child: Image.asset(
+                                  "assets/images/Icon feather-map-pin.png"),
+                            ),
                             // )
                           ],
                         ),
@@ -175,8 +182,9 @@ class _PlayerScreenState extends State<PlayerScreen> {
                                   focusedBorder: InputBorder.none,
                                   focusedErrorBorder: InputBorder.none,
                                   enabled: false,
-                                  hintText:
-                                       widget.user.about == "" ? "" : widget.user.about,
+                                  hintText: widget.user.about == ""
+                                      ? ""
+                                      : widget.user.about,
                                   helperStyle: GoogleFonts.poppins(
                                       fontSize: 14,
                                       fontWeight: regular,

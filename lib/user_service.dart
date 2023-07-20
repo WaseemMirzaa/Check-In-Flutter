@@ -33,21 +33,22 @@ Future addUserData({
   }
 }
 
-void getUsersOnLocation(LatLng courtLocation) async{
-
-  final double latitude = 37.7749;
-  final double longitude = -122.4194;
-  final double earthRadius = 6371; // Earth's radius in kilometers
-  final double radiusInKm = 10; // Example distance in kilometers
+void getUsersOnLocation(LatLng courtLocation) async {
+  const double latitude = 37.7749;
+  const double longitude = -122.4194;
+  const double earthRadius = 6371; // Earth's radius in kilometers
+  const double radiusInKm = 10; // Example distance in kilometers
 
   final double radius = _kilometersToDegrees(radiusInKm);
 
-  final pi = 3.14159;
+  const pi = 3.14159;
 
   final double lowerLat = latitude - (radius / earthRadius) * (180 / pi);
-  final double lowerLng = longitude - (radius / earthRadius) * (180 / pi) / cos(latitude * pi / 180);
+  final double lowerLng = longitude -
+      (radius / earthRadius) * (180 / pi) / cos(latitude * pi / 180);
   final double upperLat = latitude + (radius / earthRadius) * (180 / pi);
-  final double upperLng = longitude + (radius / earthRadius) * (180 / pi) / cos(latitude * pi / 180);
+  final double upperLng = longitude +
+      (radius / earthRadius) * (180 / pi) / cos(latitude * pi / 180);
 
   final collectionReference = FirebaseFirestore.instance.collection('users');
 
@@ -66,8 +67,6 @@ void getUsersOnLocation(LatLng courtLocation) async{
     print(user);
   }
 }
-
-
 
 double _degreesToKilometers(double degrees) {
   double earthRadiusInKilometers = 6371;

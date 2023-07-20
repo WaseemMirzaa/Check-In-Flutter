@@ -8,58 +8,55 @@ import 'package:flutter/services.dart' show rootBundle;
 import '../model/CourtModel.dart';
 
 class CourtsParser {
-
   static final List<CourtModel> additionalLocations = [];
 
   Future<String> loadAsset() async {
     return await rootBundle.loadString('assets/check-in-data.txt');
   }
+
   Future<List<CourtModel>> getCourtsFromCSVFileAndFirestore() async {
     final List<CourtModel> filteredLocations = [];
     final currentLocation = await getCurrentLocation();
 
     try {
-
       var csvString = await loadAsset();
 
-      var csvData = CsvToListConverter().convert(csvString);
-
+      var csvData = const CsvToListConverter().convert(csvString);
 
       for (var i = 1; i < csvData.length; i++) {
-            final location = CourtModel(
-              city: csvData[i][0].toString(),
-              street: csvData[i][1].toString(),
-              placeId: csvData[i][2].toString(),
-              latitude: double.parse(csvData[i][3].toString()),
-              longitude: double.parse(csvData[i][4].toString()),
-              url: csvData[i][5].toString(),
-              state: csvData[i][6].toString(),
-              address: csvData[i][7].toString(),
-              title: csvData[i][8].toString(),
-            );
+        final location = CourtModel(
+          city: csvData[i][0].toString(),
+          street: csvData[i][1].toString(),
+          placeId: csvData[i][2].toString(),
+          latitude: double.parse(csvData[i][3].toString()),
+          longitude: double.parse(csvData[i][4].toString()),
+          url: csvData[i][5].toString(),
+          state: csvData[i][6].toString(),
+          address: csvData[i][7].toString(),
+          title: csvData[i][8].toString(),
+        );
 
-            final court = LatLng(location.latitude, location.longitude);
-            var isInRadius = checkIfWithinRadius(currentLocation, court);
-            // final distance = Geodesy().distanceBetweenTwoGeoPoints(
-            //   currentPosition,
-            //   locationPosition,
-            // );
+        final court = LatLng(location.latitude, location.longitude);
+        var isInRadius = checkIfWithinRadius(currentLocation, court);
+        // final distance = Geodesy().distanceBetweenTwoGeoPoints(
+        //   currentPosition,
+        //   locationPosition,
+        // );
 
-            if (isInRadius) { // Distance in meters (50km = 50000m)
-              filteredLocations.add(location);
-            }
-          }
+        if (isInRadius) {
+          // Distance in meters (50km = 50000m)
+          filteredLocations.add(location);
+        }
+      }
     } catch (e) {
       print(e);
     }
-
 
     final snap = FirebaseFirestore.instance;
 
     try {
       await snap.collection('AdditionalLocations').get().then((querySnapshot) {
-        querySnapshot.docs.forEach((doc) {
-
+        for (var doc in querySnapshot.docs) {
           final location = CourtModel(
             city: doc.data()['city'],
             street: doc.data()['street'],
@@ -77,11 +74,11 @@ class CourtsParser {
           final court = LatLng(location.latitude, location.longitude);
           var isInRadius = checkIfWithinRadius(currentLocation, court);
 
-          if (isInRadius) { // Distance in meters (50km = 50000m)
+          if (isInRadius) {
+            // Distance in meters (50km = 50000m)
             filteredLocations.add(location);
           }
-
-        });
+        }
       });
     } catch (e) {
       print(e);
@@ -90,7 +87,8 @@ class CourtsParser {
     return filteredLocations;
   }
 
-  Future<List<CourtModel>> getCourtsByNameOrAddressFromCSVFile(String search) async {
+  Future<List<CourtModel>> getCourtsByNameOrAddressFromCSVFile(
+      String search) async {
     final List<CourtModel> filteredLocations = [];
 
     try {
@@ -102,8 +100,7 @@ class CourtsParser {
 
       var csvString = await loadAsset();
 
-      var csvData = CsvToListConverter().convert(csvString);
-
+      var csvData = const CsvToListConverter().convert(csvString);
 
       for (var i = 1; i < csvData.length; i++) {
         final location = CourtModel(
@@ -121,28 +118,25 @@ class CourtsParser {
         final court = LatLng(location.latitude, location.longitude);
 
         // Filter courts based on address
-        if (location.title.toLowerCase().contains(search.toLowerCase()) || location.address.toLowerCase().contains(search.toLowerCase())) {
+        if (location.title.toLowerCase().contains(search.toLowerCase()) ||
+            location.address.toLowerCase().contains(search.toLowerCase())) {
           filteredLocations.add(location);
-
         }
-
       }
 
-      additionalLocations.forEach((location) {
+      for (var location in additionalLocations) {
         // Filter courts based on address
-        if (location.title.toLowerCase().contains(search.toLowerCase()) || location.address.toLowerCase().contains(search.toLowerCase())) {
+        if (location.title.toLowerCase().contains(search.toLowerCase()) ||
+            location.address.toLowerCase().contains(search.toLowerCase())) {
           filteredLocations.add(location);
-
         }
-      });
-
+      }
     } catch (e) {
       print(e);
     }
 
     return filteredLocations;
   }
-
 
   bool checkIfWithinRadius(Position userPos, LatLng court) {
     double distanceInMeters = Geolocator.distanceBetween(
@@ -158,7 +152,7 @@ class CourtsParser {
 
   Future<Position> getCurrentLocation() async {
     final geolocator = Geolocator();
-    final locationOptions = LocationOptions(
+    final locationOptions = const LocationOptions(
       accuracy: LocationAccuracy.best,
       distanceFilter: 10, // Minimum distance for location updates (in meters)
     );

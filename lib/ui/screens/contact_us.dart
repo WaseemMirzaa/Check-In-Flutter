@@ -1,4 +1,3 @@
-import 'package:check_in/ui/screens/persistent_nav_bar.dart';
 import 'package:check_in/ui/widgets/common_button.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -31,7 +30,8 @@ class _ContactUsState extends State<ContactUs> {
     final Uri params = Uri(
       scheme: 'mailto',
       path: 'support@checkinhoops.net',
-      query: 'subject=Contact Us Inquiry&body=Name: ${nameController.text}\nEmail: ${emailController.text}',
+      query:
+          'subject=Contact Us Inquiry&body=Name: ${nameController.text}\nEmail: ${emailController.text}',
     );
 
     final String url = params.toString();
@@ -60,11 +60,11 @@ class _ContactUsState extends State<ContactUs> {
       appBar: AppBar(
         leading: Row(
           children: [
-            SizedBox(
+            const SizedBox(
               width: 30,
             ),
             GestureDetector(
-              onTap: (){
+              onTap: () {
                 Navigator.pop(context);
               },
               child: SizedBox(
@@ -84,16 +84,16 @@ class _ContactUsState extends State<ContactUs> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Padding(
-            padding: EdgeInsets.symmetric(horizontal: 50, vertical: 36),
+            padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 36),
             child: Column(
               children: [
-                customTextField("Name", greenColor,nameController),
+                customTextField("Name", greenColor, nameController),
                 customTextField("Email", greenColor, emailController),
               ],
             ),
           ),
           Padding(
-            padding: EdgeInsets.symmetric(
+            padding: const EdgeInsets.symmetric(
               horizontal: 30,
               vertical: 15,
             ),

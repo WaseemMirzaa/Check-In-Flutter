@@ -1,14 +1,11 @@
+// ignore_for_file: prefer_typing_uninitialized_variables
+
 import 'dart:async';
-import 'dart:io';
-import 'dart:math';
 import 'package:check_in/auth_service.dart';
 import 'package:check_in/model/user_modal.dart';
-import 'package:check_in/search_location.dart';
 import 'package:check_in/ui/screens/contact_us.dart';
 import 'package:check_in/ui/screens/persistent_nav_bar.dart';
-import 'package:check_in/ui/screens/player.dart';
 import 'package:check_in/ui/screens/privacy_policy.dart';
-import 'package:check_in/ui/screens/start.dart';
 import 'package:check_in/ui/screens/terms_conditions.dart';
 import 'package:check_in/ui/widgets/common_button.dart';
 import 'package:check_in/utils/colors.dart';
@@ -19,7 +16,6 @@ import 'package:flutter/material.dart';
 
 // import 'package:flutter_heat_map/flutter_heat_map.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
-import 'package:geocoding/geocoding.dart' as geocoding;
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -30,12 +26,8 @@ import 'package:google_maps_webservice/places.dart';
 
 // import 'package:location/location.dart' ;
 import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import '../../constants.dart';
 import '../../utils/CourtsParser.dart';
-import 'Players.dart';
-import 'package:intl/intl.dart';
-import 'package:flutter/foundation.dart';
 
 class AddHomeCourt extends StatefulWidget {
   final isMyProfile;
@@ -53,13 +45,13 @@ class _AddHomeCourtState extends State<AddHomeCourt>
   bool withinRadius = false;
   double ZOOM_LEVEL_INITIAL = 12;
   RxInt heatMapRadius = 45.obs;
-  int _previousZoomLevel = 12;
+  final int _previousZoomLevel = 12;
   double heatmapZoomFactor = 2.5;
   int searchRadius = 30 * 1000;
 
   StreamSubscription<Position>? _positionStreamSubscription;
 
-  GlobalKey<ScaffoldState> _scaffoldState = GlobalKey<ScaffoldState>();
+  final GlobalKey<ScaffoldState> _scaffoldState = GlobalKey<ScaffoldState>();
 
   BitmapDescriptor sourceIcon = BitmapDescriptor.defaultMarker;
   BitmapDescriptor destinationIcon = BitmapDescriptor.defaultMarker;
@@ -81,13 +73,12 @@ class _AddHomeCourtState extends State<AddHomeCourt>
 
   TextEditingController typeAheadController = TextEditingController();
 
-  final _places =
-      GoogleMapsPlaces(apiKey: Constants.API_KEY);
+  final _places = GoogleMapsPlaces(apiKey: Constants.API_KEY);
   String _selectedPlace = '';
 
   Position? currentLocation;
   final Completer<GoogleMapController> _googleMapController = Completer();
-  GoogleMapController? _mapController = null;
+  GoogleMapController? _mapController;
 
   Set<Marker> markers = Set<Marker>.identity();
 
@@ -103,7 +94,6 @@ class _AddHomeCourtState extends State<AddHomeCourt>
       _selectedLocation =
           LatLng(currentLocation!.latitude, currentLocation!.latitude);
       courtNames();
-
     });
 
     return Future.value(currentLocation);
@@ -111,7 +101,7 @@ class _AddHomeCourtState extends State<AddHomeCourt>
 
   Future courtNames() async {
     await snap.collection('goldenLocations').get().then((querySnapshot) {
-      querySnapshot.docs.forEach((doc) {
+      for (var doc in querySnapshot.docs) {
         double latitude = doc.data()['lat'];
         double longitude = doc.data()['lng'];
         String name = doc.data()['name'];
@@ -122,7 +112,7 @@ class _AddHomeCourtState extends State<AddHomeCourt>
           position: location,
           infoWindow: InfoWindow(title: name),
           icon:
-          BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueYellow),
+              BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueYellow),
           onTap: () {
             _selectedPlace = name;
             // pushNewScreen(
@@ -133,10 +123,9 @@ class _AddHomeCourtState extends State<AddHomeCourt>
           },
         );
         markers.add(marker);
-      });
+      }
       setState(() {});
     });
-
 
     // ADDING PLACCES API COURTS LOCATION MARKER
     // final placesResponse = await _places.searchNearbyWithRadius(
@@ -150,17 +139,16 @@ class _AddHomeCourtState extends State<AddHomeCourt>
     //   name: 'ball court',
     // );
 
-    final courts  = await CourtsParser().getCourtsFromCSVFileAndFirestore();
+    final courts = await CourtsParser().getCourtsFromCSVFileAndFirestore();
 
     // final placesResponse = await getBasketballCourts();
 
     // placesResponse?.results.forEach((place) {
-    courts.forEach((place) {
+    for (var place in courts) {
       LatLng location = LatLng(
         place.latitude,
         place.longitude,
       );
-
 
       BitmapDescriptor icon;
       // if (isGolden) {
@@ -186,13 +174,12 @@ class _AddHomeCourtState extends State<AddHomeCourt>
         },
       );
       markers.add(marker);
-    });
+    }
 
     setState(() {
       markers = markers;
     });
   }
-
 
   Future<Position> setCurrentLocationOnMap() async {
     GoogleMapController googleMapController = await _googleMapController.future;
@@ -222,7 +209,6 @@ class _AddHomeCourtState extends State<AddHomeCourt>
     }
   }
 
-
   double getCurrentZoomLevel() {
     if (_mapController != null) {
       _mapController!.getZoomLevel().then((double zoomLevel) {
@@ -244,7 +230,7 @@ class _AddHomeCourtState extends State<AddHomeCourt>
       key: _scaffoldState,
       drawer: Drawer(
         backgroundColor: whiteColor,
-        child: Container(
+        child: SizedBox(
           height: 300,
           child: ListView(
             // Important: Remove any padding from the ListView.
@@ -454,7 +440,7 @@ class _AddHomeCourtState extends State<AddHomeCourt>
                                   }
                                   final courts = await CourtsParser()
                                       .getCourtsByNameOrAddressFromCSVFile(
-                                      pattern);
+                                          pattern);
 
                                   // final placesResponse =
                                   //     await _places.searchNearbyWithRadius(
@@ -490,7 +476,6 @@ class _AddHomeCourtState extends State<AddHomeCourt>
                                   var lat = prediction.latitude;
                                   var lng = prediction.longitude;
 
-
                                   final GoogleMapController controller =
                                       await _googleMapController.future;
                                   controller.animateCamera(
@@ -501,7 +486,6 @@ class _AddHomeCourtState extends State<AddHomeCourt>
                                       ),
                                     ),
                                   );
-
 
                                   final location = LatLng(
                                     lat,
@@ -517,16 +501,15 @@ class _AddHomeCourtState extends State<AddHomeCourt>
                                     // icon: icon,
                                     onTap: () {
                                       _selectedPlace = prediction.title;
-
                                     },
                                   );
 
                                   bool matched = false;
-                                  markers.forEach((marker1) {
+                                  for (var marker1 in markers) {
                                     if (marker1.markerId == marker.markerId) {
                                       matched = true;
                                     }
-                                  });
+                                  }
 
                                   if (!matched) {
                                     markers.add(marker);
@@ -563,10 +546,10 @@ class _AddHomeCourtState extends State<AddHomeCourt>
                       child: Visibility(
                         visible: widget.isMyProfile,
                         child: fullWidthButton("SELECT", () async {
-                          var _selectedLocationName = "";
+                          var selectedLocationName = "";
 
                           if (_selectedPlace.isNotEmpty) {
-                            _selectedLocationName = _selectedPlace;
+                            selectedLocationName = _selectedPlace;
                           }
                           // else {
                           //   // Reverse geocode the selected location to get the address
@@ -586,7 +569,7 @@ class _AddHomeCourtState extends State<AddHomeCourt>
                           FirebaseFirestore.instance
                               .collection("USER")
                               .doc(FirebaseAuth.instance.currentUser!.uid)
-                              .update({"home court": _selectedLocationName});
+                              .update({"home court": selectedLocationName});
                           pushNewScreen(context,
                               screen: Home(), withNavBar: false);
                         }),

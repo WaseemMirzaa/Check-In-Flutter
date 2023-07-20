@@ -2,14 +2,12 @@ import 'package:check_in/controllers/user_controller.dart';
 import 'package:check_in/model/user_modal.dart';
 import 'package:check_in/ui/screens/persistent_nav_bar.dart';
 import 'package:check_in/ui/screens/start.dart';
-import 'package:check_in/user_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:nb_utils/nb_utils.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 UserController userController = Get.put(UserController());
 final auth = FirebaseAuth.instance;
@@ -59,11 +57,11 @@ Future<void> login(email, password, context) async {
   } on FirebaseAuthException catch (e) {
     print('error message ${e.message}');
     // Get.snackbar('Error', e.message ?? '', snackPosition: SnackPosition.BOTTOM);
-    Get.snackbar('Error', "Invalid username or password", snackPosition: SnackPosition.BOTTOM);
+    Get.snackbar('Error', "Invalid username or password",
+        snackPosition: SnackPosition.BOTTOM);
     print('Failed with error code: ${e.code}');
     print(e.message);
   }
-  ;
 }
 
 Future<void> logout(context) async {
@@ -81,10 +79,10 @@ Future<void> logout(context) async {
   auth.signOut().then(
         (value) =>
             // pushNewScreen(context, screen: const StartView(), withNavBar: false)
-        Get.offAll(StartView()),
-            // Navigator.of(context, rootNavigator: !false).pushReplacement(
-            //     getPageRoute(PageTransitionAnimation.cupertino,
-            //         enterPage: StartView())),
+            Get.offAll(const StartView()),
+        // Navigator.of(context, rootNavigator: !false).pushReplacement(
+        //     getPageRoute(PageTransitionAnimation.cupertino,
+        //         enterPage: StartView())),
       );
 }
 
@@ -93,37 +91,37 @@ Future<void> delAcc(context) async {
   return showDialog(
     context: context,
     builder: (BuildContext context) => AlertDialog(
-      title: Text('Confirmation'),
-      content: Text(
+      title: const Text('Confirmation'),
+      content: const Text(
           'Are you sure you want to delete you account?\nThese changes are irreversible'),
       actions: <Widget>[
         OutlinedButton(
-          child: Text('Cancel'),
+          child: const Text('Cancel'),
           onPressed: () {
             Navigator.of(context).pop(false);
           },
         ),
         OutlinedButton(
-          child: Text('Proceed'),
+          child: const Text('Proceed'),
           onPressed: () {
             showDialog(
                 context: context,
                 barrierDismissible: false,
                 builder: (context) => AlertDialog(
-                      title: Text('Enter Password'),
+                      title: const Text('Enter Password'),
                       content: TextFormField(
                         controller: pass,
                         obscureText: true,
                       ),
                       actions: [
                         OutlinedButton(
-                          child: Text('Cancel'),
+                          child: const Text('Cancel'),
                           onPressed: () {
                             Navigator.of(context).pop(false);
                           },
                         ),
                         OutlinedButton(
-                          child: Text('Delete Account'),
+                          child: const Text('Delete Account'),
                           onPressed: () async {
                             User? user = FirebaseAuth.instance.currentUser;
 
@@ -138,11 +136,13 @@ Future<void> delAcc(context) async {
                               await user
                                   .reauthenticateWithCredential(credential);
 
-                              snap.collection("USER").doc(auth.currentUser!.uid).delete();
+                              snap
+                                  .collection("USER")
+                                  .doc(auth.currentUser!.uid)
+                                  .delete();
 
                               await user.delete().then((value) {
-
-                                Get.offAll(StartView());
+                                Get.offAll(const StartView());
 
                                 // Navigator.of(context, rootNavigator: !false)
                                 //     .pushReplacement(getPageRoute(

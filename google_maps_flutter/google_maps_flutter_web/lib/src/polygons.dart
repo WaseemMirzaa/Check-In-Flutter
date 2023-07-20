@@ -26,9 +26,7 @@ class PolygonsController extends GeometryController {
   ///
   /// Wraps each Polygon into its corresponding [PolygonController].
   void addPolygons(Set<Polygon> polygonsToAdd) {
-    if (polygonsToAdd != null) {
-      polygonsToAdd.forEach(_addPolygon);
-    }
+    polygonsToAdd.forEach(_addPolygon);
   }
 
   void _addPolygon(Polygon polygon) {
@@ -51,9 +49,7 @@ class PolygonsController extends GeometryController {
 
   /// Updates a set of [Polygon] objects with new options.
   void changePolygons(Set<Polygon> polygonsToChange) {
-    if (polygonsToChange != null) {
-      polygonsToChange.forEach(_changePolygon);
-    }
+    polygonsToChange.forEach(_changePolygon);
   }
 
   void _changePolygon(Polygon polygon) {

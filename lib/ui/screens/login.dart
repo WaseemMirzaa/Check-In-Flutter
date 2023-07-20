@@ -1,5 +1,4 @@
 import 'package:check_in/auth_service.dart';
-import 'package:check_in/ui/screens/persistent_nav_bar.dart';
 import 'package:check_in/ui/screens/start.dart';
 import 'package:check_in/ui/widgets/common_button.dart';
 import 'package:check_in/utils/gaps.dart';
@@ -9,7 +8,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sizer/sizer.dart';
 
 class LoginView extends StatefulWidget {
@@ -99,6 +97,7 @@ class _LoginViewState extends State<LoginView> {
                                 !Validate(email)) {
                               return 'Please enter Valid Email Address';
                             }
+                            return null;
                           },
                           onChanged: (val) {
                             setState(() {
