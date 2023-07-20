@@ -1,15 +1,9 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:io';
-import 'dart:math';
 import 'package:check_in/auth_service.dart';
 import 'package:check_in/model/user_modal.dart';
-import 'package:check_in/search_location.dart';
-import 'package:check_in/ui/screens/History.dart';
 import 'package:check_in/ui/screens/contact_us.dart';
-import 'package:check_in/ui/screens/player.dart';
 import 'package:check_in/ui/screens/privacy_policy.dart';
-import 'package:check_in/ui/screens/start.dart';
 import 'package:check_in/ui/screens/terms_conditions.dart';
 import 'package:check_in/ui/widgets/common_button.dart';
 import 'package:check_in/utils/CourtsParser.dart';
@@ -31,7 +25,6 @@ import 'package:google_maps_webservice/places.dart';
 
 // import 'package:location/location.dart' ;
 import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import '../../constants.dart';
 import 'Players.dart';
 import 'package:intl/intl.dart';
@@ -55,7 +48,7 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
   int searchRadius = 30 * 1000;
   StreamSubscription<Position>? _positionStreamSubscription;
 
-  GlobalKey<ScaffoldState> _scaffoldState = GlobalKey<ScaffoldState>();
+  final GlobalKey<ScaffoldState> _scaffoldState = GlobalKey<ScaffoldState>();
 
   BitmapDescriptor sourceIcon = BitmapDescriptor.defaultMarker;
   BitmapDescriptor destinationIcon = BitmapDescriptor.defaultMarker;
@@ -66,7 +59,7 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
 
   DocumentReference docRef = FirebaseFirestore.instance
       .collection('USER')
-      .doc(FirebaseAuth.instance.currentUser!.uid);
+      .doc(FirebaseAuth.instance.currentUser?.uid);
 
   LatLng? loc;
 
@@ -83,7 +76,7 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
 
   Position? currentLocation;
   final Completer<GoogleMapController> _googleMapController = Completer();
-  GoogleMapController? _mapController = null;
+  GoogleMapController? _mapController;
 
   Set<Marker> markers = Set<Marker>.identity();
 
@@ -103,8 +96,6 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
     // const WeightedLatLng(LatLng(37.785, -122.437)),
     // const WeightedLatLng(LatLng(37.785, -122.435))
   ];
-
-
 
   Future indexValue() async {
     final document = FirebaseFirestore.instance
@@ -158,7 +149,7 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
 
     try {
       await snap.collection('goldenLocations').get().then((querySnapshot) {
-        querySnapshot.docs.forEach((doc) {
+        for (var doc in querySnapshot.docs) {
           double latitude = doc.data()['lat'];
           double longitude = doc.data()['lng'];
           String name = doc.data()['name'];
@@ -182,13 +173,12 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
           );
           markers.add(marker);
           addHeatedMarkers(marker);
-        });
+        }
         setState(() {});
       });
     } catch (e) {
       print(e);
     }
-
 
     // ADDING PLACCES API COURTS LOCATION MARKER
     // final placesResponse = await _places.searchNearbyWithRadius(
@@ -207,7 +197,7 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
     // final placesResponse = await getBasketballCourts();
 
     // placesResponse?.results.forEach((place) {
-    courts.forEach((place) {
+    for (var place in courts) {
       LatLng location = LatLng(
         place.latitude,
         place.longitude,
@@ -234,7 +224,6 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
               courtLatLng: location,
               courtName: place.title,
               isCheckedIn: checkedInCourtName == place.title,
-
             ),
             withNavBar: false,
           );
@@ -242,7 +231,7 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
       );
       markers.add(marker);
       addHeatedMarkers(marker);
-    });
+    }
 
     setState(() {
       // markers = markers;
@@ -293,10 +282,11 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
       heatMapRadius.value = 50;
     }
 
-    print("Zoom Level = " + zoomLevel.toString());
-    print("heatMapRadius.value = " + heatMapRadius.value.toString());
+    print("Zoom Level = $zoomLevel");
+    print("heatMapRadius.value = ${heatMapRadius.value}");
     setState(() {});
   }
+
   Future<int> getUsersCountOnLocation(LatLng court) async {
     final QuerySnapshot snapshot = await FirebaseFirestore.instance
         .collection('USER')
@@ -326,7 +316,7 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
 
   void addLocationChangeListener() {
     // Configure the location callback
-    var locationOptions = LocationOptions(
+    var locationOptions = const LocationOptions(
       accuracy: LocationAccuracy.best,
       distanceFilter:
           10, // Minimum distance (in meters) for location change updates
@@ -485,7 +475,7 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
       key: _scaffoldState,
       drawer: Drawer(
         backgroundColor: whiteColor,
-        child: Container(
+        child: SizedBox(
           height: 300,
           child: ListView(
             // Important: Remove any padding from the ListView.
@@ -532,25 +522,29 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
                       screen: const TermsAndConditions(), withNavBar: false);
                 },
               ),
-              ListTile(
-                leading: const Icon(
-                  Icons.logout_outlined,
-                ),
-                title: const Text('LogOut'),
-                onTap: () async {
-                  logout(context);
-                  userController.userModel.value = UserModel();
-                },
-              ),
-              ListTile(
-                leading: const Icon(
-                  Icons.delete_forever_outlined,
-                ),
-                title: const Text('Delete Acc'),
-                onTap: () {
-                  delAcc(context);
-                },
-              ),
+              FirebaseAuth.instance.currentUser == null
+                  ? const SizedBox()
+                  : ListTile(
+                      leading: const Icon(
+                        Icons.logout_outlined,
+                      ),
+                      title: const Text('LogOut'),
+                      onTap: () async {
+                        logout(context);
+                        userController.userModel.value = UserModel();
+                      },
+                    ),
+              FirebaseAuth.instance.currentUser == null
+                  ? const SizedBox()
+                  : ListTile(
+                      leading: const Icon(
+                        Icons.delete_forever_outlined,
+                      ),
+                      title: const Text('Delete Acc'),
+                      onTap: () {
+                        delAcc(context);
+                      },
+                    ),
             ],
           ),
         ),
@@ -584,8 +578,7 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
                         },
                         onCameraMove: (CameraPosition position) {
                           int currentZoomLevel = position.zoom.toInt();
-                          if (_previousZoomLevel != null &&
-                              currentZoomLevel != _previousZoomLevel) {
+                          if (currentZoomLevel != _previousZoomLevel) {
                             // Zoom level changed
                             setHeatMapSize(currentZoomLevel);
                             // print(
@@ -679,7 +672,7 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
                                 Navigator.pushAndRemoveUntil(
                                     context,
                                     MaterialPageRoute(
-                                        builder: (context) => CheckIn()),
+                                        builder: (context) => const CheckIn()),
                                     (route) => false);
                                 // Navigator.pushReplacement(
                                 //   context,
@@ -822,8 +815,8 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
                                         screen: PlayersView(
                                           courtLatLng: location,
                                           courtName: prediction.title,
-                                          isCheckedIn: checkedInCourtName == prediction.title,
-
+                                          isCheckedIn: checkedInCourtName ==
+                                              prediction.title,
                                         ),
                                         withNavBar: false,
                                       );
@@ -831,11 +824,11 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
                                   );
 
                                   bool matched = false;
-                                  markers.forEach((marker1) {
+                                  for (var marker1 in markers) {
                                     if (marker1.markerId == marker.markerId) {
                                       matched = true;
                                     }
-                                  });
+                                  }
 
                                   if (!matched) {
                                     markers.add(marker);
@@ -843,8 +836,6 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
 
                                     setState(() {});
                                   }
-
-
                                 },
                                 transitionBuilder:
                                     (context, suggestionsBox, controller) {

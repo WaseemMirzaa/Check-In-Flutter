@@ -1,30 +1,24 @@
 import 'dart:io';
 
-import 'package:check_in/ui/screens/login.dart';
-import 'package:check_in/ui/screens/persistent_nav_bar.dart';
 import 'package:check_in/ui/screens/splash.dart';
-import 'package:check_in/ui/screens/start.dart';
 import 'package:check_in/utils/colors.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get_navigation/src/root/get_material_app.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sizer/sizer.dart';
 
-import 'ui/screens/History.dart';
 import 'firebase_options.dart';
 
 String? con;
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  if(Platform.isIOS){
+  if (Platform.isIOS) {
     await Firebase.initializeApp(
       // name: "check_in",// Removing this name causes exception and show white screen on ios
       options: DefaultFirebaseOptions.currentPlatform,
     );
-  }else {
+  } else {
     await Firebase.initializeApp();
   }
   // SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -50,7 +44,7 @@ class MyApp extends StatelessWidget {
           debugShowCheckedModeBanner: false,
           title: 'Check In',
           theme: ThemeData(scaffoldBackgroundColor: whiteColor),
-          home: Splash(),
+          home: const Splash(),
         );
       },
     );

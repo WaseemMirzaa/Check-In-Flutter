@@ -1,17 +1,20 @@
+// ignore_for_file: must_be_immutable
+
 import 'package:check_in/ui/screens/player.dart';
-import 'package:check_in/utils/gaps.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
 import 'package:sizer/sizer.dart';
 
 class PlayersView extends StatefulWidget {
   final LatLng courtLatLng;
   String courtName;
   bool isCheckedIn = false;
-  PlayersView({required this.courtLatLng, required this.courtName, required this.isCheckedIn});
+  PlayersView(
+      {super.key,
+      required this.courtLatLng,
+      required this.courtName,
+      required this.isCheckedIn});
 
   @override
   State<PlayersView> createState() => _PlayersViewState();
@@ -55,9 +58,6 @@ class UserService {
   Stream<List<User>> get emptyUsers {
     return Stream.fromIterable([<User>[]]);
   }
-
-
-
 }
 
 class _PlayersViewState extends State<PlayersView> {
@@ -77,14 +77,11 @@ class _PlayersViewState extends State<PlayersView> {
   Future<int> getNumberOfPlayers() async {
     final snapshot = await _firestore.collection('USER').get();
     final users = snapshot.docs.where((doc) =>
-    doc.get("checkedIn") == true &&
+        doc.get("checkedIn") == true &&
         doc.get("courtLat") == widget.courtLatLng.latitude &&
-        doc.get("courtLng") == widget.courtLatLng.longitude
-    );
+        doc.get("courtLng") == widget.courtLatLng.longitude);
     numberOfPLayers = users.length;
-    setState(() {
-
-    });
+    setState(() {});
     return users.length;
   }
 
@@ -133,10 +130,10 @@ class _PlayersViewState extends State<PlayersView> {
           child: Column(
             children: [
               Padding(
-                padding: EdgeInsets.only(top: 10),
+                padding: const EdgeInsets.only(top: 10),
                 child: Text(
                   widget.courtName ?? "",
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontFamily: 'Poppins',
                     fontSize: 15,
                     color: Color(0xff007a33),
@@ -148,10 +145,10 @@ class _PlayersViewState extends State<PlayersView> {
               ),
 
               Padding(
-                padding: EdgeInsets.only(top: 10),
+                padding: const EdgeInsets.only(top: 10),
                 child: Text(
-                  "Number of Players: " + numberOfPLayers.toString(),
-                  style: TextStyle(
+                  "Number of Players: $numberOfPLayers",
+                  style: const TextStyle(
                     fontFamily: 'Poppins',
                     fontSize: 15,
                     // color: Color(0xff007a33),
@@ -179,7 +176,9 @@ class _PlayersViewState extends State<PlayersView> {
                 height: 20,
               ),
               StreamBuilder<List<User>>(
-                stream: widget.isCheckedIn ? UserService(court: widget.courtLatLng).users : UserService(court: widget.courtLatLng).emptyUsers,
+                stream: widget.isCheckedIn
+                    ? UserService(court: widget.courtLatLng).users
+                    : UserService(court: widget.courtLatLng).emptyUsers,
                 builder: (context, snapshot) {
                   if (!snapshot.hasData) {
                     return const Center(child: CircularProgressIndicator());

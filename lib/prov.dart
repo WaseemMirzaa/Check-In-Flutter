@@ -13,23 +13,21 @@ class GetxMaps with ChangeNotifier {
   late GoogleMapController _mapController;
   LatLng get gpsPosition => _gpsactual;
   LatLng get initialPos => _initialposition;
-  final Set<Marker> _markers = Set();
+  final Set<Marker> _markers = {};
   Set<Marker> get markers => _markers;
   GoogleMapController get mapController => _mapController;
 
   void getMoveCamera() async {
-  List<Placemark> placemark = await placemarkFromCoordinates(
-    _initialposition.latitude,
-    _initialposition.longitude,
-    localeIdentifier: "en_US"
-  );
+    List<Placemark> placemark = await placemarkFromCoordinates(
+        _initialposition.latitude, _initialposition.longitude,
+        localeIdentifier: "en_US");
 
-  if (placemark.isNotEmpty) {
-    locationController.text = placemark[0].name!;
-  } else {
-    locationController.text = "Unknown location";
+    if (placemark.isNotEmpty) {
+      locationController.text = placemark[0].name!;
+    } else {
+      locationController.text = "Unknown location";
+    }
   }
-}
 
   void getUserLocation() async {
     if (!(await Geolocator.isLocationServiceEnabled())) {
@@ -86,5 +84,3 @@ class GetxMaps with ChangeNotifier {
     notifyListeners();
   }
 }
-
-

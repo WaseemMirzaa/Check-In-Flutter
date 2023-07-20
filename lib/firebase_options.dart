@@ -67,7 +67,8 @@ class DefaultFirebaseOptions {
     messagingSenderId: '41160719092',
     projectId: 'check-in-7ecd7',
     storageBucket: 'check-in-7ecd7.appspot.com',
-    iosClientId: '41160719092-sdkcvbdqcrci7lso8p83nrnpkvt89dqc.apps.googleusercontent.com',
+    iosClientId:
+        '41160719092-sdkcvbdqcrci7lso8p83nrnpkvt89dqc.apps.googleusercontent.com',
     iosBundleId: 'com.developlogix.checkin',
   );
 
@@ -77,7 +78,8 @@ class DefaultFirebaseOptions {
     messagingSenderId: '41160719092',
     projectId: 'check-in-7ecd7',
     storageBucket: 'check-in-7ecd7.appspot.com',
-    iosClientId: '41160719092-sdkcvbdqcrci7lso8p83nrnpkvt89dqc.apps.googleusercontent.com',
+    iosClientId:
+        '41160719092-sdkcvbdqcrci7lso8p83nrnpkvt89dqc.apps.googleusercontent.com',
     iosBundleId: 'com.developlogix.checkin',
   );
 }

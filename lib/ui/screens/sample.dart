@@ -1,18 +1,23 @@
+// ignore_for_file: library_private_types_in_public_api
+
 import 'package:flutter/material.dart';
 
 class MyNavigationBar extends StatefulWidget {
-  MyNavigationBar ({Key? key}) : super(key: key);
+  const MyNavigationBar({Key? key}) : super(key: key);
 
   @override
   _MyNavigationBarState createState() => _MyNavigationBarState();
 }
 
-class _MyNavigationBarState extends State<MyNavigationBar > {
+class _MyNavigationBarState extends State<MyNavigationBar> {
   int _selectedIndex = 0;
   static const List<Widget> _widgetOptions = <Widget>[
-    Text('Home Page', style: TextStyle(fontSize: 35, fontWeight: FontWeight.bold)),
-    Text('Search Page', style: TextStyle(fontSize: 35, fontWeight: FontWeight.bold)),
-    Text('Profile Page', style: TextStyle(fontSize: 35, fontWeight: FontWeight.bold)),
+    Text('Home Page',
+        style: TextStyle(fontSize: 35, fontWeight: FontWeight.bold)),
+    Text('Search Page',
+        style: TextStyle(fontSize: 35, fontWeight: FontWeight.bold)),
+    Text('Profile Page',
+        style: TextStyle(fontSize: 35, fontWeight: FontWeight.bold)),
   ];
 
   void _onItemTapped(int index) {
@@ -26,23 +31,20 @@ class _MyNavigationBarState extends State<MyNavigationBar > {
     return Scaffold(
       appBar: AppBar(
           title: const Text('Flutter BottomNavigationBar Example'),
-          backgroundColor: Colors.green
-      ),
+          backgroundColor: Colors.green),
       body: Center(
         child: _widgetOptions.elementAt(_selectedIndex),
       ),
       bottomNavigationBar: BottomNavigationBar(
           items: const <BottomNavigationBarItem>[
             BottomNavigationBarItem(
-              label: "f",
+                label: "f",
                 icon: Icon(Icons.home),
-                backgroundColor: Colors.green
-            ),
+                backgroundColor: Colors.green),
             BottomNavigationBarItem(
                 label: "f",
                 icon: Icon(Icons.search),
-                backgroundColor: Colors.yellow
-            ),
+                backgroundColor: Colors.yellow),
             BottomNavigationBarItem(
               label: "f",
               icon: Icon(Icons.person),
@@ -54,8 +56,7 @@ class _MyNavigationBarState extends State<MyNavigationBar > {
           selectedItemColor: Colors.black,
           iconSize: 40,
           onTap: _onItemTapped,
-          elevation: 5
-      ),
+          elevation: 5),
     );
   }
-} 
+}

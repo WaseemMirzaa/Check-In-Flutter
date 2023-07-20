@@ -106,6 +106,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   String mail = FirebaseAuth.instance.currentUser?.email as String;
+  // String mail = FirebaseAuth.instance.currentUser?.email ?? "";
   bool tapped = false;
   String? aboutMe;
 
@@ -138,7 +139,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   return const Center(child: CircularProgressIndicator());
                 }
                 final users = snapshot.data;
-                return (users!.isNotEmpty && users != null)
+                return (users!.isNotEmpty)
                     ? Column(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         crossAxisAlignment: CrossAxisAlignment.center,
@@ -146,7 +147,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           Column(
                             children: [
                               verticalGap(3.h),
-                              Container(
+                              SizedBox(
                                 width: 35.9.w,
                                 //   padding: EdgeInsets.all(10),
                                 child: Stack(
@@ -178,11 +179,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                         NetworkImage(
                                                             users[0].pic))),
                                         child: Center(
-                                          child: users[0].pic.isEmpty ? Image.asset(
-                                              'assets/images/Icon material-person.png',
-                                              scale: 1.5,
-                                              color: Colors.grey[850]!.withOpacity(0.5),
-                                              ) : Container(),
+                                          child: users[0].pic.isEmpty
+                                              ? Image.asset(
+                                                  'assets/images/Icon material-person.png',
+                                                  scale: 1.5,
+                                                  color: Colors.grey[850]!
+                                                      .withOpacity(0.5),
+                                                )
+                                              : Container(),
                                         ),
                                       ),
                                     ),

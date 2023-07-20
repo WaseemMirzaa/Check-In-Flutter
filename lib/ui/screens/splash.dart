@@ -1,6 +1,4 @@
 import 'package:check_in/ui/screens/persistent_nav_bar.dart';
-import 'package:check_in/ui/screens/start.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class Splash extends StatefulWidget {
@@ -19,16 +17,16 @@ class _SplashState extends State<Splash> {
 
   _navigatetohome() async {
     Widget firstWidget;
-    if (FirebaseAuth.instance.currentUser != null) {
-      firstWidget = Home();
-    } else {
-      firstWidget = const StartView();
-    }
-    await Future.delayed(Duration(milliseconds: 1500), () {
+    firstWidget = const Home();
+    // if (FirebaseAuth.instance.currentUser != null) {
+    //   firstWidget = const Home();
+    // } else {
+    //   firstWidget = const StartView();
+    // }
+    await Future.delayed(const Duration(milliseconds: 1500), () {
       Navigator.pushReplacement(
           context, MaterialPageRoute(builder: (context) => firstWidget));
     });
-
   }
 
   @override
@@ -56,7 +54,7 @@ class _SplashState extends State<Splash> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  SizedBox.fromSize(size: Size.fromHeight(20)),
+                  SizedBox.fromSize(size: const Size.fromHeight(20)),
                   Expanded(
                     flex: 2,
                     child: Image.asset(
@@ -64,17 +62,20 @@ class _SplashState extends State<Splash> {
                       scale: 1,
                     ),
                   ),
-                  SizedBox(height: 0),
-                  Text(
+                  const SizedBox(height: 0),
+                  const Text(
                     'Powered by',
                     style: TextStyle(fontSize: 12, color: Colors.black),
                   ),
-                  SizedBox(height: 4),
-                  Text(
+                  const SizedBox(height: 4),
+                  const Text(
                     'Ville Marcos LLC',
-                    style: TextStyle(fontSize: 16, color: Colors.black, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.black,
+                        fontWeight: FontWeight.bold),
                   ),
-                  SizedBox(height: 30),
+                  const SizedBox(height: 30),
                 ],
               ),
             ),
@@ -83,5 +84,4 @@ class _SplashState extends State<Splash> {
       ),
     );
   }
-
 }

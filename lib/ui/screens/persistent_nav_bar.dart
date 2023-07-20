@@ -1,6 +1,11 @@
+// ignore_for_file: avoid_print
+
 import 'package:check_in/ui/screens/check_in.dart';
 import 'package:check_in/ui/screens/profile_screen.dart';
+import 'package:check_in/ui/screens/start.dart';
 import 'package:check_in/utils/colors.dart';
+import 'package:check_in/utils/styles.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -49,7 +54,8 @@ class CustomNavBarWidget extends StatelessWidget {
       items; // NOTE: You CAN declare your own model here instead of `PersistentBottomNavBarItem`.
   final ValueChanged<int> onItemSelected;
 
-  CustomNavBarWidget({
+  const CustomNavBarWidget({
+    super.key,
     required this.selectedIndex,
     required this.items,
     required this.onItemSelected,
@@ -95,7 +101,30 @@ class CustomNavBarWidget extends StatelessWidget {
             return Flexible(
               child: GestureDetector(
                 onTap: () {
-                  this.onItemSelected(index);
+                  if (FirebaseAuth.instance.currentUser == null) {
+                    showDialog(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                              title: poppinsText("You are not logged in", 16,
+                                  FontWeight.w500, Colors.black),
+                              actions: [
+                                TextButton(
+                                  onPressed: () {
+                                    Get.offAll(() => const StartView());
+                                  },
+                                  child: const Text('Login'),
+                                ),
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                  },
+                                  child: const Text('Cancel'),
+                                ),
+                              ],
+                            ));
+                  } else {
+                    onItemSelected(index);
+                  }
                 },
                 child: _buildItem(item, selectedIndex == index),
               ),
@@ -108,6 +137,8 @@ class CustomNavBarWidget extends StatelessWidget {
 }
 
 class Home extends StatefulWidget {
+  const Home({super.key});
+
   @override
   State<Home> createState() => _HomeState();
 }

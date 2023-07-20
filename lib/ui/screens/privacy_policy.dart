@@ -1,8 +1,6 @@
 import 'dart:async';
 
-import 'package:check_in/ui/screens/persistent_nav_bar.dart';
 import 'package:flutter/material.dart';
-import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
 import 'package:sizer/sizer.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
@@ -25,7 +23,7 @@ class _PrivacyPolicyState extends State<PrivacyPolicy> {
       appBar: AppBar(
         leading: Row(
           children: [
-            SizedBox(
+            const SizedBox(
               width: 30,
             ),
             GestureDetector(
@@ -47,11 +45,11 @@ class _PrivacyPolicyState extends State<PrivacyPolicy> {
         title: poppinsText("Privacy Policy", 20, FontWeight.bold, blackColor),
       ),
       body: Container(
-        margin: EdgeInsets.only(top: 10),
-        padding: EdgeInsets.only(top: 10, left: 10, right: 10),
+        margin: const EdgeInsets.only(top: 10),
+        padding: const EdgeInsets.only(top: 10, left: 10, right: 10),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.only(
+          borderRadius: const BorderRadius.only(
             topRight: Radius.circular(30),
             topLeft: Radius.circular(30),
           ),
@@ -60,7 +58,7 @@ class _PrivacyPolicyState extends State<PrivacyPolicy> {
               color: Colors.grey.withOpacity(0.2),
               blurRadius: 5,
               //   spreadRadius: -12,
-              offset: Offset(0, -3), // changes position of shadow
+              offset: const Offset(0, -3), // changes position of shadow
             ),
           ],
         ),
