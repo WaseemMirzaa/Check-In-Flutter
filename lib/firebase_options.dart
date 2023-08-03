@@ -50,8 +50,9 @@ class DefaultFirebaseOptions {
     projectId: 'check-in-7ecd7',
     authDomain: 'check-in-7ecd7.firebaseapp.com',
     storageBucket: 'check-in-7ecd7.appspot.com',
-    measurementId: 'G-H3E3Z7TGZM',
+    measurementId: 'G-3JV5EZHQ6E',
   );
+
 
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyArLxMF1wjbQzOw4xIqh_zfNJ8-cG7CaBY',
