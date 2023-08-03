@@ -1,4 +1,4 @@
-package com.developlogix.checkin
+package com.developlogix.checkinapp
 
 import io.flutter.embedding.android.FlutterActivity
 

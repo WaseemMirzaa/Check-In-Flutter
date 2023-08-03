@@ -99,27 +99,30 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
   ];
 
   Future indexValue() async {
-    final document = FirebaseFirestore.instance
-        .collection('USER')
-        .doc(FirebaseAuth.instance.currentUser!.uid);
-    document.get().then((DocumentSnapshot snapshot) {
-      if (snapshot.exists) {
-        dynamic data = snapshot.data();
-        isCheckedIn = data['checkedIn'];
-        // print("${pata['checkedIn']}Siuuu");
-        // print(isCheckedIn);
-        if (isCheckedIn == false) {
-          index = 0;
-        } else if (isCheckedIn == true) {
-          checkedInCourtName = data['checkedInCourtName'] ?? "";
-          index = 1;
+
+    if (FirebaseAuth.instance.currentUser != null) {
+      final document = FirebaseFirestore.instance
+              .collection('USER')
+              .doc(FirebaseAuth.instance.currentUser!.uid);
+      document.get().then((DocumentSnapshot snapshot) {
+        if (snapshot.exists) {
+          dynamic data = snapshot.data();
+          isCheckedIn = data['checkedIn'];
+          // print("${pata['checkedIn']}Siuuu");
+          // print(isCheckedIn);
+          if (isCheckedIn == false) {
+            index = 0;
+          } else if (isCheckedIn == true) {
+            checkedInCourtName = data['checkedInCourtName'] ?? "";
+            index = 1;
+          }
+          setState(() {});
+          // print("${index} is index");
+        } else {
+          print('Document does not exist!');
         }
-        setState(() {});
-        // print("${index} is index");
-      } else {
-        print('Document does not exist!');
-      }
-    });
+      });
+    }
   }
 
   changeIndex() {
