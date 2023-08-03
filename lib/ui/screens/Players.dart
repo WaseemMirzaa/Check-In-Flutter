@@ -12,9 +12,9 @@ class PlayersView extends StatefulWidget {
   bool isCheckedIn = false;
   PlayersView(
       {super.key,
-      required this.courtLatLng,
-      required this.courtName,
-      required this.isCheckedIn});
+        required this.courtLatLng,
+        required this.courtName,
+        required this.isCheckedIn});
 
   @override
   State<PlayersView> createState() => _PlayersViewState();
@@ -25,12 +25,14 @@ class User {
   final String email;
   final String about;
   final String court;
+  final String photoUrl;
 
   User(
       {required this.name,
-      required this.email,
-      required this.about,
-      required this.court});
+        required this.email,
+        required this.about,
+        required this.court,
+        required this.photoUrl});
 }
 
 class UserService {
@@ -41,16 +43,17 @@ class UserService {
     return _firestore.collection('USER').snapshots().map((snapshot) {
       return snapshot.docs
           .where((d) =>
-              // d.get("uid") != FirebaseAuth.instance.currentUser!.uid &&
-              d.get("checkedIn") == true &&
-              d.get("courtLat") == court.latitude &&
-              d.get("courtLng") == court.longitude)
+      // d.get("uid") != FirebaseAuth.instance.currentUser!.uid &&
+      d.get("checkedIn") == true &&
+          d.get("courtLat") == court.latitude &&
+          d.get("courtLng") == court.longitude)
           .map((doc) => User(
-                name: doc.data()['user name'],
-                email: doc.data()['email'],
-                about: doc.data()['about me'] ?? "",
-                court: doc.data()['home court'] ?? "",
-              ))
+        name: doc.data()['user name'],
+        email: doc.data()['email'],
+        about: doc.data()['about me'] ?? "",
+        court: doc.data()['home court'] ?? "",
+        photoUrl: doc.data()['photoUrl'] ?? "",
+      ))
           .toList();
     });
   }
@@ -77,7 +80,7 @@ class _PlayersViewState extends State<PlayersView> {
   Future<int> getNumberOfPlayers() async {
     final snapshot = await _firestore.collection('USER').get();
     final users = snapshot.docs.where((doc) =>
-        doc.get("checkedIn") == true &&
+    doc.get("checkedIn") == true &&
         doc.get("courtLat") == widget.courtLatLng.latitude &&
         doc.get("courtLng") == widget.courtLatLng.longitude);
     numberOfPLayers = users.length;
@@ -223,15 +226,30 @@ class _PlayersViewState extends State<PlayersView> {
                                           child: Container(
                                             height: 85,
                                             width: 85,
-                                            decoration: const BoxDecoration(
+                                            decoration: BoxDecoration(
                                               shape: BoxShape.circle,
                                             ),
-                                            child: Image.asset(
-                                              'assets/images/player.png',
-                                              fit: BoxFit.fill,
+                                            child: ClipOval(
+                                              child: Image.network(
+                                                user.photoUrl != "" ? user.photoUrl : 'https://firebasestorage.googleapis.com/v0/b/check-in-7ecd7.appspot.com/o/placeholders%2Fplayer.png?alt=media&token=3f50ba31-00ec-483f-ac03-a13d5e0a260c',
+                                                fit: BoxFit.fill,
+                                                loadingBuilder: (context, child, loadingProgress) {
+                                                  if (loadingProgress == null) return child;
+                                                  return Center(
+                                                    child: CircularProgressIndicator(), // You can replace this with any loading indicator you prefer.
+                                                  );
+                                                },
+                                                errorBuilder: (context, error, stackTrace) {
+                                                  return Image.asset(
+                                                    'assets/images/player.png', // The local placeholder image
+                                                    fit: BoxFit.fill,
+                                                  );
+                                                },
+                                              ),
                                             ),
                                           ),
                                         ),
+
                                         Text.rich(
                                           TextSpan(
                                               text: "${user.name}\n",
@@ -245,7 +263,7 @@ class _PlayersViewState extends State<PlayersView> {
                                               children: [
                                                 TextSpan(
                                                   text:
-                                                      "@${user.email.substring(0, user.email.indexOf('@'))}\n",
+                                                  "@${user.email.substring(0, user.email.indexOf('@'))}\n",
                                                   style: const TextStyle(
                                                     fontFamily: 'Poppins',
                                                     fontSize: 9,
@@ -264,7 +282,7 @@ class _PlayersViewState extends State<PlayersView> {
                                                       text: 'Home Court :',
                                                       style: TextStyle(
                                                         fontWeight:
-                                                            FontWeight.w600,
+                                                        FontWeight.w600,
                                                       ),
                                                     ),
                                                     TextSpan(
@@ -273,9 +291,9 @@ class _PlayersViewState extends State<PlayersView> {
                                                           : user.court,
                                                       style: const TextStyle(
                                                         color:
-                                                            Color(0xff9f9f9f),
+                                                        Color(0xff9f9f9f),
                                                         fontWeight:
-                                                            FontWeight.w500,
+                                                        FontWeight.w500,
                                                       ),
                                                     ),
                                                   ],
@@ -289,7 +307,7 @@ class _PlayersViewState extends State<PlayersView> {
                               ),
                               Padding(
                                 padding:
-                                    const EdgeInsets.only(left: 20, right: 20),
+                                const EdgeInsets.only(left: 20, right: 20),
                                 child: Container(
                                   height: 1,
                                   color: const Color(0xff9f9f9f),

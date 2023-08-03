@@ -64,12 +64,19 @@ class _PlayerScreenState extends State<PlayerScreen> {
                         Container(
                           height: 15.h,
                           width: 32.9.w,
-                          decoration: const BoxDecoration(
+                          decoration: BoxDecoration(
                               color: Colors.red,
                               shape: BoxShape.circle,
-                              image: DecorationImage(
+                              image:
+                                 DecorationImage(
+                                  fit: BoxFit.fill,
                                   image:
-                                      AssetImage("assets/images/player.png"))),
+                                  // AssetImage(
+                                  //     "assets/images/Mask Group 1.png")
+                                  NetworkImage(
+                                      widget.user.photoUrl != "" ? widget.user.photoUrl :'https://firebasestorage.googleapis.com/v0/b/check-in-7ecd7.appspot.com/o/placeholders%2Fplayer.png?alt=media&token=3f50ba31-00ec-483f-ac03-a13d5e0a260c',
+                                     ))
+                          ),
                         ),
                         Align(
                           alignment: Alignment.bottomRight,
