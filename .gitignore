@@ -45,3 +45,4 @@ app.*.map.json
 /.fvm/flutter_sdk/
 /ios/Runner.xcworkspace/xcshareddata/swiftpm/Package.resolved
 /.fvm/
+/functions/node_modules/
