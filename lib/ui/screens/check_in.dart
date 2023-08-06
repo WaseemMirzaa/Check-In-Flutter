@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:check_in/auth_service.dart';
+import 'package:check_in/firebase-models/user_firebase_model.dart';
 import 'package:check_in/model/user_modal.dart';
 import 'package:check_in/ui/screens/contact_us.dart';
 import 'package:check_in/ui/screens/privacy_policy.dart';
@@ -417,6 +418,7 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
       setState(() {
         courtInfo['checkInTime'] =
             DateFormat('HH:mm:ss').format(DateTime.now());
+        courtInfo[CheckedCourts.checkInTimeStamp] = Timestamp.now();
 
         checkedInCourtName = courtInfo['courtName'];
       });
@@ -426,6 +428,8 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
         "checkedInCourtName": courtInfo['courtName'],
         "courtLat": loc!.latitude,
         "courtLng": loc!.longitude,
+        UserFirebaseModel.lastCheckin: Timestamp.now(),
+        UserFirebaseModel.lastCheckout: FieldValue.delete(),
       });
 
       Get.snackbar("Checked In", "You have checked into this court.",
@@ -442,6 +446,9 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
         "checkedIn": false,
         "courtLat": FieldValue.delete(),
         "courtLng": FieldValue.delete(),
+        UserFirebaseModel.lastCheckout: Timestamp.now(),
+        UserFirebaseModel.lastCheckin: FieldValue.delete(),
+
       });
 
       checkedInCourtName = '';
