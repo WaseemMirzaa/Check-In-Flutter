@@ -23,7 +23,7 @@ const firestore = admin.firestore();
 //   response.send("Hello from Firebase!");
 // });
 
-exports.deleteLastCheckedIn = functions.pubsub.schedule("every 5 minutes")
+exports.deleteLastCheckedIn = functions.pubsub.schedule("every 60 minutes")
     .onRun((context) => {
       const currentTime = new Date();
 
@@ -32,17 +32,26 @@ exports.deleteLastCheckedIn = functions.pubsub.schedule("every 5 minutes")
             const batch = firestore.batch();
 
             querySnapshot.forEach((doc) => {
-              const lastCheckedIn = doc.get("lastCheckedIn");
+              const lastCheckin = doc.get("lastCheckin");
+              // console.log("lastCheckin:" + lastCheckin);
+              // console.log("checkedIn:" + doc.get("checkedIn"));
 
-              if (lastCheckedIn) {
-                const lastCheckedInTime = lastCheckedIn.toDate();
+              if (lastCheckin) {
+                const lastCheckedInTime = lastCheckin.toDate();
+                // console.log("lastCheckedInTime:" + lastCheckedInTime);
+
                 const hoursSinceLastCheckedIn = Math.abs(currentTime -
                   lastCheckedInTime) / (1000 * 60 * 60);
 
+                // eslint-disable-next-line max-len
+                // console.log("hoursSinceLastCheckedIn:" + hoursSinceLastCheckedIn);
+
                 if (hoursSinceLastCheckedIn >= 12) {
+                  console.log("CheckedOut email:" + doc.get("email"));
+
                   // Delete the lastCheckedIn field
                   batch.update(doc.ref,
-                      {lastCheckedIn: admin.firestore.FieldValue.delete()});
+                      {lastCheckin: admin.firestore.FieldValue.delete()});
 
                   // Set the checkedIn field to false
                   batch.update(doc.ref, {checkedIn: false});
