@@ -46,7 +46,7 @@ exports.deleteLastCheckedIn = functions.pubsub.schedule("every 60 minutes")
                 // eslint-disable-next-line max-len
                 // console.log("hoursSinceLastCheckedIn:" + hoursSinceLastCheckedIn);
 
-                if (hoursSinceLastCheckedIn >= 12) {
+                if (hoursSinceLastCheckedIn >= 3) {
                   console.log("CheckedOut email:" + doc.get("email"));
 
                   // Delete the lastCheckedIn field
