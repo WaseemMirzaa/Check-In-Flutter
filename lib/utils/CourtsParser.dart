@@ -21,7 +21,7 @@ class CourtsParser {
     try {
       var csvString = await loadAsset();
 
-      var csvData = const CsvToListConverter().convert(csvString);
+      var csvData = const CsvToListConverter().convert(csvString,eol: "\n");
 
       for (var i = 1; i < csvData.length; i++) {
         final location = CourtModel(
