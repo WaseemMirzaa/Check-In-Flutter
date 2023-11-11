@@ -66,7 +66,8 @@ class _PrivacyPolicyState extends State<PrivacyPolicy> {
           return WebView(
             initialUrl:
                 // "https://www.freeprivacypolicy.com/live/fc6c8c08-7126-407d-b16b-5ac249c71a80",
-                "https://docs.google.com/document/d/1ILdrqJL3AYxTZ7zA-QQoPJbFafoE3FscMrKROymN4y0/edit?usp=sharing",
+                // "https://docs.google.com/document/d/1ILdrqJL3AYxTZ7zA-QQoPJbFafoE3FscMrKROymN4y0/edit?usp=sharing",
+                "https://sites.google.com/view/checkin-privacy-policy",
             javascriptMode: JavascriptMode.unrestricted,
             onWebViewCreated: (WebViewController webViewController) {
               _controller.complete(webViewController);

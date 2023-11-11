@@ -1,4 +1,5 @@
 import 'package:check_in/auth_service.dart';
+import 'package:check_in/ui/screens/forgot_password.dart';
 import 'package:check_in/ui/screens/start.dart';
 import 'package:check_in/ui/widgets/common_button.dart';
 import 'package:check_in/utils/gaps.dart';
@@ -49,7 +50,7 @@ class _LoginViewState extends State<LoginView> {
             GestureDetector(
               onTap: () {
                 pushNewScreen(context,
-                    screen: StartView(isBack:false), withNavBar: false);
+                    screen: StartView(isBack: false), withNavBar: false);
               },
               child: SizedBox(
                 height: 2.1.h,
@@ -156,6 +157,28 @@ class _LoginViewState extends State<LoginView> {
                             ),
                           ),
                         ),
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          GestureDetector(
+                            onTap: () {
+                              pushNewScreen(context,
+                                  screen: const ForgotPassword(),
+                                  withNavBar: false);
+                            },
+                            child: Text(
+                              'Forgot Password',
+                              style: TextStyle(
+                                fontFamily: 'Poppins',
+                                fontSize: 1.7.h,
+                                color: const Color(0xff000000),
+                                fontWeight: FontWeight.w500,
+                              ),
+                              softWrap: false,
+                            ),
+                          ),
+                        ],
                       ),
                       Padding(
                           padding: EdgeInsets.only(top: 3.6.h),

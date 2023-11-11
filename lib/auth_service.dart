@@ -79,7 +79,9 @@ Future<void> logout(context) async {
   auth.signOut().then(
         (value) =>
             // pushNewScreen(context, screen: const StartView(), withNavBar: false)
-            Get.offAll(StartView(isBack: false,)),
+            Get.offAll(StartView(
+          isBack: false,
+        )),
         // Navigator.of(context, rootNavigator: !false).pushReplacement(
         //     getPageRoute(PageTransitionAnimation.cupertino,
         //         enterPage: StartView())),
@@ -193,4 +195,33 @@ toModal(BuildContext context) async {
       .doc(auth.currentUser?.uid ?? "")
       .get();
   UserModel userModel = UserModel.fromMap(snap.data() as Map<String, dynamic>);
+}
+
+Future<void> resetPassword({required String emailText}) async {
+  final email = emailText.trim();
+
+  try {
+    // Attempt to send the password reset email
+    await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
+
+    // Display a success message and navigate back
+    Fluttertoast.showToast(msg: "Password reset link sent via Email").then((value) {
+      Get.back(); // Navigate back to the previous screen
+    });
+  } on FirebaseAuthException catch (e) {
+    if (e.code == 'user-not-found') {
+      // Handle the case where the email is not registered
+      Fluttertoast.showToast(msg: "Email not registered").then((value) {
+        // You can take appropriate action, such as displaying an error message to the user
+      });
+    } else {
+      // Handle other Firebase Authentication exceptions
+      print('Error: ${e.message}');
+      Fluttertoast.showToast(msg: 'An error occurred: ${e.message}');
+    }
+  } catch (e) {
+    // Handle other exceptions
+    print('Error: $e');
+    Fluttertoast.showToast(msg: 'An error occurred: $e');
+  }
 }
