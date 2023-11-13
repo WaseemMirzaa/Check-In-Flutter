@@ -31,7 +31,7 @@ class User {
   final String about;
   final String court;
   final String pic;
-  final bool? IsVerified;
+  final bool? isVerified;
 
   User(
       {required this.name,
@@ -39,7 +39,7 @@ class User {
       required this.about,
       required this.court,
       required this.pic,
-      this.IsVerified});
+      this.isVerified});
 }
 
 class UserService {
@@ -55,7 +55,7 @@ class UserService {
                 about: doc.data()['about me'] ?? "",
                 court: doc.data()['home court'] ?? "",
                 pic: doc.data()['photoUrl'] ?? "",
-                IsVerified: doc.data()['IsVerified'] ?? null,
+                isVerified: doc.data()['isVerified'] ?? null,
               ))
           .toList();
     });
@@ -66,7 +66,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   UserController userController = Get.put(UserController());
 
   UserModel userd = UserModel();
-  bool IsVerified = false;
+  bool isVerified = false;
   getUser() async {
     DocumentSnapshot snapshot = await FirebaseFirestore.instance
         .collection("USER")
@@ -201,8 +201,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                                 'assets/images/logo-new.png'),
                                                             fit: BoxFit.fill)),
                                                   )),
-                                    if (users[0].IsVerified == null ||
-                                        users[0].IsVerified == true)
+                                    if (users[0].isVerified == null ||
+                                        users[0].isVerified == true)
                                       Align(
                                         alignment: Alignment.bottomRight,
                                         child: Container(
@@ -347,7 +347,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                           ],
                                         ),
                                         TextField(
-                                          maxLines: users[0].IsVerified == false
+                                          maxLines: users[0].isVerified == false
                                               ? 3
                                               : 5,
                                           onChanged: (val) {
@@ -379,7 +379,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                   color:
                                                       const Color(0xff777777))),
                                         ),
-                                        users[0].IsVerified == false
+                                        users[0].isVerified == false
                                             ? Center(
                                                 child: SizedBox(
                                                   width: 70.h,
@@ -387,7 +387,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                   child: fullWidthButton(
                                                       "Apply for varification",
                                                       () {
-                                                    if (users[0].IsVerified ==
+                                                    if (users[0].isVerified ==
                                                         false) {
                                                       launch(_emailLaunchUri
                                                           .toString());

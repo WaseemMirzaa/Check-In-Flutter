@@ -27,7 +27,7 @@ class User {
   final String about;
   final String court;
   final String photoUrl;
-  bool? IsVerified;
+  bool? isVerified;
 
   User(
       {required this.name,
@@ -35,7 +35,7 @@ class User {
         required this.about,
         required this.court,
         required this.photoUrl,
-        this.IsVerified
+        this.isVerified
         });
 }
 
@@ -57,7 +57,7 @@ class UserService {
         about: doc.data()['about me'] ?? "",
         court: doc.data()['home court'] ?? "",
         photoUrl: doc.data()['photoUrl'] ?? "",
-        IsVerified: doc.data()['IsVerified'] ?? true,
+        isVerified: doc.data()['isVerified'] ?? true,
       ))
           .toList();
     });
@@ -277,7 +277,7 @@ class _PlayersViewState extends State<PlayersView> {
                                                         ),
                                                 ),
                                               ),
-                                               users[index].IsVerified == false
+                                               users[index].isVerified == false
                                                   ? const SizedBox()
                                                   : Align(
                                                       alignment:

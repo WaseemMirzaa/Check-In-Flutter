@@ -85,7 +85,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
                                     )),
                           ),
                         ),
-                        widget.user.IsVerified == false
+                        widget.user.isVerified == false
                             ? const SizedBox()
                             : Align(
                                 alignment: Alignment.bottomRight,

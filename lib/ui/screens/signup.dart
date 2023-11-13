@@ -23,7 +23,7 @@ class _SignupViewState extends State<SignupView> {
   String userName = '';
   String email = '';
   String password = '';
-  bool IsVerified = false;
+  bool isVerified = false;
   bool agreeToTerms = false;
   bool isSignUpButtonEnabled = false;
 

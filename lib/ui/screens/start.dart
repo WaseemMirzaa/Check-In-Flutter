@@ -124,8 +124,7 @@ class _StartViewState extends State<StartView> {
                   Padding(
                     padding: EdgeInsets.only(top: 0.9.h, bottom: 0.9.h),
                     child: Container(
-                      height: 8.h,
-                      // height: 6.h,
+                      height: 6.h,
                       decoration: BoxDecoration(
                         color: const Color(0xffffffff),
                         borderRadius: BorderRadius.circular(11.0),
