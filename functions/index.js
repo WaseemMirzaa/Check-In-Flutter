@@ -1,3 +1,4 @@
+/* eslint-disable require-jsdoc */
 /**
  * Import function triggers from their respective submodules:
  *
@@ -72,3 +73,37 @@ exports.deleteLastCheckedIn = functions.pubsub.schedule("every 60 minutes")
     });
 
 
+// Function to create a record in AdditionalLocationsLog collection
+async function logAdditionalLocationChange(change, context) {
+  const newValue = change.after.data();
+  const previousValue = change.before.data();
+
+  console.log("change: " + change);
+  console.log("newValue: " + newValue);
+  console.log("previousValue: " + previousValue);
+
+  const additionalLocationId = context.params.locationId;
+
+  if (!previousValue && newValue) {
+    // Document added
+    await firestore.collection("AdditionalLocationsLog").add({
+      action: "added",
+      locationId: additionalLocationId,
+      title: newValue.title,
+      timestamp: admin.firestore.FieldValue.serverTimestamp(),
+    });
+  } else if (previousValue && !newValue) {
+    // Document deleted
+    await firestore.collection("AdditionalLocationsLog").add({
+      action: "deleted",
+      locationId: additionalLocationId,
+      title: previousValue.title,
+      timestamp: admin.firestore.FieldValue.serverTimestamp(),
+    });
+  }
+}
+
+// Cloud Function to trigger on document write in AdditionalLocations collection
+exports.onAdditionalLocationWrite = functions.firestore
+    .document("AdditionalLocations/{locationId}")
+    .onWrite(logAdditionalLocationChange);

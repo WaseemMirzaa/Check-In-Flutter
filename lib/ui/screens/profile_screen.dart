@@ -13,6 +13,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:nb_utils/nb_utils.dart' as nbutils;
 import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
 import 'package:sizer/sizer.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -55,7 +56,7 @@ class UserService {
                 about: doc.data()['about me'] ?? "",
                 court: doc.data()['home court'] ?? "",
                 pic: doc.data()['photoUrl'] ?? "",
-                isVerified: doc.data()['isVerified'] ?? null,
+                isVerified: doc.data()['isVerified'],
               ))
           .toList();
     });
@@ -121,17 +122,48 @@ class _ProfileScreenState extends State<ProfileScreen> {
     // getUser();
     // UserService();
     // TODO: implement initState
+
     super.initState();
   }
 
-  final Uri _emailLaunchUri =
-      Uri(scheme: 'mailto', path: 'support@checkinhoops.net', queryParameters: {
-    'subject': 'Apply-for-verification',
-  });
+  sendEmail(String name, String email, String homeCourt) async {
+    const subject = "Application for Checkin Hoops Profile Verification";
+
+    var emailContent = '''
+    
+    Dear Support Team,
+    
+    I would like to apply for the profile verification:
+    
+    - My Name: $name
+    - My Email: $email
+    - My Home Court: $homeCourt
+    - Description: 
+    
+    Please take a look on my profile.
+    
+    Best regards,
+    $name
+    ''';
+
+    final Uri _emailLaunchUri = Uri(
+      scheme: 'mailto',
+      path: 'support@checkinhoops.net',
+      // Replace with the recipient's email address for reporting
+      query: 'subject=$subject&body=$emailContent',
+    );
+
+    // if (await canLaunchUrl(_emailLaunchUri)) {
+    try {
+      await launchUrl(_emailLaunchUri);
+    } catch (e) {
+      nbutils.toast("Could not launch email.");
+      print(e);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    String nmail = mail.substring(0, mail.indexOf('@'));
 
     return Scaffold(
       appBar: AppBar(
@@ -379,28 +411,74 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                   color:
                                                       const Color(0xff777777))),
                                         ),
-                                        users[0].isVerified == false
-                                            ? Center(
-                                                child: SizedBox(
-                                                  width: 70.h,
-                                                  height: 7.h,
-                                                  child: fullWidthButton(
-                                                      "Apply for varification",
-                                                      () {
-                                                    if (users[0].isVerified ==
-                                                        false) {
-                                                      launch(_emailLaunchUri
-                                                          .toString());
-                                                    }
-                                                  }),
-                                                ),
-                                              )
-                                            : const SizedBox(),
-                                        verticalGap(15),
+
+                                        verticalGap(20),
                                         Container(
                                           height: 1,
                                           color: greyColor,
-                                        )
+                                        ),
+
+                                        users[0].isVerified == false
+                                            ? Padding(
+                                          padding: EdgeInsets.only(top: 20, bottom: 10),
+                                          child: Container(
+                                            height: 6.h,
+                                            decoration: BoxDecoration(
+                                              color: const Color(0xffffffff),
+                                              borderRadius: BorderRadius.circular(11.0),
+                                              border: Border.all(
+                                                  width: 1.0, color: greenColor),
+                                              boxShadow: const [
+                                                BoxShadow(
+                                                  color: Color(0x29000000),
+                                                  offset: Offset(0, 3),
+                                                  blurRadius: 6,
+                                                ),
+                                              ],
+                                            ),
+                                            child: Material(
+                                              color: Colors.transparent,
+                                              child: InkWell(
+                                                borderRadius: BorderRadius.circular(11),
+                                                onTap: () {
+                                                  if (users[0].isVerified ==
+                                                      false) {
+                                                    sendEmail(users[0].name, users[0].email, users[0].court);
+                                                  }
+                                                },
+                                                child: Center(
+                                                  child: Text(
+                                                    'Verify Profile',
+                                                    style: TextStyle(
+                                                      fontFamily: 'Poppins',
+                                                      fontSize: 1.7.h,
+                                                      color: const Color(0xff000000),
+                                                      fontWeight: FontWeight.w500,
+                                                    ),
+                                                    textAlign: TextAlign.center,
+                                                    softWrap: false,
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ) : const SizedBox(),
+
+
+                                        //
+                                        // users[0].isVerified == false
+                                        //     ? Center(
+                                        //   child: SizedBox(
+                                        //     width: 70.h,
+                                        //     height: 7.h,
+                                        //     child: fullWidthButton(
+                                        //         "Apply for verification",
+                                        //             () {
+                                        //
+                                        //         }),
+                                        //   ),
+                                        // )
+                                        //     : const SizedBox(),
                                       ],
                                     ),
                                   ),
@@ -422,3 +500,5 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 }
+
+
