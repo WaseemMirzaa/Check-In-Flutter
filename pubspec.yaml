@@ -64,7 +64,7 @@ dependencies:
   app_tracking_transparency: ^2.0.4
 
   google_maps_flutter:
-      path: /Users/apple/StudioProjects/Check-In-Flutter/google_maps_flutter/google_maps_flutter
+      path: D:/Sabir-Flutter/Flutter-Code/Check-In-Flutter/google_maps_flutter/google_maps_flutter
 #
 #  google_maps_flutter_platform_interface:
 #      path: /Users/apple/StudioProjects/Check-In-Flutter/google_maps_flutter/google_maps_flutter_platform_interface

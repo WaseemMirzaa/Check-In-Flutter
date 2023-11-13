@@ -1,6 +1,7 @@
 // ignore_for_file: must_be_immutable
 
 import 'package:check_in/ui/screens/player.dart';
+import 'package:check_in/utils/colors.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -26,13 +27,16 @@ class User {
   final String about;
   final String court;
   final String photoUrl;
+  bool? IsVerified;
 
   User(
       {required this.name,
         required this.email,
         required this.about,
         required this.court,
-        required this.photoUrl});
+        required this.photoUrl,
+        this.IsVerified
+        });
 }
 
 class UserService {
@@ -53,6 +57,7 @@ class UserService {
         about: doc.data()['about me'] ?? "",
         court: doc.data()['home court'] ?? "",
         photoUrl: doc.data()['photoUrl'] ?? "",
+        IsVerified: doc.data()['IsVerified'] ?? true,
       ))
           .toList();
     });
@@ -222,30 +227,74 @@ class _PlayersViewState extends State<PlayersView> {
                                     child: Row(
                                       children: [
                                         Padding(
-                                          padding: const EdgeInsets.all(12.0),
-                                          child: Container(
-                                            height: 85,
-                                            width: 85,
-                                            decoration: BoxDecoration(
-                                              shape: BoxShape.circle,
-                                            ),
-                                            child: ClipOval(
-                                              child: Image.network(
-                                                user.photoUrl != "" ? user.photoUrl : 'https://firebasestorage.googleapis.com/v0/b/check-in-7ecd7.appspot.com/o/placeholders%2Fplayer.png?alt=media&token=3f50ba31-00ec-483f-ac03-a13d5e0a260c',
-                                                fit: BoxFit.fill,
-                                                loadingBuilder: (context, child, loadingProgress) {
-                                                  if (loadingProgress == null) return child;
-                                                  return Center(
-                                                    child: CircularProgressIndicator(), // You can replace this with any loading indicator you prefer.
-                                                  );
-                                                },
-                                                errorBuilder: (context, error, stackTrace) {
-                                                  return Image.asset(
-                                                    'assets/images/player.png', // The local placeholder image
-                                                    fit: BoxFit.fill,
-                                                  );
-                                                },
+                                          padding: const EdgeInsets.all(10.0),
+                                          child: SizedBox(
+                                           width: 26.w,
+                                           
+                                            child: Stack(
+                                            alignment: Alignment.bottomRight,
+                                            clipBehavior: Clip.none,
+                                            children: [
+                                                 Container(
+                                                height: 13.5.h,
+                                                width: 24.w,
+                                                decoration: BoxDecoration(
+                                                  shape: BoxShape.circle,
+                                                  border: user.photoUrl == ""
+                                                      ? Border.all(
+                                                          width: 2,
+                                                          color: greenColor)
+                                                      : null,
+                                                ),
+                                                child: ClipOval(
+                                                  child: user.photoUrl != ""
+                                                      ? Image.network(
+                                                          user.photoUrl,
+                                                          fit: BoxFit.fill,
+                                                          loadingBuilder: (context,
+                                                              child,
+                                                              loadingProgress) {
+                                                            if (loadingProgress ==
+                                                                null)
+                                                              return child;
+                                                            return const Center(
+                                                              child:
+                                                                  CircularProgressIndicator(), // You can replace this with any loading indicator you prefer.
+                                                            );
+                                                          },
+                                                          errorBuilder:
+                                                              (context, error,
+                                                                  stackTrace) {
+                                                            return Image.asset(
+                                                              'assets/images/logo-new.png', // The local placeholder image
+                                                              fit: BoxFit.fill,
+                                                            );
+                                                          },
+                                                        )
+                                                      : Image.asset(
+                                                          "assets/images/logo-new.png",
+                                                          fit: BoxFit.fill,
+                                                        ),
+                                                ),
                                               ),
+                                               users[index].IsVerified == false
+                                                  ? const SizedBox()
+                                                  : Align(
+                                                      alignment:
+                                                          Alignment.bottomRight,
+                                                      child: Container(
+                                                        height: 5.h,
+                                                        width: 10.w,
+                                                        decoration: const BoxDecoration(
+                                                            shape:
+                                                                BoxShape.circle,
+                                                            image: DecorationImage(
+                                                                image: AssetImage(
+                                                                    "assets/images/instagram-verification-badge.png"))),
+                                                      ),
+                                                    ),
+
+                                              ],
                                             ),
                                           ),
                                         ),

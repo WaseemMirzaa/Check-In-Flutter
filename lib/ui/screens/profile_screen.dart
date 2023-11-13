@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:check_in/controllers/user_controller.dart';
 import 'package:check_in/model/user_modal.dart';
 import 'package:check_in/ui/screens/add_home_court.dart';
+import 'package:check_in/ui/widgets/common_button.dart';
 import 'package:check_in/utils/colors.dart';
 import 'package:check_in/utils/styles.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -14,6 +15,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
 import 'package:sizer/sizer.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../utils/gaps.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -29,13 +31,15 @@ class User {
   final String about;
   final String court;
   final String pic;
+  final bool? IsVerified;
 
   User(
       {required this.name,
       required this.email,
       required this.about,
       required this.court,
-      required this.pic});
+      required this.pic,
+      this.IsVerified});
 }
 
 class UserService {
@@ -51,6 +55,7 @@ class UserService {
                 about: doc.data()['about me'] ?? "",
                 court: doc.data()['home court'] ?? "",
                 pic: doc.data()['photoUrl'] ?? "",
+                IsVerified: doc.data()['IsVerified'] ?? null,
               ))
           .toList();
     });
@@ -61,6 +66,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   UserController userController = Get.put(UserController());
 
   UserModel userd = UserModel();
+  bool IsVerified = false;
   getUser() async {
     DocumentSnapshot snapshot = await FirebaseFirestore.instance
         .collection("USER")
@@ -118,6 +124,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
     super.initState();
   }
 
+  final Uri _emailLaunchUri =
+      Uri(scheme: 'mailto', path: 'support@checkinhoops.net', queryParameters: {
+    'subject': 'Apply-for-verification',
+  });
+
   @override
   Widget build(BuildContext context) {
     String nmail = mail.substring(0, mail.indexOf('@'));
@@ -155,53 +166,57 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   alignment: Alignment.bottomCenter,
                                   children: [
                                     GestureDetector(
-                                      onTap: _selectImage,
-                                      child: Container(
-                                        height: 15.h,
-                                        width: 32.9.w,
-                                        decoration: BoxDecoration(
-                                            color: Colors.red,
-                                            shape: BoxShape.circle,
-                                            image: (_downloadUrl != null)
-                                                ? DecorationImage(
-                                                    fit: BoxFit.fill,
-                                                    image:
-                                                        // AssetImage(
-                                                        //     "assets/images/Mask Group 1.png")
-                                                        NetworkImage(
+                                        onTap: _selectImage,
+                                        child: (_downloadUrl != null)
+                                            ? Container(
+                                                height: 20.h,
+                                                width: 35.h,
+                                                decoration: BoxDecoration(
+                                                    shape: BoxShape.circle,
+                                                    image: DecorationImage(
+                                                        image: NetworkImage(
                                                             _downloadUrl
-                                                                as String))
-                                                : DecorationImage(
-                                                    fit: BoxFit.fill,
-                                                    image:
-                                                        // AssetImage(
-                                                        //     "assets/images/Mask Group 1.png")
-                                                        NetworkImage(
-                                                            users[0].pic))),
-                                        child: Center(
-                                          child: users[0].pic.isEmpty
-                                              ? Image.asset(
-                                                  'assets/images/Icon material-person.png',
-                                                  scale: 1.5,
-                                                  color: Colors.grey[850]!
-                                                      .withOpacity(0.5),
-                                                )
-                                              : Container(),
+                                                                as String),
+                                                        fit: BoxFit.fill)))
+                                            : (users[0].pic.isNotEmpty)
+                                                ? Container(
+                                                    height: 20.h,
+                                                    width: 35.h,
+                                                    decoration: BoxDecoration(
+                                                        shape: BoxShape.circle,
+                                                        image: DecorationImage(
+                                                            image: NetworkImage(
+                                                                users[0].pic),
+                                                            fit: BoxFit.fill)))
+                                                : Container(
+                                                    height: 20.h,
+                                                    width: 35.h,
+                                                    decoration: BoxDecoration(
+                                                        shape: BoxShape.circle,
+                                                        border: Border.all(
+                                                            width: 2,
+                                                            color: greenColor),
+                                                        image: const DecorationImage(
+                                                            image: AssetImage(
+                                                                'assets/images/logo-new.png'),
+                                                            fit: BoxFit.fill)),
+                                                  )),
+                                    if (users[0].IsVerified == null ||
+                                        users[0].IsVerified == true)
+                                      Align(
+                                        alignment: Alignment.bottomRight,
+                                        child: Container(
+                                          height: 5.5.h,
+                                          width: 12.1.w,
+                                          decoration: const BoxDecoration(
+                                              shape: BoxShape.circle,
+                                              image: DecorationImage(
+                                                  image: AssetImage(
+                                                      "assets/images/instagram-verification-badge.png"))),
                                         ),
-                                      ),
-                                    ),
-                                    Align(
-                                      alignment: Alignment.bottomRight,
-                                      child: Container(
-                                        height: 5.5.h,
-                                        width: 12.1.w,
-                                        decoration: const BoxDecoration(
-                                            shape: BoxShape.circle,
-                                            image: DecorationImage(
-                                                image: AssetImage(
-                                                    "assets/images/instagram-verification-badge.png"))),
-                                      ),
-                                    ),
+                                      )
+                                    else
+                                      const SizedBox(),
                                   ],
                                 ),
                               ),
@@ -213,11 +228,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   32,
                                   FontWeight.bold,
                                   blackColor),
-                              poppinsText(
-                                  "@${users[0].email.substring(0, users[0].email.indexOf('@'))}",
-                                  12,
-                                  FontWeight.normal,
-                                  blackColor),
+                              // poppinsText(
+                              //     "@${users[0].email.substring(0, users[0].email.indexOf('@'))}",
+                              //     12,
+                              //     FontWeight.normal,
+                              //     blackColor),
                             ],
                           ),
                           Column(
@@ -267,13 +282,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               SizedBox(
                                 height: 3.5.h,
                               ),
-                              Stack(
-                                alignment: Alignment.topCenter,
+                              Column(
+                                // alignment: Alignment.topCenter,
                                 children: [
                                   Container(
                                     padding: const EdgeInsets.only(
-                                        left: 30, right: 30, top: 30),
-                                    height: 200,
+                                      left: 30,
+                                      right: 30,
+                                    ),
+                                    height: 32.h,
                                     decoration: BoxDecoration(
                                       color: whiteColor,
                                       borderRadius: const BorderRadius.only(
@@ -291,6 +308,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     ),
                                     child: Column(
                                       children: [
+                                        Container(
+                                          width: 100,
+                                          height: 0.5.h,
+                                          decoration: BoxDecoration(
+                                              color: greenColor,
+                                              borderRadius:
+                                                  const BorderRadius.only(
+                                                      bottomLeft:
+                                                          Radius.circular(5),
+                                                      bottomRight:
+                                                          Radius.circular(5))),
+                                        ),
+                                        SizedBox(
+                                          height: 2.h,
+                                        ),
                                         Row(
                                           mainAxisAlignment:
                                               MainAxisAlignment.spaceBetween,
@@ -315,7 +347,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                           ],
                                         ),
                                         TextField(
-                                          maxLines: 5,
+                                          maxLines: users[0].IsVerified == false
+                                              ? 3
+                                              : 5,
                                           onChanged: (val) {
                                             setState(() {
                                               aboutMe = val;
@@ -345,6 +379,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                   color:
                                                       const Color(0xff777777))),
                                         ),
+                                        users[0].IsVerified == false
+                                            ? Center(
+                                                child: SizedBox(
+                                                  width: 70.h,
+                                                  height: 7.h,
+                                                  child: fullWidthButton(
+                                                      "Apply for varification",
+                                                      () {
+                                                    if (users[0].IsVerified ==
+                                                        false) {
+                                                      launch(_emailLaunchUri
+                                                          .toString());
+                                                    }
+                                                  }),
+                                                ),
+                                              )
+                                            : const SizedBox(),
                                         verticalGap(15),
                                         Container(
                                           height: 1,
@@ -353,11 +404,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                       ],
                                     ),
                                   ),
-                                  Container(
-                                    width: 100,
-                                    color: greenColor,
-                                    height: 2,
-                                  ),
+                                  // Container(
+                                  //   width: 100,
+                                  //   color: greenColor,
+                                  //   height: 2,
+                                  // ),
                                 ],
                               )
                             ],

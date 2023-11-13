@@ -18,7 +18,6 @@ class StartView extends StatefulWidget {
 }
 
 class _StartViewState extends State<StartView> {
-
   String _authStatus = 'Unknown';
 
   @override
@@ -27,14 +26,14 @@ class _StartViewState extends State<StartView> {
 
     // It is safer to call native code using addPostFrameCallback after the widget has been fully built and initialized.
     // Directly calling native code from initState may result in errors due to the widget tree not being fully built at that point.
-    WidgetsFlutterBinding.ensureInitialized().addPostFrameCallback((_) => initPlugin());
-
+    WidgetsFlutterBinding.ensureInitialized()
+        .addPostFrameCallback((_) => initPlugin());
   }
 
   // Platform messages are asynchronous, so we initialize in an async method.
   Future<void> initPlugin() async {
     final TrackingStatus status =
-    await AppTrackingTransparency.trackingAuthorizationStatus;
+        await AppTrackingTransparency.trackingAuthorizationStatus;
     setState(() => _authStatus = '$status');
     // If the system can show an authorization request dialog
     if (status == TrackingStatus.notDetermined) {
@@ -44,7 +43,7 @@ class _StartViewState extends State<StartView> {
       await Future.delayed(const Duration(milliseconds: 200));
       // Request system's tracking authorization dialog
       final TrackingStatus status =
-      await AppTrackingTransparency.requestTrackingAuthorization();
+          await AppTrackingTransparency.requestTrackingAuthorization();
       setState(() => _authStatus = '$status');
     }
 
@@ -60,7 +59,7 @@ class _StartViewState extends State<StartView> {
           content: const Text(
             'We care about your privacy and data security. We use your email to maintain your own profile against it. '
             'Also we use your location to show you the nearest basketball courts in your area. '
-                'Can we continue to use your data to give you best experience ?\n\nYou can change your choice anytime in the app settings. ',
+            'Can we continue to use your data to give you best experience ?\n\nYou can change your choice anytime in the app settings. ',
           ),
           actions: [
             TextButton(
@@ -75,28 +74,29 @@ class _StartViewState extends State<StartView> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: widget.isBack ? AppBar(
-        backgroundColor: Colors.white,
-        leading: Row(
-          children: [
-            const SizedBox(
-              width: 30,
-            ),
-            GestureDetector(
-              onTap: () {
-                Navigator.pop(context);
-              },
-              child: SizedBox(
-                height: 2.1.h,
-                width: 2.9.w,
-                child: Image.asset("assets/images/Path 6.png"),
+      appBar: widget.isBack
+          ? AppBar(
+              backgroundColor: Colors.white,
+              leading: Row(
+                children: [
+                  const SizedBox(
+                    width: 30,
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.pop(context);
+                    },
+                    child: SizedBox(
+                      height: 2.1.h,
+                      width: 2.9.w,
+                      child: Image.asset("assets/images/Path 6.png"),
+                    ),
+                  )
+                ],
               ),
+              elevation: 0,
             )
-          ],
-        ),
-        elevation: 0,
-      ) : null,
-
+          : null,
       body: Padding(
         padding: EdgeInsets.all(horizontalPadding),
         child: Center(
@@ -124,7 +124,8 @@ class _StartViewState extends State<StartView> {
                   Padding(
                     padding: EdgeInsets.only(top: 0.9.h, bottom: 0.9.h),
                     child: Container(
-                      height: 6.h,
+                      height: 8.h,
+                      // height: 6.h,
                       decoration: BoxDecoration(
                         color: const Color(0xffffffff),
                         borderRadius: BorderRadius.circular(11.0),

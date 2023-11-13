@@ -31,6 +31,7 @@ Future<void> signUp(
                 "email": auth.currentUser!.email,
                 "uid": auth.currentUser!.uid,
                 "checkedIn": false,
+                "IsVerified": false,
               },
             )
                 // .then((value) async => await toModal(context))
