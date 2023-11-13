@@ -65,31 +65,40 @@ class _PlayerScreenState extends State<PlayerScreen> {
                           height: 15.h,
                           width: 32.9.w,
                           decoration: BoxDecoration(
-                              color: Colors.red,
-                              shape: BoxShape.circle,
-                              image:
-                                 DecorationImage(
-                                  fit: BoxFit.fill,
-                                  image:
-                                  // AssetImage(
-                                  //     "assets/images/Mask Group 1.png")
-                                  NetworkImage(
-                                      widget.user.photoUrl != "" ? widget.user.photoUrl :'https://firebasestorage.googleapis.com/v0/b/check-in-7ecd7.appspot.com/o/placeholders%2Fplayer.png?alt=media&token=3f50ba31-00ec-483f-ac03-a13d5e0a260c',
-                                     ))
-                          ),
-                        ),
-                        Align(
-                          alignment: Alignment.bottomRight,
-                          child: Container(
-                            height: 5.5.h,
-                            width: 12.1.w,
-                            decoration: const BoxDecoration(
-                                shape: BoxShape.circle,
-                                image: DecorationImage(
+                            shape: BoxShape.circle,
+                            border: widget.user.photoUrl == ""
+                                ? Border.all(width: 2, color: greenColor)
+                                : null,
+                            image: widget.user.photoUrl != ""
+                                ? DecorationImage(
+                                    fit: BoxFit.fill,
+                                    image:
+                                        // AssetImage(
+                                        //     "assets/images/Mask Group 1.png")
+                                        NetworkImage(
+                                      widget.user.photoUrl,
+                                    ))
+                                : const DecorationImage(
+                                    fit: BoxFit.fill,
                                     image: AssetImage(
-                                        "assets/images/instagram-verification-badge.png"))),
+                                      "assets/images/logo-new.png",
+                                    )),
                           ),
                         ),
+                        widget.user.IsVerified == false
+                            ? const SizedBox()
+                            : Align(
+                                alignment: Alignment.bottomRight,
+                                child: Container(
+                                  height: 5.5.h,
+                                  width: 12.1.w,
+                                  decoration: const BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      image: DecorationImage(
+                                          image: AssetImage(
+                                              "assets/images/instagram-verification-badge.png"))),
+                                ),
+                              ),
                       ],
                     ),
                   ),
@@ -151,6 +160,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
                   Stack(
                     alignment: Alignment.topCenter,
                     children: [
+                      
                       Container(
                         padding:
                             const EdgeInsets.only(left: 30, right: 30, top: 30),

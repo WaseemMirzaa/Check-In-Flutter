@@ -23,6 +23,7 @@ class _SignupViewState extends State<SignupView> {
   String userName = '';
   String email = '';
   String password = '';
+  bool IsVerified = false;
   bool agreeToTerms = false;
   bool isSignUpButtonEnabled = false;
 
@@ -55,7 +56,7 @@ class _SignupViewState extends State<SignupView> {
             GestureDetector(
               onTap: () {
                 pushNewScreen(context,
-                    screen: StartView(isBack:false), withNavBar: false);
+                    screen: StartView(isBack: false), withNavBar: false);
               },
               child: SizedBox(
                 height: 2.1.h,
@@ -67,226 +68,223 @@ class _SignupViewState extends State<SignupView> {
         ),
         elevation: 0,
       ),
-      body: Padding(
-        padding: EdgeInsets.all(horizontalPadding),
-        child: SizedBox(
-          height: MediaQuery.of(context).size.height,
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                SizedBox(
-                  height: 4.h,
-                ),
-                Image.asset(
-                  "assets/images/logo-new.png",
-                  scale: 3,
-                ),
-                SizedBox(
-                  height: 10.h,
-                ),
-                SizedBox(
-                  child: Column(
-                    children: [
-                      Padding(
-                        padding: EdgeInsets.only(top: 0.9.h, bottom: 0.9.h),
-                        child: TextFormField(
-                          enableSuggestions: false,
-                          autocorrect: false,
-                          textInputAction: TextInputAction.next,
-                          onEditingComplete: () =>
-                              FocusScope.of(context).nextFocus(),
-                          validator: (v) {
-                            if (v == null || v.isEmpty) {
-                              return 'Please enter your first name';
-                            }
-                            return null;
-                          },
-                          onChanged: (val) {
-                            setState(() {
-                              userName = val;
-                            });
-                          },
-                          decoration: InputDecoration(
-                            enabledBorder: const UnderlineInputBorder(
-                              borderSide: BorderSide(color: Color(0xff707070)),
-                            ),
-                            focusedBorder: const UnderlineInputBorder(
-                              borderSide: BorderSide(color: Color(0xff707070)),
-                            ),
-                            hintText: 'Username',
-                            hintStyle: TextStyle(
-                              fontFamily: 'Poppins',
-                              fontSize: 1.7.h,
-                              color: const Color(0xff707070),
-                              fontWeight: FontWeight.w600,
-                              height: 1.2142857142857142,
-                            ),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: EdgeInsets.all(horizontalPadding),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              SizedBox(
+                height: 3.h,
+              ),
+              Image.asset(
+                "assets/images/logo-new.png",
+                scale: 3,
+              ),
+              SizedBox(
+                height: 5.h,
+              ),
+              SizedBox(
+                child: Column(
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.only(top: 0.9.h, bottom: 0.9.h),
+                      child: TextFormField(
+                        enableSuggestions: false,
+                        autocorrect: false,
+                        textInputAction: TextInputAction.next,
+                        onEditingComplete: () =>
+                            FocusScope.of(context).nextFocus(),
+                        validator: (v) {
+                          if (v == null || v.isEmpty) {
+                            return 'Please enter your first name';
+                          }
+                          return null;
+                        },
+                        onChanged: (val) {
+                          setState(() {
+                            userName = val;
+                          });
+                        },
+                        decoration: InputDecoration(
+                          enabledBorder: const UnderlineInputBorder(
+                            borderSide: BorderSide(color: Color(0xff707070)),
+                          ),
+                          focusedBorder: const UnderlineInputBorder(
+                            borderSide: BorderSide(color: Color(0xff707070)),
+                          ),
+                          hintText: 'Username',
+                          hintStyle: TextStyle(
+                            fontFamily: 'Poppins',
+                            fontSize: 1.7.h,
+                            color: const Color(0xff707070),
+                            fontWeight: FontWeight.w600,
+                            height: 1.2142857142857142,
                           ),
                         ),
                       ),
-                      Padding(
-                        padding: EdgeInsets.only(top: 0.9.h, bottom: 0.9.h),
-                        child: TextFormField(
-                          enableSuggestions: false,
-                          autocorrect: false,
-                          textInputAction: TextInputAction.next,
-                          onEditingComplete: () =>
-                              FocusScope.of(context).nextFocus(),
-                          keyboardType: TextInputType.emailAddress,
-                          validator: (v) {
-                            if (v == null || v.isEmpty || !Validate(email)) {
-                              return 'Please enter Valid Email address';
-                            }
-                            return null;
-                          },
-                          onChanged: (val) {
-                            setState(() {
-                              email = val.trim();
-                            });
-                            Validate(email);
-                          },
-                          decoration: InputDecoration(
-                            enabledBorder: const UnderlineInputBorder(
-                              borderSide: BorderSide(color: Color(0xff707070)),
-                            ),
-                            focusedBorder: const UnderlineInputBorder(
-                              borderSide: BorderSide(color: Color(0xff707070)),
-                            ),
-                            hintText: 'Email',
-                            hintStyle: TextStyle(
-                              fontFamily: 'Poppins',
-                              fontSize: 1.7.h,
-                              color: const Color(0xff707070),
-                              fontWeight: FontWeight.w600,
-                              height: 1.2142857142857142,
-                            ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.only(top: 0.9.h, bottom: 0.9.h),
+                      child: TextFormField(
+                        enableSuggestions: false,
+                        autocorrect: false,
+                        textInputAction: TextInputAction.next,
+                        onEditingComplete: () =>
+                            FocusScope.of(context).nextFocus(),
+                        keyboardType: TextInputType.emailAddress,
+                        validator: (v) {
+                          if (v == null || v.isEmpty || !Validate(email)) {
+                            return 'Please enter Valid Email address';
+                          }
+                          return null;
+                        },
+                        onChanged: (val) {
+                          setState(() {
+                            email = val.trim();
+                          });
+                          Validate(email);
+                        },
+                        decoration: InputDecoration(
+                          enabledBorder: const UnderlineInputBorder(
+                            borderSide: BorderSide(color: Color(0xff707070)),
+                          ),
+                          focusedBorder: const UnderlineInputBorder(
+                            borderSide: BorderSide(color: Color(0xff707070)),
+                          ),
+                          hintText: 'Email',
+                          hintStyle: TextStyle(
+                            fontFamily: 'Poppins',
+                            fontSize: 1.7.h,
+                            color: const Color(0xff707070),
+                            fontWeight: FontWeight.w600,
+                            height: 1.2142857142857142,
                           ),
                         ),
                       ),
-                      Padding(
-                        padding: EdgeInsets.only(top: 0.9.h, bottom: 0.9.h),
-                        child: TextFormField(
-                          enableSuggestions: false,
-                          autocorrect: false,
-                          obscureText: index == 0 ? true : false,
-                          validator: (v) {
-                            if (v == null || v.isEmpty || v.length < 6) {
-                              return 'Password must be 6 digits long';
-                            }
-                            return null;
-                          },
-                          onChanged: (v) {
-                            setState(() {
-                              password = v;
-                            });
-                          },
-                          decoration: InputDecoration(
-                            enabledBorder: const UnderlineInputBorder(
-                              borderSide: BorderSide(color: Color(0xff707070)),
-                            ),
-                            focusedBorder: const UnderlineInputBorder(
-                              borderSide: BorderSide(color: Color(0xff707070)),
-                            ),
-                            hintText: 'Password',
-                            hintStyle: TextStyle(
-                              fontFamily: 'Poppins',
-                              fontSize: 1.7.h,
-                              color: const Color(0xff707070),
-                              fontWeight: FontWeight.w600,
-                              height: 1.2142857142857142,
-                            ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.only(top: 0.9.h, bottom: 0.9.h),
+                      child: TextFormField(
+                        enableSuggestions: false,
+                        autocorrect: false,
+                        obscureText: index == 0 ? true : false,
+                        validator: (v) {
+                          if (v == null || v.isEmpty || v.length < 6) {
+                            return 'Password must be 6 digits long';
+                          }
+                          return null;
+                        },
+                        onChanged: (v) {
+                          setState(() {
+                            password = v;
+                          });
+                        },
+                        decoration: InputDecoration(
+                          enabledBorder: const UnderlineInputBorder(
+                            borderSide: BorderSide(color: Color(0xff707070)),
+                          ),
+                          focusedBorder: const UnderlineInputBorder(
+                            borderSide: BorderSide(color: Color(0xff707070)),
+                          ),
+                          hintText: 'Password',
+                          hintStyle: TextStyle(
+                            fontFamily: 'Poppins',
+                            fontSize: 1.7.h,
+                            color: const Color(0xff707070),
+                            fontWeight: FontWeight.w600,
+                            height: 1.2142857142857142,
                           ),
                         ),
                       ),
-                      Row(
-                        children: [
-                          Checkbox(
-                            value: agreeToTerms,
-                            onChanged: (value) {
-                              setState(() {
-                                agreeToTerms = value ?? false;
-                                isSignUpButtonEnabled = agreeToTerms;
-                              });
-                            },
+                    ),
+                    Row(
+                      children: [
+                        Checkbox(
+                          value: agreeToTerms,
+                          onChanged: (value) {
+                            setState(() {
+                              agreeToTerms = value ?? false;
+                              isSignUpButtonEnabled = agreeToTerms;
+                            });
+                          },
+                        ),
+                        // Expanded(
+                        //   child:
+                        Text(
+                          "I agree to the ",
+                          style: TextStyle(
+                            fontFamily: 'Poppins',
+                            fontSize: 1.2.h,
+                            color: const Color(0xff707070),
+                            fontWeight: FontWeight.w600,
+                            // height: 1.2142857142857142,
                           ),
-                          // Expanded(
-                          //   child:
-                          Text(
-                            "I agree to the ",
+                        ),
+                        // ),
+                        GestureDetector(
+                          onTap: () {
+                            pushNewScreen(context,
+                                screen: const PrivacyPolicy(),
+                                withNavBar: false);
+                          },
+                          child: Text(
+                            "Privacy Policy",
                             style: TextStyle(
-                              fontFamily: 'Poppins',
+                              color: Colors.blue,
+                              fontWeight: FontWeight.bold,
                               fontSize: 1.2.h,
-                              color: const Color(0xff707070),
-                              fontWeight: FontWeight.w600,
-                              // height: 1.2142857142857142,
                             ),
                           ),
-                          // ),
-                          GestureDetector(
-                            onTap: () {
-                              pushNewScreen(context,
-                                  screen: const PrivacyPolicy(),
-                                  withNavBar: false);
-                            },
-                            child: Text(
-                              "Privacy Policy",
-                              style: TextStyle(
-                                color: Colors.blue,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 1.2.h,
-                              ),
-                            ),
+                        ),
+                        Text(
+                          " & ",
+                          style: TextStyle(
+                            fontFamily: 'Poppins',
+                            fontSize: 1.2.h,
+                            color: const Color(0xff707070),
+                            fontWeight: FontWeight.w600,
+                            // height: 1.2142857142857142,
                           ),
-                          Text(
-                            " & ",
+                        ),
+                        GestureDetector(
+                          onTap: () {
+                            pushNewScreen(context,
+                                screen: const TermsAndConditions(),
+                                withNavBar:
+                                    false); // Handle the action to open the Terms & Conditions screen
+                          },
+                          child: Text(
+                            "Terms & Conditions",
                             style: TextStyle(
-                              fontFamily: 'Poppins',
+                              color: Colors.blue,
+                              fontWeight: FontWeight.bold,
                               fontSize: 1.2.h,
-                              color: const Color(0xff707070),
-                              fontWeight: FontWeight.w600,
-                              // height: 1.2142857142857142,
                             ),
                           ),
-                          GestureDetector(
-                            onTap: () {
-                              pushNewScreen(context,
-                                  screen: const TermsAndConditions(),
-                                  withNavBar:
-                                      false); // Handle the action to open the Terms & Conditions screen
-                            },
-                            child: Text(
-                              "Terms & Conditions",
-                              style: TextStyle(
-                                color: Colors.blue,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 1.2.h,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: 2.0.h),
-                      // Add some spacing between the checkbox and the sign-up button
-                      Padding(
-                          padding: EdgeInsets.only(top: 3.6.h),
-                          child: fullWidthButton('Sign up', () async {
-                            if (!isSignUpButtonEnabled) {
-                              Get.snackbar(
-                                  "Error", "Agree to terms & conditions");
-                            } else if (userName != '') {
-                              if (Validate(email)) {
-                                signUp(email, password, userName, context);
-                              }
-                            } else if (userName == '') {
-                              Get.snackbar("Error", "Enter User Name");
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 2.0.h),
+                    // Add some spacing between the checkbox and the sign-up button
+                    Padding(
+                        padding: EdgeInsets.only(top: 3.6.h),
+                        child: fullWidthButton('Sign up', () async {
+                          if (!isSignUpButtonEnabled) {
+                            Get.snackbar(
+                                "Error", "Agree to terms & conditions");
+                          } else if (userName != '') {
+                            if (Validate(email)) {
+                              signUp(email, password, userName, context);
                             }
-                          })),
-                    ],
-                  ),
+                          } else if (userName == '') {
+                            Get.snackbar("Error", "Enter User Name");
+                          }
+                        })),
+                  ],
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),

@@ -100,11 +100,10 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
   ];
 
   Future indexValue() async {
-
     if (FirebaseAuth.instance.currentUser != null) {
       final document = FirebaseFirestore.instance
-              .collection('USER')
-              .doc(FirebaseAuth.instance.currentUser!.uid);
+          .collection('USER')
+          .doc(FirebaseAuth.instance.currentUser!.uid);
       document.get().then((DocumentSnapshot snapshot) {
         if (snapshot.exists) {
           dynamic data = snapshot.data();
@@ -117,7 +116,7 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
             checkedInCourtName = data['checkedInCourtName'] ?? "";
             index = 1;
           }
-          setState(() {});
+          mounted ? setState(() {}) : null;
           // print("${index} is index");
         } else {
           print('Document does not exist!');
@@ -448,7 +447,6 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
         "courtLng": FieldValue.delete(),
         UserFirebaseModel.lastCheckout: Timestamp.now(),
         UserFirebaseModel.lastCheckin: FieldValue.delete(),
-
       });
 
       checkedInCourtName = '';
@@ -784,9 +782,12 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
                                   );
                                 },
                                 onSuggestionSelected: (prediction) async {
-                                  setState(() {
-                                    _selectedPlace = prediction.title as String;
-                                  });
+                                  mounted
+                                      ? setState(() {
+                                          _selectedPlace =
+                                              prediction.title as String;
+                                        })
+                                      : null;
                                   typeAheadController.text = _selectedPlace;
 
                                   // var placeId = prediction.placeId;
@@ -845,7 +846,7 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
                                     markers.add(marker);
                                     addHeatedMarkers(marker);
 
-                                    setState(() {});
+                                    mounted ? setState(() {}) : null;
                                   }
                                 },
                                 transitionBuilder:
@@ -867,12 +868,16 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
                           showDialog(
                               context: context,
                               builder: (context) => AlertDialog(
-                                    title: poppinsText("Please log in to use more features",
-                                        16, FontWeight.w500, Colors.black),
+                                    title: poppinsText(
+                                        "Please log in to use more features",
+                                        16,
+                                        FontWeight.w500,
+                                        Colors.black),
                                     actions: [
                                       TextButton(
                                         onPressed: () {
-                                          Get.off(() => StartView(isBack:true));
+                                          Get.off(
+                                              () => StartView(isBack: true));
                                         },
                                         child: const Text('Login'),
                                       ),

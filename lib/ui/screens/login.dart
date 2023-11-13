@@ -49,7 +49,7 @@ class _LoginViewState extends State<LoginView> {
             GestureDetector(
               onTap: () {
                 pushNewScreen(context,
-                    screen: StartView(isBack:false), withNavBar: false);
+                    screen: StartView(isBack: false), withNavBar: false);
               },
               child: SizedBox(
                 height: 2.1.h,
@@ -61,120 +61,117 @@ class _LoginViewState extends State<LoginView> {
         ),
         elevation: 0,
       ),
-      body: Padding(
-        padding: EdgeInsets.all(horizontalPadding),
-        child: SizedBox(
-          height: MediaQuery.of(context).size.height,
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                SizedBox(
-                  height: 4.h,
-                ),
-                Image.asset(
-                  "assets/images/logo-new.png",
-                  scale: 3,
-                ),
-                SizedBox(
-                  height: 12.h,
-                ),
-                SizedBox(
-                  child: Column(
-                    children: [
-                      Padding(
-                        padding: EdgeInsets.only(top: 0.9.h, bottom: 0.9.h),
-                        child: TextFormField(
-                          enableSuggestions: false,
-                          autocorrect: false,
-                          textInputAction: TextInputAction.next,
-                          onEditingComplete: () =>
-                              FocusScope.of(context).nextFocus(),
-                          validator: (v) {
-                            if (v == null ||
-                                v.isEmpty ||
-                                v.length < 6 ||
-                                !Validate(email)) {
-                              return 'Please enter Valid Email Address';
-                            }
-                            return null;
-                          },
-                          onChanged: (val) {
-                            setState(() {
-                              email = val;
-                            });
-                          },
-                          decoration: InputDecoration(
-                            enabledBorder: const UnderlineInputBorder(
-                              borderSide: BorderSide(color: Color(0xff707070)),
-                            ),
-                            focusedBorder: const UnderlineInputBorder(
-                              borderSide: BorderSide(color: Color(0xff707070)),
-                            ),
-                            hintText: 'Email',
-                            hintStyle: TextStyle(
-                              fontFamily: 'Poppins',
-                              fontSize: 1.7.h,
-                              color: const Color(0xff707070),
-                              fontWeight: FontWeight.w600,
-                              height: 1.2142857142857142,
-                            ),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: EdgeInsets.all(horizontalPadding),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              SizedBox(
+                height: 4.h,
+              ),
+              Image.asset(
+                "assets/images/logo-new.png",
+                scale: 3,
+              ),
+              SizedBox(
+                height: 12.h,
+              ),
+              SizedBox(
+                child: Column(
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.only(top: 0.9.h, bottom: 0.9.h),
+                      child: TextFormField(
+                        enableSuggestions: false,
+                        autocorrect: false,
+                        textInputAction: TextInputAction.next,
+                        onEditingComplete: () =>
+                            FocusScope.of(context).nextFocus(),
+                        validator: (v) {
+                          if (v == null ||
+                              v.isEmpty ||
+                              v.length < 6 ||
+                              !Validate(email)) {
+                            return 'Please enter Valid Email Address';
+                          }
+                          return null;
+                        },
+                        onChanged: (val) {
+                          setState(() {
+                            email = val;
+                          });
+                        },
+                        decoration: InputDecoration(
+                          enabledBorder: const UnderlineInputBorder(
+                            borderSide: BorderSide(color: Color(0xff707070)),
+                          ),
+                          focusedBorder: const UnderlineInputBorder(
+                            borderSide: BorderSide(color: Color(0xff707070)),
+                          ),
+                          hintText: 'Email',
+                          hintStyle: TextStyle(
+                            fontFamily: 'Poppins',
+                            fontSize: 1.7.h,
+                            color: const Color(0xff707070),
+                            fontWeight: FontWeight.w600,
+                            height: 1.2142857142857142,
                           ),
                         ),
                       ),
-                      Padding(
-                        padding: EdgeInsets.only(top: 0.9.h, bottom: 0.9.h),
-                        child: TextFormField(
-                          enableSuggestions: false,
-                          autocorrect: false,
-                          obscureText: index == 0 ? true : false,
-                          validator: (v) {
-                            if (v == null || v.isEmpty || v.length < 6) {
-                              return 'Password must be 6 digits long';
-                            }
-                            return null;
-                          },
-                          onChanged: (v) {
-                            setState(() {
-                              password = v;
-                            });
-                          },
-                          decoration: InputDecoration(
-                            enabledBorder: const UnderlineInputBorder(
-                              borderSide: BorderSide(color: Color(0xff707070)),
-                            ),
-                            focusedBorder: const UnderlineInputBorder(
-                              borderSide: BorderSide(color: Color(0xff707070)),
-                            ),
-                            hintText: 'Password',
-                            hintStyle: TextStyle(
-                              fontFamily: 'Poppins',
-                              fontSize: 1.7.h,
-                              color: const Color(0xff707070),
-                              fontWeight: FontWeight.w600,
-                              height: 1.2142857142857142,
-                            ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.only(top: 0.9.h, bottom: 0.9.h),
+                      child: TextFormField(
+                        enableSuggestions: false,
+                        autocorrect: false,
+                        obscureText: index == 0 ? true : false,
+                        validator: (v) {
+                          if (v == null || v.isEmpty || v.length < 6) {
+                            return 'Password must be 6 digits long';
+                          }
+                          return null;
+                        },
+                        onChanged: (v) {
+                          setState(() {
+                            password = v;
+                          });
+                        },
+                        decoration: InputDecoration(
+                          enabledBorder: const UnderlineInputBorder(
+                            borderSide: BorderSide(color: Color(0xff707070)),
+                          ),
+                          focusedBorder: const UnderlineInputBorder(
+                            borderSide: BorderSide(color: Color(0xff707070)),
+                          ),
+                          hintText: 'Password',
+                          hintStyle: TextStyle(
+                            fontFamily: 'Poppins',
+                            fontSize: 1.7.h,
+                            color: const Color(0xff707070),
+                            fontWeight: FontWeight.w600,
+                            height: 1.2142857142857142,
                           ),
                         ),
                       ),
-                      Padding(
-                          padding: EdgeInsets.only(top: 3.6.h),
-                          child: fullWidthButton('Log in', () async {
-                            if (password != "" && email != "") {
-                              login(email, password, context);
-                            } else if (password == "") {
-                              Get.snackbar("Error", "Enter Password",
-                                  snackPosition: SnackPosition.BOTTOM);
-                            } else if (email == "") {
-                              Get.snackbar("Error", "Enter Email",
-                                  snackPosition: SnackPosition.BOTTOM);
-                            }
-                          })),
-                    ],
-                  ),
+                    ),
+                    Padding(
+                        padding: EdgeInsets.only(top: 3.6.h),
+                        child: fullWidthButton('Log in', () async {
+                          if (password != "" && email != "") {
+                            login(email, password, context);
+                          } else if (password == "") {
+                            Get.snackbar("Error", "Enter Password",
+                                snackPosition: SnackPosition.BOTTOM);
+                          } else if (email == "") {
+                            Get.snackbar("Error", "Enter Email",
+                                snackPosition: SnackPosition.BOTTOM);
+                          }
+                        })),
+                  ],
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),
