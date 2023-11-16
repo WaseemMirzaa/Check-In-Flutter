@@ -140,7 +140,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     - My Home Court: $homeCourt
     - Description: 
     
-    Please take a look on my profile.
     
     Best regards,
     $name
