@@ -127,7 +127,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   sendEmail(String name, String email, String homeCourt) async {
-    const subject = "Application for Checkin Hoops Profile Verification";
+    const subject = "Application for Check In Hoops Profile Verification";
 
     var emailContent = '''
     
