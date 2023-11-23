@@ -417,51 +417,51 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                           color: greyColor,
                                         ),
 
-                                        users[0].isVerified == false
-                                            ? Padding(
-                                          padding: EdgeInsets.only(top: 20, bottom: 10),
-                                          child: Container(
-                                            height: 6.h,
-                                            decoration: BoxDecoration(
-                                              color: const Color(0xffffffff),
-                                              borderRadius: BorderRadius.circular(11.0),
-                                              border: Border.all(
-                                                  width: 1.0, color: greenColor),
-                                              boxShadow: const [
-                                                BoxShadow(
-                                                  color: Color(0x29000000),
-                                                  offset: Offset(0, 3),
-                                                  blurRadius: 6,
-                                                ),
-                                              ],
-                                            ),
-                                            child: Material(
-                                              color: Colors.transparent,
-                                              child: InkWell(
-                                                borderRadius: BorderRadius.circular(11),
-                                                onTap: () {
-                                                  if (users[0].isVerified ==
-                                                      false) {
-                                                    sendEmail(users[0].name, users[0].email, users[0].court);
-                                                  }
-                                                },
-                                                child: Center(
-                                                  child: Text(
-                                                    'Verify Profile',
-                                                    style: TextStyle(
-                                                      fontFamily: 'Poppins',
-                                                      fontSize: 1.7.h,
-                                                      color: const Color(0xff000000),
-                                                      fontWeight: FontWeight.w500,
-                                                    ),
-                                                    textAlign: TextAlign.center,
-                                                    softWrap: false,
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                        ) : const SizedBox(),
+                                        // users[0].isVerified == false
+                                        //     ? Padding(
+                                        //   padding: EdgeInsets.only(top: 20, bottom: 10),
+                                        //   child: Container(
+                                        //     height: 6.h,
+                                        //     decoration: BoxDecoration(
+                                        //       color: const Color(0xffffffff),
+                                        //       borderRadius: BorderRadius.circular(11.0),
+                                        //       border: Border.all(
+                                        //           width: 1.0, color: greenColor),
+                                        //       boxShadow: const [
+                                        //         BoxShadow(
+                                        //           color: Color(0x29000000),
+                                        //           offset: Offset(0, 3),
+                                        //           blurRadius: 6,
+                                        //         ),
+                                        //       ],
+                                        //     ),
+                                        //     child: Material(
+                                        //       color: Colors.transparent,
+                                        //       child: InkWell(
+                                        //         borderRadius: BorderRadius.circular(11),
+                                        //         onTap: () {
+                                        //           if (users[0].isVerified ==
+                                        //               false) {
+                                        //             sendEmail(users[0].name, users[0].email, users[0].court);
+                                        //           }
+                                        //         },
+                                        //         child: Center(
+                                        //           child: Text(
+                                        //             'Verify Profile',
+                                        //             style: TextStyle(
+                                        //               fontFamily: 'Poppins',
+                                        //               fontSize: 1.7.h,
+                                        //               color: const Color(0xff000000),
+                                        //               fontWeight: FontWeight.w500,
+                                        //             ),
+                                        //             textAlign: TextAlign.center,
+                                        //             softWrap: false,
+                                        //           ),
+                                        //         ),
+                                        //       ),
+                                        //     ),
+                                        //   ),
+                                        // ) : const SizedBox(),
 
 
                                         //
