@@ -491,8 +491,20 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
     return ZOOM_LEVEL_INITIAL;
   }
 
+  getUser() async {
+    DocumentSnapshot snapshot = await FirebaseFirestore.instance
+        .collection("USER")
+        .doc(FirebaseAuth.instance.currentUser?.uid ?? "")
+        .get();
+    userController.userModel.value = UserModel.fromMap(snapshot.data() as Map<String, dynamic>);
+    print(userController.userModel.value);
+    // UserModel currentUser = UserModel.fromMap(snapshot.data() as Map<String, dynamic>);
+
+  }
+
   @override
   void initState() {
+    getUser();
     // setCustomMarkerIcon();
     getCurrentLocation();
     indexValue();
@@ -551,32 +563,22 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
                   pushNewScreen(context, screen: const TermsAndConditions(), withNavBar: false);
                 },
               ),
-           FirebaseAuth.instance.currentUser == null
-      ? const SizedBox()
-            : StreamBuilder<List<User>>(
-                  stream: UserService().users,
-                  builder: (context, snapshot) {
-                    final users = snapshot.data;
-
-                    if(users != null && users.isNotEmpty && users[0].isVerified == false) {
-
-                      return ListTile(
+           userController.userModel.value.isVerified == null || userController.userModel.value.isVerified == true
+               ? const SizedBox()
+               : ListTile(
                         leading: const Icon(
                           Icons.verified,
                         ),
                         title: const Text('Verify Profile'),
                         onTap: () {
-                          if (users[0].isVerified ==
+                          if (userController.userModel.value.isVerified ==
                               false) {
-                            sendEmail(users[0].name, users[0].email, users[0].court);
+                            sendEmail(userController.userModel.value.userName ?? "", userController.userModel.value.email ?? "", userController.userModel.value.homeCourt ?? "");
                           }
 
                         },
-                      );
-                    }
-                    return Container();
+                      ),
 
-                  }),
               FirebaseAuth.instance.currentUser == null
                   ? const SizedBox()
                   : ListTile(

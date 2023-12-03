@@ -46,16 +46,16 @@ class User {
 class UserService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  Stream<List<User>> get users {
+  Stream<List<UserModel>> get users {
     return _firestore.collection('USER').snapshots().map((snapshot) {
       return snapshot.docs
           .where((d) => d.get("uid") == FirebaseAuth.instance.currentUser!.uid)
-          .map((doc) => User(
-                name: doc.data()['user name'],
+          .map((doc) => UserModel(
+                userName: doc.data()['user name'],
                 email: doc.data()['email'],
-                about: doc.data()['about me'] ?? "",
-                court: doc.data()['home court'] ?? "",
-                pic: doc.data()['photoUrl'] ?? "",
+                aboutMe: doc.data()['about me'] ?? "",
+                homeCourt: doc.data()['home court'] ?? "",
+                photoUrl: doc.data()['photoUrl'] ?? "",
                 isVerified: doc.data()['isVerified'],
               ))
           .toList();
@@ -66,7 +66,7 @@ class UserService {
 class _ProfileScreenState extends State<ProfileScreen> {
   UserController userController = Get.put(UserController());
 
-  UserModel userd = UserModel();
+  // UserModel userd = UserModel();
   bool isVerified = false;
   getUser() async {
     DocumentSnapshot snapshot = await FirebaseFirestore.instance
@@ -75,7 +75,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         .get();
     UserModel currentUser =
         UserModel.fromMap(snapshot.data() as Map<String, dynamic>);
-    userd = currentUser;
+    userController.userModel.value = currentUser;
     setState(() {});
   }
 
@@ -119,7 +119,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   void initState() {
-    // getUser();
+    getUser();
     // UserService();
     // TODO: implement initState
 
@@ -174,14 +174,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
       body: SingleChildScrollView(
         child: SizedBox(
           height: MediaQuery.of(context).size.height * 0.8,
-          child: StreamBuilder<List<User>>(
-              stream: UserService().users,
-              builder: (context, snapshot) {
-                if (!snapshot.hasData) {
-                  return const Center(child: CircularProgressIndicator());
-                }
-                final users = snapshot.data;
-                return (users!.isNotEmpty)
+          child:
+                // if (!snapshot.hasData) {
+                //   return const Center(child: CircularProgressIndicator());
+                // }
+                // final users = snapshot.data;
+                !userController.userModel.value.uid.isEmptyOrNull
                     ? Column(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         crossAxisAlignment: CrossAxisAlignment.center,
@@ -209,7 +207,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                             _downloadUrl
                                                                 as String),
                                                         fit: BoxFit.fill)))
-                                            : (users[0].pic.isNotEmpty)
+                                            : (!userController.userModel.value.photoUrl.isEmptyOrNull)
                                                 ? Container(
                                                     height: 20.h,
                                                     width: 35.h,
@@ -217,7 +215,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                         shape: BoxShape.circle,
                                                         image: DecorationImage(
                                                             image: NetworkImage(
-                                                                users[0].pic),
+                                                                userController.userModel.value.photoUrl ?? ""),
                                                             fit: BoxFit.fill)))
                                                 : Container(
                                                     height: 20.h,
@@ -232,8 +230,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                                 'assets/images/logo-new.png'),
                                                             fit: BoxFit.fill)),
                                                   )),
-                                    if (users[0].isVerified == null ||
-                                        users[0].isVerified == true)
+                                    if (userController.userModel.value.isVerified == null ||
+                                        userController.userModel.value.isVerified == true)
                                       Align(
                                         alignment: Alignment.bottomRight,
                                         child: Container(
@@ -255,12 +253,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               poppinsText(
                                   // FirebaseAuth.instance.currentUser?.displayName
                                   //     as String,
-                                  users[0].name,
+                                  userController.userModel.value.userName ?? "",
                                   32,
                                   FontWeight.bold,
                                   blackColor),
                               // poppinsText(
-                              //     "@${users[0].email.substring(0, users[0].email.indexOf('@'))}",
+                              //     "@${userController.userModel.value.email.substring(0, userController.userModel.value.email.indexOf('@'))}",
                               //     12,
                               //     FontWeight.normal,
                               //     blackColor),
@@ -281,9 +279,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                           MainAxisAlignment.spaceBetween,
                                       children: [
                                         poppinsText(
-                                            (users[0].court == "")
+                                            (userController.userModel.value.homeCourt.isEmptyOrNull)
                                                 ? ""
-                                                : users[0].court,
+                                                : userController.userModel.value.homeCourt ?? "",
                                             14,
                                             semiBold,
                                             blackColor),
@@ -378,7 +376,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                           ],
                                         ),
                                         TextField(
-                                          maxLines: users[0].isVerified == false
+                                          maxLines: userController.userModel.value.isVerified == false
                                               ? 3
                                               : 5,
                                           onChanged: (val) {
@@ -401,9 +399,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                               focusedBorder: InputBorder.none,
                                               focusedErrorBorder:
                                                   InputBorder.none,
-                                              hintText: (users[0].about == "")
+                                              hintText: (userController.userModel.value.aboutMe.isEmptyOrNull)
                                                   ? "Tell us about your game"
-                                                  : users[0].about,
+                                                  : userController.userModel.value.aboutMe ?? "",
                                               helperStyle: GoogleFonts.poppins(
                                                   fontSize: 14,
                                                   fontWeight: regular,
@@ -417,83 +415,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                           color: greyColor,
                                         ),
 
-                                        // users[0].isVerified == false
-                                        //     ? Padding(
-                                        //   padding: EdgeInsets.only(top: 20, bottom: 10),
-                                        //   child: Container(
-                                        //     height: 6.h,
-                                        //     decoration: BoxDecoration(
-                                        //       color: const Color(0xffffffff),
-                                        //       borderRadius: BorderRadius.circular(11.0),
-                                        //       border: Border.all(
-                                        //           width: 1.0, color: greenColor),
-                                        //       boxShadow: const [
-                                        //         BoxShadow(
-                                        //           color: Color(0x29000000),
-                                        //           offset: Offset(0, 3),
-                                        //           blurRadius: 6,
-                                        //         ),
-                                        //       ],
-                                        //     ),
-                                        //     child: Material(
-                                        //       color: Colors.transparent,
-                                        //       child: InkWell(
-                                        //         borderRadius: BorderRadius.circular(11),
-                                        //         onTap: () {
-                                        //           if (users[0].isVerified ==
-                                        //               false) {
-                                        //             sendEmail(users[0].name, users[0].email, users[0].court);
-                                        //           }
-                                        //         },
-                                        //         child: Center(
-                                        //           child: Text(
-                                        //             'Verify Profile',
-                                        //             style: TextStyle(
-                                        //               fontFamily: 'Poppins',
-                                        //               fontSize: 1.7.h,
-                                        //               color: const Color(0xff000000),
-                                        //               fontWeight: FontWeight.w500,
-                                        //             ),
-                                        //             textAlign: TextAlign.center,
-                                        //             softWrap: false,
-                                        //           ),
-                                        //         ),
-                                        //       ),
-                                        //     ),
-                                        //   ),
-                                        // ) : const SizedBox(),
-
-
-                                        //
-                                        // users[0].isVerified == false
-                                        //     ? Center(
-                                        //   child: SizedBox(
-                                        //     width: 70.h,
-                                        //     height: 7.h,
-                                        //     child: fullWidthButton(
-                                        //         "Apply for verification",
-                                        //             () {
-                                        //
-                                        //         }),
-                                        //   ),
-                                        // )
-                                        //     : const SizedBox(),
                                       ],
                                     ),
                                   ),
-                                  // Container(
-                                  //   width: 100,
-                                  //   color: greenColor,
-                                  //   height: 2,
-                                  // ),
+
                                 ],
                               )
                             ],
                           ),
                         ],
                       )
-                    : const Center(child: Text("Loading..."));
-              }),
+                    : const Center(child: Text("Loading...")),
         ),
       ),
     );
