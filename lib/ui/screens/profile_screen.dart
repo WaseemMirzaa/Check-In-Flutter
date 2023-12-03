@@ -14,6 +14,8 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:nb_utils/nb_utils.dart' as nbutils;
+import 'package:percent_indicator/circular_percent_indicator.dart';
+// import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
 import 'package:sizer/sizer.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -26,6 +28,8 @@ class ProfileScreen extends StatefulWidget {
   State<ProfileScreen> createState() => _ProfileScreenState();
 }
 
+int? totalCount = 28;
+
 class User {
   final String name;
   final String email;
@@ -33,14 +37,17 @@ class User {
   final String court;
   final String pic;
   final bool? isVerified;
+  final int goldenCheckin;
 
-  User(
-      {required this.name,
-      required this.email,
-      required this.about,
-      required this.court,
-      required this.pic,
-      this.isVerified});
+  User({
+    required this.name,
+    required this.email,
+    required this.about,
+    required this.court,
+    required this.pic,
+    this.isVerified,
+    required this.goldenCheckin,
+  });
 }
 
 class UserService {
@@ -57,9 +64,24 @@ class UserService {
                 homeCourt: doc.data()['home court'] ?? "",
                 photoUrl: doc.data()['photoUrl'] ?? "",
                 isVerified: doc.data()['isVerified'],
+                goldenCheckin: doc.data()['goldenCheckin'] ?? 0,
               ))
           .toList();
     });
+  }
+}
+
+Future<int> getGoldenLocationsCount() async {
+  try {
+    QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+        .collection('goldenLocations') // Replace with your collection name
+        .get();
+
+    int count = querySnapshot.size;
+    return count;
+  } catch (e) {
+    print("Error getting golden locations count: $e");
+    return 0; // Return 0 in case of an error
   }
 }
 
@@ -112,6 +134,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
+  void initializeData() async {
+    // Example: Fetching the total count asynchronously
+    try {
+      totalCount = await getGoldenLocationsCount();
+    } catch (e) {
+      print("Error fetching data: $e");
+      // Handle the error as needed
+    }
+
+    // Update the state after the asynchronous work is done
+    if (mounted) {
+      setState(() {});
+    }
+  }
+
   String mail = FirebaseAuth.instance.currentUser?.email as String;
   // String mail = FirebaseAuth.instance.currentUser?.email ?? "";
   bool tapped = false;
@@ -121,6 +158,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
   void initState() {
     getUser();
     // UserService();
+    // initializeData();
+    // print("Siuuu${totalCount}");
     // TODO: implement initState
 
     super.initState();
@@ -163,7 +202,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
@@ -262,7 +300,64 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               //     12,
                               //     FontWeight.normal,
                               //     blackColor),
+                              SizedBox(
+                                height: 10,
+                              ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Container(
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      border: Border.all(
+                                        color:
+                                            Color.fromARGB(255, 216, 227, 242),
+                                        width: 8.0,
+                                      ),
+                                    ),
+                                    child: CircularPercentIndicator(
+                                      radius: 55.0,
+                                      lineWidth: 8.0,
+                                      animation: true,
+                                      percent: (users[0].goldenCheckin /
+                                          totalCount!),
+                                      center: Text(
+                                        "${users[0].goldenCheckin}\nCheckins",
+                                        textAlign: TextAlign.center,
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 18.0,
+                                        ),
+                                      ),
+                                      circularStrokeCap:
+                                          CircularStrokeCap.round,
+                                      progressColor:
+                                          Color.fromARGB(255, 255, 206, 26),
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    width: 20,
+                                  ),
+                                  Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      poppinsText("Golden\nCourt", 22,
+                                          FontWeight.bold, blackColor),
+                                      poppinsText(
+                                          "${users[0].goldenCheckin} Checkins",
+                                          12,
+                                          FontWeight.normal,
+                                          blackColor),
+                                    ],
+                                  )
+                                ],
+                              ),
                             ],
+                          ),
+                          SizedBox(
+                            height: 15,
                           ),
                           Column(
                             children: [
@@ -319,7 +414,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                       left: 30,
                                       right: 30,
                                     ),
-                                    height: 32.h,
+                                    height: 20.h,
                                     decoration: BoxDecoration(
                                       color: whiteColor,
                                       borderRadius: const BorderRadius.only(
@@ -431,5 +526,3 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 }
-
-
