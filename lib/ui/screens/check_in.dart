@@ -961,39 +961,3 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
   }
 }
 
-class UserService {
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-
-  Stream<List<User>> get users {
-    return _firestore.collection('USER').snapshots().map((snapshot) {
-      return snapshot.docs
-          .where((d) => d.get("uid") == FirebaseAuth.instance.currentUser!.uid)
-          .map((doc) => User(
-        name: doc.data()['user name'],
-        email: doc.data()['email'],
-        about: doc.data()['about me'] ?? "",
-        court: doc.data()['home court'] ?? "",
-        pic: doc.data()['photoUrl'] ?? "",
-        isVerified: doc.data()['isVerified'],
-      ))
-          .toList();
-    });
-  }
-}
-
-class User {
-  final String name;
-  final String email;
-  final String about;
-  final String court;
-  final String pic;
-  final bool? isVerified;
-
-  User(
-      {required this.name,
-        required this.email,
-        required this.about,
-        required this.court,
-        required this.pic,
-        this.isVerified});
-}
