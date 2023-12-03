@@ -2,9 +2,12 @@ import 'package:check_in/utils/gaps.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../utils/DateTimeUtils.dart';
+import '../../utils/colors.dart';
+import '../../utils/styles.dart';
 
 class HistoryView extends StatefulWidget {
   const HistoryView({super.key});
@@ -105,6 +108,7 @@ class _HistoryViewState extends State<HistoryView> {
             itemBuilder: (context, int index) {
               return Column(
                 children: [
+                  
                   Padding(
                     padding: EdgeInsets.symmetric(
                         horizontal: horizontalPadding, vertical: 1.1.h),

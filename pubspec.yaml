@@ -62,6 +62,7 @@ dependencies:
   firebase_crashlytics: ^3.3.2
   csv: ^5.0.2
   app_tracking_transparency: ^2.0.4
+  percent_indicator: ^4.2.3
 
   google_maps_flutter:
       path: E:/Git projects/Check-In-Flutter/google_maps_flutter/google_maps_flutter
