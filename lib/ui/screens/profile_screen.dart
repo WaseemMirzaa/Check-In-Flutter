@@ -28,27 +28,9 @@ class ProfileScreen extends StatefulWidget {
   State<ProfileScreen> createState() => _ProfileScreenState();
 }
 
-int? totalCount = 28;
+int? totalCount = 10;
 
-class User {
-  final String name;
-  final String email;
-  final String about;
-  final String court;
-  final String pic;
-  final bool? isVerified;
-  final int goldenCheckin;
 
-  User({
-    required this.name,
-    required this.email,
-    required this.about,
-    required this.court,
-    required this.pic,
-    this.isVerified,
-    required this.goldenCheckin,
-  });
-}
 
 class UserService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -158,7 +140,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   void initState() {
     getUser();
     // UserService();
-    // initializeData();
+    initializeData();
     // print("Siuuu${totalCount}");
     // TODO: implement initState
 
@@ -319,10 +301,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                       radius: 55.0,
                                       lineWidth: 8.0,
                                       animation: true,
-                                      percent: (users[0].goldenCheckin /
-                                          totalCount!),
+                                      percent: (
+                                          (userController.userModel.value.goldenCheckin ?? 0)
+                                          /
+                                              (totalCount ?? 10)),
                                       center: Text(
-                                        "${users[0].goldenCheckin}\nCheckins",
+                                        "${userController.userModel.value.goldenCheckin}\nCheck ins",
                                         textAlign: TextAlign.center,
                                         style: TextStyle(
                                           fontWeight: FontWeight.bold,
@@ -346,7 +330,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                       poppinsText("Golden\nCourt", 22,
                                           FontWeight.bold, blackColor),
                                       poppinsText(
-                                          "${users[0].goldenCheckin} Checkins",
+                                          "${userController.userModel.value.goldenCheckin} Check ins",
                                           12,
                                           FontWeight.normal,
                                           blackColor),
@@ -520,7 +504,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           ),
                         ],
                       )
-                    : const Center(child: Text("Loading...")),
+                    : const Center(child: CircularProgressIndicator()),
+                    // : const Center(child: Text("Loading...")),
         ),
       ),
     );
