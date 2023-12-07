@@ -30,6 +30,7 @@ import 'package:google_maps_webservice/places.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../constants.dart';
+import '../../controllers/user_controller.dart';
 import 'Players.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/foundation.dart';
@@ -501,6 +502,9 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
 
       print("HAAAA$val");
       if (courtInfo['isGolden'] && val) {
+        Get.find<UserController>().updateGoldenCheckin(
+      (Get.find<UserController>().userModel.value.goldenCheckin ?? 0) + 1,
+    );
         snap.collection("USER").doc(auth.currentUser!.uid).update({
           "goldenCheckin": FieldValue.increment(1),
         });
