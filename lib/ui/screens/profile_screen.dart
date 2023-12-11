@@ -294,6 +294,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             SizedBox(
                               height: 10,
                             ),
+                            
                             Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
@@ -312,7 +313,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                         percent: ((userController.userModel
                                                     .value.goldenCheckin ??
                                                 0) /
-                                            (totalCount ?? 10)),
+                                            (totalCount ?? 10)).clamp(0.0, 1.0),
                                         center: Text(
                                           "${userController.userModel.value.goldenCheckin}\nCheck ins",
                                           textAlign: TextAlign.center,
