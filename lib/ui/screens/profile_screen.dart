@@ -294,7 +294,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             SizedBox(
                               height: 10,
                             ),
-                            
+
                             Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
@@ -311,9 +311,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                         lineWidth: 8.0,
                                         animation: true,
                                         percent: ((userController.userModel
-                                                    .value.goldenCheckin ??
-                                                0) /
-                                            (totalCount ?? 10)).clamp(0.0, 1.0),
+                                                        .value.goldenCheckin ??
+                                                    0) /
+                                                (totalCount ?? 10))
+                                            .clamp(0.0, 1.0),
                                         center: Text(
                                           "${userController.userModel.value.goldenCheckin}\nCheck ins",
                                           textAlign: TextAlign.center,
@@ -337,11 +338,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   children: [
                                     poppinsText("Golden\nCourt", 22,
                                         FontWeight.bold, blackColor),
-                                    poppinsText(
-                                        "${userController.userModel.value.goldenCheckin} Check ins",
-                                        12,
-                                        FontWeight.normal,
-                                        blackColor),
+                                    Obx(
+                                      () => poppinsText(
+                                          "${userController.userModel.value.goldenCheckin} Check ins",
+                                          12,
+                                          FontWeight.normal,
+                                          blackColor),
+                                    ),
                                   ],
                                 )
                               ],
