@@ -106,6 +106,7 @@ class _HistoryViewState extends State<HistoryView> {
         child: ListView.builder(
             itemCount: dataArray.length,
             itemBuilder: (context, int index) {
+              final imageIndex = index % courtsList.length;
               return Column(
                 children: [
                   
@@ -136,7 +137,7 @@ class _HistoryViewState extends State<HistoryView> {
                                 borderRadius: BorderRadius.circular(15.0),
                               ),
                               child: Image.asset(
-                                "assets/images/${courtsList[index]}.png",
+                                "assets/images/${courtsList[imageIndex]}.png",
                                 scale: 3,
                                 fit: BoxFit.fill,
                               ),
