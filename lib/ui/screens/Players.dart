@@ -7,15 +7,17 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:sizer/sizer.dart';
 
+import '../../core/constant/constant.dart';
+
 class PlayersView extends StatefulWidget {
   final LatLng courtLatLng;
   String courtName;
   bool isCheckedIn = false;
   PlayersView(
       {super.key,
-        required this.courtLatLng,
-        required this.courtName,
-        required this.isCheckedIn});
+      required this.courtLatLng,
+      required this.courtName,
+      required this.isCheckedIn});
 
   @override
   State<PlayersView> createState() => _PlayersViewState();
@@ -31,12 +33,11 @@ class User {
 
   User(
       {required this.name,
-        required this.email,
-        required this.about,
-        required this.court,
-        required this.photoUrl,
-        this.isVerified
-        });
+      required this.email,
+      required this.about,
+      required this.court,
+      required this.photoUrl,
+      this.isVerified});
 }
 
 class UserService {
@@ -44,21 +45,21 @@ class UserService {
   final LatLng court;
   UserService({required this.court});
   Stream<List<User>> get users {
-    return _firestore.collection('USER').snapshots().map((snapshot) {
+    return _firestore.collection(Collections.USER).snapshots().map((snapshot) {
       return snapshot.docs
           .where((d) =>
-      // d.get("uid") != FirebaseAuth.instance.currentUser!.uid &&
-      d.get("checkedIn") == true &&
-          d.get("courtLat") == court.latitude &&
-          d.get("courtLng") == court.longitude)
+              // d.get("uid") != FirebaseAuth.instance.currentUser!.uid &&
+              d.get("checkedIn") == true &&
+              d.get("courtLat") == court.latitude &&
+              d.get("courtLng") == court.longitude)
           .map((doc) => User(
-        name: doc.data()['user name'],
-        email: doc.data()['email'],
-        about: doc.data()['about me'] ?? "",
-        court: doc.data()['home court'] ?? "",
-        photoUrl: doc.data()['photoUrl'] ?? "",
-        isVerified: doc.data()['isVerified'] ?? true,
-      ))
+                name: doc.data()['user name'],
+                email: doc.data()['email'],
+                about: doc.data()['about me'] ?? "",
+                court: doc.data()['home court'] ?? "",
+                photoUrl: doc.data()['photoUrl'] ?? "",
+                isVerified: doc.data()['isVerified'] ?? true,
+              ))
           .toList();
     });
   }
@@ -83,9 +84,9 @@ class _PlayersViewState extends State<PlayersView> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   Future<int> getNumberOfPlayers() async {
-    final snapshot = await _firestore.collection('USER').get();
+    final snapshot = await _firestore.collection(Collections.USER).get();
     final users = snapshot.docs.where((doc) =>
-    doc.get("checkedIn") == true &&
+        doc.get("checkedIn") == true &&
         doc.get("courtLat") == widget.courtLatLng.latitude &&
         doc.get("courtLng") == widget.courtLatLng.longitude);
     numberOfPLayers = users.length;
@@ -229,76 +230,75 @@ class _PlayersViewState extends State<PlayersView> {
                                         Padding(
                                           padding: const EdgeInsets.all(10.0),
                                           child: SizedBox(
-                                           width: 26.w,
-                                           
+                                            width: 26.w,
                                             child: Stack(
-                                            alignment: Alignment.bottomRight,
-                                            clipBehavior: Clip.none,
-                                            children: [
-                                                 Container(
-                                                height: 13.5.h,
-                                                width: 24.w,
-                                                decoration: BoxDecoration(
-                                                  shape: BoxShape.circle,
-                                                  border: user.photoUrl == ""
-                                                      ? Border.all(
-                                                          width: 2,
-                                                          color: greenColor)
-                                                      : null,
+                                              alignment: Alignment.bottomRight,
+                                              clipBehavior: Clip.none,
+                                              children: [
+                                                Container(
+                                                  height: 13.5.h,
+                                                  width: 24.w,
+                                                  decoration: BoxDecoration(
+                                                    shape: BoxShape.circle,
+                                                    border: user.photoUrl == ""
+                                                        ? Border.all(
+                                                            width: 2,
+                                                            color: greenColor)
+                                                        : null,
+                                                  ),
+                                                  child: ClipOval(
+                                                    child: user.photoUrl != ""
+                                                        ? Image.network(
+                                                            user.photoUrl,
+                                                            fit: BoxFit.fill,
+                                                            loadingBuilder:
+                                                                (context, child,
+                                                                    loadingProgress) {
+                                                              if (loadingProgress ==
+                                                                  null)
+                                                                return child;
+                                                              return const Center(
+                                                                child:
+                                                                    CircularProgressIndicator(), // You can replace this with any loading indicator you prefer.
+                                                              );
+                                                            },
+                                                            errorBuilder:
+                                                                (context, error,
+                                                                    stackTrace) {
+                                                              return Image
+                                                                  .asset(
+                                                                'assets/images/logo-new.png', // The local placeholder image
+                                                                fit:
+                                                                    BoxFit.fill,
+                                                              );
+                                                            },
+                                                          )
+                                                        : Image.asset(
+                                                            "assets/images/logo-new.png",
+                                                            fit: BoxFit.fill,
+                                                          ),
+                                                  ),
                                                 ),
-                                                child: ClipOval(
-                                                  child: user.photoUrl != ""
-                                                      ? Image.network(
-                                                          user.photoUrl,
-                                                          fit: BoxFit.fill,
-                                                          loadingBuilder: (context,
-                                                              child,
-                                                              loadingProgress) {
-                                                            if (loadingProgress ==
-                                                                null)
-                                                              return child;
-                                                            return const Center(
-                                                              child:
-                                                                  CircularProgressIndicator(), // You can replace this with any loading indicator you prefer.
-                                                            );
-                                                          },
-                                                          errorBuilder:
-                                                              (context, error,
-                                                                  stackTrace) {
-                                                            return Image.asset(
-                                                              'assets/images/logo-new.png', // The local placeholder image
-                                                              fit: BoxFit.fill,
-                                                            );
-                                                          },
-                                                        )
-                                                      : Image.asset(
-                                                          "assets/images/logo-new.png",
-                                                          fit: BoxFit.fill,
+                                                users[index].isVerified == false
+                                                    ? const SizedBox()
+                                                    : Align(
+                                                        alignment: Alignment
+                                                            .bottomRight,
+                                                        child: Container(
+                                                          height: 5.h,
+                                                          width: 10.w,
+                                                          decoration: const BoxDecoration(
+                                                              shape: BoxShape
+                                                                  .circle,
+                                                              image: DecorationImage(
+                                                                  image: AssetImage(
+                                                                      "assets/images/instagram-verification-badge.png"))),
                                                         ),
-                                                ),
-                                              ),
-                                               users[index].isVerified == false
-                                                  ? const SizedBox()
-                                                  : Align(
-                                                      alignment:
-                                                          Alignment.bottomRight,
-                                                      child: Container(
-                                                        height: 5.h,
-                                                        width: 10.w,
-                                                        decoration: const BoxDecoration(
-                                                            shape:
-                                                                BoxShape.circle,
-                                                            image: DecorationImage(
-                                                                image: AssetImage(
-                                                                    "assets/images/instagram-verification-badge.png"))),
                                                       ),
-                                                    ),
-
                                               ],
                                             ),
                                           ),
                                         ),
-
                                         Text.rich(
                                           TextSpan(
                                               text: "${user.name}\n",
@@ -312,7 +312,7 @@ class _PlayersViewState extends State<PlayersView> {
                                               children: [
                                                 TextSpan(
                                                   text:
-                                                  "@${user.email.substring(0, user.email.indexOf('@'))}\n",
+                                                      "@${user.email.substring(0, user.email.indexOf('@'))}\n",
                                                   style: const TextStyle(
                                                     fontFamily: 'Poppins',
                                                     fontSize: 9,
@@ -331,7 +331,7 @@ class _PlayersViewState extends State<PlayersView> {
                                                       text: 'Home Court :',
                                                       style: TextStyle(
                                                         fontWeight:
-                                                        FontWeight.w600,
+                                                            FontWeight.w600,
                                                       ),
                                                     ),
                                                     TextSpan(
@@ -340,9 +340,9 @@ class _PlayersViewState extends State<PlayersView> {
                                                           : user.court,
                                                       style: const TextStyle(
                                                         color:
-                                                        Color(0xff9f9f9f),
+                                                            Color(0xff9f9f9f),
                                                         fontWeight:
-                                                        FontWeight.w500,
+                                                            FontWeight.w500,
                                                       ),
                                                     ),
                                                   ],
@@ -356,7 +356,7 @@ class _PlayersViewState extends State<PlayersView> {
                               ),
                               Padding(
                                 padding:
-                                const EdgeInsets.only(left: 20, right: 20),
+                                    const EdgeInsets.only(left: 20, right: 20),
                                 child: Container(
                                   height: 1,
                                   color: const Color(0xff9f9f9f),

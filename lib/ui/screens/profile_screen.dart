@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:check_in/controllers/user_controller.dart';
+import 'package:check_in/core/constant/constant.dart';
 import 'package:check_in/model/user_modal.dart';
 import 'package:check_in/model/user_modal.dart';
 import 'package:check_in/ui/screens/add_home_court.dart';
@@ -35,17 +36,17 @@ class UserService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   Stream<List<UserModel>> get users {
-    return _firestore.collection('USER').snapshots().map((snapshot) {
+    return _firestore.collection(Collections.USER).snapshots().map((snapshot) {
       return snapshot.docs
           .where((d) => d.get("uid") == FirebaseAuth.instance.currentUser!.uid)
           .map((doc) => UserModel(
-                userName: doc.data()['user name'],
-                email: doc.data()['email'],
-                aboutMe: doc.data()['about me'] ?? "",
-                homeCourt: doc.data()['home court'] ?? "",
-                photoUrl: doc.data()['photoUrl'] ?? "",
-                isVerified: doc.data()['isVerified'],
-                goldenCheckin: doc.data()['goldenCheckin'] ?? 0,
+                userName: doc.data()[UserKey.USER_NAME],
+                email: doc.data()[UserKey.EMAIL],
+                aboutMe: doc.data()[UserKey.ABOUT_ME] ?? "",
+                homeCourt: doc.data()[UserKey.HOME_COURT] ?? "",
+                photoUrl: doc.data()[UserKey.PHOTO_URL] ?? "",
+                isVerified: doc.data()[UserKey.IS_VERIFIED],
+                goldenCheckin: doc.data()[UserKey.GOLDEN_CHECK_IN] ?? 0,
               ))
           .toList();
     });
@@ -55,7 +56,7 @@ class UserService {
 Future<int> getGoldenLocationsCount() async {
   try {
     QuerySnapshot querySnapshot = await FirebaseFirestore.instance
-        .collection('goldenLocations') // Replace with your collection name
+        .collection(Collections.GOLDEN_LOCATIONS) // Replace with your collection name
         .get();
 
     int count = querySnapshot.size;
@@ -73,7 +74,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   bool isVerified = false;
   getUser() async {
     DocumentSnapshot snapshot = await FirebaseFirestore.instance
-        .collection("USER")
+        .collection(Collections.USER)
         .doc(userController.userModel.value.uid)
         .get();
     UserModel currentUser =
@@ -109,9 +110,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
       final firestore = FirebaseFirestore.instance;
       final userId = FirebaseAuth.instance.currentUser!.uid;
       await firestore
-          .collection('USER')
+          .collection(Collections.USER)
           .doc(userId)
-          .update({'photoUrl': downloadUrl});
+          .update({UserKey.PHOTO_URL: downloadUrl});
     }
   }
 
@@ -477,7 +478,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                           setState(() {
                                             aboutMe = val;
                                             FirebaseFirestore.instance
-                                                .collection("USER")
+                                                .collection(Collections.USER)
                                                 .doc(FirebaseAuth
                                                     .instance.currentUser!.uid)
                                                 .update({"about me": aboutMe});

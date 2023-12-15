@@ -7,6 +7,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
+import 'core/constant/constant.dart';
+
 Future addUserData({
   required String fullName,
   required String email,
@@ -21,7 +23,7 @@ Future addUserData({
         userName: fullName,
       );
       FirebaseFirestore.instance
-          .collection("USER")
+          .collection(Collections.USER)
           .doc(auth.currentUser!.uid)
           .set(userModel.toMap());
     } else {
