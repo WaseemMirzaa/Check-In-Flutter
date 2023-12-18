@@ -43,7 +43,9 @@ class MyApp extends StatelessWidget {
         return GetMaterialApp(
           debugShowCheckedModeBanner: false,
           title: 'Check In',
-          theme: ThemeData(scaffoldBackgroundColor: whiteColor),
+          theme: ThemeData(
+            scaffoldBackgroundColor: whiteColor,
+          ),
           home: const Splash(),
         );
       },

@@ -313,7 +313,7 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
     $name
     ''';
 
-    final Uri _emailLaunchUri = Uri(
+    final Uri emailLaunchUri = Uri(
       scheme: 'mailto',
       path: 'support@checkinhoops.net',
       // Replace with the recipient's email address for reporting
@@ -322,7 +322,7 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
 
     // if (await canLaunchUrl(_emailLaunchUri)) {
     try {
-      await launchUrl(_emailLaunchUri);
+      await launchUrl(emailLaunchUri);
     } catch (e) {
       nbutils.toast("Could not launch email.");
       print(e);
@@ -470,10 +470,11 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
     // Check if the coordinates are already present in the array
     if (checkedCourts.any((court) =>
         court['courtLat'] == currentCourtLat &&
-        court['courtLng'] == currentCourtLng))
+        court['courtLng'] == currentCourtLng)) {
       return false;
-    else
+    } else {
       return true;
+    }
   }
 
   void _buttonPress() async {
@@ -503,8 +504,8 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
       print("HAAAA$val");
       if (courtInfo['isGolden'] && val) {
         Get.find<UserController>().updateGoldenCheckin(
-      (Get.find<UserController>().userModel.value.goldenCheckin ?? 0) + 1,
-    );
+          (Get.find<UserController>().userModel.value.goldenCheckin ?? 0) + 1,
+        );
         snap.collection("USER").doc(auth.currentUser!.uid).update({
           "goldenCheckin": FieldValue.increment(1),
         });
@@ -552,10 +553,10 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
         .collection("USER")
         .doc(FirebaseAuth.instance.currentUser?.uid ?? "")
         .get();
-    userController.userModel.value = UserModel.fromMap(snapshot.data() as Map<String, dynamic>);
+    userController.userModel.value =
+        UserModel.fromMap(snapshot.data() as Map<String, dynamic>);
     print(userController.userModel.value);
     // UserModel currentUser = UserModel.fromMap(snapshot.data() as Map<String, dynamic>);
-
   }
 
   @override
@@ -622,22 +623,24 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
                       screen: const TermsAndConditions(), withNavBar: false);
                 },
               ),
-           userController.userModel.value.isVerified == null || userController.userModel.value.isVerified == true
-               ? const SizedBox()
-               : ListTile(
-                        leading: const Icon(
-                          Icons.verified,
-                        ),
-                        title: const Text('Verify Profile'),
-                        onTap: () {
-                          if (userController.userModel.value.isVerified ==
-                              false) {
-                            sendEmail(userController.userModel.value.userName ?? "", userController.userModel.value.email ?? "", userController.userModel.value.homeCourt ?? "");
-                          }
-
-                        },
+              userController.userModel.value.isVerified == null ||
+                      userController.userModel.value.isVerified == true
+                  ? const SizedBox()
+                  : ListTile(
+                      leading: const Icon(
+                        Icons.verified,
                       ),
-
+                      title: const Text('Verify Profile'),
+                      onTap: () {
+                        if (userController.userModel.value.isVerified ==
+                            false) {
+                          sendEmail(
+                              userController.userModel.value.userName ?? "",
+                              userController.userModel.value.email ?? "",
+                              userController.userModel.value.homeCourt ?? "");
+                        }
+                      },
+                    ),
               FirebaseAuth.instance.currentUser == null
                   ? const SizedBox()
                   : ListTile(
@@ -1039,4 +1042,3 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
     _positionStreamSubscription?.cancel();
   }
 }
-

@@ -21,7 +21,7 @@ class CourtsParser {
     try {
       var csvString = await loadAsset();
 
-      var csvData = const CsvToListConverter().convert(csvString,eol: "\n");
+      var csvData = const CsvToListConverter().convert(csvString, eol: "\n");
 
       for (var i = 1; i < csvData.length; i++) {
         final location = CourtModel(
@@ -152,7 +152,7 @@ class CourtsParser {
 
   Future<Position> getCurrentLocation() async {
     final geolocator = Geolocator();
-    final locationOptions = const LocationOptions(
+    const locationOptions = LocationOptions(
       accuracy: LocationAccuracy.best,
       distanceFilter: 10, // Minimum distance for location updates (in meters)
     );
