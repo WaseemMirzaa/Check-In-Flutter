@@ -1,4 +1,5 @@
 import 'package:check_in/controllers/user_controller.dart';
+import 'package:check_in/core/constant/constant.dart';
 import 'package:check_in/model/user_modal.dart';
 import 'package:check_in/ui/screens/persistent_nav_bar.dart';
 import 'package:check_in/ui/screens/start.dart';
@@ -25,7 +26,7 @@ Future<void> signUp(
         // .then((value) async =>
         //     await addUserData(email: email, fullName: userName))
         .then((value) => auth.currentUser?.updateDisplayName(userName))
-        .then((value) => snap.collection("USER").doc(auth.currentUser!.uid).set(
+        .then((value) => snap.collection(Collections.USER).doc(auth.currentUser!.uid).set(
               {
                 "user name": auth.currentUser!.displayName,
                 "email": auth.currentUser!.email,
@@ -72,7 +73,7 @@ Future<void> logout(context) async {
 
   //Checkout
 
-  snap.collection("USER").doc(auth.currentUser!.uid).update({
+  snap.collection(Collections.USER).doc(auth.currentUser!.uid).update({
     "checkedIn": false,
     "courtLat": FieldValue.delete(),
     "courtLng": FieldValue.delete(),
@@ -140,7 +141,7 @@ Future<void> delAcc(context) async {
                                   .reauthenticateWithCredential(credential);
 
                               snap
-                                  .collection("USER")
+                                  .collection(Collections.USER)
                                   .doc(auth.currentUser!.uid)
                                   .delete();
 
@@ -169,7 +170,7 @@ Future<void> delAcc(context) async {
                     ));
 
             // snap
-            //     .collection("USER")
+            //     .collection(Collections.USER)
             //     .doc(auth.currentUser!.uid)
             //     .delete()
             //     .then((value) => auth.currentUser!.delete().then((value) {
@@ -192,7 +193,7 @@ Future<void> delAcc(context) async {
 
 toModal(BuildContext context) async {
   DocumentSnapshot snap = await FirebaseFirestore.instance
-      .collection("USER")
+      .collection(Collections.USER)
       .doc(auth.currentUser?.uid ?? "")
       .get();
   UserModel userModel = UserModel.fromMap(snap.data() as Map<String, dynamic>);

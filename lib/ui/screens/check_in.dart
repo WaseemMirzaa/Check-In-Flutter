@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:check_in/auth_service.dart';
+import 'package:check_in/core/constant/constant.dart';
+import 'package:check_in/core/constant/temp_language.dart';
 import 'package:check_in/firebase-models/user_firebase_model.dart';
 import 'package:check_in/model/user_modal.dart';
 import 'package:check_in/ui/screens/contact_us.dart';
@@ -63,7 +65,7 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
   final snap = FirebaseFirestore.instance;
 
   DocumentReference docRef = FirebaseFirestore.instance
-      .collection('USER')
+      .collection(Collections.USER)
       .doc(FirebaseAuth.instance.currentUser?.uid);
 
   LatLng? loc;
@@ -105,18 +107,18 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
   Future indexValue() async {
     if (FirebaseAuth.instance.currentUser != null) {
       final document = FirebaseFirestore.instance
-          .collection('USER')
+          .collection(Collections.USER)
           .doc(FirebaseAuth.instance.currentUser!.uid);
       document.get().then((DocumentSnapshot snapshot) {
         if (snapshot.exists) {
           dynamic data = snapshot.data();
-          isCheckedIn = data['checkedIn'];
+          isCheckedIn = data[UserKey.CHECKED_IN];
           // print("${pata['checkedIn']}Siuuu");
           // print(isCheckedIn);
           if (isCheckedIn == false) {
             index = 0;
           } else if (isCheckedIn == true) {
-            checkedInCourtName = data['checkedInCourtName'] ?? "";
+            checkedInCourtName = data[UserKey.CHECKED_IN_COURT_NAME] ?? "";
             index = 1;
           }
           mounted ? setState(() {}) : null;
@@ -155,17 +157,20 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
     // Golden Location
 
     try {
-      await snap.collection('goldenLocations').get().then((querySnapshot) {
+      await snap
+          .collection(Collections.GOLDEN_LOCATIONS)
+          .get()
+          .then((querySnapshot) {
         for (var doc in querySnapshot.docs) {
-          double latitude = doc.data()['lat'];
-          double longitude = doc.data()['lng'];
-          String name = doc.data()['name'];
+          double latitude = doc.data()[TempLanguage.lat];
+          double longitude = doc.data()[TempLanguage.lng];
+          String name = doc.data()[TempLanguage.name];
 
           LatLng location = LatLng(latitude, longitude);
           Marker marker = Marker(
             markerId: MarkerId(doc.id),
             position: location,
-            infoWindow: InfoWindow(title: name, snippet: "golden"),
+            infoWindow: InfoWindow(title: name, snippet: TempLanguage.golden),
             icon: BitmapDescriptor.defaultMarkerWithHue(
                 BitmapDescriptor.hueYellow),
             onTap: () {
@@ -324,17 +329,17 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
     try {
       await launchUrl(_emailLaunchUri);
     } catch (e) {
-      nbutils.toast("Could not launch email.");
+      nbutils.toast(TempLanguage.notLaunchEmailToast);
       print(e);
     }
   }
 
   Future<int> getUsersCountOnLocation(LatLng court) async {
     final QuerySnapshot snapshot = await FirebaseFirestore.instance
-        .collection('USER')
-        .where('checkedIn', isEqualTo: true)
-        .where('courtLat', isEqualTo: court.latitude)
-        .where('courtLng', isEqualTo: court.longitude)
+        .collection(Collections.USER)
+        .where(UserKey.CHECKED_IN, isEqualTo: true)
+        .where(TempLanguage.courtLat, isEqualTo: court.latitude)
+        .where(TempLanguage.courtLng, isEqualTo: court.longitude)
         .get();
 
     return snapshot.size;
@@ -398,21 +403,21 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
         loc = marker.position;
         courtN = marker.infoWindow.title;
         courtInfo.addAll({
-          "courtLat": loc!.latitude,
-          "courtLng": loc!.longitude,
-          "courtName": courtN,
+          TempLanguage.courtLat: loc!.latitude,
+          TempLanguage.courtLng: loc!.longitude,
+          TempLanguage.courtName: courtN,
         });
         print(marker.infoWindow.snippet);
-        if (marker.infoWindow.snippet == "golden") {
+        if (marker.infoWindow.snippet == TempLanguage.golden) {
           // Add additional info for golden location
           courtInfo.addAll({
-            "isGolden": true,
+            TempLanguage.isGolden: true,
             // Add any other specific information for golden locations
           });
         } else {
           // If not a golden location, you can still add some other information
           courtInfo.addAll({
-            "isGolden": false,
+            TempLanguage.isGolden: false,
             // Add any other specific information for non-golden locations
           });
         }
@@ -463,14 +468,17 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
 
   Future<bool> isCourtAlreadyStored(
       double currentCourtLat, double currentCourtLng) async {
-    DocumentSnapshot userDoc =
-        await snap.collection("USER").doc(auth.currentUser!.uid).get();
-    List<dynamic> checkedCourts =
-        (userDoc.data() as Map<String, dynamic>?)?['checkedCourts'] ?? [];
+    DocumentSnapshot userDoc = await snap
+        .collection(Collections.USER)
+        .doc(auth.currentUser!.uid)
+        .get();
+    List<dynamic> checkedCourts = (userDoc.data()
+            as Map<String, dynamic>?)?[TempLanguage.checkedCourts] ??
+        [];
     // Check if the coordinates are already present in the array
     if (checkedCourts.any((court) =>
-        court['courtLat'] == currentCourtLat &&
-        court['courtLng'] == currentCourtLng))
+        court[TempLanguage.courtLat] == currentCourtLat &&
+        court[TempLanguage.courtLng] == currentCourtLng))
       return false;
     else
       return true;
@@ -490,23 +498,23 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
       });
       print(courtInfo['isGolden']);
       bool val = await isCourtAlreadyStored(loc!.latitude, loc!.longitude);
-      snap.collection("USER").doc(auth.currentUser!.uid).update({
-        "checkedCourts": FieldValue.arrayUnion([courtInfo]),
-        "checkedIn": true,
-        "checkedInCourtName": courtInfo['courtName'],
-        "courtLat": loc!.latitude,
-        "courtLng": loc!.longitude,
+      snap.collection(Collections.USER).doc(auth.currentUser!.uid).update({
+        TempLanguage.checkedCourts: FieldValue.arrayUnion([courtInfo]),
+        UserKey.CHECKED_IN: true,
+        UserKey.CHECKED_IN_COURT_NAME: courtInfo[TempLanguage.courtName],
+        TempLanguage.courtLat: loc!.latitude,
+        TempLanguage.courtLng: loc!.longitude,
         UserFirebaseModel.lastCheckin: Timestamp.now(),
         UserFirebaseModel.lastCheckout: FieldValue.delete(),
       });
 
       print("HAAAA$val");
-      if (courtInfo['isGolden'] && val) {
+      if (courtInfo[TempLanguage.isGolden] && val) {
         Get.find<UserController>().updateGoldenCheckin(
-      (Get.find<UserController>().userModel.value.goldenCheckin ?? 0) + 1,
-    );
-        snap.collection("USER").doc(auth.currentUser!.uid).update({
-          "goldenCheckin": FieldValue.increment(1),
+          (Get.find<UserController>().userModel.value.goldenCheckin ?? 0) + 1,
+        );
+        snap.collection(Collections.USER).doc(auth.currentUser!.uid).update({
+          UserKey.GOLDEN_CHECK_IN: FieldValue.increment(1),
         });
       }
 
@@ -520,17 +528,18 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
     }
     //Checkout Pressed
     else if (index == 0) {
-      snap.collection("USER").doc(auth.currentUser!.uid).update({
-        "checkedIn": false,
-        "courtLat": FieldValue.delete(),
-        "courtLng": FieldValue.delete(),
+      snap.collection(Collections.USER).doc(auth.currentUser!.uid).update({
+        UserKey.CHECKED_IN: false,
+        TempLanguage.courtLat: FieldValue.delete(),
+        TempLanguage.courtLng: FieldValue.delete(),
         UserFirebaseModel.lastCheckout: Timestamp.now(),
         UserFirebaseModel.lastCheckin: FieldValue.delete(),
       });
 
       checkedInCourtName = '';
 
-      Get.snackbar("Checked Out", "You have left the court.",
+      Get.snackbar(
+          TempLanguage.checkOutToastTitle, TempLanguage.checkOutToastMessage,
           backgroundColor: Colors.white,
           borderWidth: 4,
           borderColor: Colors.black,
@@ -549,13 +558,13 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
 
   getUser() async {
     DocumentSnapshot snapshot = await FirebaseFirestore.instance
-        .collection("USER")
+        .collection(Collections.USER)
         .doc(FirebaseAuth.instance.currentUser?.uid ?? "")
         .get();
-    userController.userModel.value = UserModel.fromMap(snapshot.data() as Map<String, dynamic>);
+    userController.userModel.value =
+        UserModel.fromMap(snapshot.data() as Map<String, dynamic>);
     print(userController.userModel.value);
     // UserModel currentUser = UserModel.fromMap(snapshot.data() as Map<String, dynamic>);
-
   }
 
   @override
@@ -596,7 +605,7 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
                 leading: const Icon(
                   Icons.contact_page,
                 ),
-                title: const Text('Contact Us'),
+                title: Text(TempLanguage.contactUs),
                 onTap: () {
                   pushNewScreen(context,
                       screen: const ContactUs(), withNavBar: false);
@@ -606,7 +615,7 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
                 leading: const Icon(
                   Icons.privacy_tip,
                 ),
-                title: const Text('Privacy Policy'),
+                title: Text(TempLanguage.privacyPolicy),
                 onTap: () {
                   pushNewScreen(context,
                       screen: const PrivacyPolicy(), withNavBar: false);
@@ -616,35 +625,37 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
                 leading: const Icon(
                   Icons.privacy_tip,
                 ),
-                title: const Text('Terms And Conditions'),
+                title: Text(TempLanguage.termsAndConditions),
                 onTap: () {
                   pushNewScreen(context,
                       screen: const TermsAndConditions(), withNavBar: false);
                 },
               ),
-           userController.userModel.value.isVerified == null || userController.userModel.value.isVerified == true
-               ? const SizedBox()
-               : ListTile(
-                        leading: const Icon(
-                          Icons.verified,
-                        ),
-                        title: const Text('Verify Profile'),
-                        onTap: () {
-                          if (userController.userModel.value.isVerified ==
-                              false) {
-                            sendEmail(userController.userModel.value.userName ?? "", userController.userModel.value.email ?? "", userController.userModel.value.homeCourt ?? "");
-                          }
-
-                        },
+              userController.userModel.value.isVerified == null ||
+                      userController.userModel.value.isVerified == true
+                  ? const SizedBox()
+                  : ListTile(
+                      leading: const Icon(
+                        Icons.verified,
                       ),
-
+                      title: Text(TempLanguage.verifyProfile),
+                      onTap: () {
+                        if (userController.userModel.value.isVerified ==
+                            false) {
+                          sendEmail(
+                              userController.userModel.value.userName ?? "",
+                              userController.userModel.value.email ?? "",
+                              userController.userModel.value.homeCourt ?? "");
+                        }
+                      },
+                    ),
               FirebaseAuth.instance.currentUser == null
                   ? const SizedBox()
                   : ListTile(
                       leading: const Icon(
                         Icons.logout_outlined,
                       ),
-                      title: const Text('LogOut'),
+                      title: Text(TempLanguage.logOut),
                       onTap: () async {
                         logout(context);
                         userController.userModel.value = UserModel();
@@ -656,7 +667,7 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
                       leading: const Icon(
                         Icons.delete_forever_outlined,
                       ),
-                      title: const Text('Delete Acc'),
+                      title: Text(TempLanguage.deleteAcc),
                       onTap: () {
                         delAcc(context);
                       },
@@ -673,7 +684,7 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
               width: MediaQuery.of(context).size.width,
               child: GestureDetector(
                 child: currentLocation == null
-                    ? const Center(child: Text("Loading..."))
+                    ? Center(child: Text(TempLanguage.loading))
                     : GoogleMap(
                         mapToolbarEnabled: false,
                         zoomControlsEnabled: true,
@@ -836,7 +847,7 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
                                     focusedBorder: InputBorder.none,
                                     focusedErrorBorder: InputBorder.none,
                                     fillColor: Colors.white,
-                                    hintText: "Find Courts Near You",
+                                    hintText: TempLanguage.findCourts,
                                     hintStyle: GoogleFonts.poppins(
                                         fontSize: 12,
                                         fontWeight: medium,
@@ -970,13 +981,15 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
                       padding: const EdgeInsets.only(
                           left: 40, right: 40, bottom: 10),
                       child: fullWidthButton(
-                          index == 0 ? "CHECK IN" : "CHECK OUT", () {
+                          index == 0
+                              ? TempLanguage.checkIn
+                              : TempLanguage.checkOut, () {
                         if (FirebaseAuth.instance.currentUser == null) {
                           showDialog(
                               context: context,
                               builder: (context) => AlertDialog(
                                     title: poppinsText(
-                                        "Please log in to use more features",
+                                        TempLanguage.logInForFeatures,
                                         16,
                                         FontWeight.w500,
                                         Colors.black),
@@ -986,20 +999,21 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
                                           Get.off(
                                               () => StartView(isBack: true));
                                         },
-                                        child: const Text('Login'),
+                                        child: Text(TempLanguage.logIn),
                                       ),
                                       TextButton(
                                         onPressed: () {
                                           Navigator.pop(context);
                                         },
-                                        child: const Text('Cancel'),
+                                        child: Text(TempLanguage.cancel),
                                       ),
                                     ],
                                   ));
                         } else {
                           withinRadius == true || index == 1
                               ? _buttonPress()
-                              : Get.snackbar("Alert", "You are not at a court.",
+                              : Get.snackbar(TempLanguage.notAtCourtToastTitle,
+                                  TempLanguage.notAtCourtToastMessage,
                                   backgroundColor: Colors.white,
                                   borderWidth: 4,
                                   borderColor: Colors.black,
@@ -1039,4 +1053,3 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
     _positionStreamSubscription?.cancel();
   }
 }
-
