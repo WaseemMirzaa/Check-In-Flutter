@@ -2,6 +2,7 @@
 
 import 'dart:async';
 import 'package:check_in/auth_service.dart';
+import 'package:check_in/core/constant/temp_language.dart';
 import 'package:check_in/model/user_modal.dart';
 import 'package:check_in/ui/screens/contact_us.dart';
 import 'package:check_in/ui/screens/persistent_nav_bar.dart';
@@ -27,6 +28,8 @@ import 'package:google_maps_webservice/places.dart';
 // import 'package:location/location.dart' ;
 import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
 import '../../constants.dart';
+import '../../core/constant/constant.dart';
+import '../../core/constant/temp_language.dart';
 import '../../utils/CourtsParser.dart';
 
 class AddHomeCourt extends StatefulWidget {
@@ -61,7 +64,7 @@ class _AddHomeCourtState extends State<AddHomeCourt>
   final snap = FirebaseFirestore.instance;
 
   DocumentReference docRef = FirebaseFirestore.instance
-      .collection('USER')
+      .collection(Collections.USER)
       .doc(FirebaseAuth.instance.currentUser!.uid);
 
   LatLng? loc;
@@ -100,11 +103,11 @@ class _AddHomeCourtState extends State<AddHomeCourt>
   }
 
   Future courtNames() async {
-    await snap.collection('goldenLocations').get().then((querySnapshot) {
+    await snap.collection(Collections.GOLDEN_LOCATIONS).get().then((querySnapshot) {
       for (var doc in querySnapshot.docs) {
-        double latitude = doc.data()['lat'];
-        double longitude = doc.data()['lng'];
-        String name = doc.data()['name'];
+        double latitude = doc.data()[TempLanguage.lat];
+        double longitude = doc.data()[TempLanguage.lng];
+        String name = doc.data()[TempLanguage.name];
 
         LatLng location = LatLng(latitude, longitude);
         Marker marker = Marker(
@@ -251,7 +254,7 @@ class _AddHomeCourtState extends State<AddHomeCourt>
                 leading: const Icon(
                   Icons.contact_page,
                 ),
-                title: const Text('Contact Us'),
+                title: Text(TempLanguage.contactUs),
                 onTap: () {
                   pushNewScreen(context,
                       screen: const ContactUs(), withNavBar: false);
@@ -261,7 +264,7 @@ class _AddHomeCourtState extends State<AddHomeCourt>
                 leading: const Icon(
                   Icons.privacy_tip,
                 ),
-                title: const Text('Privacy Policy'),
+                title: Text(TempLanguage.privacyPolicy),
                 onTap: () {
                   pushNewScreen(context,
                       screen: const PrivacyPolicy(), withNavBar: false);
@@ -271,7 +274,7 @@ class _AddHomeCourtState extends State<AddHomeCourt>
                 leading: const Icon(
                   Icons.privacy_tip,
                 ),
-                title: const Text('Terms And Conditions'),
+                title: Text(TempLanguage.termsAndConditions),
                 onTap: () {
                   pushNewScreen(context,
                       screen: const TermsAndConditions(), withNavBar: false);
@@ -281,7 +284,7 @@ class _AddHomeCourtState extends State<AddHomeCourt>
                 leading: const Icon(
                   Icons.logout_outlined,
                 ),
-                title: const Text('LogOut'),
+                title: Text(TempLanguage.logOut),
                 onTap: () async {
                   logout(context);
                   userController.userModel.value = UserModel();
@@ -291,7 +294,7 @@ class _AddHomeCourtState extends State<AddHomeCourt>
                 leading: const Icon(
                   Icons.delete_forever_outlined,
                 ),
-                title: const Text('Delete Acc'),
+                title: Text(TempLanguage.deleteAcc),
                 onTap: () {
                   delAcc(context);
                 },
@@ -308,7 +311,7 @@ class _AddHomeCourtState extends State<AddHomeCourt>
               width: MediaQuery.of(context).size.width,
               child: GestureDetector(
                   child: currentLocation == null
-                      ? const Center(child: Text("Loading..."))
+                      ? Center(child: Text(TempLanguage.loading))
                       : GoogleMap(
                           // mapToolbarEnabled: false,
                           zoomControlsEnabled: true,
@@ -398,7 +401,7 @@ class _AddHomeCourtState extends State<AddHomeCourt>
                                     focusedBorder: InputBorder.none,
                                     focusedErrorBorder: InputBorder.none,
                                     fillColor: Colors.white,
-                                    hintText: "Find Courts Near You",
+                                    hintText: TempLanguage.findCourts,
                                     hintStyle: GoogleFonts.poppins(
                                         fontSize: 12,
                                         fontWeight: medium,
@@ -545,7 +548,7 @@ class _AddHomeCourtState extends State<AddHomeCourt>
                       padding: const EdgeInsets.only(left: 40, right: 40),
                       child: Visibility(
                         visible: widget.isMyProfile,
-                        child: fullWidthButton("SELECT", () async {
+                        child: fullWidthButton(TempLanguage.select, () async {
                           var selectedLocationName = "";
 
                           if (_selectedPlace.isNotEmpty) {
@@ -567,9 +570,9 @@ class _AddHomeCourtState extends State<AddHomeCourt>
                           // }
 
                           FirebaseFirestore.instance
-                              .collection("USER")
+                              .collection(Collections.USER)
                               .doc(FirebaseAuth.instance.currentUser!.uid)
-                              .update({"home court": selectedLocationName});
+                              .update({UserKey.HOME_COURT: selectedLocationName});
                           pushNewScreen(context,
                               screen: Home(), withNavBar: false);
                         }),

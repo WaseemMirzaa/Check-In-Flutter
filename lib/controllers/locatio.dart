@@ -1,5 +1,6 @@
 // ignore_for_file: prefer_interpolation_to_compose_strings, avoid_print
 
+import 'package:check_in/core/constant/temp_language.dart';
 import 'package:check_in/loc.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:get/get.dart';
@@ -20,7 +21,7 @@ class LocationController extends GetxController {
       http.Response response = await getLocationData(text);
       var data = jsonDecode(response.body.toString());
       print("my status is " + data["status"]);
-      if (data['status'] == 'OK') {
+      if (data['status'] == TempLanguage.ok) {
         _predictionList = [];
         data['predictions'].forEach((prediction) =>
             _predictionList.add(Prediction.fromJson(prediction)));

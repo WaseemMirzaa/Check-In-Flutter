@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:sizer/sizer.dart';
 
+import '../../core/constant/constant.dart';
 import '../../utils/DateTimeUtils.dart';
 import '../../utils/colors.dart';
 import '../../utils/styles.dart';
@@ -52,7 +53,7 @@ class _HistoryViewState extends State<HistoryView> {
 
   Future<List<dynamic>> fetchData() async {
     final documentSnapshot = await FirebaseFirestore.instance
-        .collection("USER")
+        .collection(Collections.USER)
         .doc(FirebaseAuth.instance.currentUser!.uid)
         .get();
 
@@ -109,7 +110,6 @@ class _HistoryViewState extends State<HistoryView> {
               final imageIndex = index % courtsList.length;
               return Column(
                 children: [
-                  
                   Padding(
                     padding: EdgeInsets.symmetric(
                         horizontal: horizontalPadding, vertical: 1.1.h),
