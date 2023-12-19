@@ -105,7 +105,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     UserModel currentUser =
         UserModel.fromMap(snapshot.data() as Map<String, dynamic>);
     userController.userModel.value = currentUser;
-    setState(() {});
+    if(mounted)setState(() {});
   }
 
   File? _imageFile;

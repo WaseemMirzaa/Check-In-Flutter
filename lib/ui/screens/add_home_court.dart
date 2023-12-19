@@ -92,12 +92,14 @@ class _AddHomeCourtState extends State<AddHomeCourt>
         desiredAccuracy: LocationAccuracy.high);
     // courtNames();
     print(currentLocation?.longitude);
-    setState(() {
+    if(mounted) {
+      setState(() {
       currentLocation = position;
       _selectedLocation =
           LatLng(currentLocation!.latitude, currentLocation!.latitude);
       courtNames();
     });
+    }
 
     return Future.value(currentLocation);
   }
@@ -127,7 +129,7 @@ class _AddHomeCourtState extends State<AddHomeCourt>
         );
         markers.add(marker);
       }
-      setState(() {});
+      if(mounted)setState(() {});
     });
 
     // ADDING PLACCES API COURTS LOCATION MARKER
@@ -179,9 +181,11 @@ class _AddHomeCourtState extends State<AddHomeCourt>
       markers.add(marker);
     }
 
-    setState(() {
+    if(mounted) {
+      setState(() {
       markers = markers;
     });
+    }
   }
 
   Future<Position> setCurrentLocationOnMap() async {
@@ -195,7 +199,7 @@ class _AddHomeCourtState extends State<AddHomeCourt>
         ),
       ),
     );
-    setState(() {});
+    if(mounted)setState(() {});
 
     return Future.value(currentLocation);
   }
@@ -466,9 +470,11 @@ class _AddHomeCourtState extends State<AddHomeCourt>
                                   );
                                 },
                                 onSuggestionSelected: (prediction) async {
-                                  setState(() {
+                                  if(mounted) {
+                                    setState(() {
                                     _selectedPlace = prediction.title as String;
                                   });
+                                  }
                                   typeAheadController.text = _selectedPlace;
 
                                   // var placeId = prediction.placeId;
@@ -516,7 +522,7 @@ class _AddHomeCourtState extends State<AddHomeCourt>
 
                                   if (!matched) {
                                     markers.add(marker);
-                                    setState(() {});
+                                    if(mounted)setState(() {});
                                   }
                                 },
                                 transitionBuilder:

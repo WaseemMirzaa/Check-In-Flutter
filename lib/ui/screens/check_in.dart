@@ -137,7 +137,7 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
     } else {
       index = 0;
     }
-    setState(() {});
+    if(mounted)setState(() {});
     // print(index);
   }
 
@@ -147,10 +147,12 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
           desiredAccuracy: LocationAccuracy.high);
       // courtNames();
       // print(currentLocation?.longitude);
-      setState(() {
+      if(mounted) {
+        setState(() {
         currentLocation = position;
         courtNames();
       });
+      }
     } catch (e) {
       log('Enable location');
       nbutils.toast('Enable your location');
@@ -192,7 +194,7 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
           markers.add(marker);
           addHeatedMarkers(marker);
         }
-        setState(() {});
+        if(mounted)setState(() {});
       });
     } catch (e) {
       print(e);
@@ -251,10 +253,12 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
       addHeatedMarkers(marker);
     }
 
-    setState(() {
+    if(mounted) {
+      setState(() {
       // markers = markers;
       addLocationChangeListener();
     });
+    }
   }
 
   Future<PlacesSearchResponse?> getBasketballCourts() async {
@@ -290,7 +294,7 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
 
     WeightedLatLng point = WeightedLatLng(marker.position, weight: intensity);
 
-    setState(() => heatmapPoints.add(point));
+    if(mounted)setState(() => heatmapPoints.add(point));
   }
 
   void setHeatMapSize(int zoomLevel) {
@@ -302,7 +306,7 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
 
     print("Zoom Level = $zoomLevel");
     print("heatMapRadius.value = ${heatMapRadius.value}");
-    setState(() {});
+    if(mounted)setState(() {});
   }
 
   sendEmail(String name, String email, String homeCourt) async {
@@ -362,7 +366,7 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
         ),
       ),
     );
-    setState(() {});
+    if(mounted)setState(() {});
 
     return Future.value(currentLocation);
   }
@@ -381,7 +385,7 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
       distanceFilter:
           10, // Minimum distance (in meters) for location change updates
     ).listen((Position position) {
-      setState(() {
+      if(mounted)setState(() {
         currentLocation = position;
         checkIfWithinRadiusAndSetUserCourtInfo();
       });
@@ -502,13 +506,15 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
 
     //CheckIn Pressed
     if (index == 1) {
-      setState(() {
+      if(mounted) {
+        setState(() {
         courtInfo['checkInTime'] =
             DateFormat('HH:mm:ss').format(DateTime.now());
         courtInfo[CheckedCourts.checkInTimeStamp] = Timestamp.now();
 
         checkedInCourtName = courtInfo['courtName'];
       });
+      }
       print(courtInfo['isGolden']);
       bool val = await isCourtAlreadyStored(loc!.latitude, loc!.longitude);
       snap.collection(Collections.USER).doc(auth.currentUser!.uid).update({
