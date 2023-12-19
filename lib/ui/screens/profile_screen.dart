@@ -368,11 +368,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                             ),
                                             circularStrokeCap:
                                             CircularStrokeCap.round,
-                                        progressColor:
+                                            progressColor:
                                             darkYellowColor,
-                                      )),
+                                          ),
+                                        );
+                                      } else {
+                                        return const Center(child: Text('Something went wrong'),);
+                                      }
+                                    },
+                                  ),
                                 ),
-                                SizedBox(
+                                const SizedBox(
                                   width: 20,
                                 ),
                                 InkWell(
