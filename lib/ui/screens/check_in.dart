@@ -557,13 +557,16 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
   }
 
   getUser() async {
-    DocumentSnapshot snapshot = await FirebaseFirestore.instance
-        .collection(Collections.USER)
-        .doc(FirebaseAuth.instance.currentUser?.uid ?? "")
-        .get();
-    userController.userModel.value =
-        UserModel.fromMap(snapshot.data() as Map<String, dynamic>);
-    print(userController.userModel.value);
+
+    if (FirebaseAuth.instance.currentUser != null) {
+      DocumentSnapshot snapshot = await FirebaseFirestore.instance
+              .collection(Collections.USER)
+              .doc(FirebaseAuth.instance.currentUser?.uid ?? "")
+              .get();
+      userController.userModel.value =
+          UserModel.fromMap(snapshot.data() as Map<String, dynamic>);
+      print(userController.userModel.value);
+    }
     // UserModel currentUser = UserModel.fromMap(snapshot.data() as Map<String, dynamic>);
   }
 
@@ -631,6 +634,9 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
                       screen: const TermsAndConditions(), withNavBar: false);
                 },
               ),
+              FirebaseAuth.instance.currentUser == null
+                  ? const SizedBox()
+              :
               userController.userModel.value.isVerified == null ||
                       userController.userModel.value.isVerified == true
                   ? const SizedBox()

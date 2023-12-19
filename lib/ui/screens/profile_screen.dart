@@ -565,7 +565,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                 color:
                                                     const Color(0xff777777))),
                                       ),
-                                      verticalGap(20),
+                                      // verticalGap(20),
                                       Container(
                                         height: 1,
                                         color: greyColor,
