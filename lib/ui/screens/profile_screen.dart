@@ -7,6 +7,7 @@ import 'package:check_in/core/constant/temp_language.dart';
 import 'package:check_in/model/user_modal.dart';
 import 'package:check_in/model/user_modal.dart';
 import 'package:check_in/ui/screens/add_home_court.dart';
+import 'package:check_in/ui/screens/unique_courts_screen.dart';
 import 'package:check_in/ui/widgets/common_button.dart';
 import 'package:check_in/utils/colors.dart';
 import 'package:check_in/utils/styles.dart';
@@ -23,7 +24,9 @@ import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
 import 'package:sizer/sizer.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../../auth_service.dart';
 import '../../utils/gaps.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({Key? key}) : super(key: key);
@@ -53,6 +56,34 @@ class UserService {
           .toList();
     });
   }
+}
+
+Future<List<UserModel>?> getUniqueCourtNameMaps() async {
+  CollectionReference<Map<String, dynamic>> collectionReference = FirebaseFirestore.instance.collection('USER');
+  DocumentSnapshot<Map<String, dynamic>> document = await collectionReference.doc(userController.userModel.value.uid).get();
+
+  Set<String> uniqueCourtNames = <String>{};
+  List<UserModel> resultMaps = [];
+
+  List<Map<String, dynamic>> mapsArray = List<Map<String, dynamic>>.from(document.data()?['checkedCourts']);
+
+
+  for (var map in mapsArray) {
+    String courtName = map['courtName'];
+    if (courtName == 'Morse Kelley Park' || courtName == 'Morse Kelly Park') {
+      if (!uniqueCourtNames.contains('Morse Kelley Park') && !uniqueCourtNames.contains('Morse Kelly Park')) {
+        resultMaps.add(UserModel.fromMap(map));
+        uniqueCourtNames.add(courtName);
+      }
+    } else {
+      if (!uniqueCourtNames.contains(courtName)) {
+        resultMaps.add(UserModel.fromMap(map));
+        uniqueCourtNames.add(courtName);
+      }
+    }
+  }
+
+  return resultMaps;
 }
 
 Future<int> getGoldenLocationsCount() async {
@@ -122,6 +153,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
     // Example: Fetching the total count asynchronously
     try {
       totalCount = await getGoldenLocationsCount();
+      // final courts = await getUniqueCourtNameMaps();
+      // totalCount = courts.length;
     } catch (e) {
       print("Error fetching data: $e");
       // Handle the error as needed
@@ -294,7 +327,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             //     12,
                             //     FontWeight.normal,
                             //     blackColor),
-                            SizedBox(
+                            const SizedBox(
                               height: 10,
                             ),
 
@@ -309,24 +342,31 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                       width: 8.0,
                                     ),
                                   ),
-                                  child: Obx(() => CircularPercentIndicator(
-                                        radius: 55.0,
-                                        lineWidth: 8.0,
-                                        animation: true,
-                                        percent: ((userController.userModel
-                                                        .value.goldenCheckin ??
-                                                    0) /
-                                                (totalCount ?? 10))
-                                            .clamp(0.0, 1.0),
-                                        center: Text(
-                                          "${userController.userModel.value.goldenCheckin}\nCheck ins",
-                                          textAlign: TextAlign.center,
-                                          style: TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 18.0,
-                                          ),
-                                        ),
-                                        circularStrokeCap:
+                                  child: FutureBuilder<List<UserModel>?>(
+                                    future: getUniqueCourtNameMaps(),
+                                    builder: (context, snapshot){
+                                      if (snapshot.connectionState == ConnectionState.waiting) {
+                                        return const Center(child: CircularProgressIndicator());
+                                      } else if (snapshot.hasData && snapshot.data != null) {
+                                        return InkWell(
+                                          onTap: (){
+                                            Navigator.push(
+                                                context, MaterialPageRoute(builder: (context) => const UniqueCourtsScreen()));
+                                          },
+                                          child: CircularPercentIndicator(
+                                            radius: 55.0,
+                                            lineWidth: 8.0,
+                                            animation: true,
+                                            percent: ((snapshot.data?.length ?? 0) / (totalCount ?? 10)).clamp(0.0, 1.0),
+                                            center: Text(
+                                              "${snapshot.data?.length ?? 0}\nCheck ins",
+                                              textAlign: TextAlign.center,
+                                              style: const TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 18.0,
+                                              ),
+                                            ),
+                                            circularStrokeCap:
                                             CircularStrokeCap.round,
                                         progressColor:
                                             darkYellowColor,
@@ -335,26 +375,37 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 SizedBox(
                                   width: 20,
                                 ),
-                                Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    poppinsText("Golden\nCourt", 22,
-                                        FontWeight.bold, blackColor),
-                                    Obx(
-                                      () => poppinsText(
-                                          "${userController.userModel.value.goldenCheckin} Check ins",
-                                          12,
-                                          FontWeight.normal,
-                                          blackColor),
-                                    ),
-                                  ],
+                                InkWell(
+                                  onTap: (){
+                                    Navigator.push(
+                                        context, MaterialPageRoute(builder: (context) => const UniqueCourtsScreen()));
+                                  },
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      poppinsText("Golden\nCourt", 22, FontWeight.bold, blackColor),
+                                      FutureBuilder<List<UserModel>?>(
+                                        future: getUniqueCourtNameMaps(),
+                                        builder: (context, snapshot){
+                                          if (snapshot.connectionState == ConnectionState.waiting) {
+                                            return const Center(child: CircularProgressIndicator());
+                                          } else if (snapshot.hasData && snapshot.data != null) {
+                                            return poppinsText(
+                                                "${snapshot.data?.length ?? 0} Check ins", 12, FontWeight.normal, blackColor);
+                                          } else {
+                                            return const Center(child: Text('Something went wrong'),);
+                                          }
+                                        },
+                                      ),
+                                    ],
+                                  ),
                                 )
                               ],
                             ),
                           ],
                         ),
-                        SizedBox(
+                        const SizedBox(
                           height: 15,
                         ),
                         Column(
