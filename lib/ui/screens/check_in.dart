@@ -402,10 +402,17 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
       if (withinRadius) {
         loc = marker.position;
         courtN = marker.infoWindow.title;
+        int id;
+        try {
+          id = int.parse(marker.markerId.value);
+        } catch (e) {
+          id = 0;
+        }
         courtInfo.addAll({
           TempLanguage.courtLat: loc!.latitude,
           TempLanguage.courtLng: loc!.longitude,
           TempLanguage.courtName: courtN,
+          'id': id,
         });
         print(marker.infoWindow.snippet);
         if (marker.infoWindow.snippet == TempLanguage.golden) {

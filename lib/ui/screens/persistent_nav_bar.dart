@@ -150,7 +150,10 @@ class _HomeState extends State<Home> {
     return [
       const CheckIn(),
       const HistoryView(),
-      const ProfileScreen(),
+      KeyedSubtree(
+        key: UniqueKey(),
+        child: const ProfileScreen()
+      ),
     ];
   }
 
@@ -231,6 +234,7 @@ class _HomeState extends State<Home> {
         hideNavigationBarWhenKeyboardShows: true,
         backgroundColor: Colors.white,
         popAllScreensOnTapOfSelectedTab: true,
+        stateManagement: false,
         confineInSafeArea: true,
         handleAndroidBackButtonPress: true,
         customWidget: (navBarEssentials) => Container(
