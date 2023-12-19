@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:developer';
 import 'package:check_in/auth_service.dart';
 import 'package:check_in/core/constant/constant.dart';
 import 'package:check_in/core/constant/temp_language.dart';
@@ -140,15 +141,20 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
     // print(index);
   }
 
-  Future<Position> getCurrentLocation() async {
-    Position position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high);
-    // courtNames();
-    // print(currentLocation?.longitude);
-    setState(() {
-      currentLocation = position;
-      courtNames();
-    });
+  Future<Position?> getCurrentLocation() async {
+    try {
+      Position position = await Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.high);
+      // courtNames();
+      // print(currentLocation?.longitude);
+      setState(() {
+        currentLocation = position;
+        courtNames();
+      });
+    } catch (e) {
+      log('Enable location');
+      nbutils.toast('Enable your location');
+    }
 
     return Future.value(currentLocation);
   }
@@ -402,10 +408,17 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
       if (withinRadius) {
         loc = marker.position;
         courtN = marker.infoWindow.title;
+        int id;
+        try {
+          id = int.parse(marker.markerId.value);
+        } catch (e) {
+          id = 0;
+        }
         courtInfo.addAll({
           TempLanguage.courtLat: loc!.latitude,
           TempLanguage.courtLng: loc!.longitude,
           TempLanguage.courtName: courtN,
+          'id': id,
         });
         print(marker.infoWindow.snippet);
         if (marker.infoWindow.snippet == TempLanguage.golden) {

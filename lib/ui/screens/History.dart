@@ -8,6 +8,7 @@ import 'package:sizer/sizer.dart';
 import '../../core/constant/constant.dart';
 import '../../utils/DateTimeUtils.dart';
 import '../../utils/colors.dart';
+import '../../utils/common.dart';
 import '../../utils/styles.dart';
 
 class HistoryView extends StatefulWidget {
@@ -18,28 +19,6 @@ class HistoryView extends StatefulWidget {
 }
 
 class _HistoryViewState extends State<HistoryView> {
-  var courtsList = [
-    'pexels-king-siberia-2277981',
-    'pexels-ricardo-esquivel-1607855',
-    'pexels-daniel-absi-680074',
-    'pexels-tom-jackson-2891884',
-    'pexels-tom-jackson-2891884',
-    'pexels-king-siberia-2277981',
-    'pexels-ricardo-esquivel-1607855',
-    'pexels-daniel-absi-680074',
-    'pexels-tom-jackson-2891884',
-    'pexels-tom-jackson-2891884',
-    'pexels-king-siberia-2277981',
-    'pexels-ricardo-esquivel-1607855',
-    'pexels-daniel-absi-680074',
-    'pexels-tom-jackson-2891884',
-    'pexels-tom-jackson-2891884',
-    'pexels-king-siberia-2277981',
-    'pexels-ricardo-esquivel-1607855',
-    'pexels-daniel-absi-680074',
-    'pexels-tom-jackson-2891884',
-    'pexels-tom-jackson-2891884',
-  ];
 
   List<String> courts = [
     "Boston ",
@@ -102,7 +81,9 @@ class _HistoryViewState extends State<HistoryView> {
         elevation: 0,
       ),
       backgroundColor: Colors.white,
-      body: Padding(
+      body: dataArray.isEmpty
+          ? const Center(child: CircularProgressIndicator(),)
+          : Padding(
         padding: const EdgeInsets.only(top: 20),
         child: ListView.builder(
             itemCount: dataArray.length,
