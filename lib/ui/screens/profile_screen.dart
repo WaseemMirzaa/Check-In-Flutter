@@ -338,7 +338,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     future: getUniqueCourtNameMaps(),
                                     builder: (context, snapshot){
                                       if (snapshot.connectionState == ConnectionState.waiting) {
-                                        return const Center(child: CircularProgressIndicator());
+                                        return const SizedBox(
+                                          height: 110,
+                                            width: 110,
+                                            child: Center(child: CircularProgressIndicator()));
                                       } else if (snapshot.hasData && snapshot.data != null) {
                                         return InkWell(
                                           onTap: (){
@@ -387,7 +390,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                         future: getUniqueCourtNameMaps(),
                                         builder: (context, snapshot){
                                           if (snapshot.connectionState == ConnectionState.waiting) {
-                                            return const Center(child: CircularProgressIndicator());
+                                            // return const Center(child: CircularProgressIndicator());
+                                            return const Center();
                                           } else if (snapshot.hasData && snapshot.data != null) {
                                             return poppinsText(
                                                 "${snapshot.data?.length ?? 0} Check ins", 12, FontWeight.normal, blackColor);

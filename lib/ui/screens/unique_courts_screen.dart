@@ -135,20 +135,20 @@ class UniqueCourtsScreen extends StatelessWidget {
                                             fontWeight: FontWeight.w500,
                                           ),
                                         ),
-                                        const TextSpan(
-                                          text: 'Check in :',
-                                          style: TextStyle(
-                                            fontWeight: FontWeight.w600,
-                                          ),
-                                        ),
-                                        TextSpan(
-                                          text:
-                                          ' ${DateTimeUtils.time24to12(court["checkInTime"])} ',
-                                          style: const TextStyle(
-                                            color: Color(0xff9f9f9f),
-                                            fontWeight: FontWeight.w500,
-                                          ),
-                                        ),
+                                        // const TextSpan(
+                                        //   text: 'Check in :',
+                                        //   style: TextStyle(
+                                        //     fontWeight: FontWeight.w600,
+                                        //   ),
+                                        // ),
+                                        // TextSpan(
+                                        //   text:
+                                        //   ' ${DateTimeUtils.time24to12(court["checkInTime"])} ',
+                                        //   style: const TextStyle(
+                                        //     color: Color(0xff9f9f9f),
+                                        //     fontWeight: FontWeight.w500,
+                                        //   ),
+                                        // ),
                                       ],
                                     ),
                                   ]))
