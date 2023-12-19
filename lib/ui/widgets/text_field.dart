@@ -1,3 +1,4 @@
+import 'package:check_in/utils/colors.dart';
 import 'package:flutter/material.dart';
 
 TextField customTextField(
@@ -8,11 +9,11 @@ TextField customTextField(
     obscureText: false,
     controller: controller,
     decoration: InputDecoration(
-      enabledBorder: const UnderlineInputBorder(
-        borderSide: BorderSide(color: Color(0xff707070)),
+      enabledBorder: UnderlineInputBorder(
+        borderSide: BorderSide(color: greyColor),
       ),
-      focusedBorder: const UnderlineInputBorder(
-        borderSide: BorderSide(color: Color(0xff707070)),
+      focusedBorder: UnderlineInputBorder(
+        borderSide: BorderSide(color: greyColor),
       ),
       hintText: hint,
       hintStyle: TextStyle(

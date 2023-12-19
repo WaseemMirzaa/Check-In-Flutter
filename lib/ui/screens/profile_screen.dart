@@ -1,7 +1,9 @@
 import 'dart:io';
 
 import 'package:check_in/controllers/user_controller.dart';
+import 'package:check_in/core/constant/app_assets.dart';
 import 'package:check_in/core/constant/constant.dart';
+import 'package:check_in/core/constant/temp_language.dart';
 import 'package:check_in/model/user_modal.dart';
 import 'package:check_in/model/user_modal.dart';
 import 'package:check_in/ui/screens/add_home_court.dart';
@@ -177,7 +179,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     try {
       await launchUrl(_emailLaunchUri);
     } catch (e) {
-      nbutils.toast("Could not launch email.");
+      nbutils.toast(TempLanguage.notLaunchEmailToast);
       print(e);
     }
   }
@@ -190,7 +192,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         elevation: 0,
         centerTitle: true,
         backgroundColor: whiteColor,
-        title: poppinsText("Profile", 20, FontWeight.bold, blackColor),
+        title: poppinsText(TempLanguage.profile, 20, FontWeight.bold, blackColor),
       ),
       body: SingleChildScrollView(
         child: SizedBox(
@@ -253,7 +255,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                           color: greenColor),
                                                       image: const DecorationImage(
                                                           image: AssetImage(
-                                                              'assets/images/logo-new.png'),
+                                                              AppAssets.LOGO_NEW),
                                                           fit: BoxFit.fill)),
                                                 )),
                                   if (userController
@@ -271,7 +273,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                             shape: BoxShape.circle,
                                             image: DecorationImage(
                                                 image: AssetImage(
-                                                    "assets/images/instagram-verification-badge.png"))),
+                                                    AppAssets.INSTAGRAM_VERIFICATION))),
                                       ),
                                     )
                                   else
@@ -303,7 +305,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   decoration: BoxDecoration(
                                     shape: BoxShape.circle,
                                     border: Border.all(
-                                      color: Color.fromARGB(255, 216, 227, 242),
+                                      color: offWhiteColor,
                                       width: 8.0,
                                     ),
                                   ),
@@ -327,7 +329,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                         circularStrokeCap:
                                             CircularStrokeCap.round,
                                         progressColor:
-                                            Color.fromARGB(255, 255, 206, 26),
+                                            darkYellowColor,
                                       )),
                                 ),
                                 SizedBox(
@@ -357,7 +359,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ),
                         Column(
                           children: [
-                            poppinsText("Home Court", 14, semiBold, greenColor),
+                            poppinsText(TempLanguage.homeCourt, 14, semiBold, greenColor),
                             verticalGap(0.8.h),
                             Padding(
                               padding:
@@ -388,7 +390,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                           height: 2.3.h,
                                           width: 4.47.w,
                                           child: Image.asset(
-                                              "assets/images/Icon feather-map-pin.png"),
+                                              AppAssets.MAP_PIN),
                                         ),
                                       )
                                     ],
@@ -420,7 +422,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                         topRight: Radius.circular(10)),
                                     boxShadow: [
                                       BoxShadow(
-                                        color: Colors.grey.withOpacity(0.2),
+                                        color: greyColor.withOpacity(0.2),
                                         blurRadius: 1,
                                         //   spreadRadius: -12,
                                         offset: const Offset(0,
@@ -449,7 +451,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                         mainAxisAlignment:
                                             MainAxisAlignment.spaceBetween,
                                         children: [
-                                          poppinsText("About me", 14, semiBold,
+                                          poppinsText(TempLanguage.aboutMe, 14, semiBold,
                                               blackColor),
                                           InkWell(
                                             onTap: () => setState(() {
@@ -462,7 +464,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                 height: 1.8.h,
                                                 width: 4.w,
                                                 child: Image.asset(
-                                                    "assets/images/Icon feather-edit-2.png"),
+                                                    AppAssets.EDIT_ICON),
                                               ),
                                             ),
                                           )
@@ -481,7 +483,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                 .collection(Collections.USER)
                                                 .doc(FirebaseAuth
                                                     .instance.currentUser!.uid)
-                                                .update({"about me": aboutMe});
+                                                .update({UserKey.ABOUT_ME: aboutMe});
                                           });
                                         },
                                         decoration: InputDecoration(
@@ -498,7 +500,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                     .value
                                                     .aboutMe
                                                     .isEmptyOrNull)
-                                                ? "Tell us about your game"
+                                                ? TempLanguage.tellUsAboutGame
                                                 : userController.userModel.value
                                                         .aboutMe ??
                                                     "",
@@ -506,7 +508,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                 fontSize: 14,
                                                 fontWeight: regular,
                                                 color:
-                                                    const Color(0xff777777))),
+                                                    silverColor)),
                                       ),
                                       verticalGap(20),
                                       Container(

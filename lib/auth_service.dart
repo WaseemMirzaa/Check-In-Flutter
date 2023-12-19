@@ -28,11 +28,11 @@ Future<void> signUp(
         .then((value) => auth.currentUser?.updateDisplayName(userName))
         .then((value) => snap.collection(Collections.USER).doc(auth.currentUser!.uid).set(
               {
-                "user name": auth.currentUser!.displayName,
-                "email": auth.currentUser!.email,
-                "uid": auth.currentUser!.uid,
-                "checkedIn": false,
-                "isVerified": false,
+                UserKey.USER_NAME: auth.currentUser!.displayName,
+                UserKey.EMAIL: auth.currentUser!.email,
+                UserKey.UID: auth.currentUser!.uid,
+                UserKey.CHECKED_IN: false,
+                UserKey.IS_VERIFIED: false,
               },
             )
                 // .then((value) async => await toModal(context))
@@ -74,9 +74,9 @@ Future<void> logout(context) async {
   //Checkout
 
   snap.collection(Collections.USER).doc(auth.currentUser!.uid).update({
-    "checkedIn": false,
-    "courtLat": FieldValue.delete(),
-    "courtLng": FieldValue.delete(),
+    UserKey.CHECKED_IN: false,
+    CourtKey.COURT_LAT: FieldValue.delete(),
+    CourtKey.COURT_LNG: FieldValue.delete(),
   });
   auth.signOut().then(
         (value) =>

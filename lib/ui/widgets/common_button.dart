@@ -1,31 +1,33 @@
 import 'package:flutter/material.dart';
 
+import '../../utils/colors.dart';
+
 Container fullWidthButton(String label, VoidCallback onTap) {
   return Container(
     height: 50,
     decoration: BoxDecoration(
-      color: const Color(0xff007a33),
+      color: greenColor,
       borderRadius: BorderRadius.circular(11.0),
-      boxShadow: const [
+      boxShadow: [
         BoxShadow(
-          color: Color(0x29000000),
+          color: blackTranslucentColor,
           offset: Offset(0, 3),
           blurRadius: 6,
         ),
       ],
     ),
     child: Material(
-      color: Colors.transparent,
+      color: transparentColor,
       child: InkWell(
         borderRadius: BorderRadius.circular(11.0),
         onTap: onTap,
         child: Center(
           child: Text(
             label,
-            style: const TextStyle(
+            style: TextStyle(
               fontFamily: 'Poppins',
               fontSize: 14,
-              color: Color(0xffffffff),
+              color: whiteColor,
               fontWeight: FontWeight.w500,
             ),
             textAlign: TextAlign.center,

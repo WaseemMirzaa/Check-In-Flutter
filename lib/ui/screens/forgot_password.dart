@@ -1,3 +1,5 @@
+import 'package:check_in/core/constant/app_assets.dart';
+import 'package:check_in/core/constant/temp_language.dart';
 import 'package:flutter/material.dart';
 import 'package:nb_utils/nb_utils.dart' as toast;
 import 'package:sizer/sizer.dart';
@@ -33,9 +35,9 @@ class _ForgotPasswordState extends State<ForgotPassword> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: whiteColor,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: whiteColor,
         leading: Row(
           children: [
             const SizedBox(
@@ -48,12 +50,12 @@ class _ForgotPasswordState extends State<ForgotPassword> {
               child: SizedBox(
                 height: 2.1.h,
                 width: 2.9.w,
-                child: Image.asset("assets/images/Path 6.png"),
+                child: Image.asset(AppAssets.LEFT_ARROW),
               ),
             )
           ],
         ),
-        title: poppinsText("Forgot Password", 20, FontWeight.bold, blackColor),
+        title: poppinsText(TempLanguage.forgotPassword, 20, FontWeight.bold, blackColor),
         centerTitle: true,
         elevation: 0,
       ),
@@ -75,7 +77,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                     children: [
                       Center(
                         child: Image.asset(
-                          "assets/images/logo-new.png",
+                          AppAssets.LOGO_NEW,
                           scale: 0.5.h,
                         ),
                       ),
@@ -100,7 +102,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                               FocusScope.of(context).nextFocus(),
                           validator: (v) {
                             if (v == null || v.isEmpty || v.length < 6) {
-                              return 'Please enter some text';
+                              return TempLanguage.enterText;
                             }
                             return null;
                           },
@@ -110,17 +112,17 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                             });
                           },
                           decoration: InputDecoration(
-                            enabledBorder: const UnderlineInputBorder(
-                              borderSide: BorderSide(color: Color(0xff707070)),
+                            enabledBorder: UnderlineInputBorder(
+                              borderSide: BorderSide(color: greyColor),
                             ),
-                            focusedBorder: const UnderlineInputBorder(
-                              borderSide: BorderSide(color: Color(0xff707070)),
+                            focusedBorder: UnderlineInputBorder(
+                              borderSide: BorderSide(color: greyColor),
                             ),
-                            hintText: 'Email',
+                            hintText: TempLanguage.emailCap,
                             hintStyle: TextStyle(
-                              fontFamily: 'Poppins',
+                              fontFamily: TempLanguage.poppins,
                               fontSize: 1.7.h,
-                              color: const Color(0xff707070),
+                              color: greyColor,
                               fontWeight: FontWeight.w600,
                               height: 1.2142857142857142,
                             ),
@@ -139,12 +141,12 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                     children: [
                       Padding(
                           padding: EdgeInsets.only(top: 12.h),
-                          child: fullWidthButton('Send Email', () async {
+                          child: fullWidthButton(TempLanguage.sendEmail, () async {
                             if (Validate(email)) {
                               await resetPassword(emailText: email);
                             } else {
                               toast.Fluttertoast.showToast(
-                                  msg: "Enter Valid Email Address");
+                                  msg: TempLanguage.validEmail);
                             }
                           })),
                     ],

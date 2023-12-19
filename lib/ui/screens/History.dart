@@ -1,3 +1,4 @@
+import 'package:check_in/core/constant/temp_language.dart';
 import 'package:check_in/utils/gaps.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -57,7 +58,7 @@ class _HistoryViewState extends State<HistoryView> {
         .doc(FirebaseAuth.instance.currentUser!.uid)
         .get();
 
-    final checkedCourtsData = documentSnapshot.data()?["checkedCourts"];
+    final checkedCourtsData = documentSnapshot.data()?[CourtKey.CHECKED_COURTS];
 
     if (checkedCourtsData != null && checkedCourtsData is List<dynamic>) {
       dataArray = List.from(checkedCourtsData).reversed.toList();
@@ -86,14 +87,14 @@ class _HistoryViewState extends State<HistoryView> {
     fetchData();
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: whiteColor,
         centerTitle: true,
-        title: const Text(
-          'History',
+        title: Text(
+          TempLanguage.history,
           style: TextStyle(
-            fontFamily: 'Poppins',
+            fontFamily: TempLanguage.poppins,
             fontSize: 20,
-            color: Color(0xff000000),
+            color: blackColor,
             fontWeight: FontWeight.w700,
           ),
           textAlign: TextAlign.right,
@@ -101,7 +102,7 @@ class _HistoryViewState extends State<HistoryView> {
         ),
         elevation: 0,
       ),
-      backgroundColor: Colors.white,
+      backgroundColor: whiteColor,
       body: Padding(
         padding: const EdgeInsets.only(top: 20),
         child: ListView.builder(
@@ -116,11 +117,11 @@ class _HistoryViewState extends State<HistoryView> {
                     child: Container(
                       height: 14.h,
                       decoration: BoxDecoration(
-                        color: const Color(0xffffffff),
+                        color: whiteColor,
                         borderRadius: BorderRadius.circular(6.0),
-                        boxShadow: const [
+                        boxShadow: [
                           BoxShadow(
-                            color: Color(0x29000000),
+                            color: blackTranslucentColor,
                             offset: Offset(0, 1),
                             blurRadius: 6,
                           ),
@@ -146,22 +147,22 @@ class _HistoryViewState extends State<HistoryView> {
                           Text.rich(TextSpan(
                               text: '${dataArray[index]["courtName"]}\n',
                               style: TextStyle(
-                                fontFamily: 'Poppins',
+                                fontFamily: TempLanguage.poppins,
                                 fontSize: 1.6.h,
-                                color: const Color(0xff000000),
+                                color: blackColor,
                                 fontWeight: FontWeight.w600,
                               ),
                               children: [
                                 TextSpan(
                                   style: TextStyle(
-                                    fontFamily: 'Poppins',
+                                    fontFamily: TempLanguage.poppins,
                                     fontSize: 1.1.h,
-                                    color: const Color(0xff007a33),
+                                    color: greenColor,
                                     height: 1.7,
                                   ),
                                   children: [
-                                    const TextSpan(
-                                      text: 'Court Location :',
+                                    TextSpan(
+                                      text: TempLanguage.courtLocation,
                                       style: TextStyle(
                                         fontWeight: FontWeight.w600,
                                       ),
@@ -169,13 +170,13 @@ class _HistoryViewState extends State<HistoryView> {
                                     TextSpan(
                                       text:
                                           ' ${dataArray[index]["courtName"]}\n',
-                                      style: const TextStyle(
-                                        color: Color(0xff9f9f9f),
+                                      style: TextStyle(
+                                        color: silverColor,
                                         fontWeight: FontWeight.w500,
                                       ),
                                     ),
-                                    const TextSpan(
-                                      text: 'Check in :',
+                                    TextSpan(
+                                      text: TempLanguage.checkInHistory,
                                       style: TextStyle(
                                         fontWeight: FontWeight.w600,
                                       ),
@@ -183,8 +184,8 @@ class _HistoryViewState extends State<HistoryView> {
                                     TextSpan(
                                       text:
                                           ' ${DateTimeUtils.time24to12(dataArray[index]["checkInTime"])} ',
-                                      style: const TextStyle(
-                                        color: Color(0xff9f9f9f),
+                                      style: TextStyle(
+                                        color: silverColor,
                                         fontWeight: FontWeight.w500,
                                       ),
                                     ),
@@ -200,7 +201,7 @@ class _HistoryViewState extends State<HistoryView> {
                         horizontal: horizontalPadding + 15),
                     child: Container(
                       height: 1,
-                      color: const Color(0xff9f9f9f),
+                      color: silverColor,
                     ),
                   )
                 ],

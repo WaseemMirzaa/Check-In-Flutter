@@ -1,5 +1,7 @@
 import 'dart:async';
 
+import 'package:check_in/core/constant/app_assets.dart';
+import 'package:check_in/core/constant/temp_language.dart';
 import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
 import 'package:webview_flutter/webview_flutter.dart';
@@ -34,7 +36,7 @@ class _PrivacyPolicyState extends State<PrivacyPolicy> {
               child: SizedBox(
                 height: 2.1.h,
                 width: 2.9.w,
-                child: Image.asset("assets/images/Path 6.png"),
+                child: Image.asset(AppAssets.LEFT_ARROW),
               ),
             )
           ],
@@ -42,20 +44,20 @@ class _PrivacyPolicyState extends State<PrivacyPolicy> {
         elevation: 0,
         centerTitle: true,
         backgroundColor: whiteColor,
-        title: poppinsText("Privacy Policy", 20, FontWeight.bold, blackColor),
+        title: poppinsText(TempLanguage.privacyPolicy, 20, FontWeight.bold, blackColor),
       ),
       body: Container(
         margin: const EdgeInsets.only(top: 10),
         padding: const EdgeInsets.only(top: 10, left: 10, right: 10),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: whiteColor,
           borderRadius: const BorderRadius.only(
             topRight: Radius.circular(30),
             topLeft: Radius.circular(30),
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.grey.withOpacity(0.2),
+              color: greyColor.withOpacity(0.2),
               blurRadius: 5,
               //   spreadRadius: -12,
               offset: const Offset(0, -3), // changes position of shadow

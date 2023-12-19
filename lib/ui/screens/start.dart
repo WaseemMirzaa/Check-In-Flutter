@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import 'package:check_in/core/constant/app_assets.dart';
+import 'package:check_in/core/constant/temp_language.dart';
 import 'package:check_in/ui/screens/login.dart';
 import 'package:check_in/ui/screens/signup.dart';
 import 'package:check_in/ui/widgets/common_button.dart';
@@ -8,6 +10,8 @@ import 'package:flutter/material.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
 import 'package:sizer/sizer.dart';
 import 'package:app_tracking_transparency/app_tracking_transparency.dart';
+
+import '../../utils/colors.dart';
 
 class StartView extends StatefulWidget {
   bool isBack = false;
@@ -55,16 +59,14 @@ class _StartViewState extends State<StartView> {
       await showDialog<void>(
         context: context,
         builder: (context) => AlertDialog(
-          title: const Text('Dear User'),
-          content: const Text(
-            'We care about your privacy and data security. We use your email to maintain your own profile against it. '
-            'Also we use your location to show you the nearest basketball courts in your area. '
-            'Can we continue to use your data to give you best experience ?\n\nYou can change your choice anytime in the app settings. ',
+          title: Text(TempLanguage.dearUser),
+          content: Text(
+           TempLanguage.alertContentText,
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('Continue'),
+              child: Text(TempLanguage.continueButton),
             ),
           ],
         ),
@@ -73,10 +75,10 @@ class _StartViewState extends State<StartView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: whiteColor,
       appBar: widget.isBack
           ? AppBar(
-              backgroundColor: Colors.white,
+              backgroundColor: whiteColor,
               leading: Row(
                 children: [
                   const SizedBox(
@@ -89,7 +91,7 @@ class _StartViewState extends State<StartView> {
                     child: SizedBox(
                       height: 2.1.h,
                       width: 2.9.w,
-                      child: Image.asset("assets/images/Path 6.png"),
+                      child: Image.asset(AppAssets.LEFT_ARROW),
                     ),
                   )
                 ],
@@ -107,7 +109,7 @@ class _StartViewState extends State<StartView> {
                 height: MediaQuery.of(context).size.height * 0.4,
                 child: Center(
                   child: Image.asset(
-                    "assets/images/logo-new.png",
+                    AppAssets.LOGO_NEW,
                     scale: 3,
                   ),
                 ),
@@ -116,7 +118,7 @@ class _StartViewState extends State<StartView> {
                 children: [
                   Padding(
                     padding: EdgeInsets.only(top: 0.9.h, bottom: 0.9.h),
-                    child: fullWidthButton("Log in", () {
+                    child: fullWidthButton(TempLanguage.logInSpaced, () {
                       pushNewScreen(context,
                           screen: const LoginView(), withNavBar: false);
                     }),
@@ -126,20 +128,20 @@ class _StartViewState extends State<StartView> {
                     child: Container(
                       height: 6.h,
                       decoration: BoxDecoration(
-                        color: const Color(0xffffffff),
+                        color: whiteColor,
                         borderRadius: BorderRadius.circular(11.0),
                         border: Border.all(
-                            width: 1.0, color: const Color(0xff707070)),
-                        boxShadow: const [
+                            width: 1.0, color: greyColor),
+                        boxShadow: [
                           BoxShadow(
-                            color: Color(0x29000000),
+                            color: blackTranslucentColor,
                             offset: Offset(0, 3),
                             blurRadius: 6,
                           ),
                         ],
                       ),
                       child: Material(
-                        color: Colors.transparent,
+                        color: transparentColor,
                         child: InkWell(
                           borderRadius: BorderRadius.circular(11),
                           onTap: () {
@@ -148,11 +150,11 @@ class _StartViewState extends State<StartView> {
                           },
                           child: Center(
                             child: Text(
-                              'Sign up',
+                              TempLanguage.signUp,
                               style: TextStyle(
-                                fontFamily: 'Poppins',
+                                fontFamily: TempLanguage.poppins,
                                 fontSize: 1.7.h,
-                                color: const Color(0xff000000),
+                                color: blackColor,
                                 fontWeight: FontWeight.w500,
                               ),
                               textAlign: TextAlign.center,

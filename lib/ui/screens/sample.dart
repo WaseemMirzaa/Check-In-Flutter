@@ -1,6 +1,9 @@
 // ignore_for_file: library_private_types_in_public_api
 
+import 'package:check_in/core/constant/temp_language.dart';
 import 'package:flutter/material.dart';
+
+import '../../utils/colors.dart';
 
 class MyNavigationBar extends StatefulWidget {
   const MyNavigationBar({Key? key}) : super(key: key);
@@ -11,12 +14,12 @@ class MyNavigationBar extends StatefulWidget {
 
 class _MyNavigationBarState extends State<MyNavigationBar> {
   int _selectedIndex = 0;
-  static const List<Widget> _widgetOptions = <Widget>[
-    Text('Home Page',
+  static List<Widget> _widgetOptions = <Widget>[
+    Text(TempLanguage.homePage,
         style: TextStyle(fontSize: 35, fontWeight: FontWeight.bold)),
-    Text('Search Page',
+    Text(TempLanguage.searchPage,
         style: TextStyle(fontSize: 35, fontWeight: FontWeight.bold)),
-    Text('Profile Page',
+    Text(TempLanguage.searchPage,
         style: TextStyle(fontSize: 35, fontWeight: FontWeight.bold)),
   ];
 
@@ -31,29 +34,29 @@ class _MyNavigationBarState extends State<MyNavigationBar> {
     return Scaffold(
       appBar: AppBar(
           title: const Text('Flutter BottomNavigationBar Example'),
-          backgroundColor: Colors.green),
+          backgroundColor: lightGreenColor),
       body: Center(
         child: _widgetOptions.elementAt(_selectedIndex),
       ),
       bottomNavigationBar: BottomNavigationBar(
-          items: const <BottomNavigationBarItem>[
+          items: <BottomNavigationBarItem>[
             BottomNavigationBarItem(
                 label: "f",
                 icon: Icon(Icons.home),
-                backgroundColor: Colors.green),
+                backgroundColor: lightGreenColor),
             BottomNavigationBarItem(
                 label: "f",
                 icon: Icon(Icons.search),
-                backgroundColor: Colors.yellow),
+                backgroundColor: yellowColor),
             BottomNavigationBarItem(
               label: "f",
               icon: Icon(Icons.person),
-              backgroundColor: Colors.blue,
+              backgroundColor: blueColor,
             ),
           ],
           type: BottomNavigationBarType.shifting,
           currentIndex: _selectedIndex,
-          selectedItemColor: Colors.black,
+          selectedItemColor: blackColor,
           iconSize: 40,
           onTap: _onItemTapped,
           elevation: 5),

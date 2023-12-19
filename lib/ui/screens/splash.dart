@@ -1,5 +1,9 @@
+import 'package:check_in/core/constant/app_assets.dart';
+import 'package:check_in/core/constant/temp_language.dart';
 import 'package:check_in/ui/screens/persistent_nav_bar.dart';
 import 'package:flutter/material.dart';
+
+import '../../utils/colors.dart';
 
 class Splash extends StatefulWidget {
   const Splash({super.key});
@@ -32,14 +36,14 @@ class _SplashState extends State<Splash> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: Colors.white,
+      color: whiteColor,
       child: Stack(
         children: [
           Positioned.fill(
             child: Align(
               alignment: Alignment.bottomCenter,
               child: Image.asset(
-                "assets/images/basketball-bro.png",
+                AppAssets.BASKETBALL_BRO,
                 fit: BoxFit.cover,
               ),
             ),
@@ -58,21 +62,21 @@ class _SplashState extends State<Splash> {
                   Expanded(
                     flex: 2,
                     child: Image.asset(
-                      "assets/images/logo-new.png",
+                      AppAssets.LOGO_NEW,
                       scale: 1,
                     ),
                   ),
                   const SizedBox(height: 0),
-                  const Text(
-                    'Powered by',
-                    style: TextStyle(fontSize: 12, color: Colors.black),
+                  Text(
+                    TempLanguage.poweredBy,
+                    style: TextStyle(fontSize: 12, color: blackColor),
                   ),
                   const SizedBox(height: 4),
-                  const Text(
-                    'Ville Marcos LLC',
+                  Text(
+                    TempLanguage.villeMarcos,
                     style: TextStyle(
                         fontSize: 16,
-                        color: Colors.black,
+                        color: blackColor,
                         fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 30),

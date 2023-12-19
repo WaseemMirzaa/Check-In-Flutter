@@ -2,6 +2,7 @@
 
 import 'dart:async';
 import 'package:check_in/auth_service.dart';
+import 'package:check_in/core/constant/app_assets.dart';
 import 'package:check_in/core/constant/temp_language.dart';
 import 'package:check_in/model/user_modal.dart';
 import 'package:check_in/ui/screens/contact_us.dart';
@@ -105,9 +106,9 @@ class _AddHomeCourtState extends State<AddHomeCourt>
   Future courtNames() async {
     await snap.collection(Collections.GOLDEN_LOCATIONS).get().then((querySnapshot) {
       for (var doc in querySnapshot.docs) {
-        double latitude = doc.data()[TempLanguage.lat];
-        double longitude = doc.data()[TempLanguage.lng];
-        String name = doc.data()[TempLanguage.name];
+        double latitude = doc.data()[CourtKey.LAT];
+        double longitude = doc.data()[CourtKey.LNG];
+        String name = doc.data()[CourtKey.NAME];
 
         LatLng location = LatLng(latitude, longitude);
         Marker marker = Marker(
@@ -244,7 +245,7 @@ class _AddHomeCourtState extends State<AddHomeCourt>
                   color: whiteColor,
                 ),
                 child: Image.asset(
-                  "assets/images/logo-new.png",
+                  AppAssets.LOGO_NEW,
                 ),
               ),
               const SizedBox(
@@ -381,7 +382,7 @@ class _AddHomeCourtState extends State<AddHomeCourt>
                         Material(
                           borderRadius: BorderRadius.circular(10),
                           elevation: 2,
-                          shadowColor: Colors.grey,
+                          shadowColor: greyColor,
                           child: SingleChildScrollView(
                             child: ClipRRect(
                               borderRadius: BorderRadius.circular(10),
@@ -400,7 +401,7 @@ class _AddHomeCourtState extends State<AddHomeCourt>
                                     errorBorder: InputBorder.none,
                                     focusedBorder: InputBorder.none,
                                     focusedErrorBorder: InputBorder.none,
-                                    fillColor: Colors.white,
+                                    fillColor: whiteColor,
                                     hintText: TempLanguage.findCourts,
                                     hintStyle: GoogleFonts.poppins(
                                         fontSize: 12,
@@ -414,7 +415,7 @@ class _AddHomeCourtState extends State<AddHomeCourt>
                                           height: 17,
                                           width: 17,
                                           child: Image.asset(
-                                            "assets/images/Icon ionic-ios-search.png",
+                                            AppAssets.IOS_SEARCH_ICON,
                                             fit: BoxFit.fill,
                                           ),
                                         ),
@@ -589,10 +590,10 @@ class _AddHomeCourtState extends State<AddHomeCourt>
                 onPressed: () {
                   setCurrentLocationOnMap();
                 },
-                backgroundColor: Colors.blueAccent,
-                child: const Icon(
+                backgroundColor: blueAccentColor,
+                child: Icon(
                   Icons.gps_fixed,
-                  color: Colors.white,
+                  color: whiteColor,
                 ),
               ),
             ),

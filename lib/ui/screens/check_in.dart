@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:check_in/auth_service.dart';
+import 'package:check_in/core/constant/app_assets.dart';
 import 'package:check_in/core/constant/constant.dart';
 import 'package:check_in/core/constant/temp_language.dart';
 import 'package:check_in/firebase-models/user_firebase_model.dart';
@@ -162,15 +163,15 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
           .get()
           .then((querySnapshot) {
         for (var doc in querySnapshot.docs) {
-          double latitude = doc.data()[TempLanguage.lat];
-          double longitude = doc.data()[TempLanguage.lng];
-          String name = doc.data()[TempLanguage.name];
+          double latitude = doc.data()[CourtKey.LAT];
+          double longitude = doc.data()[CourtKey.LNG];
+          String name = doc.data()[CourtKey.NAME];
 
           LatLng location = LatLng(latitude, longitude);
           Marker marker = Marker(
             markerId: MarkerId(doc.id),
             position: location,
-            infoWindow: InfoWindow(title: name, snippet: TempLanguage.golden),
+            infoWindow: InfoWindow(title: name, snippet: CourtKey.GOLDEN),
             icon: BitmapDescriptor.defaultMarkerWithHue(
                 BitmapDescriptor.hueYellow),
             onTap: () {
@@ -338,8 +339,8 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
     final QuerySnapshot snapshot = await FirebaseFirestore.instance
         .collection(Collections.USER)
         .where(UserKey.CHECKED_IN, isEqualTo: true)
-        .where(TempLanguage.courtLat, isEqualTo: court.latitude)
-        .where(TempLanguage.courtLng, isEqualTo: court.longitude)
+        .where(CourtKey.COURT_LAT, isEqualTo: court.latitude)
+        .where(CourtKey.COURT_LNG, isEqualTo: court.longitude)
         .get();
 
     return snapshot.size;
@@ -403,21 +404,21 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
         loc = marker.position;
         courtN = marker.infoWindow.title;
         courtInfo.addAll({
-          TempLanguage.courtLat: loc!.latitude,
-          TempLanguage.courtLng: loc!.longitude,
-          TempLanguage.courtName: courtN,
+          CourtKey.COURT_LAT: loc!.latitude,
+          CourtKey.COURT_LNG: loc!.longitude,
+          CourtKey.COURT_NAME: courtN,
         });
         print(marker.infoWindow.snippet);
-        if (marker.infoWindow.snippet == TempLanguage.golden) {
+        if (marker.infoWindow.snippet == CourtKey.GOLDEN) {
           // Add additional info for golden location
           courtInfo.addAll({
-            TempLanguage.isGolden: true,
+            CourtKey.IS_GOLDEN: true,
             // Add any other specific information for golden locations
           });
         } else {
           // If not a golden location, you can still add some other information
           courtInfo.addAll({
-            TempLanguage.isGolden: false,
+            CourtKey.IS_GOLDEN: false,
             // Add any other specific information for non-golden locations
           });
         }
@@ -473,12 +474,12 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
         .doc(auth.currentUser!.uid)
         .get();
     List<dynamic> checkedCourts = (userDoc.data()
-            as Map<String, dynamic>?)?[TempLanguage.checkedCourts] ??
+            as Map<String, dynamic>?)?[CourtKey.CHECKED_COURTS] ??
         [];
     // Check if the coordinates are already present in the array
     if (checkedCourts.any((court) =>
-        court[TempLanguage.courtLat] == currentCourtLat &&
-        court[TempLanguage.courtLng] == currentCourtLng))
+        court[CourtKey.COURT_LAT] == currentCourtLat &&
+        court[CourtKey.COURT_LNG] == currentCourtLng))
       return false;
     else
       return true;
@@ -499,17 +500,17 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
       print(courtInfo['isGolden']);
       bool val = await isCourtAlreadyStored(loc!.latitude, loc!.longitude);
       snap.collection(Collections.USER).doc(auth.currentUser!.uid).update({
-        TempLanguage.checkedCourts: FieldValue.arrayUnion([courtInfo]),
+        CourtKey.CHECKED_COURTS: FieldValue.arrayUnion([courtInfo]),
         UserKey.CHECKED_IN: true,
-        UserKey.CHECKED_IN_COURT_NAME: courtInfo[TempLanguage.courtName],
-        TempLanguage.courtLat: loc!.latitude,
-        TempLanguage.courtLng: loc!.longitude,
+        UserKey.CHECKED_IN_COURT_NAME: courtInfo[CourtKey.COURT_NAME],
+        CourtKey.COURT_LAT: loc!.latitude,
+        CourtKey.COURT_LNG: loc!.longitude,
         UserFirebaseModel.lastCheckin: Timestamp.now(),
         UserFirebaseModel.lastCheckout: FieldValue.delete(),
       });
 
       print("HAAAA$val");
-      if (courtInfo[TempLanguage.isGolden] && val) {
+      if (courtInfo[CourtKey.IS_GOLDEN] && val) {
         Get.find<UserController>().updateGoldenCheckin(
           (Get.find<UserController>().userModel.value.goldenCheckin ?? 0) + 1,
         );
@@ -519,10 +520,10 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
       }
 
       Get.snackbar("Checked In", "You have checked into this court.",
-          backgroundColor: Colors.white,
+          backgroundColor: whiteColor,
           borderWidth: 4,
-          borderColor: Colors.black,
-          colorText: Colors.black);
+          borderColor: blackColor,
+          colorText: blackColor);
       // print(index);
       // print(withinRadius);
     }
@@ -530,8 +531,8 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
     else if (index == 0) {
       snap.collection(Collections.USER).doc(auth.currentUser!.uid).update({
         UserKey.CHECKED_IN: false,
-        TempLanguage.courtLat: FieldValue.delete(),
-        TempLanguage.courtLng: FieldValue.delete(),
+        CourtKey.COURT_LAT: FieldValue.delete(),
+        CourtKey.COURT_LNG: FieldValue.delete(),
         UserFirebaseModel.lastCheckout: Timestamp.now(),
         UserFirebaseModel.lastCheckin: FieldValue.delete(),
       });
@@ -540,10 +541,10 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
 
       Get.snackbar(
           TempLanguage.checkOutToastTitle, TempLanguage.checkOutToastMessage,
-          backgroundColor: Colors.white,
+          backgroundColor: whiteColor,
           borderWidth: 4,
-          borderColor: Colors.black,
-          colorText: Colors.black);
+          borderColor: blackColor,
+          colorText: blackColor);
     }
   }
 
@@ -595,7 +596,7 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
                   color: whiteColor,
                 ),
                 child: Image.asset(
-                  "assets/images/logo-new.png",
+                  AppAssets.LOGO_NEW,
                 ),
               ),
               const SizedBox(
@@ -718,7 +719,7 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
                               heatmapId: const HeatmapId('test'),
                               data: heatmapPoints,
                               gradient: HeatmapGradient(
-                                const <HeatmapGradientColor>[
+                                 <HeatmapGradientColor>[
                                   // Web needs a first color with 0 alpha
                                   // if (kIsWeb)
                                   //   HeatmapGradientColor(
@@ -726,11 +727,11 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
                                   //     0,
                                   //   ),
                                   HeatmapGradientColor(
-                                    Colors.yellow,
+                                    yellowColor,
                                     0.2,
                                   ),
                                   HeatmapGradientColor(
-                                    Colors.red,
+                                    redColor,
                                     0.6,
                                   ),
                                   // HeatmapGradientColor(
@@ -742,7 +743,7 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
                                   //   0.8,
                                   // ),
                                   HeatmapGradientColor(
-                                    Colors.blue,
+                                    blueColor,
                                     1,
                                   ),
                                 ],
@@ -827,7 +828,7 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
                         Material(
                           borderRadius: BorderRadius.circular(10),
                           elevation: 2,
-                          shadowColor: Colors.grey,
+                          shadowColor: greyColor,
                           child: SingleChildScrollView(
                             child: ClipRRect(
                               borderRadius: BorderRadius.circular(10),
@@ -846,7 +847,7 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
                                     errorBorder: InputBorder.none,
                                     focusedBorder: InputBorder.none,
                                     focusedErrorBorder: InputBorder.none,
-                                    fillColor: Colors.white,
+                                    fillColor: whiteColor,
                                     hintText: TempLanguage.findCourts,
                                     hintStyle: GoogleFonts.poppins(
                                         fontSize: 12,
@@ -860,7 +861,7 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
                                           height: 17,
                                           width: 17,
                                           child: Image.asset(
-                                            "assets/images/Icon ionic-ios-search.png",
+                                            AppAssets.IOS_SEARCH_ICON,
                                             fit: BoxFit.fill,
                                           ),
                                         ),
@@ -992,7 +993,7 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
                                         TempLanguage.logInForFeatures,
                                         16,
                                         FontWeight.w500,
-                                        Colors.black),
+                                        blackColor),
                                     actions: [
                                       TextButton(
                                         onPressed: () {
@@ -1014,10 +1015,10 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
                               ? _buttonPress()
                               : Get.snackbar(TempLanguage.notAtCourtToastTitle,
                                   TempLanguage.notAtCourtToastMessage,
-                                  backgroundColor: Colors.white,
+                                  backgroundColor: whiteColor,
                                   borderWidth: 4,
-                                  borderColor: Colors.black,
-                                  colorText: Colors.black);
+                                  borderColor: blackColor,
+                                  colorText: blackColor);
                         }
                       }),
                     ),
@@ -1032,10 +1033,10 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
                 onPressed: () {
                   setCurrentLocationOnMap();
                 },
-                backgroundColor: Colors.blueAccent,
-                child: const Icon(
+                backgroundColor: blueAccentColor,
+                child: Icon(
                   Icons.gps_fixed,
-                  color: Colors.white,
+                  color: whiteColor,
                 ),
               ),
             ),

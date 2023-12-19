@@ -1,5 +1,6 @@
 // ignore_for_file: avoid_print
 
+import 'package:check_in/core/constant/temp_language.dart';
 import 'package:check_in/ui/screens/check_in.dart';
 import 'package:check_in/ui/screens/profile_screen.dart';
 import 'package:check_in/ui/screens/start.dart';
@@ -89,8 +90,8 @@ class CustomNavBarWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: const BoxDecoration(
-          color: Colors.white,
+      decoration: BoxDecoration(
+          color: whiteColor,
           borderRadius: BorderRadius.only(topLeft: Radius.circular(40))),
       child: SizedBox(
         width: double.infinity,
@@ -105,20 +106,20 @@ class CustomNavBarWidget extends StatelessWidget {
                     showDialog(
                         context: context,
                         builder: (context) => AlertDialog(
-                              title: poppinsText("Please log in to use more features", 16,
-                                  FontWeight.w500, Colors.black),
+                              title: poppinsText(TempLanguage.logInForFeatures, 16,
+                                  FontWeight.w500, blackColor),
                               actions: [
                                 TextButton(
                                   onPressed: () {
                                     Get.off(() => StartView(isBack: true));
                                   },
-                                  child: const Text('Login'),
+                                  child: Text(TempLanguage.logIn),
                                 ),
                                 TextButton(
                                   onPressed: () {
                                     Navigator.pop(context);
                                   },
-                                  child: const Text('Cancel'),
+                                  child: Text(TempLanguage.cancel),
                                 ),
                               ],
                             ));
@@ -229,7 +230,7 @@ class _HomeState extends State<Home> {
           return showExitPopup(context);
         },
         hideNavigationBarWhenKeyboardShows: true,
-        backgroundColor: Colors.white,
+        backgroundColor: whiteColor,
         popAllScreensOnTapOfSelectedTab: true,
         confineInSafeArea: true,
         handleAndroidBackButtonPress: true,

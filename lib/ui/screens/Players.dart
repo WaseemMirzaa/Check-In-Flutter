@@ -1,5 +1,7 @@
 // ignore_for_file: must_be_immutable
 
+import 'package:check_in/core/constant/app_assets.dart';
+import 'package:check_in/core/constant/temp_language.dart';
 import 'package:check_in/ui/screens/player.dart';
 import 'package:check_in/utils/colors.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -49,16 +51,16 @@ class UserService {
       return snapshot.docs
           .where((d) =>
               // d.get("uid") != FirebaseAuth.instance.currentUser!.uid &&
-              d.get("checkedIn") == true &&
-              d.get("courtLat") == court.latitude &&
-              d.get("courtLng") == court.longitude)
+              d.get(UserKey.CHECKED_IN) == true &&
+              d.get(CourtKey.COURT_LAT) == court.latitude &&
+              d.get(CourtKey.COURT_LNG) == court.longitude)
           .map((doc) => User(
-                name: doc.data()['user name'],
-                email: doc.data()['email'],
-                about: doc.data()['about me'] ?? "",
-                court: doc.data()['home court'] ?? "",
-                photoUrl: doc.data()['photoUrl'] ?? "",
-                isVerified: doc.data()['isVerified'] ?? true,
+                name: doc.data()[UserKey.USER_NAME],
+                email: doc.data()[UserKey.EMAIL],
+                about: doc.data()[UserKey.ABOUT_ME] ?? "",
+                court: doc.data()[UserKey.HOME_COURT] ?? "",
+                photoUrl: doc.data()[UserKey.PHOTO_URL] ?? "",
+                isVerified: doc.data()[UserKey.IS_VERIFIED] ?? true,
               ))
           .toList();
     });
@@ -86,9 +88,9 @@ class _PlayersViewState extends State<PlayersView> {
   Future<int> getNumberOfPlayers() async {
     final snapshot = await _firestore.collection(Collections.USER).get();
     final users = snapshot.docs.where((doc) =>
-        doc.get("checkedIn") == true &&
-        doc.get("courtLat") == widget.courtLatLng.latitude &&
-        doc.get("courtLng") == widget.courtLatLng.longitude);
+        doc.get(UserKey.CHECKED_IN) == true &&
+        doc.get(CourtKey.COURT_LAT) == widget.courtLatLng.latitude &&
+        doc.get(CourtKey.COURT_LNG) == widget.courtLatLng.longitude);
     numberOfPLayers = users.length;
     setState(() {});
     return users.length;
@@ -104,9 +106,9 @@ class _PlayersViewState extends State<PlayersView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: whiteColor,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: whiteColor,
         leading: IconButton(
             padding: const EdgeInsets.only(left: 10),
             onPressed: () {
@@ -116,16 +118,16 @@ class _PlayersViewState extends State<PlayersView> {
               height: 2.1.h,
               width: 2.9.w,
               child: Image.asset(
-                'assets/images/Path 6.png',
+                AppAssets.LEFT_ARROW,
               ),
             )),
         centerTitle: true,
-        title: const Text(
-          'Players',
+        title: Text(
+          '${TempLanguage.player}s',
           style: TextStyle(
-            fontFamily: 'Poppins',
+            fontFamily: TempLanguage.poppins,
             fontSize: 20,
-            color: Color(0xff000000),
+            color: blackColor,
             fontWeight: FontWeight.w700,
           ),
           textAlign: TextAlign.right,
@@ -142,10 +144,10 @@ class _PlayersViewState extends State<PlayersView> {
                 padding: const EdgeInsets.only(top: 10),
                 child: Text(
                   widget.courtName ?? "",
-                  style: const TextStyle(
-                    fontFamily: 'Poppins',
+                  style: TextStyle(
+                    fontFamily: TempLanguage.poppins,
                     fontSize: 15,
-                    color: Color(0xff007a33),
+                    color: greenColor,
                     fontWeight: FontWeight.w500,
                   ),
                   textAlign: TextAlign.right,
@@ -156,9 +158,9 @@ class _PlayersViewState extends State<PlayersView> {
               Padding(
                 padding: const EdgeInsets.only(top: 10),
                 child: Text(
-                  "Number of Players: $numberOfPLayers",
-                  style: const TextStyle(
-                    fontFamily: 'Poppins',
+                  "${TempLanguage.numOfPlayers}$numberOfPLayers",
+                  style: TextStyle(
+                    fontFamily: TempLanguage.poppins,
                     fontSize: 15,
                     // color: Color(0xff007a33),
                     fontWeight: FontWeight.w500,
@@ -215,11 +217,11 @@ class _PlayersViewState extends State<PlayersView> {
                                   child: Container(
                                     height: 115,
                                     decoration: BoxDecoration(
-                                      color: const Color(0xffffffff),
+                                      color: whiteColor,
                                       borderRadius: BorderRadius.circular(6.0),
-                                      boxShadow: const [
+                                      boxShadow: [
                                         BoxShadow(
-                                          color: Color(0x29000000),
+                                          color: blackTranslucentColor,
                                           offset: Offset(0, 1),
                                           blurRadius: 6,
                                         ),
@@ -267,14 +269,14 @@ class _PlayersViewState extends State<PlayersView> {
                                                                     stackTrace) {
                                                               return Image
                                                                   .asset(
-                                                                'assets/images/logo-new.png', // The local placeholder image
+                                                                AppAssets.LOGO_NEW, // The local placeholder image
                                                                 fit:
                                                                     BoxFit.fill,
                                                               );
                                                             },
                                                           )
                                                         : Image.asset(
-                                                            "assets/images/logo-new.png",
+                                                            AppAssets.LOGO_NEW,
                                                             fit: BoxFit.fill,
                                                           ),
                                                   ),
@@ -292,7 +294,7 @@ class _PlayersViewState extends State<PlayersView> {
                                                                   .circle,
                                                               image: DecorationImage(
                                                                   image: AssetImage(
-                                                                      "assets/images/instagram-verification-badge.png"))),
+                                                                      AppAssets.INSTAGRAM_VERIFICATION))),
                                                         ),
                                                       ),
                                               ],
@@ -302,33 +304,36 @@ class _PlayersViewState extends State<PlayersView> {
                                         Text.rich(
                                           TextSpan(
                                               text: "${user.name}\n",
-                                              style: const TextStyle(
+                                              style: TextStyle(
                                                 height: 1.5,
-                                                fontFamily: 'Poppins',
+                                                fontFamily:
+                                                    TempLanguage.poppins,
                                                 fontSize: 13,
-                                                color: Color(0xff000000),
+                                                color: blackColor,
                                                 fontWeight: FontWeight.w600,
                                               ),
                                               children: [
                                                 TextSpan(
                                                   text:
                                                       "@${user.email.substring(0, user.email.indexOf('@'))}\n",
-                                                  style: const TextStyle(
-                                                    fontFamily: 'Poppins',
+                                                  style: TextStyle(
+                                                    fontFamily:
+                                                        TempLanguage.poppins,
                                                     fontSize: 9,
-                                                    color: Color(0xff9f9f9f),
+                                                    color: silverColor,
                                                   ),
                                                 ),
                                                 TextSpan(
-                                                  style: const TextStyle(
-                                                    fontFamily: 'Poppins',
+                                                  style: TextStyle(
+                                                    fontFamily:
+                                                        TempLanguage.poppins,
                                                     fontSize: 10,
-                                                    color: Color(0xff007a33),
+                                                    color: greenColor,
                                                     height: 1.7,
                                                   ),
                                                   children: [
-                                                    const TextSpan(
-                                                      text: 'Home Court :',
+                                                    TextSpan(
+                                                      text: '${TempLanguage.homeCourt} :',
                                                       style: TextStyle(
                                                         fontWeight:
                                                             FontWeight.w600,
@@ -338,9 +343,9 @@ class _PlayersViewState extends State<PlayersView> {
                                                       text: user.court == ""
                                                           ? ' ----'
                                                           : user.court,
-                                                      style: const TextStyle(
+                                                      style: TextStyle(
                                                         color:
-                                                            Color(0xff9f9f9f),
+                                                            silverColor,
                                                         fontWeight:
                                                             FontWeight.w500,
                                                       ),
@@ -359,7 +364,7 @@ class _PlayersViewState extends State<PlayersView> {
                                     const EdgeInsets.only(left: 20, right: 20),
                                 child: Container(
                                   height: 1,
-                                  color: const Color(0xff9f9f9f),
+                                  color: silverColor,
                                 ),
                               ),
                             ],
