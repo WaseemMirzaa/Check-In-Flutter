@@ -152,7 +152,7 @@ class _HomeState extends State<Home> {
 
   List<Widget> _buildScreens() {
     return [
-      const MessageScreen(),
+      MessageScreen(),
       const CheckIn(),
       const HistoryView(),
       const ProfileScreen(),

@@ -20,53 +20,37 @@ class GroupdetailScreen extends StatelessWidget {
         child: Column(
           children: [
             verticalGap(40),
-            groupName(),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                poppinsText('Basketall Group', 19, bold, blackColor),
+              ],
+            ),
             const Divider(thickness: 2),
             verticalGap(26),
-            groupImage(),
+            const CircleAvatar(
+              backgroundImage: NetworkImage(
+                  'https://wac-cdn.atlassian.com/dam/jcr:ba03a215-2f45-40f5-8540-b2015223c918/Max-R_Headshot%20(1).jpg?cdnVersion=1365'),
+              radius: 60,
+            ),
             verticalGap(60),
-            aboutGrouptxt(),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                poppinsText('About Group', 14, regular, blackColor),
+              ],
+            ),
             verticalGap(10),
             const Divider(thickness: 2),
-            aboutGroupdetail()
+            poppinsText(
+                'Money Market Account MC0628040080652344038362089 3I1QM5CGNW9V9IUCK3VZGFG6YDAFFGR9R9 capacity Multi-tiered Granite 256.00 Licensed Plastic Keyboard 274.00 Generic Plastic Computer 756.00 Shoes magenta indigo 78683 617 Real G’s move in silence like lasagna.',
+                14,
+                regular,
+                greyColor,
+                align: TextAlign.center)
           ],
         ),
       ),
     );
-  }
-
-  Widget groupName() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.start,
-      children: [
-        poppinsText('Basketall Group', 19, bold, blackColor),
-      ],
-    );
-  }
-
-  Widget groupImage() {
-    return const CircleAvatar(
-      backgroundImage: NetworkImage(
-          'https://wac-cdn.atlassian.com/dam/jcr:ba03a215-2f45-40f5-8540-b2015223c918/Max-R_Headshot%20(1).jpg?cdnVersion=1365'),
-      radius: 60,
-    );
-  }
-
-  Widget aboutGrouptxt() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.start,
-      children: [
-        poppinsText('About Group', 14, regular, blackColor),
-      ],
-    );
-  }
-
-  Widget aboutGroupdetail() {
-    return poppinsText(
-        'Money Market Account MC0628040080652344038362089 3I1QM5CGNW9V9IUCK3VZGFG6YDAFFGR9R9 capacity Multi-tiered Granite 256.00 Licensed Plastic Keyboard 274.00 Generic Plastic Computer 756.00 Shoes magenta indigo 78683 617 Real G’s move in silence like lasagna.',
-        14,
-        regular,
-        greyColor,
-        align: TextAlign.center);
   }
 }

@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:check_in/binding.dart';
 import 'package:check_in/ui/screens/splash.dart';
 import 'package:check_in/utils/colors.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -46,6 +47,7 @@ class MyApp extends StatelessWidget {
           theme: ThemeData(
             scaffoldBackgroundColor: whiteColor,
           ),
+          initialBinding: MyBinding(),
           home: const Splash(),
         );
       },

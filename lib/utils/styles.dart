@@ -3,10 +3,12 @@ import 'package:google_fonts/google_fonts.dart';
 
 Text poppinsText(
     String label, double fontSize, FontWeight fontWeight, Color color,
-    {TextAlign? align}) {
+    {TextAlign? align, TextOverflow? overflow}) {
   return Text(
     label,
     textAlign: align,
+    overflow: overflow,
+    
     style: GoogleFonts.poppins(
       fontWeight: fontWeight,
       fontSize: fontSize,
