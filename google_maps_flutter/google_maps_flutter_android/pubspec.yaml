@@ -23,7 +23,7 @@ dependencies:
   flutter_plugin_android_lifecycle: ^2.0.1
 #  google_maps_flutter_platform_interface: ^2.2.1
   google_maps_flutter_platform_interface:
-    path: /Users/user/Documents/OwnProjects/Check-In-Flutter/google_maps_flutter/google_maps_flutter_platform_interface
+    path: /Users/apple/StudioProjects/Check-In-Flutter/google_maps_flutter/google_maps_flutter_platform_interface
 
   stream_transform: ^2.0.0
 
@@ -37,4 +37,4 @@ dev_dependencies:
 ## FOR TESTING ONLY. DO NOT MERGE.
 #dependency_overrides:
 #  google_maps_flutter_platform_interface:
-#    path: E:/Git projects/Check-In-Flutter/google_maps_flutter/google_maps_flutter_platform_interface
+#    path: /Users/apple/StudioProjects/Check-In-Flutter/google_maps_flutter/google_maps_flutter_platform_interface

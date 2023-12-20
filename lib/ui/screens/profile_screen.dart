@@ -62,24 +62,18 @@ Future<List<UserModel>?> getUniqueCourtNameMaps() async {
   CollectionReference<Map<String, dynamic>> collectionReference = FirebaseFirestore.instance.collection('USER');
   DocumentSnapshot<Map<String, dynamic>> document = await collectionReference.doc(userController.userModel.value.uid).get();
 
-  Set<String> uniqueCourtNames = <String>{};
+  Set<int> uniqueCourtIds = <int>{};
   List<UserModel> resultMaps = [];
 
   List<Map<String, dynamic>> mapsArray = List<Map<String, dynamic>>.from(document.data()?['checkedCourts']);
 
 
   for (var map in mapsArray) {
-    String courtName = map['courtName'];
-    if (courtName == 'Morse Kelley Park' || courtName == 'Morse Kelly Park') {
-      if (!uniqueCourtNames.contains('Morse Kelley Park') && !uniqueCourtNames.contains('Morse Kelly Park')) {
-        resultMaps.add(UserModel.fromMap(map));
-        uniqueCourtNames.add(courtName);
-      }
-    } else {
-      if (!uniqueCourtNames.contains(courtName)) {
-        resultMaps.add(UserModel.fromMap(map));
-        uniqueCourtNames.add(courtName);
-      }
+    int courtId = map['id'] ?? 0;
+    bool isGold = map['isGolden'] ?? false;
+    if (isGold && courtId > 0 && !uniqueCourtIds.contains(courtId)) {
+      resultMaps.add(UserModel.fromMap(map));
+      uniqueCourtIds.add(courtId);
     }
   }
 
@@ -113,7 +107,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     UserModel currentUser =
         UserModel.fromMap(snapshot.data() as Map<String, dynamic>);
     userController.userModel.value = currentUser;
-    setState(() {});
+    if(mounted)setState(() {});
   }
 
   File? _imageFile;
@@ -346,7 +340,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     future: getUniqueCourtNameMaps(),
                                     builder: (context, snapshot){
                                       if (snapshot.connectionState == ConnectionState.waiting) {
-                                        return const Center(child: CircularProgressIndicator());
+                                        return const SizedBox(
+                                          height: 110,
+                                            width: 110,
+                                            child: Center(child: CircularProgressIndicator()));
                                       } else if (snapshot.hasData && snapshot.data != null) {
                                         return InkWell(
                                           onTap: (){
@@ -395,7 +392,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                         future: getUniqueCourtNameMaps(),
                                         builder: (context, snapshot){
                                           if (snapshot.connectionState == ConnectionState.waiting) {
-                                            return const Center(child: CircularProgressIndicator());
+                                            // return const Center(child: CircularProgressIndicator());
+                                            return const Center();
                                           } else if (snapshot.hasData && snapshot.data != null) {
                                             return poppinsText(
                                                 "${snapshot.data?.length ?? 0} Check ins", 12, FontWeight.normal, blackColor);
@@ -567,7 +565,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                 color:
                                                     silverColor)),
                                       ),
-                                      verticalGap(20),
+                                      // verticalGap(20),
                                       Container(
                                         height: 1,
                                         color: greyColor,

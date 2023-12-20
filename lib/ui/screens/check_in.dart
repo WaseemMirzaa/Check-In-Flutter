@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:developer';
 import 'package:check_in/auth_service.dart';
 import 'package:check_in/core/constant/app_assets.dart';
 import 'package:check_in/core/constant/constant.dart';
@@ -137,19 +138,26 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
     } else {
       index = 0;
     }
-    setState(() {});
+    if(mounted)setState(() {});
     // print(index);
   }
 
-  Future<Position> getCurrentLocation() async {
-    Position position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high);
-    // courtNames();
-    // print(currentLocation?.longitude);
-    setState(() {
-      currentLocation = position;
-      courtNames();
-    });
+  Future<Position?> getCurrentLocation() async {
+    try {
+      Position position = await Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.high);
+      // courtNames();
+      // print(currentLocation?.longitude);
+      if(mounted) {
+        setState(() {
+        currentLocation = position;
+        courtNames();
+      });
+      }
+    } catch (e) {
+      log('Enable location');
+      nbutils.toast('Enable your location');
+    }
 
     return Future.value(currentLocation);
   }
@@ -187,7 +195,7 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
           markers.add(marker);
           addHeatedMarkers(marker);
         }
-        setState(() {});
+        if(mounted)setState(() {});
       });
     } catch (e) {
       print(e);
@@ -246,10 +254,12 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
       addHeatedMarkers(marker);
     }
 
-    setState(() {
+    if(mounted) {
+      setState(() {
       // markers = markers;
       addLocationChangeListener();
     });
+    }
   }
 
   Future<PlacesSearchResponse?> getBasketballCourts() async {
@@ -285,7 +295,7 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
 
     WeightedLatLng point = WeightedLatLng(marker.position, weight: intensity);
 
-    setState(() => heatmapPoints.add(point));
+    if(mounted)setState(() => heatmapPoints.add(point));
   }
 
   void setHeatMapSize(int zoomLevel) {
@@ -297,7 +307,7 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
 
     print("Zoom Level = $zoomLevel");
     print("heatMapRadius.value = ${heatMapRadius.value}");
-    setState(() {});
+    if(mounted)setState(() {});
   }
 
   sendEmail(String name, String email, String homeCourt) async {
@@ -357,7 +367,7 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
         ),
       ),
     );
-    setState(() {});
+    if(mounted)setState(() {});
 
     return Future.value(currentLocation);
   }
@@ -376,7 +386,7 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
       distanceFilter:
           10, // Minimum distance (in meters) for location change updates
     ).listen((Position position) {
-      setState(() {
+      if(mounted)setState(() {
         currentLocation = position;
         checkIfWithinRadiusAndSetUserCourtInfo();
       });
@@ -403,10 +413,17 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
       if (withinRadius) {
         loc = marker.position;
         courtN = marker.infoWindow.title;
+        int id;
+        try {
+          id = int.parse(marker.markerId.value);
+        } catch (e) {
+          id = 0;
+        }
         courtInfo.addAll({
           CourtKey.COURT_LAT: loc!.latitude,
           CourtKey.COURT_LNG: loc!.longitude,
           CourtKey.COURT_NAME: courtN,
+            'id': id,
         });
         print(marker.infoWindow.snippet);
         if (marker.infoWindow.snippet == CourtKey.GOLDEN) {
@@ -490,13 +507,15 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
 
     //CheckIn Pressed
     if (index == 1) {
-      setState(() {
+      if(mounted) {
+        setState(() {
         courtInfo['checkInTime'] =
             DateFormat('HH:mm:ss').format(DateTime.now());
         courtInfo[CheckedCourts.checkInTimeStamp] = Timestamp.now();
 
         checkedInCourtName = courtInfo['courtName'];
       });
+      }
       print(courtInfo['isGolden']);
       bool val = await isCourtAlreadyStored(loc!.latitude, loc!.longitude);
       snap.collection(Collections.USER).doc(auth.currentUser!.uid).update({
@@ -558,13 +577,16 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
   }
 
   getUser() async {
-    DocumentSnapshot snapshot = await FirebaseFirestore.instance
-        .collection(Collections.USER)
-        .doc(FirebaseAuth.instance.currentUser?.uid ?? "")
-        .get();
-    userController.userModel.value =
-        UserModel.fromMap(snapshot.data() as Map<String, dynamic>);
-    print(userController.userModel.value);
+
+    if (FirebaseAuth.instance.currentUser != null) {
+      DocumentSnapshot snapshot = await FirebaseFirestore.instance
+              .collection(Collections.USER)
+              .doc(FirebaseAuth.instance.currentUser?.uid ?? "")
+              .get();
+      userController.userModel.value =
+          UserModel.fromMap(snapshot.data() as Map<String, dynamic>);
+      print(userController.userModel.value);
+    }
     // UserModel currentUser = UserModel.fromMap(snapshot.data() as Map<String, dynamic>);
   }
 
@@ -632,6 +654,9 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
                       screen: const TermsAndConditions(), withNavBar: false);
                 },
               ),
+              FirebaseAuth.instance.currentUser == null
+                  ? const SizedBox()
+              :
               userController.userModel.value.isVerified == null ||
                       userController.userModel.value.isVerified == true
                   ? const SizedBox()

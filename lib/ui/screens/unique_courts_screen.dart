@@ -12,24 +12,17 @@ Future<List<Map<String, dynamic>>> getUniqueCourtNameMaps() async {
   CollectionReference<Map<String, dynamic>> collectionReference = FirebaseFirestore.instance.collection('USER');
   DocumentSnapshot<Map<String, dynamic>> document = await collectionReference.doc(userController.userModel.value.uid).get();
 
-  Set<String> uniqueCourtNames = <String>{};
+  Set<int> uniqueCourtIds = <int>{};
   List<Map<String, dynamic>> resultMaps = [];
 
   List<Map<String, dynamic>> mapsArray = List<Map<String, dynamic>>.from(document.data()?['checkedCourts']);
 
   for (var map in mapsArray) {
-    String courtName = map['courtName'];
-    if (courtName == 'Morse Kelley Park' || courtName == 'Morse Kelly Park') {
-      if (!uniqueCourtNames.contains('Morse Kelley Park') && !uniqueCourtNames.contains('Morse Kelly Park')) {
-        map['courtName'] = 'Morse Kelley Park';
-        resultMaps.add(map);
-        uniqueCourtNames.add(courtName);
-      }
-    } else {
-      if (!uniqueCourtNames.contains(courtName)) {
-        resultMaps.add(map);
-        uniqueCourtNames.add(courtName);
-      }
+    int courtId = map['id'] ?? 0;
+    bool isGold = map['isGolden'] ?? false;
+    if (isGold && courtId > 0 && !uniqueCourtIds.contains(courtId)) {
+      resultMaps.add(map);
+      uniqueCourtIds.add(courtId);
     }
   }
 
@@ -142,20 +135,20 @@ class UniqueCourtsScreen extends StatelessWidget {
                                             fontWeight: FontWeight.w500,
                                           ),
                                         ),
-                                        const TextSpan(
-                                          text: 'Check in :',
-                                          style: TextStyle(
-                                            fontWeight: FontWeight.w600,
-                                          ),
-                                        ),
-                                        TextSpan(
-                                          text:
-                                          ' ${DateTimeUtils.time24to12(court["checkInTime"])} ',
-                                          style: const TextStyle(
-                                            color: Color(0xff9f9f9f),
-                                            fontWeight: FontWeight.w500,
-                                          ),
-                                        ),
+                                        // const TextSpan(
+                                        //   text: 'Check in :',
+                                        //   style: TextStyle(
+                                        //     fontWeight: FontWeight.w600,
+                                        //   ),
+                                        // ),
+                                        // TextSpan(
+                                        //   text:
+                                        //   ' ${DateTimeUtils.time24to12(court["checkInTime"])} ',
+                                        //   style: const TextStyle(
+                                        //     color: Color(0xff9f9f9f),
+                                        //     fontWeight: FontWeight.w500,
+                                        //   ),
+                                        // ),
                                       ],
                                     ),
                                   ]))
