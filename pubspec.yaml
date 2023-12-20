@@ -65,7 +65,7 @@ dependencies:
   percent_indicator: ^4.2.3
 
   google_maps_flutter:
-      path: /Users/apple/StudioProjects/Check-In-Flutter/google_maps_flutter/google_maps_flutter
+      path: /Users/user/Documents/OwnProjects/Check-In-Flutter/google_maps_flutter/google_maps_flutter
 #
 #  google_maps_flutter_platform_interface:
 #      path: /Users/apple/StudioProjects/Check-In-Flutter/google_maps_flutter/google_maps_flutter_platform_interface
