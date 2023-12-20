@@ -28,4 +28,5 @@ class CourtKey {
   static const CHECKED_COURTS = 'checkedCourts';
   static const GOLDEN = 'golden';
   static const NAME = 'name';
+  static const ID = 'id';
 }

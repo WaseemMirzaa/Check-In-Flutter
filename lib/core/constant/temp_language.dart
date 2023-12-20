@@ -1,4 +1,3 @@
-import 'package:check_in/ui/screens/privacy_policy.dart';
 
 class TempLanguage {
   static String get poppins => 'Poppins';
@@ -10,6 +9,7 @@ class TempLanguage {
   static String get nameCap => 'Name';
   static String get email => 'email';
   static String get emailCap => 'Email';
+  static String get goldenCourtsText => 'Golden Courts';
   static String get ok => 'OK';
   static String get history => 'History';
   static String get password => 'Password';
@@ -62,6 +62,7 @@ class TempLanguage {
   static String get error => "Error";
   static String get enterEmail => "Enter Email";
   static String get enterPassword => "Enter Password";
+  static String get wentWrong => 'Something went wrong';
 
   static String get dearUser => "Dear User";
   static String get alertContentText =>

@@ -284,8 +284,7 @@ class _PlayersViewState extends State<PlayersView> {
                                                 users[index].isVerified == false
                                                     ? const SizedBox()
                                                     : Align(
-                                                        alignment: Alignment
-                                                            .bottomRight,
+                                                        alignment: Alignment.bottomRight,
                                                         child: Container(
                                                           height: 5.h,
                                                           width: 10.w,

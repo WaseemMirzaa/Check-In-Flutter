@@ -43,7 +43,7 @@ class UserService {
   Stream<List<UserModel>> get users {
     return _firestore.collection(Collections.USER).snapshots().map((snapshot) {
       return snapshot.docs
-          .where((d) => d.get("uid") == FirebaseAuth.instance.currentUser!.uid)
+          .where((d) => d.get(UserKey.UID) == FirebaseAuth.instance.currentUser!.uid)
           .map((doc) => UserModel(
                 userName: doc.data()[UserKey.USER_NAME],
                 email: doc.data()[UserKey.EMAIL],
@@ -59,18 +59,18 @@ class UserService {
 }
 
 Future<List<UserModel>?> getUniqueCourtNameMaps() async {
-  CollectionReference<Map<String, dynamic>> collectionReference = FirebaseFirestore.instance.collection('USER');
+  CollectionReference<Map<String, dynamic>> collectionReference = FirebaseFirestore.instance.collection(Collections.USER);
   DocumentSnapshot<Map<String, dynamic>> document = await collectionReference.doc(userController.userModel.value.uid).get();
 
   Set<int> uniqueCourtIds = <int>{};
   List<UserModel> resultMaps = [];
 
-  List<Map<String, dynamic>> mapsArray = List<Map<String, dynamic>>.from(document.data()?['checkedCourts']);
+  List<Map<String, dynamic>> mapsArray = List<Map<String, dynamic>>.from(document.data()?[CourtKey.CHECKED_COURTS]);
 
 
   for (var map in mapsArray) {
-    int courtId = map['id'] ?? 0;
-    bool isGold = map['isGolden'] ?? false;
+    int courtId = map[CourtKey.ID] ?? 0;
+    bool isGold = map[CourtKey.IS_GOLDEN] ?? false;
     if (isGold && courtId > 0 && !uniqueCourtIds.contains(courtId)) {
       resultMaps.add(UserModel.fromMap(map));
       uniqueCourtIds.add(courtId);
@@ -370,7 +370,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                           ),
                                         );
                                       } else {
-                                        return const Center(child: Text('Something went wrong'),);
+                                        return Center(child: Text(TempLanguage.wentWrong),);
                                       }
                                     },
                                   ),
@@ -398,7 +398,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                             return poppinsText(
                                                 "${snapshot.data?.length ?? 0} Check ins", 12, FontWeight.normal, blackColor);
                                           } else {
-                                            return const Center(child: Text('Something went wrong'),);
+                                            return Center(child: Text(TempLanguage.wentWrong),);
                                           }
                                         },
                                       ),

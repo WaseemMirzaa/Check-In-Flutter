@@ -423,7 +423,7 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
           CourtKey.COURT_LAT: loc!.latitude,
           CourtKey.COURT_LNG: loc!.longitude,
           CourtKey.COURT_NAME: courtN,
-            'id': id,
+          CourtKey.ID: id,
         });
         print(marker.infoWindow.snippet);
         if (marker.infoWindow.snippet == CourtKey.GOLDEN) {
