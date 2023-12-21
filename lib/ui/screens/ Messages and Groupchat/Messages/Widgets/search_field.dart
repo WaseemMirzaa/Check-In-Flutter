@@ -4,7 +4,8 @@ import 'package:flutter/material.dart';
 
 class SearchField extends StatelessWidget {
   TextEditingController? controller;
-  SearchField({super.key, this.controller});
+  Function(String)? onchange;
+  SearchField({super.key, this.controller, this.onchange});
 
   @override
   Widget build(BuildContext context) {
@@ -14,6 +15,7 @@ class SearchField extends StatelessWidget {
         elevation: 8,
         borderRadius: BorderRadius.circular(40),
         child: TextFormField(
+          onChanged: onchange,
           controller: controller,
           decoration: InputDecoration(
               hintText: 'Search',

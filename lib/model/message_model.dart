@@ -15,13 +15,13 @@ class Messagemodel {
       this.image,
       this.timeStamp});
 
-  factory Messagemodel.fromJson(Map<String, dynamic> json, name, image) {
+  factory Messagemodel.fromJson(Map<String, dynamic> json, name, image,unread) {
     return Messagemodel(
         id: json['id'],
         name: name,
         image: image,
         lastmessage: json['lastMessage'],
-        unreadmsg: json['unreadMsg'],
+        unreadmsg: unread,
         isgroup: json['isGroup'],
         timeStamp: json['timeStamp']);
   }

@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:sizer/sizer.dart';
 
 import '../../../../../model/message_model.dart';
 import '../../../../../utils/Constants/images.dart';
@@ -25,7 +26,7 @@ class MessageListTile extends StatelessWidget {
       child: Material(
         elevation: 5,
         borderRadius: BorderRadius.circular(6),
-        child: GestureDetector(
+        child: InkWell(
           onTap: ontap,
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 15),
@@ -68,17 +69,21 @@ class MessageListTile extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                    Container(
-                      padding: const EdgeInsets.all(4),
-                      decoration: BoxDecoration(
-                          color: greenColor, shape: BoxShape.circle),
-                      child: poppinsText(
-                        message!.unreadmsg!,
-                        9,
-                        FontWeight.normal,
-                        whiteColor,
-                      ),
-                    ),
+                    message!.unreadmsg == "0"
+                        ? SizedBox(
+                            height: 4.h,
+                          )
+                        : Container(
+                            padding: const EdgeInsets.all(4),
+                            decoration: BoxDecoration(
+                                color: greenColor, shape: BoxShape.circle),
+                            child: poppinsText(
+                              message!.unreadmsg!,
+                              9,
+                              FontWeight.normal,
+                              whiteColor,
+                            ),
+                          ),
                     poppinsText(time, 10, FontWeight.normal,
                         const Color(0xFF161F3D).withOpacity(0.4))
                   ],

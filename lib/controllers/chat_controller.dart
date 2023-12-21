@@ -7,7 +7,7 @@ import '../Services/message_service.dart';
 
 class ChatController extends GetxController {
   final MessageService chatService;
-  final RxString id = ''.obs;
+  final RxString docId = ''.obs;
   String name = '';
   bool isgroup = false;
   RxBool issticker = true.obs;
@@ -23,7 +23,7 @@ class ChatController extends GetxController {
 
   //............. get all conversation
   Stream<List<Chatmodel>> getConversation() {
-    return chatService.getConversation(id.value);
+    return chatService.getConversation(docId.value, GlobalVariable.userid);
   }
 
 //.............. send chat
@@ -33,7 +33,7 @@ class ChatController extends GetxController {
     String message = chatfieldController.text;
     Chatmodel chatmodel = Chatmodel(id: uid, message: message, time: time);
 
-    await chatService.sendMessage(id.value, chatmodel);
+    await chatService.sendMessage(docId.value, chatmodel);
   }
 
   @override

@@ -26,7 +26,9 @@ class MessageScreen extends GetView<MessageController> {
       body: Column(
         children: [
           SearchField(
-            controller: controller.searchController,
+            onchange: (query) {
+              controller.searchQuery.value = query;
+            },
           ),
           verticalGap(20),
           Expanded(
@@ -53,16 +55,25 @@ class MessageScreen extends GetView<MessageController> {
                           itemCount: snapshot.data!.length,
                           itemBuilder: (context, index) {
                             var message = snapshot.data![index];
-                            return MessageListTile(
-                              message: snapshot.data![index],
-                              ontap: () {
-                                chatcontroller.id.value = message.id!;
-                                chatcontroller.name = message.name!;
-                                chatcontroller.isgroup = message.isgroup!;
-                                pushNewScreen(context,
-                                    screen: const ChatScreen());
-                              },
-                            );
+                            return Obx(() {
+                              if (snapshot.data![index].name!
+                                  .toLowerCase()
+                                  .contains(
+                                      controller.searchQuery.toLowerCase())) {
+                                return MessageListTile(
+                                  message: snapshot.data![index],
+                                  ontap: () {
+                                    chatcontroller.docId.value = message.id!;
+                                    chatcontroller.name = message.name!;
+                                    chatcontroller.isgroup = message.isgroup!;
+                                    pushNewScreen(context,
+                                        screen: const ChatScreen());
+                                  },
+                                );
+                              } else {
+                                return Container();
+                              }
+                            });
                           });
                     }
                   }))

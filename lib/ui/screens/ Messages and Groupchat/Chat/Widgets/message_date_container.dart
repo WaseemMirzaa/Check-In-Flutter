@@ -17,8 +17,10 @@ class MessageDateContainer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    String dateseperate = chat!.time!.split(' ')[1];
-    String time = DateTimeUtils.time24to12(dateseperate);
+    String timeseperate = chat!.time!.split(' ')[1];
+    String time = DateTimeUtils.time24to12(timeseperate);
+    // String dateseperate = chat!.time!.split(' ')[0];
+    // String date = DateTimeUtils.formatTimestamp(c);
     return Column(
       crossAxisAlignment:
           mymsg! ? CrossAxisAlignment.end : CrossAxisAlignment.start,

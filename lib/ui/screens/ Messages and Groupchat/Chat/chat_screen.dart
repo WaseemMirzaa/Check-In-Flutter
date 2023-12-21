@@ -75,8 +75,10 @@ class ChatScreen extends GetView<ChatController> {
               FocusManager.instance.primaryFocus?.unfocus();
             },
             sendmsgontap: () {
-              controller.sendMessage();
-              controller.chatfieldController.clear();
+              if (controller.chatfieldController.text.isNotEmpty) {
+                controller.sendMessage();
+                controller.chatfieldController.clear();
+              }
             },
           ),
           Obx(() => Offstage(
