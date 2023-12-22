@@ -3,7 +3,7 @@ class Messagemodel {
   String? name;
   String? image;
   String? lastmessage;
-  String? unreadmsg;
+  num? unreadmsg;
   bool? isgroup;
   String? timeStamp;
   Messagemodel(
@@ -15,7 +15,8 @@ class Messagemodel {
       this.image,
       this.timeStamp});
 
-  factory Messagemodel.fromJson(Map<String, dynamic> json, name, image,unread) {
+  factory Messagemodel.fromJson(
+      Map<String, dynamic> json, name, image, unread) {
     return Messagemodel(
         id: json['id'],
         name: name,

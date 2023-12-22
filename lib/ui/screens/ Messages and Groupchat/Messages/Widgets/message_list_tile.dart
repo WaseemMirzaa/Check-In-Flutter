@@ -1,5 +1,6 @@
 // ignore_for_file: must_be_immutable
 
+import 'package:check_in/Services/message_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:sizer/sizer.dart';
@@ -54,13 +55,23 @@ class MessageListTile extends StatelessWidget {
                             ),
                             horizontalGap(8)
                           ],
-                          poppinsText(
-                              message!.name!, 15, FontWeight.bold, blackColor,
-                              overflow: TextOverflow.ellipsis),
+                          SizedBox(
+                            width: 45.w,
+                            child: poppinsText(
+                                message!.name!, 15, FontWeight.bold, blackColor,
+                                overflow: TextOverflow.ellipsis),
+                          ),
                         ],
                       ),
-                      poppinsText(message!.lastmessage!, 12, FontWeight.bold,
-                          blackColor.withOpacity(0.65))
+                      SizedBox(
+                        width: 50.w,
+                        child: poppinsText(
+                          message!.lastmessage!,
+                          12,
+                          FontWeight.bold,
+                          blackColor.withOpacity(0.65),
+                        ),
+                      )
                     ],
                   ),
                 ),
@@ -69,16 +80,16 @@ class MessageListTile extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                    message!.unreadmsg == "0"
+                    message!.unreadmsg == 0
                         ? SizedBox(
-                            height: 4.h,
+                            height: 3.h,
                           )
                         : Container(
                             padding: const EdgeInsets.all(4),
                             decoration: BoxDecoration(
                                 color: greenColor, shape: BoxShape.circle),
                             child: poppinsText(
-                              message!.unreadmsg!,
+                              MessageService().unreadCount.toString(),
                               9,
                               FontWeight.normal,
                               whiteColor,

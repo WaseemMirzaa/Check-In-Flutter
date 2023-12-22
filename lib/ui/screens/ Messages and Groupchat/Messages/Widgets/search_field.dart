@@ -15,6 +15,7 @@ class SearchField extends StatelessWidget {
         elevation: 8,
         borderRadius: BorderRadius.circular(40),
         child: TextFormField(
+          
           onChanged: onchange,
           controller: controller,
           decoration: InputDecoration(
