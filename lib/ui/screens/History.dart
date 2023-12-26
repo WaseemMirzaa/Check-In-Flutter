@@ -83,7 +83,7 @@ class _HistoryViewState extends State<HistoryView> {
       ),
       backgroundColor: Colors.white,
       body: dataArray.isEmpty
-          ? const Center(child: CircularProgressIndicator(),)
+          ? Center(child: Text(TempLanguage.noDataFound),)
           : Padding(
         padding: const EdgeInsets.only(top: 20),
         child: ListView.builder(

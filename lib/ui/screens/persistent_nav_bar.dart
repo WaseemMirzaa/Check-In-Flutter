@@ -19,15 +19,17 @@ class BottomNav {
   String icon;
   Color iconColor;
   Color boxColor;
+  String label;
 
   BottomNav({
     required this.icon,
     required this.iconColor,
     required this.boxColor,
+    required this.label
   });
 
   getBottomNavItem() {
-    return PersistentBottomNavBarItem(
+    return BottomNavigationBarItem(
       icon: Container(
         height: 36,
         width: 36,
@@ -43,6 +45,7 @@ class BottomNav {
           ),
         ),
       ),
+      label: label
     );
   }
 }
@@ -145,17 +148,17 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   final NavBarController navBarController = Get.put(NavBarController());
 
-  List<Widget> _buildScreens() {
-    return [
-      const CheckIn(),
-      const HistoryView(),
-      KeyedSubtree(key: UniqueKey(), child: const ProfileScreen()),
-    ];
-  }
+  final List<Widget> _buildScreens = [
+    const CheckIn(),
+    const HistoryView(),
+    const ProfileScreen()
+    //KeyedSubtree(key: UniqueKey(), child: const ProfileScreen()),
+  ];
 
-  List<PersistentBottomNavBarItem> _navBarsItems() {
+  List<BottomNavigationBarItem> _navBarsItems() {
     return [
       BottomNav(
+        label: 'Home',
         boxColor:
             navBarController.controller.index == 0 ? greenColor : whiteColor,
         icon: "Group 12548",
@@ -163,6 +166,7 @@ class _HomeState extends State<Home> {
             navBarController.controller.index == 0 ? whiteColor : blackColor,
       ).getBottomNavItem(),
       BottomNav(
+        label: 'History',
         boxColor:
             navBarController.controller.index == 1 ? greenColor : whiteColor,
         icon: "Icon awesome-history",
@@ -170,6 +174,7 @@ class _HomeState extends State<Home> {
             navBarController.controller.index == 1 ? whiteColor : blackColor,
       ).getBottomNavItem(),
       BottomNav(
+        label: 'Profile',
         boxColor:
             navBarController.controller.index == 2 ? greenColor : whiteColor,
         icon: "Icon material-person",
@@ -193,38 +198,59 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
-        onWillPop: _onWillPop,
-        child: PersistentTabView.custom(
-            context,
-            controller: navBarController.controller,
-            itemCount: _navBarsItems().length,
-            // This is required in case of custom style! Pass the number of items for the nav bar.
-            screens: _buildScreens(),
-            navBarHeight: 60,
-            onWillPop: (context) {
-              return showExitPopup(context);
+      onWillPop: _onWillPop,
+      child: Obx((){
+        return Scaffold(
+          body: _buildScreens[navBarController.currentIndex.value],
+          bottomNavigationBar: BottomNavigationBar(
+            items: _navBarsItems(),
+            currentIndex: navBarController.currentIndex.value,
+            //selectedItemColor: Colors.amber[800],
+            showSelectedLabels: false,
+            showUnselectedLabels: false,
+            onTap: (index) {
+              navBarController.currentIndex.value = index;
+              navBarController.controller.index = index;
             },
-            hideNavigationBarWhenKeyboardShows: true,
-            backgroundColor: whiteColor,
-            popAllScreensOnTapOfSelectedTab: true,
-            stateManagement: false,
-            confineInSafeArea: true,
-            handleAndroidBackButtonPress: true,
-            customWidget: (navBarEssentials) => Container(
-              decoration: const BoxDecoration(
-                borderRadius: BorderRadius.only(topLeft: Radius.circular(40)),
-              ),
-              child: Obx(() => CustomNavBarWidget(
-                items: _navBarsItems(),
-                selectedIndex: navBarController.currentIndex.value,
-                onItemSelected: (index) {
-                  navBarController.currentIndex.value = index;
-                  navBarController.controller.index = index;
-                  log('${navBarController.controller.index}');
-                },
-              ),)
-            ),
           ),
         );
+      }),
+    );
+
+    // return WillPopScope(
+    //     onWillPop: _onWillPop,
+    //     child: PersistentTabView.custom(
+    //         context,
+    //         controller: navBarController.controller,
+    //         itemCount: _navBarsItems().length,
+    //         // This is required in case of custom style! Pass the number of items for the nav bar.
+    //         screens: _buildScreens(),
+    //         navBarHeight: 60,
+    //         onWillPop: (context) {
+    //           return showExitPopup(context);
+    //         },
+    //         resizeToAvoidBottomInset: true,
+    //         hideNavigationBarWhenKeyboardShows: true,
+    //         backgroundColor: whiteColor,
+    //         popAllScreensOnTapOfSelectedTab: true,
+    //         stateManagement: false,
+    //         confineInSafeArea: true,
+    //         handleAndroidBackButtonPress: true,
+    //         customWidget: (navBarEssentials) => Container(
+    //           decoration: const BoxDecoration(
+    //             borderRadius: BorderRadius.only(topLeft: Radius.circular(40)),
+    //           ),
+    //           child: Obx(() => CustomNavBarWidget(
+    //             items: _navBarsItems(),
+    //             selectedIndex: navBarController.currentIndex.value,
+    //             onItemSelected: (index) {
+    //               navBarController.currentIndex.value = index;
+    //               navBarController.controller.index = index;
+    //               log('${navBarController.controller.index}');
+    //             },
+    //           ),)
+    //         ),
+    //       ),
+    //     );
   }
 }

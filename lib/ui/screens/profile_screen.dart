@@ -8,6 +8,7 @@ import 'package:check_in/model/user_modal.dart';
 import 'package:check_in/model/user_modal.dart';
 import 'package:check_in/ui/screens/add_home_court.dart';
 import 'package:check_in/ui/screens/unique_courts_screen.dart';
+import 'package:check_in/ui/widgets/about_section.dart';
 import 'package:check_in/ui/widgets/common_button.dart';
 import 'package:check_in/utils/colors.dart';
 import 'package:check_in/utils/styles.dart';
@@ -65,19 +66,20 @@ Future<List<UserModel>?> getUniqueCourtNameMaps() async {
   Set<int> uniqueCourtIds = <int>{};
   List<UserModel> resultMaps = [];
 
-  List<Map<String, dynamic>> mapsArray = List<Map<String, dynamic>>.from(document.data()?[CourtKey.CHECKED_COURTS]);
-
-
-  for (var map in mapsArray) {
-    int courtId = map[CourtKey.ID] ?? 0;
-    bool isGold = map[CourtKey.IS_GOLDEN] ?? false;
-    if (isGold && courtId > 0 && !uniqueCourtIds.contains(courtId)) {
-      resultMaps.add(UserModel.fromMap(map));
-      uniqueCourtIds.add(courtId);
+  try {
+    List<Map<String, dynamic>> mapsArray = List<Map<String, dynamic>>.from(document.data()?[CourtKey.CHECKED_COURTS]);
+    for (var map in mapsArray) {
+      int courtId = map[CourtKey.ID] ?? 0;
+      bool isGold = map[CourtKey.IS_GOLDEN] ?? false;
+      if (isGold && courtId > 0 && !uniqueCourtIds.contains(courtId)) {
+        resultMaps.add(UserModel.fromMap(map));
+        uniqueCourtIds.add(courtId);
+      }
     }
+    return resultMaps;
+  } catch (e) {
+   return null;
   }
-
-  return resultMaps;
 }
 
 Future<int> getGoldenLocationsCount() async {
@@ -162,8 +164,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   String mail = FirebaseAuth.instance.currentUser?.email as String;
   // String mail = FirebaseAuth.instance.currentUser?.email ?? "";
-  bool tapped = false;
-  String? aboutMe;
+
 
   @override
   void initState() {
@@ -369,8 +370,27 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                             darkYellowColor,
                                           ),
                                         );
-                                      } else {
+                                      } else if (snapshot.hasError){
                                         return Center(child: Text(TempLanguage.wentWrong),);
+                                      } else {
+                                        return CircularPercentIndicator(
+                                          radius: 55.0,
+                                          lineWidth: 8.0,
+                                          animation: true,
+                                          percent: (0 / (totalCount ?? 10)).clamp(0.0, 1.0),
+                                          center: const Text(
+                                            "0\nCheck ins",
+                                            textAlign: TextAlign.center,
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 18.0,
+                                            ),
+                                          ),
+                                          circularStrokeCap:
+                                          CircularStrokeCap.round,
+                                          progressColor:
+                                          darkYellowColor,
+                                        );
                                       }
                                     },
                                   ),
@@ -393,12 +413,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                         builder: (context, snapshot){
                                           if (snapshot.connectionState == ConnectionState.waiting) {
                                             // return const Center(child: CircularProgressIndicator());
-                                            return const Center();
+                                            return const Center(child: CircularProgressIndicator());
                                           } else if (snapshot.hasData && snapshot.data != null) {
                                             return poppinsText(
                                                 "${snapshot.data?.length ?? 0} Check ins", 12, FontWeight.normal, blackColor);
-                                          } else {
+                                          } else if (snapshot.hasError) {
                                             return Center(child: Text(TempLanguage.wentWrong),);
+                                          } else {
+                                            return poppinsText(
+                                                "0 Check ins", 12, FontWeight.normal, blackColor);
                                           }
                                         },
                                       ),
@@ -412,171 +435,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         const SizedBox(
                           height: 15,
                         ),
-                        Column(
-                          children: [
-                            poppinsText(TempLanguage.homeCourt, 14, semiBold, greenColor),
-                            verticalGap(0.8.h),
-                            Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 30),
-                              child: Column(
-                                children: [
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      poppinsText(
-                                          (userController.userModel.value
-                                                  .homeCourt.isEmptyOrNull)
-                                              ? ""
-                                              : userController.userModel.value
-                                                      .homeCourt ??
-                                                  "",
-                                          14,
-                                          semiBold,
-                                          blackColor),
-                                      InkWell(
-                                        onTap: () {
-                                          pushNewScreen(context,
-                                              screen: const AddHomeCourt(),
-                                              withNavBar: false);
-                                        },
-                                        child: SizedBox(
-                                          height: 2.3.h,
-                                          width: 4.47.w,
-                                          child: Image.asset(
-                                              AppAssets.MAP_PIN),
-                                        ),
-                                      )
-                                    ],
-                                  ),
-                                  verticalGap(1.3.h),
-                                  Container(
-                                    height: 1,
-                                    color: greyColor,
-                                  ),
-                                ],
-                              ),
-                            ),
-                            SizedBox(
-                              height: 3.5.h,
-                            ),
-                            Column(
-                              // alignment: Alignment.topCenter,
-                              children: [
-                                Container(
-                                  padding: const EdgeInsets.only(
-                                    left: 30,
-                                    right: 30,
-                                  ),
-                                  height: 20.h,
-                                  decoration: BoxDecoration(
-                                    color: whiteColor,
-                                    borderRadius: const BorderRadius.only(
-                                        topLeft: Radius.circular(10),
-                                        topRight: Radius.circular(10)),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: greyColor.withOpacity(0.2),
-                                        blurRadius: 1,
-                                        //   spreadRadius: -12,
-                                        offset: const Offset(0,
-                                            -3), // changes position of shadow
-                                      ),
-                                    ],
-                                  ),
-                                  child: Column(
-                                    children: [
-                                      Container(
-                                        width: 100,
-                                        height: 0.5.h,
-                                        decoration: BoxDecoration(
-                                            color: greenColor,
-                                            borderRadius:
-                                                const BorderRadius.only(
-                                                    bottomLeft:
-                                                        Radius.circular(5),
-                                                    bottomRight:
-                                                        Radius.circular(5))),
-                                      ),
-                                      SizedBox(
-                                        height: 2.h,
-                                      ),
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          poppinsText(TempLanguage.aboutMe, 14, semiBold,
-                                              blackColor),
-                                          InkWell(
-                                            onTap: () => setState(() {
-                                              tapped = !tapped;
-                                            }),
-                                            child: Padding(
-                                              padding: const EdgeInsets.only(
-                                                  left: 8),
-                                              child: SizedBox(
-                                                height: 1.8.h,
-                                                width: 4.w,
-                                                child: Image.asset(
-                                                    AppAssets.EDIT_ICON),
-                                              ),
-                                            ),
-                                          )
-                                        ],
-                                      ),
-                                      TextField(
-                                        maxLines: userController.userModel.value
-                                                    .isVerified ==
-                                                false
-                                            ? 3
-                                            : 5,
-                                        onChanged: (val) {
-                                          setState(() {
-                                            aboutMe = val;
-                                            FirebaseFirestore.instance
-                                                .collection(Collections.USER)
-                                                .doc(FirebaseAuth
-                                                    .instance.currentUser!.uid)
-                                                .update({UserKey.ABOUT_ME: aboutMe});
-                                          });
-                                        },
-                                        decoration: InputDecoration(
-                                            border: InputBorder.none,
-                                            enabled: tapped,
-                                            enabledBorder: InputBorder.none,
-                                            disabledBorder: InputBorder.none,
-                                            errorBorder: InputBorder.none,
-                                            focusedBorder: InputBorder.none,
-                                            focusedErrorBorder:
-                                                InputBorder.none,
-                                            hintText: (userController
-                                                    .userModel
-                                                    .value
-                                                    .aboutMe
-                                                    .isEmptyOrNull)
-                                                ? TempLanguage.tellUsAboutGame
-                                                : userController.userModel.value
-                                                        .aboutMe ??
-                                                    "",
-                                            helperStyle: GoogleFonts.poppins(
-                                                fontSize: 14,
-                                                fontWeight: regular,
-                                                color:
-                                                    silverColor)),
-                                      ),
-                                      // verticalGap(20),
-                                      Container(
-                                        height: 1,
-                                        color: greyColor,
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            )
-                          ],
-                        ),
+                        const AboutSection(),
                       ],
                     )
                   : const Center(child: CircularProgressIndicator()),

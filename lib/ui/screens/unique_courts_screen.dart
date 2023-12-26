@@ -17,22 +17,26 @@ Future<List<Map<String, dynamic>>> getUniqueCourtNameMaps() async {
   DocumentSnapshot<Map<String, dynamic>> document =
       await collectionReference.doc(userController.userModel.value.uid).get();
 
-  Set<int> uniqueCourtIds = <int>{};
-  List<Map<String, dynamic>> resultMaps = [];
+  try {
+    Set<int> uniqueCourtIds = <int>{};
+    List<Map<String, dynamic>> resultMaps = [];
 
-  List<Map<String, dynamic>> mapsArray =
-      List<Map<String, dynamic>>.from(document.data()?[CourtKey.CHECKED_COURTS]);
+    List<Map<String, dynamic>> mapsArray =
+          List<Map<String, dynamic>>.from(document.data()?[CourtKey.CHECKED_COURTS]);
 
-  for (var map in mapsArray) {
-    int courtId = map[CourtKey.ID] ?? 0;
-    bool isGold = map[CourtKey.IS_GOLDEN] ?? false;
-    if (isGold && courtId > 0 && !uniqueCourtIds.contains(courtId)) {
-      resultMaps.add(map);
-      uniqueCourtIds.add(courtId);
-    }
+    for (var map in mapsArray) {
+        int courtId = map[CourtKey.ID] ?? 0;
+        bool isGold = map[CourtKey.IS_GOLDEN] ?? false;
+        if (isGold && courtId > 0 && !uniqueCourtIds.contains(courtId)) {
+          resultMaps.add(map);
+          uniqueCourtIds.add(courtId);
+        }
+      }
+
+    return resultMaps;
+  } catch (e) {
+    return [];
   }
-
-  return resultMaps;
 }
 
 class UniqueCourtsScreen extends StatelessWidget {
@@ -71,7 +75,7 @@ class UniqueCourtsScreen extends StatelessWidget {
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasData && snapshot.data != null) {
+          } else if (snapshot.hasData && snapshot.data != null && snapshot.data!.isNotEmpty) {
             return ListView.builder(
                 itemCount: snapshot.data?.length ?? 0,
                 itemBuilder: (context, int index) {
@@ -175,9 +179,13 @@ class UniqueCourtsScreen extends StatelessWidget {
                     ],
                   );
                 });
-          } else {
+          } else if (snapshot.hasError) {
             return Center(
               child: Text(TempLanguage.wentWrong),
+            );
+          } else {
+            return Center(
+              child: Text(TempLanguage.noDataFound),
             );
           }
         },
