@@ -5,7 +5,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:nb_utils/nb_utils.dart' hide greenColor, blackColor, whiteColor;
 import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
 import 'package:sizer/sizer.dart';
-import 'package:get/get.dart';
 import '../../controllers/user_controller.dart';
 import '../../core/constant/app_assets.dart';
 import '../../core/constant/constant.dart';
@@ -16,7 +15,9 @@ import '../../utils/styles.dart';
 import '../screens/add_home_court.dart';
 
 class AboutSection extends StatefulWidget {
-  const AboutSection({Key? key}) : super(key: key);
+  final UserController userController;
+  const AboutSection({Key? key, required this.userController})
+      : super(key: key);
 
   @override
   State<AboutSection> createState() => _AboutSectionState();
@@ -24,9 +25,15 @@ class AboutSection extends StatefulWidget {
 
 class _AboutSectionState extends State<AboutSection> {
   bool tapped = false;
-  String? aboutMe;
-  UserController userController = Get.find<UserController>();
-
+  String aboutMe = '';
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    aboutMe = (widget.userController.userModel.value.aboutMe.isEmptyOrNull)
+        ? TempLanguage.tellUsAboutGame
+        : widget.userController.userModel.value.aboutMe ?? "";
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -35,35 +42,30 @@ class _AboutSectionState extends State<AboutSection> {
         poppinsText(TempLanguage.homeCourt, 14, semiBold, greenColor),
         verticalGap(0.8.h),
         Padding(
-          padding:
-          const EdgeInsets.symmetric(horizontal: 30),
+          padding: const EdgeInsets.symmetric(horizontal: 30),
           child: Column(
             children: [
               Row(
-                mainAxisAlignment:
-                MainAxisAlignment.spaceBetween,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   poppinsText(
-                      (userController.userModel.value
-                          .homeCourt.isEmptyOrNull)
+                      (widget.userController.userModel.value.homeCourt
+                              .isEmptyOrNull)
                           ? ""
-                          : userController.userModel.value
-                          .homeCourt ??
-                          "",
+                          : widget.userController.userModel.value.homeCourt ??
+                              "",
                       14,
                       semiBold,
                       blackColor),
                   InkWell(
                     onTap: () {
                       pushNewScreen(context,
-                          screen: const AddHomeCourt(),
-                          withNavBar: false);
+                          screen: const AddHomeCourt(), withNavBar: false);
                     },
                     child: SizedBox(
                       height: 2.3.h,
                       width: 4.47.w,
-                      child: Image.asset(
-                          AppAssets.MAP_PIN),
+                      child: Image.asset(AppAssets.MAP_PIN),
                     ),
                   )
                 ],
@@ -98,8 +100,7 @@ class _AboutSectionState extends State<AboutSection> {
                     color: greyColor.withOpacity(0.2),
                     blurRadius: 1,
                     //   spreadRadius: -12,
-                    offset: const Offset(0,
-                        -3), // changes position of shadow
+                    offset: const Offset(0, -3), // changes position of shadow
                   ),
                 ],
               ),
@@ -110,55 +111,52 @@ class _AboutSectionState extends State<AboutSection> {
                     height: 0.5.h,
                     decoration: BoxDecoration(
                         color: greenColor,
-                        borderRadius:
-                        const BorderRadius.only(
-                            bottomLeft:
-                            Radius.circular(5),
-                            bottomRight:
-                            Radius.circular(5))),
+                        borderRadius: const BorderRadius.only(
+                            bottomLeft: Radius.circular(5),
+                            bottomRight: Radius.circular(5))),
                   ),
                   SizedBox(
                     height: 2.h,
                   ),
                   Row(
-                    mainAxisAlignment:
-                    MainAxisAlignment.spaceBetween,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      poppinsText(TempLanguage.aboutMe, 14, semiBold,
-                          blackColor),
+                      poppinsText(
+                          TempLanguage.aboutMe, 14, semiBold, blackColor),
                       InkWell(
                         onTap: () => setState(() {
                           tapped = !tapped;
                         }),
                         child: Padding(
-                          padding: const EdgeInsets.only(
-                              left: 8),
+                          padding: const EdgeInsets.only(left: 8),
                           child: SizedBox(
                             height: 1.8.h,
                             width: 4.w,
-                            child: Image.asset(
-                                AppAssets.EDIT_ICON),
+                            child: Image.asset(AppAssets.EDIT_ICON),
                           ),
                         ),
                       )
                     ],
                   ),
                   TextField(
-                    maxLines: userController.userModel.value
-                        .isVerified ==
-                        false
-                        ? 3
-                        : 5,
-                    onChanged: (val) {
+                    textInputAction: TextInputAction.done,
+                    onSubmitted: (value) {
                       setState(() {
-                        aboutMe = val;
+                        // userController.userModel.value.
+                        aboutMe = value;
                         FirebaseFirestore.instance
                             .collection(Collections.USER)
-                            .doc(FirebaseAuth
-                            .instance.currentUser!.uid)
+                            .doc(FirebaseAuth.instance.currentUser!.uid)
                             .update({UserKey.ABOUT_ME: aboutMe});
                       });
+                      // aboutMe = value;
                     },
+                    maxLines:
+                        widget.userController.userModel.value.isVerified ==
+                                false
+                            ? 3
+                            : 5,
+                    onChanged: (val) {},
                     decoration: InputDecoration(
                         border: InputBorder.none,
                         enabled: tapped,
@@ -166,22 +164,12 @@ class _AboutSectionState extends State<AboutSection> {
                         disabledBorder: InputBorder.none,
                         errorBorder: InputBorder.none,
                         focusedBorder: InputBorder.none,
-                        focusedErrorBorder:
-                        InputBorder.none,
-                        hintText: (userController
-                            .userModel
-                            .value
-                            .aboutMe
-                            .isEmptyOrNull)
-                            ? TempLanguage.tellUsAboutGame
-                            : userController.userModel.value
-                            .aboutMe ??
-                            "",
+                        focusedErrorBorder: InputBorder.none,
+                        hintText: aboutMe,
                         helperStyle: GoogleFonts.poppins(
                             fontSize: 14,
                             fontWeight: regular,
-                            color:
-                            silverColor)),
+                            color: silverColor)),
                   ),
                   // verticalGap(20),
                   Container(

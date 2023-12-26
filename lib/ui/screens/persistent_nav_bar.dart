@@ -21,32 +21,30 @@ class BottomNav {
   Color boxColor;
   String label;
 
-  BottomNav({
-    required this.icon,
-    required this.iconColor,
-    required this.boxColor,
-    required this.label
-  });
+  BottomNav(
+      {required this.icon,
+      required this.iconColor,
+      required this.boxColor,
+      required this.label});
 
   getBottomNavItem() {
     return BottomNavigationBarItem(
-      icon: Container(
-        height: 36,
-        width: 36,
-        decoration: BoxDecoration(shape: BoxShape.circle, color: boxColor),
-        child: Center(
-          child: SizedBox(
-            height: 19,
-            width: 19,
-            child: SvgPicture.asset(
-              "assets/images/$icon.svg",
-              color: iconColor,
+        icon: Container(
+          height: 36,
+          width: 36,
+          decoration: BoxDecoration(shape: BoxShape.circle, color: boxColor),
+          child: Center(
+            child: SizedBox(
+              height: 19,
+              width: 19,
+              child: SvgPicture.asset(
+                "assets/images/$icon.svg",
+                color: iconColor,
+              ),
             ),
           ),
         ),
-      ),
-      label: label
-    );
+        label: label);
   }
 }
 
@@ -93,7 +91,7 @@ class CustomNavBarWidget extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
           color: whiteColor,
-          borderRadius: BorderRadius.only(topLeft: Radius.circular(40))),
+          borderRadius: const BorderRadius.only(topLeft: Radius.circular(40))),
       child: SizedBox(
         width: double.infinity,
         child: Row(
@@ -199,7 +197,7 @@ class _HomeState extends State<Home> {
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: _onWillPop,
-      child: Obx((){
+      child: Obx(() {
         return Scaffold(
           body: _buildScreens[navBarController.currentIndex.value],
           bottomNavigationBar: BottomNavigationBar(

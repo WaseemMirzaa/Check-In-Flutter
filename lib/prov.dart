@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_google_places/flutter_google_places.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geocoding/geocoding.dart';
-import 'package:get/get.dart';
 
 class GetxMaps with ChangeNotifier {
   late LatLng _gpsactual;
-  LatLng _initialposition = LatLng(33.713335, 73.061926);
+  LatLng _initialposition = const LatLng(33.713335, 73.061926);
   bool activegps = true;
   TextEditingController locationController = TextEditingController();
   late GoogleMapController _mapController;

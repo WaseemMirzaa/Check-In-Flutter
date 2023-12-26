@@ -60,7 +60,7 @@ class CourtsParser {
           final location = CourtModel(
             city: doc.data()['city'],
             street: doc.data()['street'],
-            placeId: doc.data()['placeId'],
+            placeId: doc.data()['placeId']??'',
             latitude: doc.data()['latitude'],
             longitude: doc.data()['longitude'],
             url: doc.data()['url'],

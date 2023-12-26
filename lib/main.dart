@@ -9,6 +9,8 @@ import 'package:sizer/sizer.dart';
 
 import 'firebase_options.dart';
 
+List<Map<String, dynamic>> courtlist = [];
+
 String? con;
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -23,7 +25,7 @@ void main() async {
   }
   // SharedPreferences prefs = await SharedPreferences.getInstance();
   // var email = prefs.getString('email');
-  runApp(const MyApp());
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {

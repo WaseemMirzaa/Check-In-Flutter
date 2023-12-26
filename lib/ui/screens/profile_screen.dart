@@ -5,11 +5,8 @@ import 'package:check_in/core/constant/app_assets.dart';
 import 'package:check_in/core/constant/constant.dart';
 import 'package:check_in/core/constant/temp_language.dart';
 import 'package:check_in/model/user_modal.dart';
-import 'package:check_in/model/user_modal.dart';
-import 'package:check_in/ui/screens/add_home_court.dart';
 import 'package:check_in/ui/screens/unique_courts_screen.dart';
 import 'package:check_in/ui/widgets/about_section.dart';
-import 'package:check_in/ui/widgets/common_button.dart';
 import 'package:check_in/utils/colors.dart';
 import 'package:check_in/utils/styles.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -17,17 +14,14 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:nb_utils/nb_utils.dart' as nbutils;
 import 'package:percent_indicator/circular_percent_indicator.dart';
 // import 'package:percent_indicator/circular_percent_indicator.dart';
-import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
 import 'package:sizer/sizer.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../auth_service.dart';
 import '../../utils/gaps.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({Key? key}) : super(key: key);
@@ -44,7 +38,8 @@ class UserService {
   Stream<List<UserModel>> get users {
     return _firestore.collection(Collections.USER).snapshots().map((snapshot) {
       return snapshot.docs
-          .where((d) => d.get(UserKey.UID) == FirebaseAuth.instance.currentUser!.uid)
+          .where((d) =>
+              d.get(UserKey.UID) == FirebaseAuth.instance.currentUser!.uid)
           .map((doc) => UserModel(
                 userName: doc.data()[UserKey.USER_NAME],
                 email: doc.data()[UserKey.EMAIL],
@@ -60,14 +55,17 @@ class UserService {
 }
 
 Future<List<UserModel>?> getUniqueCourtNameMaps() async {
-  CollectionReference<Map<String, dynamic>> collectionReference = FirebaseFirestore.instance.collection(Collections.USER);
-  DocumentSnapshot<Map<String, dynamic>> document = await collectionReference.doc(userController.userModel.value.uid).get();
+  CollectionReference<Map<String, dynamic>> collectionReference =
+      FirebaseFirestore.instance.collection(Collections.USER);
+  DocumentSnapshot<Map<String, dynamic>> document =
+      await collectionReference.doc(userController.userModel.value.uid).get();
 
   Set<int> uniqueCourtIds = <int>{};
   List<UserModel> resultMaps = [];
 
   try {
-    List<Map<String, dynamic>> mapsArray = List<Map<String, dynamic>>.from(document.data()?[CourtKey.CHECKED_COURTS]);
+    List<Map<String, dynamic>> mapsArray = List<Map<String, dynamic>>.from(
+        document.data()?[CourtKey.CHECKED_COURTS]);
     for (var map in mapsArray) {
       int courtId = map[CourtKey.ID] ?? 0;
       bool isGold = map[CourtKey.IS_GOLDEN] ?? false;
@@ -78,14 +76,15 @@ Future<List<UserModel>?> getUniqueCourtNameMaps() async {
     }
     return resultMaps;
   } catch (e) {
-   return null;
+    return null;
   }
 }
 
 Future<int> getGoldenLocationsCount() async {
   try {
     QuerySnapshot querySnapshot = await FirebaseFirestore.instance
-        .collection(Collections.GOLDEN_LOCATIONS) // Replace with your collection name
+        .collection(
+            Collections.GOLDEN_LOCATIONS) // Replace with your collection name
         .get();
 
     int count = querySnapshot.size;
@@ -109,7 +108,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     UserModel currentUser =
         UserModel.fromMap(snapshot.data() as Map<String, dynamic>);
     userController.userModel.value = currentUser;
-    if(mounted)setState(() {});
+    if (mounted) setState(() {});
   }
 
   File? _imageFile;
@@ -165,7 +164,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
   String mail = FirebaseAuth.instance.currentUser?.email as String;
   // String mail = FirebaseAuth.instance.currentUser?.email ?? "";
 
-
   @override
   void initState() {
     getUser();
@@ -196,7 +194,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     $name
     ''';
 
-    final Uri _emailLaunchUri = Uri(
+    final Uri emailLaunchUri = Uri(
       scheme: 'mailto',
       path: 'support@checkinhoops.net',
       // Replace with the recipient's email address for reporting
@@ -205,7 +203,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     // if (await canLaunchUrl(_emailLaunchUri)) {
     try {
-      await launchUrl(_emailLaunchUri);
+      await launchUrl(emailLaunchUri);
     } catch (e) {
       nbutils.toast(TempLanguage.notLaunchEmailToast);
       print(e);
@@ -220,7 +218,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
         elevation: 0,
         centerTitle: true,
         backgroundColor: whiteColor,
-        title: poppinsText(TempLanguage.profile, 20, FontWeight.bold, blackColor),
+        title:
+            poppinsText(TempLanguage.profile, 20, FontWeight.bold, blackColor),
       ),
       body: SingleChildScrollView(
         child: SizedBox(
@@ -281,10 +280,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                       border: Border.all(
                                                           width: 2,
                                                           color: greenColor),
-                                                      image: const DecorationImage(
-                                                          image: AssetImage(
-                                                              AppAssets.LOGO_NEW),
-                                                          fit: BoxFit.fill)),
+                                                      image:
+                                                          const DecorationImage(
+                                                              image: AssetImage(
+                                                                  AppAssets
+                                                                      .LOGO_NEW),
+                                                              fit:
+                                                                  BoxFit.fill)),
                                                 )),
                                   if (userController
                                               .userModel.value.isVerified ==
@@ -300,8 +302,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                         decoration: const BoxDecoration(
                                             shape: BoxShape.circle,
                                             image: DecorationImage(
-                                                image: AssetImage(
-                                                    AppAssets.INSTAGRAM_VERIFICATION))),
+                                                image: AssetImage(AppAssets
+                                                    .INSTAGRAM_VERIFICATION))),
                                       ),
                                     )
                                   else
@@ -339,23 +341,33 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   ),
                                   child: FutureBuilder<List<UserModel>?>(
                                     future: getUniqueCourtNameMaps(),
-                                    builder: (context, snapshot){
-                                      if (snapshot.connectionState == ConnectionState.waiting) {
+                                    builder: (context, snapshot) {
+                                      if (snapshot.connectionState ==
+                                          ConnectionState.waiting) {
                                         return const SizedBox(
-                                          height: 110,
+                                            height: 110,
                                             width: 110,
-                                            child: Center(child: CircularProgressIndicator()));
-                                      } else if (snapshot.hasData && snapshot.data != null) {
+                                            child: Center(
+                                                child:
+                                                    CircularProgressIndicator()));
+                                      } else if (snapshot.hasData &&
+                                          snapshot.data != null) {
                                         return InkWell(
-                                          onTap: (){
+                                          onTap: () {
                                             Navigator.push(
-                                                context, MaterialPageRoute(builder: (context) => const UniqueCourtsScreen()));
+                                                context,
+                                                MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        const UniqueCourtsScreen()));
                                           },
                                           child: CircularPercentIndicator(
                                             radius: 55.0,
                                             lineWidth: 8.0,
                                             animation: true,
-                                            percent: ((snapshot.data?.length ?? 0) / (totalCount ?? 10)).clamp(0.0, 1.0),
+                                            percent:
+                                                ((snapshot.data?.length ?? 0) /
+                                                        (totalCount ?? 10))
+                                                    .clamp(0.0, 1.0),
                                             center: Text(
                                               "${snapshot.data?.length ?? 0}\nCheck ins",
                                               textAlign: TextAlign.center,
@@ -365,19 +377,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                               ),
                                             ),
                                             circularStrokeCap:
-                                            CircularStrokeCap.round,
-                                            progressColor:
-                                            darkYellowColor,
+                                                CircularStrokeCap.round,
+                                            progressColor: darkYellowColor,
                                           ),
                                         );
-                                      } else if (snapshot.hasError){
-                                        return Center(child: Text(TempLanguage.wentWrong),);
+                                      } else if (snapshot.hasError) {
+                                        return Center(
+                                          child: Text(TempLanguage.wentWrong),
+                                        );
                                       } else {
                                         return CircularPercentIndicator(
                                           radius: 55.0,
                                           lineWidth: 8.0,
                                           animation: true,
-                                          percent: (0 / (totalCount ?? 10)).clamp(0.0, 1.0),
+                                          percent: (0 / (totalCount ?? 10))
+                                              .clamp(0.0, 1.0),
                                           center: const Text(
                                             "0\nCheck ins",
                                             textAlign: TextAlign.center,
@@ -387,9 +401,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                             ),
                                           ),
                                           circularStrokeCap:
-                                          CircularStrokeCap.round,
-                                          progressColor:
-                                          darkYellowColor,
+                                              CircularStrokeCap.round,
+                                          progressColor: darkYellowColor,
                                         );
                                       }
                                     },
@@ -399,29 +412,47 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   width: 20,
                                 ),
                                 InkWell(
-                                  onTap: (){
+                                  onTap: () {
                                     Navigator.push(
-                                        context, MaterialPageRoute(builder: (context) => const UniqueCourtsScreen()));
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                const UniqueCourtsScreen()));
                                   },
                                   child: Column(
                                     mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
-                                      poppinsText("Golden\nCourt", 22, FontWeight.bold, blackColor),
+                                      poppinsText("Golden\nCourt", 22,
+                                          FontWeight.bold, blackColor),
                                       FutureBuilder<List<UserModel>?>(
                                         future: getUniqueCourtNameMaps(),
-                                        builder: (context, snapshot){
-                                          if (snapshot.connectionState == ConnectionState.waiting) {
+                                        builder: (context, snapshot) {
+                                          if (snapshot.connectionState ==
+                                              ConnectionState.waiting) {
                                             // return const Center(child: CircularProgressIndicator());
-                                            return const Center(child: CircularProgressIndicator());
-                                          } else if (snapshot.hasData && snapshot.data != null) {
+                                            return const Center(
+                                                child:
+                                                    CircularProgressIndicator());
+                                          } else if (snapshot.hasData &&
+                                              snapshot.data != null) {
                                             return poppinsText(
-                                                "${snapshot.data?.length ?? 0} Check ins", 12, FontWeight.normal, blackColor);
+                                                "${snapshot.data?.length ?? 0} Check ins",
+                                                12,
+                                                FontWeight.normal,
+                                                blackColor);
                                           } else if (snapshot.hasError) {
-                                            return Center(child: Text(TempLanguage.wentWrong),);
+                                            return Center(
+                                              child:
+                                                  Text(TempLanguage.wentWrong),
+                                            );
                                           } else {
                                             return poppinsText(
-                                                "0 Check ins", 12, FontWeight.normal, blackColor);
+                                                "0 Check ins",
+                                                12,
+                                                FontWeight.normal,
+                                                blackColor);
                                           }
                                         },
                                       ),
@@ -435,7 +466,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         const SizedBox(
                           height: 15,
                         ),
-                        const AboutSection(),
+                        AboutSection(userController: userController),
                       ],
                     )
                   : const Center(child: CircularProgressIndicator()),
