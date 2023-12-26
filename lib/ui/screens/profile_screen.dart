@@ -1,7 +1,9 @@
 import 'dart:io';
 
 import 'package:check_in/controllers/user_controller.dart';
+import 'package:check_in/core/constant/app_assets.dart';
 import 'package:check_in/core/constant/constant.dart';
+import 'package:check_in/core/constant/temp_language.dart';
 import 'package:check_in/model/user_modal.dart';
 import 'package:check_in/model/user_modal.dart';
 import 'package:check_in/ui/screens/add_home_court.dart';
@@ -41,7 +43,7 @@ class UserService {
   Stream<List<UserModel>> get users {
     return _firestore.collection(Collections.USER).snapshots().map((snapshot) {
       return snapshot.docs
-          .where((d) => d.get("uid") == FirebaseAuth.instance.currentUser!.uid)
+          .where((d) => d.get(UserKey.UID) == FirebaseAuth.instance.currentUser!.uid)
           .map((doc) => UserModel(
                 userName: doc.data()[UserKey.USER_NAME],
                 email: doc.data()[UserKey.EMAIL],
@@ -57,18 +59,18 @@ class UserService {
 }
 
 Future<List<UserModel>?> getUniqueCourtNameMaps() async {
-  CollectionReference<Map<String, dynamic>> collectionReference = FirebaseFirestore.instance.collection('USER');
+  CollectionReference<Map<String, dynamic>> collectionReference = FirebaseFirestore.instance.collection(Collections.USER);
   DocumentSnapshot<Map<String, dynamic>> document = await collectionReference.doc(userController.userModel.value.uid).get();
 
   Set<int> uniqueCourtIds = <int>{};
   List<UserModel> resultMaps = [];
 
-  List<Map<String, dynamic>> mapsArray = List<Map<String, dynamic>>.from(document.data()?['checkedCourts']);
+  List<Map<String, dynamic>> mapsArray = List<Map<String, dynamic>>.from(document.data()?[CourtKey.CHECKED_COURTS]);
 
 
   for (var map in mapsArray) {
-    int courtId = map['id'] ?? 0;
-    bool isGold = map['isGolden'] ?? false;
+    int courtId = map[CourtKey.ID] ?? 0;
+    bool isGold = map[CourtKey.IS_GOLDEN] ?? false;
     if (isGold && courtId > 0 && !uniqueCourtIds.contains(courtId)) {
       resultMaps.add(UserModel.fromMap(map));
       uniqueCourtIds.add(courtId);
@@ -204,7 +206,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     try {
       await launchUrl(_emailLaunchUri);
     } catch (e) {
-      nbutils.toast("Could not launch email.");
+      nbutils.toast(TempLanguage.notLaunchEmailToast);
       print(e);
     }
   }
@@ -217,7 +219,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         elevation: 0,
         centerTitle: true,
         backgroundColor: whiteColor,
-        title: poppinsText("Profile", 20, FontWeight.bold, blackColor),
+        title: poppinsText(TempLanguage.profile, 20, FontWeight.bold, blackColor),
       ),
       body: SingleChildScrollView(
         child: SizedBox(
@@ -280,7 +282,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                           color: greenColor),
                                                       image: const DecorationImage(
                                                           image: AssetImage(
-                                                              'assets/images/logo-new.png'),
+                                                              AppAssets.LOGO_NEW),
                                                           fit: BoxFit.fill)),
                                                 )),
                                   if (userController
@@ -298,7 +300,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                             shape: BoxShape.circle,
                                             image: DecorationImage(
                                                 image: AssetImage(
-                                                    "assets/images/instagram-verification-badge.png"))),
+                                                    AppAssets.INSTAGRAM_VERIFICATION))),
                                       ),
                                     )
                                   else
@@ -330,7 +332,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   decoration: BoxDecoration(
                                     shape: BoxShape.circle,
                                     border: Border.all(
-                                      color: const Color.fromARGB(255, 216, 227, 242),
+                                      color: offWhiteColor,
                                       width: 8.0,
                                     ),
                                   ),
@@ -364,11 +366,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                             circularStrokeCap:
                                             CircularStrokeCap.round,
                                             progressColor:
-                                            const Color.fromARGB(255, 255, 206, 26),
+                                            darkYellowColor,
                                           ),
                                         );
                                       } else {
-                                        return const Center(child: Text('Something went wrong'),);
+                                        return Center(child: Text(TempLanguage.wentWrong),);
                                       }
                                     },
                                   ),
@@ -396,7 +398,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                             return poppinsText(
                                                 "${snapshot.data?.length ?? 0} Check ins", 12, FontWeight.normal, blackColor);
                                           } else {
-                                            return const Center(child: Text('Something went wrong'),);
+                                            return Center(child: Text(TempLanguage.wentWrong),);
                                           }
                                         },
                                       ),
@@ -412,7 +414,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ),
                         Column(
                           children: [
-                            poppinsText("Home Court", 14, semiBold, greenColor),
+                            poppinsText(TempLanguage.homeCourt, 14, semiBold, greenColor),
                             verticalGap(0.8.h),
                             Padding(
                               padding:
@@ -443,7 +445,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                           height: 2.3.h,
                                           width: 4.47.w,
                                           child: Image.asset(
-                                              "assets/images/Icon feather-map-pin.png"),
+                                              AppAssets.MAP_PIN),
                                         ),
                                       )
                                     ],
@@ -475,7 +477,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                         topRight: Radius.circular(10)),
                                     boxShadow: [
                                       BoxShadow(
-                                        color: Colors.grey.withOpacity(0.2),
+                                        color: greyColor.withOpacity(0.2),
                                         blurRadius: 1,
                                         //   spreadRadius: -12,
                                         offset: const Offset(0,
@@ -504,7 +506,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                         mainAxisAlignment:
                                             MainAxisAlignment.spaceBetween,
                                         children: [
-                                          poppinsText("About me", 14, semiBold,
+                                          poppinsText(TempLanguage.aboutMe, 14, semiBold,
                                               blackColor),
                                           InkWell(
                                             onTap: () => setState(() {
@@ -517,7 +519,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                 height: 1.8.h,
                                                 width: 4.w,
                                                 child: Image.asset(
-                                                    "assets/images/Icon feather-edit-2.png"),
+                                                    AppAssets.EDIT_ICON),
                                               ),
                                             ),
                                           )
@@ -536,7 +538,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                 .collection(Collections.USER)
                                                 .doc(FirebaseAuth
                                                     .instance.currentUser!.uid)
-                                                .update({"about me": aboutMe});
+                                                .update({UserKey.ABOUT_ME: aboutMe});
                                           });
                                         },
                                         decoration: InputDecoration(
@@ -553,7 +555,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                     .value
                                                     .aboutMe
                                                     .isEmptyOrNull)
-                                                ? "Tell us about your game"
+                                                ? TempLanguage.tellUsAboutGame
                                                 : userController.userModel.value
                                                         .aboutMe ??
                                                     "",
@@ -561,7 +563,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                 fontSize: 14,
                                                 fontWeight: regular,
                                                 color:
-                                                    const Color(0xff777777))),
+                                                    silverColor)),
                                       ),
                                       // verticalGap(20),
                                       Container(

@@ -1,18 +1,17 @@
 // ignore_for_file: avoid_print
-
+import 'dart:developer';
+import 'package:check_in/core/constant/temp_language.dart';
 import 'package:check_in/ui/screens/check_in.dart';
 import 'package:check_in/ui/screens/profile_screen.dart';
 import 'package:check_in/ui/screens/start.dart';
 import 'package:check_in/utils/colors.dart';
+import 'package:check_in/utils/common.dart';
 import 'package:check_in/utils/styles.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
-
 import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
-
 import 'History.dart';
 import '../../controllers/nav_bar_controller.dart';
 
@@ -89,8 +88,8 @@ class CustomNavBarWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: const BoxDecoration(
-          color: Colors.white,
+      decoration: BoxDecoration(
+          color: whiteColor,
           borderRadius: BorderRadius.only(topLeft: Radius.circular(40))),
       child: SizedBox(
         width: double.infinity,
@@ -105,20 +104,20 @@ class CustomNavBarWidget extends StatelessWidget {
                     showDialog(
                         context: context,
                         builder: (context) => AlertDialog(
-                              title: poppinsText("Please log in to use more features", 16,
-                                  FontWeight.w500, Colors.black),
+                              title: poppinsText(TempLanguage.logInForFeatures,
+                                  16, FontWeight.w500, blackColor),
                               actions: [
                                 TextButton(
                                   onPressed: () {
                                     Get.off(() => StartView(isBack: true));
                                   },
-                                  child: const Text('Login'),
+                                  child: Text(TempLanguage.logIn),
                                 ),
                                 TextButton(
                                   onPressed: () {
                                     Navigator.pop(context);
                                   },
-                                  child: const Text('Cancel'),
+                                  child: Text(TempLanguage.cancel),
                                 ),
                               ],
                             ));
@@ -150,10 +149,7 @@ class _HomeState extends State<Home> {
     return [
       const CheckIn(),
       const HistoryView(),
-      KeyedSubtree(
-        key: UniqueKey(),
-        child: const ProfileScreen()
-      ),
+      KeyedSubtree(key: UniqueKey(), child: const ProfileScreen()),
     ];
   }
 
@@ -183,29 +179,6 @@ class _HomeState extends State<Home> {
     ];
   }
 
-  Future<bool> showExitPopup(BuildContext? context) async {
-    return await showDialog(
-          context: context!,
-          builder: (context) => AlertDialog(
-            title: const Text('Exit App'),
-            content: const Text('Do you want to exit an App?'),
-            actions: [
-              ElevatedButton(
-                onPressed: () => Navigator.of(context).pop(false),
-                //return false when click on "NO"
-                child: const Text('No'),
-              ),
-              ElevatedButton(
-                onPressed: () => SystemNavigator.pop(),
-                //return true when click on "Yes"
-                child: const Text('Yes'),
-              ),
-            ],
-          ),
-        ) ??
-        false; //if showDialouge had returned null, then return false
-  }
-
   Future<bool> _onWillPop() async {
     if (navBarController.currentIndex.value == 0) {
       // Only show exit confirmation dialog on the first screen (CheckIn)
@@ -220,43 +193,38 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
-      onWillPop: _onWillPop,
-      child: PersistentTabView.custom(
-        context,
-        controller: navBarController.controller,
-        itemCount: _navBarsItems().length,
-        // This is required in case of custom style! Pass the number of items for the nav bar.
-        screens: _buildScreens(),
-        navBarHeight: 60,
-        onWillPop: (context) {
-          return showExitPopup(context);
-        },
-        hideNavigationBarWhenKeyboardShows: true,
-        backgroundColor: Colors.white,
-        popAllScreensOnTapOfSelectedTab: true,
-        stateManagement: false,
-        confineInSafeArea: true,
-        handleAndroidBackButtonPress: true,
-        customWidget: (navBarEssentials) => Container(
-          decoration: const BoxDecoration(
-            borderRadius: BorderRadius.only(topLeft: Radius.circular(40)),
-          ),
-          child: CustomNavBarWidget(
-            // Your custom widget goes here
-            items: _navBarsItems(),
-            selectedIndex: navBarController.currentIndex.value,
-            onItemSelected: (index) {
-              setState(() {
-                navBarController.currentIndex.value = index;
-                navBarController.controller.index =
-                    index; // NOTE: THIS IS CRITICAL!! Don't miss it!
-              });
-              print(navBarController.currentIndex.value);
-              print(navBarController.controller.index);
+        onWillPop: _onWillPop,
+        child: PersistentTabView.custom(
+            context,
+            controller: navBarController.controller,
+            itemCount: _navBarsItems().length,
+            // This is required in case of custom style! Pass the number of items for the nav bar.
+            screens: _buildScreens(),
+            navBarHeight: 60,
+            onWillPop: (context) {
+              return showExitPopup(context);
             },
+            hideNavigationBarWhenKeyboardShows: true,
+            backgroundColor: whiteColor,
+            popAllScreensOnTapOfSelectedTab: true,
+            stateManagement: false,
+            confineInSafeArea: true,
+            handleAndroidBackButtonPress: true,
+            customWidget: (navBarEssentials) => Container(
+              decoration: const BoxDecoration(
+                borderRadius: BorderRadius.only(topLeft: Radius.circular(40)),
+              ),
+              child: Obx(() => CustomNavBarWidget(
+                items: _navBarsItems(),
+                selectedIndex: navBarController.currentIndex.value,
+                onItemSelected: (index) {
+                  navBarController.currentIndex.value = index;
+                  navBarController.controller.index = index;
+                  log('${navBarController.controller.index}');
+                },
+              ),)
+            ),
           ),
-        ),
-      ),
-    );
+        );
   }
 }

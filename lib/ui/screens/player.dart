@@ -1,3 +1,5 @@
+import 'package:check_in/core/constant/app_assets.dart';
+import 'package:check_in/core/constant/temp_language.dart';
 import 'package:check_in/ui/screens/Players.dart';
 import 'package:check_in/utils/colors.dart';
 import 'package:check_in/utils/styles.dart';
@@ -32,19 +34,19 @@ class _PlayerScreenState extends State<PlayerScreen> {
               height: 2.1.h,
               width: 2.9.w,
               child: Material(
-                  color: Colors.transparent,
+                  color: transparentColor,
                   child: InkWell(
                       onTap: () {
                         Navigator.pop(context);
                       },
-                      child: Image.asset("assets/images/Path 6.png"))),
+                      child: Image.asset(AppAssets.LEFT_ARROW))),
             )
           ],
         ),
         elevation: 0,
         centerTitle: true,
         backgroundColor: whiteColor,
-        title: poppinsText("Player", 20, FontWeight.bold, blackColor),
+        title: poppinsText(TempLanguage.player, 20, FontWeight.bold, blackColor),
       ),
       body: SingleChildScrollView(
         child: SizedBox(
@@ -81,7 +83,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
                                 : const DecorationImage(
                                     fit: BoxFit.fill,
                                     image: AssetImage(
-                                      "assets/images/logo-new.png",
+                                      AppAssets.LOGO_NEW,
                                     )),
                           ),
                         ),
@@ -96,7 +98,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
                                       shape: BoxShape.circle,
                                       image: DecorationImage(
                                           image: AssetImage(
-                                              "assets/images/instagram-verification-badge.png"))),
+                                              AppAssets.INSTAGRAM_VERIFICATION))),
                                 ),
                               ),
                       ],
@@ -114,7 +116,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
               ),
               Column(
                 children: [
-                  poppinsText("Home Court", 14, semiBold, greenColor),
+                  poppinsText(TempLanguage.homeCourt, 14, semiBold, greenColor),
                   verticalGap(0.8.h),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 30),
@@ -141,7 +143,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
                               height: 2.3.h,
                               width: 4.47.w,
                               child: Image.asset(
-                                  "assets/images/Icon feather-map-pin.png"),
+                                  AppAssets.MAP_PIN),
                             ),
                             // )
                           ],
@@ -172,7 +174,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
                               topRight: Radius.circular(10)),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.grey.withOpacity(0.2),
+                              color: greyColor.withOpacity(0.2),
                               blurRadius: 1,
                               //   spreadRadius: -12,
                               offset: const Offset(
@@ -186,7 +188,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 poppinsText(
-                                    "About me", 14, semiBold, blackColor),
+                                    TempLanguage.aboutMe, 14, semiBold, blackColor),
                               ],
                             ),
                             TextFormField(
@@ -205,7 +207,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
                                   helperStyle: GoogleFonts.poppins(
                                       fontSize: 14,
                                       fontWeight: regular,
-                                      color: const Color(0xff777777))),
+                                      color: textColor)),
                             ),
                             verticalGap(15),
                             Container(

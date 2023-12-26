@@ -1,3 +1,5 @@
+import 'package:check_in/core/constant/app_assets.dart';
+import 'package:check_in/core/constant/temp_language.dart';
 import 'package:check_in/ui/widgets/common_button.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -45,11 +47,11 @@ class _ContactUsState extends State<ContactUs> {
     if (canLaunch) {
       await launchUrl(params);
     } else {
-      Get.snackbar("Alert", "Could not launch email app.",
-          backgroundColor: Colors.white,
+      Get.snackbar(TempLanguage.emailErrorToastTitle, TempLanguage.emailErrorToastMessage,
+          backgroundColor: whiteColor,
           borderWidth: 4,
-          borderColor: Colors.red,
-          colorText: Colors.black);
+          borderColor: redColor,
+          colorText: blackColor);
       print('Could not launch email app.');
     }
   }
@@ -70,7 +72,7 @@ class _ContactUsState extends State<ContactUs> {
               child: SizedBox(
                 height: 2.1.h,
                 width: 2.9.w,
-                child: Image.asset("assets/images/Path 6.png"),
+                child: Image.asset(AppAssets.LEFT_ARROW),
               ),
             )
           ],
@@ -78,7 +80,7 @@ class _ContactUsState extends State<ContactUs> {
         elevation: 0,
         centerTitle: true,
         backgroundColor: whiteColor,
-        title: poppinsText("Contact Us", 20, FontWeight.bold, blackColor),
+        title: poppinsText(TempLanguage.contactUs, 20, FontWeight.bold, blackColor),
       ),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -87,8 +89,8 @@ class _ContactUsState extends State<ContactUs> {
             padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 36),
             child: Column(
               children: [
-                customTextField("Name", greenColor, nameController),
-                customTextField("Email", greenColor, emailController),
+                customTextField(TempLanguage.nameCap, greenColor, nameController),
+                customTextField(TempLanguage.emailCap, greenColor, emailController),
               ],
             ),
           ),
@@ -97,7 +99,7 @@ class _ContactUsState extends State<ContactUs> {
               horizontal: 30,
               vertical: 15,
             ),
-            child: fullWidthButton("SUBMIT", () {
+            child: fullWidthButton(TempLanguage.submit, () {
               _launchEmailApp();
             }),
           )

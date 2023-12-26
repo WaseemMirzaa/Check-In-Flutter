@@ -1,4 +1,6 @@
 import 'package:check_in/auth_service.dart';
+import 'package:check_in/core/constant/app_assets.dart';
+import 'package:check_in/core/constant/temp_language.dart';
 import 'package:check_in/ui/screens/forgot_password.dart';
 import 'package:check_in/ui/screens/start.dart';
 import 'package:check_in/ui/widgets/common_button.dart';
@@ -10,6 +12,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
 import 'package:sizer/sizer.dart';
+
+import '../../utils/colors.dart';
 
 class LoginView extends StatefulWidget {
   const LoginView({super.key});
@@ -39,9 +43,9 @@ class _LoginViewState extends State<LoginView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: whiteColor,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: whiteColor,
         leading: Row(
           children: [
             const SizedBox(
@@ -55,7 +59,7 @@ class _LoginViewState extends State<LoginView> {
               child: SizedBox(
                 height: 2.1.h,
                 width: 2.9.w,
-                child: Image.asset("assets/images/Path 6.png"),
+                child: Image.asset(AppAssets.LEFT_ARROW),
               ),
             )
           ],
@@ -74,7 +78,7 @@ class _LoginViewState extends State<LoginView> {
                   height: 4.h,
                 ),
                 Image.asset(
-                  "assets/images/logo-new.png",
+                  AppAssets.LOGO_NEW,
                   scale: 3,
                 ),
                 SizedBox(
@@ -96,7 +100,7 @@ class _LoginViewState extends State<LoginView> {
                                 v.isEmpty ||
                                 v.length < 6 ||
                                 !Validate(email)) {
-                              return 'Please enter Valid Email Address';
+                              return "Please ${TempLanguage.validEmail}";
                             }
                             return null;
                           },
@@ -106,17 +110,17 @@ class _LoginViewState extends State<LoginView> {
                             });
                           },
                           decoration: InputDecoration(
-                            enabledBorder: const UnderlineInputBorder(
-                              borderSide: BorderSide(color: Color(0xff707070)),
+                            enabledBorder: UnderlineInputBorder(
+                              borderSide: BorderSide(color: greyColor),
                             ),
-                            focusedBorder: const UnderlineInputBorder(
-                              borderSide: BorderSide(color: Color(0xff707070)),
+                            focusedBorder: UnderlineInputBorder(
+                              borderSide: BorderSide(color: greyColor),
                             ),
-                            hintText: 'Email',
+                            hintText: TempLanguage.emailCap,
                             hintStyle: TextStyle(
-                              fontFamily: 'Poppins',
+                              fontFamily: TempLanguage.poppins,
                               fontSize: 1.7.h,
-                              color: const Color(0xff707070),
+                              color: greyColor,
                               fontWeight: FontWeight.w600,
                               height: 1.2142857142857142,
                             ),
@@ -131,7 +135,7 @@ class _LoginViewState extends State<LoginView> {
                           obscureText: index == 0 ? true : false,
                           validator: (v) {
                             if (v == null || v.isEmpty || v.length < 6) {
-                              return 'Password must be 6 digits long';
+                              return TempLanguage.passwordCheck;
                             }
                             return null;
                           },
@@ -141,17 +145,17 @@ class _LoginViewState extends State<LoginView> {
                             });
                           },
                           decoration: InputDecoration(
-                            enabledBorder: const UnderlineInputBorder(
-                              borderSide: BorderSide(color: Color(0xff707070)),
+                            enabledBorder: UnderlineInputBorder(
+                              borderSide: BorderSide(color: greyColor),
                             ),
-                            focusedBorder: const UnderlineInputBorder(
-                              borderSide: BorderSide(color: Color(0xff707070)),
+                            focusedBorder: UnderlineInputBorder(
+                              borderSide: BorderSide(color: greyColor),
                             ),
-                            hintText: 'Password',
+                            hintText: TempLanguage.password,
                             hintStyle: TextStyle(
-                              fontFamily: 'Poppins',
+                              fontFamily: TempLanguage.poppins,
                               fontSize: 1.7.h,
-                              color: const Color(0xff707070),
+                              color: greyColor,
                               fontWeight: FontWeight.w600,
                               height: 1.2142857142857142,
                             ),
@@ -168,11 +172,11 @@ class _LoginViewState extends State<LoginView> {
                                   withNavBar: false);
                             },
                             child: Text(
-                              'Forgot Password',
+                              TempLanguage.forgotPassword,
                               style: TextStyle(
-                                fontFamily: 'Poppins',
+                                fontFamily: TempLanguage.poppins,
                                 fontSize: 1.7.h,
-                                color: const Color(0xff000000),
+                                color: blackColor,
                                 fontWeight: FontWeight.w500,
                               ),
                               softWrap: false,
@@ -182,14 +186,14 @@ class _LoginViewState extends State<LoginView> {
                       ),
                       Padding(
                           padding: EdgeInsets.only(top: 3.6.h),
-                          child: fullWidthButton('Log in', () async {
+                          child: fullWidthButton(TempLanguage.logInSpaced, () async {
                             if (password != "" && email != "") {
                               login(email, password, context);
                             } else if (password == "") {
-                              Get.snackbar("Error", "Enter Password",
+                              Get.snackbar(TempLanguage.error, TempLanguage.enterPassword,
                                   snackPosition: SnackPosition.BOTTOM);
                             } else if (email == "") {
-                              Get.snackbar("Error", "Enter Email",
+                              Get.snackbar(TempLanguage.error, TempLanguage.enterEmail,
                                   snackPosition: SnackPosition.BOTTOM);
                             }
                           })),
