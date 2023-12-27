@@ -28,7 +28,6 @@ class _AboutSectionState extends State<AboutSection> {
   String aboutMe = '';
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     aboutMe = (widget.userController.userModel.value.aboutMe.isEmptyOrNull)
         ? TempLanguage.tellUsAboutGame
@@ -70,6 +69,7 @@ class _AboutSectionState extends State<AboutSection> {
                   )
                 ],
               ),
+              
               verticalGap(1.3.h),
               Container(
                 height: 1,
@@ -143,13 +143,14 @@ class _AboutSectionState extends State<AboutSection> {
                     onSubmitted: (value) {
                       setState(() {
                         // userController.userModel.value.
+                        //..........
                         aboutMe = value;
+                        widget.userController.userModel.value.aboutMe = value;
                         FirebaseFirestore.instance
                             .collection(Collections.USER)
                             .doc(FirebaseAuth.instance.currentUser!.uid)
                             .update({UserKey.ABOUT_ME: aboutMe});
                       });
-                      // aboutMe = value;
                     },
                     maxLines:
                         widget.userController.userModel.value.isVerified ==

@@ -1,5 +1,4 @@
 // ignore_for_file: avoid_print
-import 'dart:developer';
 import 'package:check_in/core/constant/temp_language.dart';
 import 'package:check_in/ui/screens/check_in.dart';
 import 'package:check_in/ui/screens/profile_screen.dart';
@@ -143,7 +142,7 @@ class Home extends StatefulWidget {
   State<Home> createState() => _HomeState();
 }
 
-class _HomeState extends State<Home> {
+class _HomeState extends State<Home> with AutomaticKeepAliveClientMixin {
   final NavBarController navBarController = Get.put(NavBarController());
 
   final List<Widget> _buildScreens = [
@@ -194,12 +193,16 @@ class _HomeState extends State<Home> {
   }
 
   @override
+  bool get wantKeepAlive => true;
+  @override
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: _onWillPop,
       child: Obx(() {
         return Scaffold(
-          body: _buildScreens[navBarController.currentIndex.value],
+          body: Obx(() => IndexedStack(
+              index: navBarController.currentIndex.value,
+              children: _buildScreens)),
           bottomNavigationBar: BottomNavigationBar(
             items: _navBarsItems(),
             currentIndex: navBarController.currentIndex.value,

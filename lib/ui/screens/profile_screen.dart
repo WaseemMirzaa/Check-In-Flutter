@@ -105,6 +105,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         .collection(Collections.USER)
         .doc(userController.userModel.value.uid)
         .get();
+    print("all snapshot data.......${snapshot.data()}");
     UserModel currentUser =
         UserModel.fromMap(snapshot.data() as Map<String, dynamic>);
     userController.userModel.value = currentUser;
@@ -230,148 +231,172 @@ class _ProfileScreenState extends State<ProfileScreen> {
               // }
               // final users = snapshot.data;
               !userController.userModel.value.uid.isEmptyOrNull
-                  ? Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Column(
-                          children: [
-                            verticalGap(3.h),
-                            SizedBox(
-                              width: 35.9.w,
-                              //   padding: EdgeInsets.all(10),
-                              child: Stack(
-                                //  clipBehavior: Clip.antiAliasWithSaveLayer,
-                                alignment: Alignment.bottomCenter,
-                                children: [
-                                  GestureDetector(
-                                      onTap: _selectImage,
-                                      child: (_downloadUrl != null)
-                                          ? Container(
-                                              height: 20.h,
-                                              width: 35.h,
-                                              decoration: BoxDecoration(
-                                                  shape: BoxShape.circle,
-                                                  image: DecorationImage(
-                                                      image: NetworkImage(
-                                                          _downloadUrl
-                                                              as String),
-                                                      fit: BoxFit.fill)))
-                                          : (!userController.userModel.value
-                                                  .photoUrl.isEmptyOrNull)
-                                              ? Container(
-                                                  height: 20.h,
-                                                  width: 35.h,
-                                                  decoration: BoxDecoration(
-                                                      shape: BoxShape.circle,
-                                                      image: DecorationImage(
-                                                          image: NetworkImage(
-                                                              userController
-                                                                      .userModel
-                                                                      .value
-                                                                      .photoUrl ??
-                                                                  ""),
-                                                          fit: BoxFit.fill)))
-                                              : Container(
-                                                  height: 20.h,
-                                                  width: 35.h,
-                                                  decoration: BoxDecoration(
-                                                      shape: BoxShape.circle,
-                                                      border: Border.all(
-                                                          width: 2,
-                                                          color: greenColor),
-                                                      image:
-                                                          const DecorationImage(
-                                                              image: AssetImage(
-                                                                  AppAssets
-                                                                      .LOGO_NEW),
-                                                              fit:
-                                                                  BoxFit.fill)),
-                                                )),
-                                  if (userController
-                                              .userModel.value.isVerified ==
-                                          null ||
-                                      userController
-                                              .userModel.value.isVerified ==
-                                          true)
-                                    Align(
-                                      alignment: Alignment.bottomRight,
-                                      child: Container(
-                                        height: 5.5.h,
-                                        width: 12.1.w,
-                                        decoration: const BoxDecoration(
-                                            shape: BoxShape.circle,
-                                            image: DecorationImage(
-                                                image: AssetImage(AppAssets
-                                                    .INSTAGRAM_VERIFICATION))),
-                                      ),
-                                    )
-                                  else
-                                    const SizedBox(),
-                                ],
+                  ? SingleChildScrollView(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Column(
+                            children: [
+                              verticalGap(3.h),
+                              SizedBox(
+                                width: 35.9.w,
+                                //   padding: EdgeInsets.all(10),
+                                child: Stack(
+                                  //  clipBehavior: Clip.antiAliasWithSaveLayer,
+                                  alignment: Alignment.bottomCenter,
+                                  children: [
+                                    GestureDetector(
+                                        onTap: _selectImage,
+                                        child: (_downloadUrl != null)
+                                            ? Container(
+                                                height: 20.h,
+                                                width: 35.h,
+                                                decoration: BoxDecoration(
+                                                    shape: BoxShape.circle,
+                                                    image: DecorationImage(
+                                                        image: NetworkImage(
+                                                            _downloadUrl
+                                                                as String),
+                                                        fit: BoxFit.fill)))
+                                            : (!userController.userModel.value
+                                                    .photoUrl.isEmptyOrNull)
+                                                ? Container(
+                                                    height: 20.h,
+                                                    width: 35.h,
+                                                    decoration: BoxDecoration(
+                                                        shape: BoxShape.circle,
+                                                        image: DecorationImage(
+                                                            image: NetworkImage(
+                                                                userController
+                                                                        .userModel
+                                                                        .value
+                                                                        .photoUrl ??
+                                                                    ""),
+                                                            fit: BoxFit.fill)))
+                                                : Container(
+                                                    height: 20.h,
+                                                    width: 35.h,
+                                                    decoration: BoxDecoration(
+                                                        shape: BoxShape.circle,
+                                                        border: Border.all(
+                                                            width: 2,
+                                                            color: greenColor),
+                                                        image: const DecorationImage(
+                                                            image: AssetImage(
+                                                                AppAssets
+                                                                    .LOGO_NEW),
+                                                            fit: BoxFit.fill)),
+                                                  )),
+                                    if (userController
+                                                .userModel.value.isVerified ==
+                                            null ||
+                                        userController
+                                                .userModel.value.isVerified ==
+                                            true)
+                                      Align(
+                                        alignment: Alignment.bottomRight,
+                                        child: Container(
+                                          height: 5.5.h,
+                                          width: 12.1.w,
+                                          decoration: const BoxDecoration(
+                                              shape: BoxShape.circle,
+                                              image: DecorationImage(
+                                                  image: AssetImage(AppAssets
+                                                      .INSTAGRAM_VERIFICATION))),
+                                        ),
+                                      )
+                                    else
+                                      const SizedBox(),
+                                  ],
+                                ),
                               ),
-                            ),
-                            verticalGap(0.5.h),
-                            poppinsText(
-                                // FirebaseAuth.instance.currentUser?.displayName
-                                //     as String,
-                                userController.userModel.value.userName ?? "",
-                                32,
-                                FontWeight.bold,
-                                blackColor),
-                            // poppinsText(
-                            //     "@${userController.userModel.value.email.substring(0, userController.userModel.value.email.indexOf('@'))}",
-                            //     12,
-                            //     FontWeight.normal,
-                            //     blackColor),
-                            const SizedBox(
-                              height: 10,
-                            ),
+                              verticalGap(0.5.h),
+                              poppinsText(
+                                  // FirebaseAuth.instance.currentUser?.displayName
+                                  //     as String,
+                                  userController.userModel.value.userName ?? "",
+                                  32,
+                                  FontWeight.bold,
+                                  blackColor),
+                              // poppinsText(
+                              //     "@${userController.userModel.value.email.substring(0, userController.userModel.value.email.indexOf('@'))}",
+                              //     12,
+                              //     FontWeight.normal,
+                              //     blackColor),
+                              const SizedBox(
+                                height: 10,
+                              ),
 
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Container(
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    border: Border.all(
-                                      color: offWhiteColor,
-                                      width: 8.0,
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Container(
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      border: Border.all(
+                                        color: offWhiteColor,
+                                        width: 8.0,
+                                      ),
                                     ),
-                                  ),
-                                  child: FutureBuilder<List<UserModel>?>(
-                                    future: getUniqueCourtNameMaps(),
-                                    builder: (context, snapshot) {
-                                      if (snapshot.connectionState ==
-                                          ConnectionState.waiting) {
-                                        return const SizedBox(
-                                            height: 110,
-                                            width: 110,
-                                            child: Center(
-                                                child:
-                                                    CircularProgressIndicator()));
-                                      } else if (snapshot.hasData &&
-                                          snapshot.data != null) {
-                                        return InkWell(
-                                          onTap: () {
-                                            Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        const UniqueCourtsScreen()));
-                                          },
-                                          child: CircularPercentIndicator(
+                                    child: FutureBuilder<List<UserModel>?>(
+                                      future: getUniqueCourtNameMaps(),
+                                      builder: (context, snapshot) {
+                                        if (snapshot.connectionState ==
+                                            ConnectionState.waiting) {
+                                          return const SizedBox(
+                                              height: 110,
+                                              width: 110,
+                                              child: Center(
+                                                  child:
+                                                      CircularProgressIndicator()));
+                                        } else if (snapshot.hasData &&
+                                            snapshot.data != null) {
+                                          return InkWell(
+                                            onTap: () {
+                                              Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          const UniqueCourtsScreen()));
+                                            },
+                                            child: CircularPercentIndicator(
+                                              radius: 55.0,
+                                              lineWidth: 8.0,
+                                              animation: true,
+                                              percent:
+                                                  ((snapshot.data?.length ??
+                                                              0) /
+                                                          (totalCount ?? 10))
+                                                      .clamp(0.0, 1.0),
+                                              center: Text(
+                                                "${snapshot.data?.length ?? 0}\nCheck ins",
+                                                textAlign: TextAlign.center,
+                                                style: const TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 18.0,
+                                                ),
+                                              ),
+                                              circularStrokeCap:
+                                                  CircularStrokeCap.round,
+                                              progressColor: darkYellowColor,
+                                            ),
+                                          );
+                                        } else if (snapshot.hasError) {
+                                          return Center(
+                                            child: Text(TempLanguage.wentWrong),
+                                          );
+                                        } else {
+                                          return CircularPercentIndicator(
                                             radius: 55.0,
                                             lineWidth: 8.0,
                                             animation: true,
-                                            percent:
-                                                ((snapshot.data?.length ?? 0) /
-                                                        (totalCount ?? 10))
-                                                    .clamp(0.0, 1.0),
-                                            center: Text(
-                                              "${snapshot.data?.length ?? 0}\nCheck ins",
+                                            percent: (0 / (totalCount ?? 10))
+                                                .clamp(0.0, 1.0),
+                                            center: const Text(
+                                              "0\nCheck ins",
                                               textAlign: TextAlign.center,
-                                              style: const TextStyle(
+                                              style: TextStyle(
                                                 fontWeight: FontWeight.bold,
                                                 fontSize: 18.0,
                                               ),
@@ -379,95 +404,73 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                             circularStrokeCap:
                                                 CircularStrokeCap.round,
                                             progressColor: darkYellowColor,
-                                          ),
-                                        );
-                                      } else if (snapshot.hasError) {
-                                        return Center(
-                                          child: Text(TempLanguage.wentWrong),
-                                        );
-                                      } else {
-                                        return CircularPercentIndicator(
-                                          radius: 55.0,
-                                          lineWidth: 8.0,
-                                          animation: true,
-                                          percent: (0 / (totalCount ?? 10))
-                                              .clamp(0.0, 1.0),
-                                          center: const Text(
-                                            "0\nCheck ins",
-                                            textAlign: TextAlign.center,
-                                            style: TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 18.0,
-                                            ),
-                                          ),
-                                          circularStrokeCap:
-                                              CircularStrokeCap.round,
-                                          progressColor: darkYellowColor,
-                                        );
-                                      }
+                                          );
+                                        }
+                                      },
+                                    ),
+                                  ),
+                                  const SizedBox(
+                                    width: 20,
+                                  ),
+                                  InkWell(
+                                    onTap: () {
+                                      Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  const UniqueCourtsScreen()));
                                     },
-                                  ),
-                                ),
-                                const SizedBox(
-                                  width: 20,
-                                ),
-                                InkWell(
-                                  onTap: () {
-                                    Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                const UniqueCourtsScreen()));
-                                  },
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      poppinsText("Golden\nCourt", 22,
-                                          FontWeight.bold, blackColor),
-                                      FutureBuilder<List<UserModel>?>(
-                                        future: getUniqueCourtNameMaps(),
-                                        builder: (context, snapshot) {
-                                          if (snapshot.connectionState ==
-                                              ConnectionState.waiting) {
-                                            // return const Center(child: CircularProgressIndicator());
-                                            return const Center(
-                                                child:
-                                                    CircularProgressIndicator());
-                                          } else if (snapshot.hasData &&
-                                              snapshot.data != null) {
-                                            return poppinsText(
-                                                "${snapshot.data?.length ?? 0} Check ins",
-                                                12,
-                                                FontWeight.normal,
-                                                blackColor);
-                                          } else if (snapshot.hasError) {
-                                            return Center(
-                                              child:
-                                                  Text(TempLanguage.wentWrong),
-                                            );
-                                          } else {
-                                            return poppinsText(
-                                                "0 Check ins",
-                                                12,
-                                                FontWeight.normal,
-                                                blackColor);
-                                          }
-                                        },
-                                      ),
-                                    ],
-                                  ),
-                                )
-                              ],
-                            ),
-                          ],
-                        ),
-                        const SizedBox(
-                          height: 15,
-                        ),
-                        AboutSection(userController: userController),
-                      ],
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        poppinsText("Golden\nCourt", 22,
+                                            FontWeight.bold, blackColor),
+                                        FutureBuilder<List<UserModel>?>(
+                                          future: getUniqueCourtNameMaps(),
+                                          builder: (context, snapshot) {
+                                            if (snapshot.connectionState ==
+                                                ConnectionState.waiting) {
+                                              // return const Center(child: CircularProgressIndicator());
+                                              return const Center(
+                                                  child:
+                                                      CircularProgressIndicator());
+                                            } else if (snapshot.hasData &&
+                                                snapshot.data != null) {
+                                              return poppinsText(
+                                                  "${snapshot.data?.length ?? 0} Check ins",
+                                                  12,
+                                                  FontWeight.normal,
+                                                  blackColor);
+                                            } else if (snapshot.hasError) {
+                                              return Center(
+                                                child: Text(
+                                                    TempLanguage.wentWrong),
+                                              );
+                                            } else {
+                                              return poppinsText(
+                                                  "0 Check ins",
+                                                  12,
+                                                  FontWeight.normal,
+                                                  blackColor);
+                                            }
+                                          },
+                                        ),
+                                      ],
+                                    ),
+                                  )
+                                ],
+                              ),
+                            ],
+                          ),
+                          const SizedBox(
+                            height: 15,
+                          ),
+                          AboutSection(userController: userController),
+                        ],
+                      ),
                     )
                   : const Center(child: CircularProgressIndicator()),
           // : const Center(child: Text("Loading...")),

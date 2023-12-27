@@ -33,7 +33,6 @@ class _HistoryViewState extends State<HistoryView> {
         .collection(Collections.USER)
         .doc(FirebaseAuth.instance.currentUser!.uid)
         .get();
-
     final checkedCourtsData = documentSnapshot.data()?[CourtKey.CHECKED_COURTS];
 
     if (checkedCourtsData != null && checkedCourtsData is List<dynamic>) {
