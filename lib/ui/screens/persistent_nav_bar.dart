@@ -200,9 +200,7 @@ class _HomeState extends State<Home> with AutomaticKeepAliveClientMixin {
       onWillPop: _onWillPop,
       child: Obx(() {
         return Scaffold(
-          body: Obx(() => IndexedStack(
-              index: navBarController.currentIndex.value,
-              children: _buildScreens)),
+          body: _buildScreens[navBarController.currentIndex.value],
           bottomNavigationBar: BottomNavigationBar(
             items: _navBarsItems(),
             currentIndex: navBarController.currentIndex.value,

@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:check_in/controllers/user_controller.dart';
@@ -105,7 +106,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         .collection(Collections.USER)
         .doc(userController.userModel.value.uid)
         .get();
-    print("all snapshot data.......${snapshot.data()}");
+    // log("all snapshot data.......${snapshot.data()}");
     UserModel currentUser =
         UserModel.fromMap(snapshot.data() as Map<String, dynamic>);
     userController.userModel.value = currentUser;
