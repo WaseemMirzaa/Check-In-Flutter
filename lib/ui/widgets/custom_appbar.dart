@@ -6,14 +6,13 @@ import '../../utils/colors.dart';
 class CustomAppbar extends StatelessWidget implements PreferredSizeWidget {
   Widget? title;
   bool showicon;
-  Widget? leading;
   List<Widget>? actions;
   CustomAppbar(
       {super.key,
       this.title,
       this.actions,
       this.showicon = true,
-      this.leading});
+    });
 
   @override
   Widget build(BuildContext context) {

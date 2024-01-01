@@ -24,10 +24,13 @@ class MessageScreen extends GetView<MessageController> {
       appBar: const MessageAppBar(),
       body: Column(
         children: [
-          SearchField(
-            onchange: (query) {
-              controller.searchQuery.value = query;
-            },
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10.0),
+            child: SearchField(
+              onchange: (query) {
+                controller.searchQuery.value = query;
+              },
+            ),
           ),
           verticalGap(20),
           Expanded(

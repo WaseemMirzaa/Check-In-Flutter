@@ -7,20 +7,19 @@ import '../../../../../utils/colors.dart';
 import '../../../../../utils/gaps.dart';
 import '../../../../../utils/styles.dart';
 import '../../../../widgets/custom_appbar.dart';
-import '../../Group Detail/group_detail.dart';
+import '../../User Group Detail/user_group_detail.dart';
 
 class ChatAppbar extends StatelessWidget implements PreferredSizeWidget {
   String? name;
   bool? isgroup;
-  ChatAppbar({super.key, this.name, this.isgroup});
+  Function()? ontap;
+  ChatAppbar({super.key, this.name, this.isgroup,this.ontap});
 
   @override
   Widget build(BuildContext context) {
     return CustomAppbar(
       title: GestureDetector(
-        onTap: () {
-          pushNewScreen(context, screen: const GroupdetailScreen());
-        },
+        onTap: ontap,
         child: Row(mainAxisSize: MainAxisSize.min, children: [
           const CircleAvatar(
             backgroundImage: NetworkImage(

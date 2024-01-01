@@ -1,19 +1,28 @@
+import 'package:check_in/ui/screens/%20Messages%20and%20Groupchat/Group%20Members/group_members.dart';
 import 'package:check_in/ui/widgets/custom_appbar.dart';
 import 'package:check_in/utils/Constants/images.dart';
 import 'package:check_in/utils/colors.dart';
 import 'package:check_in/utils/gaps.dart';
 import 'package:check_in/utils/styles.dart';
 import 'package:flutter/material.dart';
+import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
 
 class GroupdetailScreen extends StatelessWidget {
-  const GroupdetailScreen({super.key});
+  String? name;
+  GroupdetailScreen({super.key, this.name});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomAppbar(
         title: poppinsText('Group Details', 20, bold, blackColor),
-        actions: [Image.asset(AppImage.peopleicon)],
+        actions: [
+          GestureDetector(
+              onTap: () {
+                pushNewScreen(context, screen: const GroupMember());
+              },
+              child: Image.asset(AppImage.peopleicon))
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20.0),
@@ -23,7 +32,7 @@ class GroupdetailScreen extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                poppinsText('Basketall Group', 19, bold, blackColor),
+                poppinsText(name ?? '', 19, bold, blackColor),
               ],
             ),
             const Divider(thickness: 2),

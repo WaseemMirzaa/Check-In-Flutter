@@ -5,8 +5,10 @@ import 'package:check_in/ui/screens/%20Messages%20and%20Groupchat/Chat/Widgets/s
 import 'package:check_in/utils/Constants/global_variable.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
 import '../../../../utils/gaps.dart';
 import '../../../../utils/loader.dart';
+import '../User Group Detail/user_group_detail.dart';
 import 'Widgets/message_date_container.dart';
 import 'Widgets/send_message_container.dart';
 
@@ -16,9 +18,12 @@ class ChatScreen extends GetView<ChatController> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: ChatAppbar(
-        name: controller.name,
-        isgroup: controller.isgroup,
-      ),
+          name: controller.name,
+          isgroup: controller.isgroup,
+          ontap: () {
+            pushNewScreen(context,
+                screen: GroupdetailScreen(name: controller.name));
+          }),
       body: Column(
         children: [
           Expanded(
