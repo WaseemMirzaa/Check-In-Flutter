@@ -578,8 +578,8 @@ class _AddHomeCourtState extends State<AddHomeCourt>
                           //     });
                           //   }
                           // }
-                          print(
-                              "location name selected...$selectedLocationName");
+                          userController.userModel.value.homeCourt =
+                              selectedLocationName;
                           FirebaseFirestore.instance
                               .collection(Collections.USER)
                               .doc(FirebaseAuth.instance.currentUser!.uid)
