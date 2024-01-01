@@ -1,6 +1,5 @@
 // ignore_for_file: must_be_immutable
 
-import 'package:check_in/Services/message_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:sizer/sizer.dart';
@@ -89,7 +88,7 @@ class MessageListTile extends StatelessWidget {
                             decoration: BoxDecoration(
                                 color: greenColor, shape: BoxShape.circle),
                             child: poppinsText(
-                              MessageService().unreadCount.toString(),
+                              "0${message!.unreadmsg.toString()}",
                               9,
                               FontWeight.normal,
                               whiteColor,

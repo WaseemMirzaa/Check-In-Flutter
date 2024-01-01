@@ -5,6 +5,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../model/message_model.dart';
 
+List<dynamic> mem = [];
+
 class MessageService {
   int unreadCount = 0;
   final db = FirebaseFirestore.instance;
@@ -29,9 +31,13 @@ class MessageService {
                 name = data['groupName'];
                 imagepath = data['groupImg'];
 
-                List<dynamic> mem = data['mem'];
-
-                unread = data['members'][myId]['unreadCount'];
+                mem = data['mem'];
+                for (var val in mem) {
+                  if (val['uid'] == myId) {
+                    unread = val['unreadCount'];
+                  }
+                }
+                // unread = data['members'][myId]['unreadCount'];
               } else {
                 name = data['senderId'] == myId
                     ? data['recieverName']
@@ -66,23 +72,40 @@ class MessageService {
   Future<void> updateUnreadCount(
     String docId,
     String uId,
+    // num unreadval,
   ) async {
     final docRef = _messagesCollection.doc(docId);
     db.runTransaction((transaction) async {
       final snapshot = await transaction.get(docRef);
       if (snapshot.get('isGroup') == true) {
+        for (int i = 0; i < mem.length; i++) {
+          if (mem[i]['uid'] == uId) {
+            mem[i]['unreadCount'] = 0;
+            break;
+          }
+        }
+        docRef.update({'mem': mem});
       } else {
         if (snapshot.get('senderId') == uId) {
-          docRef.update({'senderUnread': 0});
+          docRef.update({
+            'senderUnread':
+                // unreadval==0?
+                0
+            // : FieldValue.increment(1)
+          });
         } else {
-          docRef.update({'recieverUnread': 0});
+          docRef.update({
+            'recieverUnread':
+                // unreadval== 0?
+                0
+            // :FieldValue.increment(1)
+          });
         }
       }
     });
   }
 
 ////////////  fetch count
-
   Future<int> fetchTotalUnreadCount(String groupId) async {
     print('in fetch');
     try {

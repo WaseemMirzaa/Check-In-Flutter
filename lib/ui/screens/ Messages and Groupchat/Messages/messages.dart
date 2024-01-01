@@ -5,10 +5,8 @@ import 'package:check_in/ui/screens/%20Messages%20and%20Groupchat/Messages/Widge
 import 'package:check_in/ui/screens/%20Messages%20and%20Groupchat/Messages/Widgets/search_field.dart';
 import 'package:check_in/utils/gaps.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
-import 'package:screenshot/screenshot.dart';
 import '../../../../utils/loader.dart';
 import '../../../../controllers/chat_controller.dart';
 import '../../../../controllers/messages_controller.dart';
@@ -21,9 +19,7 @@ class MessageScreen extends GetView<MessageController> {
   Widget build(BuildContext context) {
     return Scaffold(
       floatingActionButton: FloatingactionButton(
-        ontap: () {
-        
-        },
+        ontap: () {},
       ),
       appBar: const MessageAppBar(),
       body: Column(
