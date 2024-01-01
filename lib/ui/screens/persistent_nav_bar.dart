@@ -210,8 +210,31 @@ class _HomeState extends State<Home> with AutomaticKeepAliveClientMixin {
             showSelectedLabels: false,
             showUnselectedLabels: false,
             onTap: (index) {
-              navBarController.currentIndex.value = index;
-              navBarController.controller.index = index;
+              if (FirebaseAuth.instance.currentUser == null) {
+                showDialog(
+                    context: context,
+                    builder: (context) => AlertDialog(
+                          title: poppinsText(TempLanguage.logInForFeatures, 16,
+                              FontWeight.w500, blackColor),
+                          actions: [
+                            TextButton(
+                              onPressed: () {
+                                Get.off(() => StartView(isBack: true));
+                              },
+                              child: Text(TempLanguage.logIn),
+                            ),
+                            TextButton(
+                              onPressed: () {
+                                Navigator.pop(context);
+                              },
+                              child: Text(TempLanguage.cancel),
+                            ),
+                          ],
+                        ));
+              } else {
+                navBarController.currentIndex.value = index;
+                navBarController.controller.index = index;
+              }
             },
           ),
         );

@@ -162,7 +162,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
-  String mail = FirebaseAuth.instance.currentUser?.email as String;
+  //String mail = FirebaseAuth.instance.currentUser?.email ?? '';
   // String mail = FirebaseAuth.instance.currentUser?.email ?? "";
 
   @override
