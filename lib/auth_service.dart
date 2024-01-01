@@ -14,7 +14,7 @@ UserController userController = Get.put(UserController());
 final auth = FirebaseAuth.instance;
 final snap = FirebaseFirestore.instance;
 
-Future<void> signUp(
+Future<bool> signUp(
   email,
   password,
   userName,
@@ -40,10 +40,12 @@ Future<void> signUp(
                     pushNewScreen(context, screen: Home(), withNavBar: false)));
   } on FirebaseAuthException catch (e) {
     print('error message ${e.message}');
-    Get.snackbar('Error', e.message ?? '', snackPosition: SnackPosition.BOTTOM);
+    Get.snackbar('Error', e.message ?? '', snackPosition: SnackPosition.TOP);
     print('Failed with error code: ${e.code}');
     print(e.message);
+    return false;
   }
+  return true;
 }
 
 Future<void> login(email, password, context) async {
@@ -60,7 +62,7 @@ Future<void> login(email, password, context) async {
     print('error message ${e.message}');
     // Get.snackbar('Error', e.message ?? '', snackPosition: SnackPosition.BOTTOM);
     Get.snackbar('Error', "Invalid username or password",
-        snackPosition: SnackPosition.BOTTOM);
+        snackPosition: SnackPosition.TOP);
     print('Failed with error code: ${e.code}');
     print(e.message);
   }
@@ -97,7 +99,7 @@ Future<void> delAcc(context) async {
     builder: (BuildContext context) => AlertDialog(
       title: const Text('Confirmation'),
       content: const Text(
-          'Are you sure you want to delete you account?\nThese changes are irreversible'),
+          'Are you sure you want to delete you account?\nThese changes are irreversible.'),
       actions: <Widget>[
         OutlinedButton(
           child: const Text('Cancel'),
