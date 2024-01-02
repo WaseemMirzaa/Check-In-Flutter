@@ -4,24 +4,38 @@ import 'package:check_in/utils/Constants/images.dart';
 import 'package:check_in/utils/colors.dart';
 import 'package:check_in/utils/gaps.dart';
 import 'package:check_in/utils/styles.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
 
-class GroupdetailScreen extends StatelessWidget {
+import '../../../../controllers/group_members_controller.dart';
+
+class GroupdetailScreen extends GetView<GroupmemberController> {
   String? name;
-  GroupdetailScreen({super.key, this.name});
+  String? docId;
+  bool? isGroup;
+  GroupdetailScreen({super.key, this.name, this.docId, this.isGroup});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomAppbar(
-        title: poppinsText('Group Details', 20, bold, blackColor),
+        title: isGroup!
+            ? poppinsText('Group Details', 20, bold, blackColor)
+            : poppinsText('User Details', 20, bold, blackColor),
         actions: [
-          GestureDetector(
-              onTap: () {
-                pushNewScreen(context, screen: const GroupMember());
-              },
-              child: Image.asset(AppImage.peopleicon))
+          isGroup!
+              ? GestureDetector(
+                  onTap: () {
+                    controller.docid = docId!;
+                    pushNewScreen(context, screen: const GroupMember());
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.only(right: 20.0),
+                    child: SvgPicture.asset(AppImage.peopleicon),
+                  ))
+              : const SizedBox()
         ],
       ),
       body: Padding(
@@ -46,17 +60,20 @@ class GroupdetailScreen extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                poppinsText('About Group', 14, regular, blackColor),
+                isGroup!
+                    ? poppinsText('About Group', 14, semiBold, blackColor)
+                    : poppinsText('About User', 14, semiBold, blackColor),
               ],
             ),
             verticalGap(10),
             const Divider(thickness: 2),
             poppinsText(
-                'Money Market Account MC0628040080652344038362089 3I1QM5CGNW9V9IUCK3VZGFG6YDAFFGR9R9 capacity Multi-tiered Granite 256.00 Licensed Plastic Keyboard 274.00 Generic Plastic Computer 756.00 Shoes magenta indigo 78683 617 Real G’s move in silence like lasagna.',
+                'Money Market Accounapacity Multi-tiered Granite 256.00 Licensed Plastic Keyboard 274.00 Generic Plastic Computer 756.00 Shoes magenta indigo 78683 617 Real G’s move in silence like lasagna.',
                 14,
                 regular,
                 greyColor,
-                align: TextAlign.center)
+                align: TextAlign.center,
+                maxlines: 9)
           ],
         ),
       ),

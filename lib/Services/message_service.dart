@@ -1,6 +1,7 @@
 // ignore_for_file: unused_local_variable, avoid_print
 
 import 'package:check_in/model/chat_model.dart';
+import 'package:check_in/utils/Constants/constants.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../model/message_model.dart';
@@ -11,12 +12,12 @@ class MessageService {
   int unreadCount = 0;
   final db = FirebaseFirestore.instance;
   final CollectionReference _messagesCollection =
-      FirebaseFirestore.instance.collection('messages');
+      FirebaseFirestore.instance.collection(Collections.MESSAGES);
 
 //............ Get Message
   Stream<List<Messagemodel>> getChatMessage(String myId) {
     return _messagesCollection
-        .where('memberIds', arrayContains: myId)
+        .where(MessageField.MEMBER_IDS, arrayContains: myId)
         .snapshots()
         .map((querySnapshot) => querySnapshot.docs.map<Messagemodel>((doc) {
               // fetchTotalUnreadCount('groupA');
@@ -24,27 +25,27 @@ class MessageService {
               Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
               String name, imagepath = '';
 
-              if (data['isGroup'] == true) {
-                name = data['groupName'];
-                imagepath = data['groupImg'];
-                mem = data['mem'];
+              if (data[MessageField.IS_GROUP] == true) {
+                name = data[MessageField.GROUP_NAME];
+                imagepath = data[MessageField.GROUP_IMG];
+                mem = data[MessageField.MEMBERS];
                 for (var val in mem) {
-                  if (val['uid'] == myId) {
-                    unread = val['unreadCount'];
+                  if (val[MessageField.MEMBER_UID] == myId) {
+                    unread = val[MessageField.MEMBER_UNREAD_COUNT];
+                    break;
                   }
                 }
               } else {
-                name = data['senderId'] == myId
-                    ? data['recieverName']
-                    : data['senderName'];
-                imagepath = data['senderId'] == myId
-                    ? data['recieverImg']
-                    : data['senderImg'];
-                unread = data['senderId'] == myId
-                    ? data['senderUnread']
-                    : data['recieverUnread'];
+                name = data[MessageField.SENDER_ID] == myId
+                    ? data[MessageField.RECIEVER_NAME]
+                    : data[MessageField.SENDER_NAME];
+                imagepath = data[MessageField.SENDER_ID] == myId
+                    ? data[MessageField.RECIEVER_IMG]
+                    : data[MessageField.SENDER_IMG];
+                unread = data[MessageField.SENDER_ID] == myId
+                    ? data[MessageField.SENDER_UNREAD]
+                    : data[MessageField.RECIEVER_UNREAD];
               }
-
               return Messagemodel.fromJson(
                   doc.data() as Map<String, dynamic>, name, imagepath, unread);
             }).toList());
@@ -54,8 +55,8 @@ class MessageService {
   Stream<List<Chatmodel>> getConversation(String docId, String uId) {
     return _messagesCollection
         .doc(docId)
-        .collection('chat')
-        .orderBy('timeStamp', descending: true)
+        .collection(Collections.CHAT)
+        .orderBy(ChatField.TIME_STAMP, descending: true)
         .snapshots()
         .map((querySnapshot) => querySnapshot.docs.map<Chatmodel>((doc) {
               updateUnreadCount(docId, uId, 0);
@@ -72,19 +73,19 @@ class MessageService {
     final docRef = _messagesCollection.doc(docId);
     db.runTransaction((transaction) async {
       final snapshot = await transaction.get(docRef);
-      if (snapshot.get('isGroup') == true) {
+      if (snapshot.get(MessageField.IS_GROUP) == true) {
         for (int i = 0; i < mem.length; i++) {
-          if (mem[i]['uid'] == uId) {
-            mem[i]['unreadCount'] = 0;
+          if (mem[i][MessageField.MEMBER_UID] == uId) {
+            mem[i][MessageField.MEMBER_UNREAD_COUNT] = 0;
             break;
           }
         }
-        docRef.update({'mem': mem});
+        docRef.update({MessageField.MEMBERS: mem});
       } else {
-        if (snapshot.get('senderId') == uId) {
-          docRef.update({'senderUnread': 0});
+        if (snapshot.get(MessageField.SENDER_ID) == uId) {
+          docRef.update({MessageField.SENDER_UNREAD: 0});
         } else {
-          docRef.update({'recieverUnread': 0});
+          docRef.update({MessageField.RECIEVER_UNREAD: 0});
         }
       }
     });
@@ -102,7 +103,7 @@ class MessageService {
   //     if (!snapshot.exists) {
   //       return 0;
   //     }
-  //     List<dynamic> memArray = snapshot.data()!['mem'] ?? [];
+  //     List<dynamic> memArray = snapshot.data()!['members'] ?? [];
   //     List<int> unreadCounts = memArray.map<int>((item) {
   //       return item['unreadCount'] ?? 0;
   //     }).toList();
@@ -126,30 +127,46 @@ class MessageService {
 
       CollectionReference messageCollection = _messagesCollection;
       batch.update(messageCollection.doc(docId), {
-        'lastMessage': chatmodel.message,
-        'timeStamp': chatmodel.time,
+        MessageField.LAST_MESSAGE: chatmodel.message,
+        MessageField.TIME_STAMP: chatmodel.time,
       });
 
       final docRef = _messagesCollection.doc(docId);
       DocumentSnapshot snapshot = await docRef.get();
-      if (snapshot.get('isGroup') == true) {
+      if (snapshot.get(MessageField.IS_GROUP) == true) {
         for (int i = 0; i < mem.length; i++) {
-          if (mem[i]['uid'] != chatmodel.id) {
-            int current = mem[i]['unreadCount'];
-            mem[i]['unreadCount'] = current + 1;
+          if (mem[i][MessageField.MEMBER_UID] != chatmodel.id) {
+            int current = mem[i][MessageField.MEMBER_UNREAD_COUNT];
+            mem[i][MessageField.MEMBER_UNREAD_COUNT] = current + 1;
           }
         }
-        batch.update(docRef, {'mem': mem});
+        batch.update(docRef, {MessageField.MEMBERS: mem});
       } else {
-        if (snapshot.get('senderId') == chatmodel.id) {
-          batch.update(docRef, {'recieverUnread': FieldValue.increment(1)});
+        if (snapshot.get(MessageField.SENDER_ID) == chatmodel.id) {
+          batch.update(
+              docRef, {MessageField.RECIEVER_UNREAD: FieldValue.increment(1)});
         } else {
-          batch.update(docRef, {'senderUnread': FieldValue.increment(1)});
+          batch.update(
+              docRef, {MessageField.SENDER_UNREAD: FieldValue.increment(1)});
         }
       }
       await batch.commit();
     } catch (e) {
       print('Error sending message: $e');
+    }
+  }
+
+//............ Get group members
+  Stream<List<dynamic>> getGroupMembers(String docId) {
+    try {
+      return _messagesCollection
+          .doc(docId)
+          .snapshots()
+          .map((DocumentSnapshot snapshot) {
+        return snapshot.get(MessageField.MEMBERS);
+      });
+    } catch (e) {
+      rethrow;
     }
   }
 }

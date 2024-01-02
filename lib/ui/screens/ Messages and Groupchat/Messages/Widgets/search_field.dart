@@ -13,10 +13,10 @@ class SearchField extends StatelessWidget {
       elevation: 8,
       borderRadius: BorderRadius.circular(40),
       child: TextFormField(
-        
         onChanged: onchange,
         controller: controller,
         decoration: InputDecoration(
+            contentPadding: const EdgeInsets.only(left: 20, right: 10),
             hintText: 'Search',
             enabledBorder: OutlineInputBorder(
               borderSide: BorderSide.none,

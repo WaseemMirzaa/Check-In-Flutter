@@ -22,7 +22,10 @@ class ChatScreen extends GetView<ChatController> {
           isgroup: controller.isgroup,
           ontap: () {
             pushNewScreen(context,
-                screen: GroupdetailScreen(name: controller.name));
+                screen: GroupdetailScreen(
+                    name: controller.name,
+                    docId: controller.docId.value,
+                    isGroup: controller.isgroup));
           }),
       body: Column(
         children: [

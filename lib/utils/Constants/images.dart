@@ -6,5 +6,5 @@ class AppImage {
   static String chatfieldicon = 'assets/images/chatfield-icon.svg';
   static String chatfieldsticker = 'assets/images/chatfield-sticker.svg';
   static String sendmsgicon = 'assets/images/sendmsg-icon.svg';
-  static String peopleicon = 'assets/images/people.png';
+  static String peopleicon = 'assets/images/people.svg';
 }
