@@ -8,7 +8,7 @@ import 'package:get/get.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
 import '../../../../utils/gaps.dart';
 import '../../../../utils/loader.dart';
-import '../User Group Detail/user_group_detail.dart';
+import '../Group Detail/group_detail.dart';
 import 'Widgets/message_date_container.dart';
 import 'Widgets/send_message_container.dart';
 
@@ -20,13 +20,12 @@ class ChatScreen extends GetView<ChatController> {
       appBar: ChatAppbar(
           name: controller.name,
           isgroup: controller.isgroup,
-          ontap: () {
-            pushNewScreen(context,
-                screen: GroupdetailScreen(
-                    name: controller.name,
-                    docId: controller.docId.value,
-                    isGroup: controller.isgroup));
-          }),
+          ontap: controller.isgroup
+              ? () {
+                  pushNewScreen(context,
+                      screen: GroupdetailScreen(docId: controller.docId.value));
+                }
+              : () {}),
       body: Column(
         children: [
           Expanded(

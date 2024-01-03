@@ -169,4 +169,27 @@ class MessageService {
       rethrow;
     }
   }
+
+//........... Get Group detail
+  Future<DocumentSnapshot> getGroupDetails(String docId) {
+    try {
+      return _messagesCollection.doc(docId).get();
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+//........... Update Group detail
+  Future<bool> updateGroupdetail(
+      String docId, String name, String about) async {
+    try {
+      DocumentReference ref = _messagesCollection.doc(docId);
+      await ref.update(
+          {MessageField.ABOUT_GROUP: about, MessageField.GROUP_NAME: name});
+
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
 }

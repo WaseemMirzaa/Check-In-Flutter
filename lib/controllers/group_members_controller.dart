@@ -9,7 +9,7 @@ class GroupmemberController extends GetxController {
 
   var searchQuery = ''.obs;
 
-//............ get messages
+//............ get groupmember
   Stream<List<dynamic>> getGroupMember() {
     return messageService.getGroupMembers(docid);
   }

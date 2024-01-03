@@ -7,7 +7,7 @@ import '../../../../../utils/colors.dart';
 import '../../../../../utils/gaps.dart';
 import '../../../../../utils/styles.dart';
 import '../../../../widgets/custom_appbar.dart';
-import '../../User Group Detail/user_group_detail.dart';
+import '../../Group Detail/group_detail.dart';
 
 class ChatAppbar extends StatelessWidget implements PreferredSizeWidget {
   String? name;
