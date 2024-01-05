@@ -16,6 +16,7 @@ class MessageField {
   static const String MEMBER_NAME = 'name';
   static const String MEMBER_UID = 'uid';
   static const String MEMBER_UNREAD_COUNT = 'unreadCount';
+  static const String MEMBER_IMG = 'image';
   static const String RECIEVER_ID = 'recieverId';
   static const String RECIEVER_IMG = 'recieverImg';
   static const String RECIEVER_NAME = 'recieverName';

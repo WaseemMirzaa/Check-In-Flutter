@@ -35,9 +35,11 @@ class MessageListTile extends StatelessWidget {
             decoration: BoxDecoration(borderRadius: BorderRadius.circular(10)),
             child: Row(
               children: [
-                const CircleAvatar(
-                  backgroundImage: NetworkImage(
-                      'https://wac-cdn.atlassian.com/dam/jcr:ba03a215-2f45-40f5-8540-b2015223c918/Max-R_Headshot%20(1).jpg?cdnVersion=1365'),
+                CircleAvatar(
+                  backgroundColor: greenColor.withOpacity(0.6),
+                  backgroundImage: NetworkImage(message!.image! == ''
+                      ? AppImage.userImagePath
+                      : message!.image!),
                   radius: 30,
                 ),
                 Padding(

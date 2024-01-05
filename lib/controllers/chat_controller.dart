@@ -9,6 +9,7 @@ class ChatController extends GetxController {
   final MessageService chatService;
   final RxString docId = ''.obs;
   String name = '';
+  String image = '';
   bool isgroup = false;
   RxBool issticker = true.obs;
   late TextEditingController chatfieldController;

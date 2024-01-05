@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:check_in/controllers/group_detail_controller.dart';
 import 'package:check_in/controllers/group_members_controller.dart';
 import 'package:check_in/ui/screens/%20Messages%20and%20Groupchat/Group%20Detail/Widgets/textfields.dart';
@@ -5,16 +7,18 @@ import 'package:check_in/ui/screens/%20Messages%20and%20Groupchat/Group%20Member
 import 'package:check_in/ui/widgets/common_button.dart';
 import 'package:check_in/ui/widgets/custom_appbar.dart';
 import 'package:check_in/utils/Constants/images.dart';
+import 'package:check_in/utils/colors.dart';
 import 'package:check_in/utils/gaps.dart';
+import 'package:check_in/utils/loader.dart';
 import 'package:check_in/utils/styles.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
-import 'package:nb_utils/nb_utils.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
 
 import 'Widgets/bottomsheet.dart';
 
+// ignore: must_be_immutable
 class GroupdetailScreen extends GetView<UsergroupDetailController> {
   String? docId;
   GroupdetailScreen({super.key, this.docId});
@@ -53,26 +57,36 @@ class GroupdetailScreen extends GetView<UsergroupDetailController> {
                     height: 135,
                     child: Stack(
                       children: [
-                        const CircleAvatar(
-                          backgroundImage: NetworkImage(
-                              'https://wac-cdn.atlassian.com/dam/jcr:ba03a215-2f45-40f5-8540-b2015223c918/Max-R_Headshot%20(1).jpg?cdnVersion=1365'),
-                          radius: 65,
-                        ),
+                        Obx(() => controller.loading.value
+                            ? loaderView()
+                            : CircleAvatar(
+                                backgroundColor: greenColor.withOpacity(0.6),
+                                backgroundImage: controller.fileImage.value !=
+                                        null
+                                    ? FileImage(File(
+                                            controller.fileImage.value!.path))
+                                        as ImageProvider
+                                    : NetworkImage(
+                                        controller.networkImage.value != ''
+                                            ? controller.networkImage.value
+                                            : AppImage.userImagePath),
+                                radius: 65,
+                              )),
                         Positioned(
                           right: 10,
                           bottom: 1,
                           child: GestureDetector(
                             onTap: () {
-                              showbottomSheet(context);
+                              showbottomSheet(context, controller);
                             },
                             child: Container(
                               height: 40,
                               width: 40,
-                              decoration: const BoxDecoration(
+                              decoration: BoxDecoration(
                                   color: greenColor, shape: BoxShape.circle),
-                              child: const Icon(
+                              child: Icon(
                                 Icons.camera_alt,
-                                color: white,
+                                color: whiteColor,
                               ),
                             ),
                           ),
@@ -108,9 +122,11 @@ class GroupdetailScreen extends GetView<UsergroupDetailController> {
             )),
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 10.0),
-              child: fullWidthButton('Save', () {
-                controller.updateGroupDetail(docId!);
-              }),
+              child: Obx(() => controller.uploadDataLoading.value
+                  ? loaderView()
+                  : fullWidthButton('Save', () {
+                      controller.updateGroupDetail(docId!);
+                    })),
             )
           ],
         ),

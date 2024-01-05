@@ -20,6 +20,7 @@ class ChatScreen extends GetView<ChatController> {
       appBar: ChatAppbar(
           name: controller.name,
           isgroup: controller.isgroup,
+          image: controller.image,
           ontap: controller.isgroup
               ? () {
                   pushNewScreen(context,

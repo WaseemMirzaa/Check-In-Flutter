@@ -8,4 +8,6 @@ class AppImage {
   static String sendmsgicon = 'assets/images/sendmsg-icon.svg';
   static String peopleicon = 'assets/images/people.svg';
   static String penicon = 'assets/images/pen_icon.svg';
+  static String userImagePath =
+      'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_640.png';
 }

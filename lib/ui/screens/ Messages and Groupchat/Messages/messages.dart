@@ -68,8 +68,9 @@ class MessageScreen extends GetView<MessageController> {
                                     chatcontroller.docId.value = message.id!;
                                     chatcontroller.name = message.name!;
                                     chatcontroller.isgroup = message.isgroup!;
+                                    chatcontroller.image = message.image!;
                                     pushNewScreen(context,
-                                        screen: ChatScreen());
+                                        screen: const ChatScreen());
                                   },
                                 );
                               } else {

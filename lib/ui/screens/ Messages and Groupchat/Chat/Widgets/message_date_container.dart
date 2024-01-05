@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../../../../model/chat_model.dart';
-import '../../../../../utils/chat_customshape.dart';
+import 'chat_customshape.dart';
 import '../../../../../utils/colors.dart';
 import '../../../../../utils/gaps.dart';
 import '../../../../../utils/styles.dart';

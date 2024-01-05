@@ -1,4 +1,5 @@
 import 'package:check_in/controllers/group_members_controller.dart';
+import 'package:check_in/utils/Constants/constants.dart';
 import 'package:check_in/utils/Constants/images.dart';
 import 'package:check_in/utils/gaps.dart';
 import 'package:flutter/material.dart';
@@ -75,7 +76,8 @@ class GroupMember extends GetView<GroupmemberController> {
                           },
                           itemBuilder: (context, index) {
                             return Obx(() {
-                              if (snapshot.data![index]['name']!
+                              if (snapshot.data![index]
+                                      [MessageField.MEMBER_NAME]!
                                   .toLowerCase()
                                   .contains(
                                       controller.searchQuery.toLowerCase())) {
@@ -95,9 +97,12 @@ class GroupMember extends GetView<GroupmemberController> {
                                               BorderRadius.circular(10)),
                                       child: Row(
                                         children: [
-                                          const CircleAvatar(
+                                          CircleAvatar(
+                                            backgroundColor:
+                                                greenColor.withOpacity(0.6),
                                             backgroundImage: NetworkImage(
-                                                'https://wac-cdn.atlassian.com/dam/jcr:ba03a215-2f45-40f5-8540-b2015223c918/Max-R_Headshot%20(1).jpg?cdnVersion=1365'),
+                                                snapshot.data![index]
+                                                    [MessageField.MEMBER_IMG]),
                                             radius: 30,
                                           ),
                                           Padding(
@@ -114,8 +119,9 @@ class GroupMember extends GetView<GroupmemberController> {
                                                     SizedBox(
                                                       width: 45.w,
                                                       child: poppinsText(
-                                                          snapshot.data![index]
-                                                              ['name'],
+                                                          snapshot.data![index][
+                                                              MessageField
+                                                                  .MEMBER_NAME],
                                                           15,
                                                           FontWeight.bold,
                                                           blackColor,

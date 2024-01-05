@@ -1,8 +1,12 @@
 // ignore_for_file: unused_local_variable, avoid_print
 
+import 'dart:developer';
+import 'dart:io';
+
 import 'package:check_in/model/chat_model.dart';
 import 'package:check_in/utils/Constants/constants.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 
 import '../model/message_model.dart';
 
@@ -13,6 +17,7 @@ class MessageService {
   final db = FirebaseFirestore.instance;
   final CollectionReference _messagesCollection =
       FirebaseFirestore.instance.collection(Collections.MESSAGES);
+  final FirebaseStorage _storage = FirebaseStorage.instance;
 
 //............ Get Message
   Stream<List<Messagemodel>> getChatMessage(String myId) {
@@ -181,15 +186,37 @@ class MessageService {
 
 //........... Update Group detail
   Future<bool> updateGroupdetail(
-      String docId, String name, String about) async {
+    String docId,
+    String name,
+    String about,
+    String imagePath,
+  ) async {
     try {
+      String? image = await uploadImageToFirebase(docId, imagePath);
       DocumentReference ref = _messagesCollection.doc(docId);
-      await ref.update(
-          {MessageField.ABOUT_GROUP: about, MessageField.GROUP_NAME: name});
+      await ref.update({
+        MessageField.ABOUT_GROUP: about,
+        MessageField.GROUP_NAME: name,
+        MessageField.GROUP_IMG: image
+      });
 
       return true;
     } catch (e) {
       return false;
+    }
+  }
+
+//........... Upload Group image
+  Future<String?> uploadImageToFirebase(String docId, String imagePath) async {
+    try {
+      Reference storageReference = _storage.ref().child('group/$docId');
+
+      await storageReference.putFile(File(imagePath));
+      final downloadUrl = await storageReference.getDownloadURL();
+      return downloadUrl;
+    } catch (e) {
+      log(e.toString());
+      return null;
     }
   }
 }
