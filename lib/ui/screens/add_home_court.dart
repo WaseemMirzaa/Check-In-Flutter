@@ -30,7 +30,6 @@ import 'package:google_maps_webservice/places.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
 import '../../constants.dart';
 import '../../core/constant/constant.dart';
-import '../../core/constant/temp_language.dart';
 import '../../utils/CourtsParser.dart';
 
 class AddHomeCourt extends StatefulWidget {
@@ -93,20 +92,23 @@ class _AddHomeCourtState extends State<AddHomeCourt>
         desiredAccuracy: LocationAccuracy.high);
     // courtNames();
     print(currentLocation?.longitude);
-    if(mounted) {
+    if (mounted) {
       setState(() {
-      currentLocation = position;
-      _selectedLocation =
-          LatLng(currentLocation!.latitude, currentLocation!.latitude);
-      courtNames();
-    });
+        currentLocation = position;
+        _selectedLocation =
+            LatLng(currentLocation!.latitude, currentLocation!.latitude);
+        courtNames();
+      });
     }
 
     return Future.value(currentLocation);
   }
 
   Future courtNames() async {
-    await snap.collection(Collections.GOLDEN_LOCATIONS).get().then((querySnapshot) {
+    await snap
+        .collection(Collections.GOLDEN_LOCATIONS)
+        .get()
+        .then((querySnapshot) {
       for (var doc in querySnapshot.docs) {
         double latitude = doc.data()[CourtKey.LAT];
         double longitude = doc.data()[CourtKey.LNG];
@@ -130,7 +132,7 @@ class _AddHomeCourtState extends State<AddHomeCourt>
         );
         markers.add(marker);
       }
-      if(mounted)setState(() {});
+      if (mounted) setState(() {});
     });
 
     // ADDING PLACCES API COURTS LOCATION MARKER
@@ -182,10 +184,10 @@ class _AddHomeCourtState extends State<AddHomeCourt>
       markers.add(marker);
     }
 
-    if(mounted) {
+    if (mounted) {
       setState(() {
-      markers = markers;
-    });
+        markers = markers;
+      });
     }
   }
 
@@ -200,7 +202,7 @@ class _AddHomeCourtState extends State<AddHomeCourt>
         ),
       ),
     );
-    if(mounted)setState(() {});
+    if (mounted) setState(() {});
 
     return Future.value(currentLocation);
   }
@@ -471,10 +473,11 @@ class _AddHomeCourtState extends State<AddHomeCourt>
                                   );
                                 },
                                 onSuggestionSelected: (prediction) async {
-                                  if(mounted) {
+                                  if (mounted) {
                                     setState(() {
-                                    _selectedPlace = prediction.title as String;
-                                  });
+                                      _selectedPlace =
+                                          prediction.title as String;
+                                    });
                                   }
                                   typeAheadController.text = _selectedPlace;
 
@@ -523,7 +526,7 @@ class _AddHomeCourtState extends State<AddHomeCourt>
 
                                   if (!matched) {
                                     markers.add(marker);
-                                    if(mounted)setState(() {});
+                                    if (mounted) setState(() {});
                                   }
                                 },
                                 transitionBuilder:
@@ -575,13 +578,15 @@ class _AddHomeCourtState extends State<AddHomeCourt>
                           //     });
                           //   }
                           // }
-
+                          userController.userModel.value.homeCourt =
+                              selectedLocationName;
                           FirebaseFirestore.instance
                               .collection(Collections.USER)
                               .doc(FirebaseAuth.instance.currentUser!.uid)
-                              .update({UserKey.HOME_COURT: selectedLocationName});
+                              .update(
+                                  {UserKey.HOME_COURT: selectedLocationName});
                           pushNewScreen(context,
-                              screen: Home(), withNavBar: false);
+                              screen: const Home(), withNavBar: false);
                         }),
                       ),
                     )

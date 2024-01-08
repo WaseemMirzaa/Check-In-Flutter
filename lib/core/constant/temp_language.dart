@@ -63,6 +63,7 @@ class TempLanguage {
   static String get enterEmail => "Enter Email";
   static String get enterPassword => "Enter Password";
   static String get wentWrong => 'Something went wrong';
+  static String get noDataFound => 'No data found';
 
   static String get dearUser => "Dear User";
   static String get alertContentText =>

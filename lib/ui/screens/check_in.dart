@@ -8,6 +8,7 @@ import 'package:check_in/core/constant/temp_language.dart';
 import 'package:check_in/firebase-models/user_firebase_model.dart';
 import 'package:check_in/model/user_modal.dart';
 import 'package:check_in/ui/screens/contact_us.dart';
+import 'package:check_in/ui/screens/persistent_nav_bar.dart';
 import 'package:check_in/ui/screens/privacy_policy.dart';
 import 'package:check_in/ui/screens/start.dart';
 import 'package:nb_utils/nb_utils.dart' as nbutils;
@@ -35,6 +36,7 @@ import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../constants.dart';
 import '../../controllers/user_controller.dart';
+import '../../main.dart';
 import 'Players.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/foundation.dart';
@@ -75,7 +77,6 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
   var courtN;
   bool? isCheckedIn = false;
   String checkedInCourtName = '';
-
   Map<String, dynamic> courtInfo = {};
 
   TextEditingController typeAheadController = TextEditingController();
@@ -138,7 +139,7 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
     } else {
       index = 0;
     }
-    if(mounted)setState(() {});
+    if (mounted) setState(() {});
     // print(index);
   }
 
@@ -148,11 +149,11 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
           desiredAccuracy: LocationAccuracy.high);
       // courtNames();
       // print(currentLocation?.longitude);
-      if(mounted) {
+      if (mounted) {
         setState(() {
-        currentLocation = position;
-        courtNames();
-      });
+          currentLocation = position;
+          courtNames();
+        });
       }
     } catch (e) {
       log('Enable location');
@@ -164,20 +165,49 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
 
   Future courtNames() async {
     // Golden Location
-
     try {
-      await snap
-          .collection(Collections.GOLDEN_LOCATIONS)
-          .get()
-          .then((querySnapshot) {
-        for (var doc in querySnapshot.docs) {
-          double latitude = doc.data()[CourtKey.LAT];
-          double longitude = doc.data()[CourtKey.LNG];
-          String name = doc.data()[CourtKey.NAME];
+      if (courtlist.isEmpty) {
+        await snap
+            .collection(Collections.GOLDEN_LOCATIONS)
+            .get()
+            .then((querySnapshot) {
+          for (var doc in querySnapshot.docs) {
+            courtlist.add(doc.data());
+            double latitude = doc.data()[CourtKey.LAT];
+            double longitude = doc.data()[CourtKey.LNG];
+            String name = doc.data()[CourtKey.NAME];
+
+            LatLng location = LatLng(latitude, longitude);
+            Marker marker = Marker(
+              markerId: MarkerId(doc.id),
+              position: location,
+              infoWindow: InfoWindow(title: name, snippet: CourtKey.GOLDEN),
+              icon: BitmapDescriptor.defaultMarkerWithHue(
+                  BitmapDescriptor.hueYellow),
+              onTap: () {
+                pushNewScreen(context,
+                    screen: PlayersView(
+                      courtLatLng: location,
+                      courtName: name,
+                      isCheckedIn: checkedInCourtName == name,
+                    ),
+                    withNavBar: false);
+              },
+            );
+            markers.add(marker);
+            addHeatedMarkers(marker);
+          }
+          if (mounted) setState(() {});
+        });
+      } else {
+        for (var doc in courtlist) {
+          double latitude = doc[CourtKey.LAT];
+          double longitude = doc[CourtKey.LNG];
+          String name = doc[CourtKey.NAME];
 
           LatLng location = LatLng(latitude, longitude);
           Marker marker = Marker(
-            markerId: MarkerId(doc.id),
+            markerId: MarkerId(doc[CourtKey.ID].toString()),
             position: location,
             infoWindow: InfoWindow(title: name, snippet: CourtKey.GOLDEN),
             icon: BitmapDescriptor.defaultMarkerWithHue(
@@ -195,8 +225,8 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
           markers.add(marker);
           addHeatedMarkers(marker);
         }
-        if(mounted)setState(() {});
-      });
+        if (mounted) setState(() {});
+      }
     } catch (e) {
       print(e);
     }
@@ -254,11 +284,11 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
       addHeatedMarkers(marker);
     }
 
-    if(mounted) {
+    if (mounted) {
       setState(() {
-      // markers = markers;
-      addLocationChangeListener();
-    });
+        // markers = markers;
+        addLocationChangeListener();
+      });
     }
   }
 
@@ -295,7 +325,7 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
 
     WeightedLatLng point = WeightedLatLng(marker.position, weight: intensity);
 
-    if(mounted)setState(() => heatmapPoints.add(point));
+    if (mounted) setState(() => heatmapPoints.add(point));
   }
 
   void setHeatMapSize(int zoomLevel) {
@@ -307,7 +337,7 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
 
     print("Zoom Level = $zoomLevel");
     print("heatMapRadius.value = ${heatMapRadius.value}");
-    if(mounted)setState(() {});
+    if (mounted) setState(() {});
   }
 
   sendEmail(String name, String email, String homeCourt) async {
@@ -329,7 +359,7 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
     $name
     ''';
 
-    final Uri _emailLaunchUri = Uri(
+    final Uri emailLaunchUri = Uri(
       scheme: 'mailto',
       path: 'support@checkinhoops.net',
       // Replace with the recipient's email address for reporting
@@ -338,7 +368,7 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
 
     // if (await canLaunchUrl(_emailLaunchUri)) {
     try {
-      await launchUrl(_emailLaunchUri);
+      await launchUrl(emailLaunchUri);
     } catch (e) {
       nbutils.toast(TempLanguage.notLaunchEmailToast);
       print(e);
@@ -367,7 +397,7 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
         ),
       ),
     );
-    if(mounted)setState(() {});
+    if (mounted) setState(() {});
 
     return Future.value(currentLocation);
   }
@@ -386,10 +416,12 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
       distanceFilter:
           10, // Minimum distance (in meters) for location change updates
     ).listen((Position position) {
-      if(mounted)setState(() {
-        currentLocation = position;
-        checkIfWithinRadiusAndSetUserCourtInfo();
-      });
+      if (mounted) {
+        setState(() {
+          currentLocation = position;
+          checkIfWithinRadiusAndSetUserCourtInfo();
+        });
+      }
     });
   }
 
@@ -490,16 +522,17 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
         .collection(Collections.USER)
         .doc(auth.currentUser!.uid)
         .get();
-    List<dynamic> checkedCourts = (userDoc.data()
-            as Map<String, dynamic>?)?[CourtKey.CHECKED_COURTS] ??
-        [];
+    List<dynamic> checkedCourts =
+        (userDoc.data() as Map<String, dynamic>?)?[CourtKey.CHECKED_COURTS] ??
+            [];
     // Check if the coordinates are already present in the array
     if (checkedCourts.any((court) =>
         court[CourtKey.COURT_LAT] == currentCourtLat &&
-        court[CourtKey.COURT_LNG] == currentCourtLng))
+        court[CourtKey.COURT_LNG] == currentCourtLng)) {
       return false;
-    else
+    } else {
       return true;
+    }
   }
 
   void _buttonPress() async {
@@ -507,14 +540,14 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
 
     //CheckIn Pressed
     if (index == 1) {
-      if(mounted) {
+      if (mounted) {
         setState(() {
-        courtInfo['checkInTime'] =
-            DateFormat('HH:mm:ss').format(DateTime.now());
-        courtInfo[CheckedCourts.checkInTimeStamp] = Timestamp.now();
+          courtInfo['checkInTime'] =
+              DateFormat('HH:mm:ss').format(DateTime.now());
+          courtInfo[CheckedCourts.checkInTimeStamp] = Timestamp.now();
 
-        checkedInCourtName = courtInfo['courtName'];
-      });
+          checkedInCourtName = courtInfo['courtName'];
+        });
       }
       print(courtInfo['isGolden']);
       bool val = await isCourtAlreadyStored(loc!.latitude, loc!.longitude);
@@ -577,12 +610,11 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
   }
 
   getUser() async {
-
     if (FirebaseAuth.instance.currentUser != null) {
       DocumentSnapshot snapshot = await FirebaseFirestore.instance
-              .collection(Collections.USER)
-              .doc(FirebaseAuth.instance.currentUser?.uid ?? "")
-              .get();
+          .collection(Collections.USER)
+          .doc(FirebaseAuth.instance.currentUser?.uid ?? "")
+          .get();
       userController.userModel.value =
           UserModel.fromMap(snapshot.data() as Map<String, dynamic>);
       print(userController.userModel.value);
@@ -656,25 +688,25 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
               ),
               FirebaseAuth.instance.currentUser == null
                   ? const SizedBox()
-              :
-              userController.userModel.value.isVerified == null ||
-                      userController.userModel.value.isVerified == true
-                  ? const SizedBox()
-                  : ListTile(
-                      leading: const Icon(
-                        Icons.verified,
-                      ),
-                      title: Text(TempLanguage.verifyProfile),
-                      onTap: () {
-                        if (userController.userModel.value.isVerified ==
-                            false) {
-                          sendEmail(
-                              userController.userModel.value.userName ?? "",
-                              userController.userModel.value.email ?? "",
-                              userController.userModel.value.homeCourt ?? "");
-                        }
-                      },
-                    ),
+                  : userController.userModel.value.isVerified == null ||
+                          userController.userModel.value.isVerified == true
+                      ? const SizedBox()
+                      : ListTile(
+                          leading: const Icon(
+                            Icons.verified,
+                          ),
+                          title: Text(TempLanguage.verifyProfile),
+                          onTap: () {
+                            if (userController.userModel.value.isVerified ==
+                                false) {
+                              sendEmail(
+                                  userController.userModel.value.userName ?? "",
+                                  userController.userModel.value.email ?? "",
+                                  userController.userModel.value.homeCourt ??
+                                      "");
+                            }
+                          },
+                        ),
               FirebaseAuth.instance.currentUser == null
                   ? const SizedBox()
                   : ListTile(
@@ -721,7 +753,10 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
                         // tileOverlays: ,
                         initialCameraPosition: CameraPosition(
                           target: LatLng(currentLocation!.latitude,
-                              currentLocation!.longitude),
+                              currentLocation!.longitude
+                              // 42.3878,
+                              // -71.1105
+                              ),
                           zoom: ZOOM_LEVEL_INITIAL,
                         ),
                         markers: markers,
@@ -744,7 +779,7 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
                               heatmapId: const HeatmapId('test'),
                               data: heatmapPoints,
                               gradient: HeatmapGradient(
-                                 <HeatmapGradientColor>[
+                                <HeatmapGradientColor>[
                                   // Web needs a first color with 0 alpha
                                   // if (kIsWeb)
                                   //   HeatmapGradientColor(
@@ -820,13 +855,17 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
                             ),
                             InkWell(
                               onTap: () {
+                                courtlist.clear();
                                 // Add your refresh button functionality here
                                 // Get.offAll(CheckIn());
+                                //....................
                                 Navigator.pushAndRemoveUntil(
                                     context,
                                     MaterialPageRoute(
-                                        builder: (context) => const CheckIn()),
+                                        builder: (context) => const Home()),
                                     (route) => false);
+                                //...................
+                                // setState(() {});
                                 // Navigator.pushReplacement(
                                 //   context,
                                 //   MaterialPageRoute(builder: (context) => CheckIn()),
