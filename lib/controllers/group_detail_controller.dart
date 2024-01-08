@@ -32,9 +32,9 @@ class UsergroupDetailController extends GetxController {
 //............ update group detail
   Future<void> updateGroupDetail(String docId) async {
     uploadDataLoading.value = true;
-    // String imagePath = fileImage.value == null ? '' : fileImage.value!.path;
-    final result = await messageService.updateGroupdetail(docId,
-        nameController.text, aboutController.text, fileImage.value!.path);
+    String imagePath = fileImage.value == null ? '' : fileImage.value!.path;
+    final result = await messageService.updateGroupdetail(
+        docId, nameController.text, aboutController.text, imagePath);
 
     if (result) {
       uploadDataLoading.value = false;

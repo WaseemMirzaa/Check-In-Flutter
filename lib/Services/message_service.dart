@@ -192,14 +192,20 @@ class MessageService {
     String imagePath,
   ) async {
     try {
-      String? image = await uploadImageToFirebase(docId, imagePath);
       DocumentReference ref = _messagesCollection.doc(docId);
-      await ref.update({
-        MessageField.ABOUT_GROUP: about,
-        MessageField.GROUP_NAME: name,
-        MessageField.GROUP_IMG: image
-      });
-
+      if (imagePath == '') {
+        await ref.update({
+          MessageField.ABOUT_GROUP: about,
+          MessageField.GROUP_NAME: name,
+        });
+      } else {
+        String? image = await uploadImageToFirebase(docId, imagePath);
+        await ref.update({
+          MessageField.ABOUT_GROUP: about,
+          MessageField.GROUP_NAME: name,
+          MessageField.GROUP_IMG: image
+        });
+      }
       return true;
     } catch (e) {
       return false;
