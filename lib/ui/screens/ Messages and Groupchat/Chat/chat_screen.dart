@@ -1,8 +1,9 @@
-import 'package:check_in/model/chat_model.dart';
+import 'package:check_in/model/Message%20and%20Group%20Message%20Model/chat_model.dart';
 import 'package:check_in/controllers/chat_controller.dart';
 import 'package:check_in/ui/screens/%20Messages%20and%20Groupchat/Chat/Widgets/appbar.dart';
 import 'package:check_in/ui/screens/%20Messages%20and%20Groupchat/Chat/Widgets/sticker_keyboard.dart';
 import 'package:check_in/utils/Constants/global_variable.dart';
+import 'package:check_in/utils/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
@@ -59,8 +60,10 @@ class ChatScreen extends GetView<ChatController> {
                                 children: [
                                   mymsg
                                       ? const SizedBox()
-                                      : const CircleAvatar(
-                                          backgroundImage: NetworkImage(
+                                      : CircleAvatar(
+                                          backgroundColor:
+                                              greenColor.withOpacity(0.6),
+                                          backgroundImage: const NetworkImage(
                                               'https://wac-cdn.atlassian.com/dam/jcr:ba03a215-2f45-40f5-8540-b2015223c918/Max-R_Headshot%20(1).jpg?cdnVersion=1365'),
                                           radius: 17,
                                         ),

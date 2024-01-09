@@ -1,5 +1,6 @@
 import 'package:check_in/controllers/group_members_controller.dart';
-import 'package:check_in/utils/Constants/constants.dart';
+import 'package:check_in/model/Message%20and%20Group%20Message%20Model/group_member_model.dart';
+import 'package:check_in/ui/screens/%20Messages%20and%20Groupchat/Group%20Members/Widgets/group_member_tile.dart';
 import 'package:check_in/utils/Constants/images.dart';
 import 'package:check_in/utils/gaps.dart';
 import 'package:flutter/material.dart';
@@ -35,7 +36,7 @@ class GroupMember extends GetView<GroupmemberController> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           verticalGap(15),
-          StreamBuilder<List<dynamic>>(
+          StreamBuilder<List<GroupMemberModel>>(
               stream: controller.getGroupMember(),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
@@ -61,7 +62,7 @@ class GroupMember extends GetView<GroupmemberController> {
           Expanded(
             child: SizedBox(
                 height: 60.h,
-                child: StreamBuilder<List<dynamic>>(
+                child: StreamBuilder<List<GroupMemberModel>>(
                     stream: controller.getGroupMember(),
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
@@ -76,77 +77,21 @@ class GroupMember extends GetView<GroupmemberController> {
                           },
                           itemBuilder: (context, index) {
                             return Obx(() {
-                              if (snapshot.data![index]
-                                      [MessageField.MEMBER_NAME]!
+                              if (snapshot.data![index].memberName!
                                   .toLowerCase()
                                   .contains(
                                       controller.searchQuery.toLowerCase())) {
-                                return Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 15.0),
-                                  child: Material(
-                                    elevation: 5,
-                                    borderRadius: BorderRadius.circular(6),
-                                    child: Container(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 15),
-                                      height: 78,
-                                      width: 50,
-                                      decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(10)),
-                                      child: Row(
-                                        children: [
-                                          CircleAvatar(
-                                            backgroundColor:
-                                                greenColor.withOpacity(0.6),
-                                            backgroundImage: NetworkImage(
-                                                snapshot.data![index]
-                                                    [MessageField.MEMBER_IMG]),
-                                            radius: 30,
-                                          ),
-                                          Padding(
-                                            padding:
-                                                const EdgeInsets.only(left: 10),
-                                            child: Column(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                Row(
-                                                  children: [
-                                                    SizedBox(
-                                                      width: 45.w,
-                                                      child: poppinsText(
-                                                          snapshot.data![index][
-                                                              MessageField
-                                                                  .MEMBER_NAME],
-                                                          15,
-                                                          FontWeight.bold,
-                                                          blackColor,
-                                                          overflow: TextOverflow
-                                                              .ellipsis),
-                                                    ),
-                                                  ],
-                                                ),
-                                                SizedBox(
-                                                  width: 50.w,
-                                                  child: poppinsText(
-                                                    'aboutt',
-                                                    12,
-                                                    FontWeight.normal,
-                                                    blackColor
-                                                        .withOpacity(0.65),
-                                                  ),
-                                                )
-                                              ],
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
+                                return GroupMemberTile(
+                                  data: snapshot.data![index],
+                                  ontap: (_) {
+                                    print('object');
+                                    if (snapshot.data![index].iAmAdmin!) {
+                                      if (!snapshot.data![index].isAdmin!) {
+                                        controller.makeGroupAdmin(
+                                            snapshot.data![index].memberId!);
+                                      }
+                                    }
+                                  },
                                 );
                               } else {
                                 return Container();

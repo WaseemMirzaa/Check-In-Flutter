@@ -7,11 +7,14 @@ import '../../../../../utils/Constants/images.dart';
 import '../../../../../utils/colors.dart';
 
 class NameTextfield extends GetView<UsergroupDetailController> {
-  const NameTextfield({super.key});
+  bool? isAdmin;
+
+  NameTextfield({super.key, this.isAdmin});
 
   @override
   Widget build(BuildContext context) {
     return TextFormField(
+      readOnly: !isAdmin!,
       focusNode: controller.namefocusNode,
       onTapOutside: (val) {
         controller.namefocusNode.unfocus();
@@ -19,22 +22,28 @@ class NameTextfield extends GetView<UsergroupDetailController> {
       controller: controller.nameController,
       style: const TextStyle(fontSize: 19, fontWeight: FontWeight.bold),
       decoration: InputDecoration(
-          suffixIcon: Padding(
-        padding: const EdgeInsets.only(top: 20, bottom: 10, left: 30),
-        child: SvgPicture.asset(
-          AppImage.penicon,
-        ),
-      )),
+          focusedBorder: UnderlineInputBorder(
+              borderSide: BorderSide(color: greyColor.withOpacity(0.6))),
+          suffixIcon: isAdmin!
+              ? Padding(
+                  padding: const EdgeInsets.only(top: 20, bottom: 10, left: 30),
+                  child: SvgPicture.asset(
+                    AppImage.penicon,
+                  ),
+                )
+              : const SizedBox()),
     );
   }
 }
 
 class AboutTextfield extends GetView<UsergroupDetailController> {
-  const AboutTextfield({super.key});
+  bool? isAdmin;
+  AboutTextfield({super.key, this.isAdmin});
 
   @override
   Widget build(BuildContext context) {
     return TextFormField(
+      readOnly: !isAdmin!,
       onTapOutside: (val) {
         controller.aboutfocusNode.unfocus();
       },
@@ -46,7 +55,8 @@ class AboutTextfield extends GetView<UsergroupDetailController> {
       controller: controller.aboutController,
       style: TextStyle(fontSize: 14, color: greyColor),
       decoration: const InputDecoration(
-          border: UnderlineInputBorder(borderSide: BorderSide.none)),
+        border: UnderlineInputBorder(borderSide: BorderSide.none),
+      ),
     );
   }
 }

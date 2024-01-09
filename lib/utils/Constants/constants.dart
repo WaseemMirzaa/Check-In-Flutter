@@ -28,6 +28,7 @@ class MessageField {
   static const String ABOUT_GROUP = 'aboutGroup';
   static const String RECIEVER_ABOUT = 'recieverAbout';
   static const String SENDER_ABOUT = 'senderAbout';
+  static const String IS_ADMIN = 'isAdmin';
 }
 
 class ChatField {

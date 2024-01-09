@@ -2,7 +2,7 @@ import 'package:check_in/utils/DateTimeUtils.dart';
 import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
 
-import '../../../../../model/chat_model.dart';
+import '../../../../../model/Message and Group Message Model/chat_model.dart';
 import 'chat_customshape.dart';
 import '../../../../../utils/colors.dart';
 import '../../../../../utils/gaps.dart';

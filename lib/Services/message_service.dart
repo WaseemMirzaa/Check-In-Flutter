@@ -3,12 +3,15 @@
 import 'dart:developer';
 import 'dart:io';
 
-import 'package:check_in/model/chat_model.dart';
+import 'package:check_in/model/Message%20and%20Group%20Message%20Model/chat_model.dart';
+import 'package:check_in/model/Message%20and%20Group%20Message%20Model/group_detail_model.dart';
+import 'package:check_in/model/Message%20and%20Group%20Message%20Model/group_member_model.dart';
 import 'package:check_in/utils/Constants/constants.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 
-import '../model/message_model.dart';
+import '../model/Message and Group Message Model/message_model.dart';
+import '../utils/Constants/global_variable.dart';
 
 List<dynamic> mem = [];
 
@@ -25,7 +28,6 @@ class MessageService {
         .where(MessageField.MEMBER_IDS, arrayContains: myId)
         .snapshots()
         .map((querySnapshot) => querySnapshot.docs.map<Messagemodel>((doc) {
-              // fetchTotalUnreadCount('groupA');
               num unread = 0;
               Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
               String name, imagepath = '';
@@ -162,13 +164,23 @@ class MessageService {
   }
 
 //............ Get group members
-  Stream<List<dynamic>> getGroupMembers(String docId) {
+  Stream<List<GroupMemberModel>> getGroupMembers(String docId) {
     try {
       return _messagesCollection
           .doc(docId)
           .snapshots()
           .map((DocumentSnapshot snapshot) {
-        return snapshot.get(MessageField.MEMBERS);
+        bool iAmAdmin = false;
+        Map<String, dynamic> data = snapshot.data() as Map<String, dynamic>;
+        List memberlst = data[MessageField.MEMBERS];
+        return memberlst.map((item) {
+          if (item[MessageField.MEMBER_UID] == GlobalVariable.userid &&
+              item[MessageField.IS_ADMIN] == true) {
+            iAmAdmin = true;
+          }
+
+          return GroupMemberModel.fromJson(item, iAmAdmin);
+        }).toList();
       });
     } catch (e) {
       rethrow;
@@ -176,9 +188,19 @@ class MessageService {
   }
 
 //........... Get Group detail
-  Future<DocumentSnapshot> getGroupDetails(String docId) {
+  Future<GroupDetailModel> getGroupDetails(String docId, String myId) async {
     try {
-      return _messagesCollection.doc(docId).get();
+      bool isAdmin = false;
+      DocumentSnapshot snapshot = await _messagesCollection.doc(docId).get();
+      Map<String, dynamic> data = snapshot.data() as Map<String, dynamic>;
+      mem = data[MessageField.MEMBERS];
+      for (var val in mem) {
+        if (val[MessageField.MEMBER_UID] == myId) {
+          isAdmin = val[MessageField.IS_ADMIN];
+          break;
+        }
+      }
+      return GroupDetailModel.fromJson(data, isAdmin);
     } catch (e) {
       rethrow;
     }
@@ -224,5 +246,20 @@ class MessageService {
       log(e.toString());
       return null;
     }
+  }
+
+//........... Make Group Admin
+  Future<void> makeGroupAdmin(String docId, String memberId) async {
+    final docRef = _messagesCollection.doc(docId);
+    db.runTransaction((transaction) async {
+      final snapshot = await transaction.get(docRef);
+      List memberLst = snapshot.get(MessageField.MEMBERS);
+      for (var data in memberLst) {
+        if (data[MessageField.MEMBER_UID] == memberId) {
+          data[MessageField.IS_ADMIN] = true;
+        }
+      }
+      transaction.update(docRef, {MessageField.MEMBERS: memberLst});
+    });
   }
 }

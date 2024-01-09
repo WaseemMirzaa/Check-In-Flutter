@@ -1,4 +1,4 @@
-import 'package:check_in/model/message_model.dart';
+import 'package:check_in/model/Message%20and%20Group%20Message%20Model/message_model.dart';
 import 'package:check_in/ui/screens/%20Messages%20and%20Groupchat/Chat/chat_screen.dart';
 import 'package:check_in/ui/screens/%20Messages%20and%20Groupchat/Messages/Widgets/appbar.dart';
 import 'package:check_in/ui/screens/%20Messages%20and%20Groupchat/Messages/Widgets/message_list_tile.dart';

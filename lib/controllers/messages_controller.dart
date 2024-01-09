@@ -1,4 +1,4 @@
-import 'package:check_in/model/message_model.dart';
+import 'package:check_in/model/Message%20and%20Group%20Message%20Model/message_model.dart';
 import 'package:check_in/utils/Constants/global_variable.dart';
 import 'package:get/get.dart';
 

@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:sizer/sizer.dart';
 
-import '../../../../../model/message_model.dart';
+import '../../../../../model/Message and Group Message Model/message_model.dart';
 import '../../../../../utils/Constants/images.dart';
 import '../../../../../utils/DateTimeUtils.dart';
 import '../../../../../utils/colors.dart';

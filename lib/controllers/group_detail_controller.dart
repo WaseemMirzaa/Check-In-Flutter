@@ -1,5 +1,5 @@
-import 'package:check_in/utils/Constants/constants.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:check_in/model/Message%20and%20Group%20Message%20Model/group_detail_model.dart';
+import 'package:check_in/utils/Constants/global_variable.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
@@ -9,23 +9,35 @@ import '../utils/Constants/app_toast.dart';
 class UsergroupDetailController extends GetxController {
   final MessageService messageService;
   UsergroupDetailController(this.messageService);
+
+  GroupDetailModel? groupDetailModel = GroupDetailModel();
+  Rx<XFile?> fileImage = Rx<XFile?>(null);
+
+  /// TextEditingController
   var nameController = TextEditingController();
   var aboutController = TextEditingController();
+
+  /// focusnode
   FocusNode namefocusNode = FocusNode();
   FocusNode aboutfocusNode = FocusNode();
-  RxString networkImage = ''.obs;
-  Rx<XFile?> fileImage = Rx<XFile?>(null);
+
+  /// loading
   RxBool loading = false.obs;
   RxBool uploadDataLoading = false.obs;
 
 //............ get detail
-  void getGroupDetail(String docId) async {
+  Future<void> getGroupDetail(String docId) async {
     loading.value = true;
-    DocumentSnapshot res = await messageService.getGroupDetails(docId);
-    Map<String, dynamic> data = res.data() as Map<String, dynamic>;
-    nameController.text = data[MessageField.GROUP_NAME];
-    aboutController.text = data[MessageField.ABOUT_GROUP];
-    networkImage.value = data[MessageField.GROUP_IMG];
+    GroupDetailModel res =
+        await messageService.getGroupDetails(docId, GlobalVariable.userid);
+
+    /// store response in model
+    groupDetailModel = res;
+
+    /// store group name and about in textEditingController
+    nameController.text = res.groupName!;
+    aboutController.text = res.groupDesc!;
+
     loading.value = false;
   }
 

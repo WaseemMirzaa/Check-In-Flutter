@@ -1,4 +1,4 @@
-import 'package:check_in/model/chat_model.dart';
+import 'package:check_in/model/Message%20and%20Group%20Message%20Model/chat_model.dart';
 import 'package:check_in/utils/Constants/global_variable.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
