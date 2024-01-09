@@ -66,6 +66,7 @@ dependencies:
 
   google_maps_flutter:
       path: ./google_maps_flutter/google_maps_flutter
+  emoji_picker_flutter: ^1.6.3
 #
 #  google_maps_flutter_platform_interface:
 #      path: E:/Git projects/Check-In-Flutter/google_maps_flutter/google_maps_flutter_platform_interface

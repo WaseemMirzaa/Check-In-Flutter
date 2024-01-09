@@ -16,3 +16,4 @@ Color silverColor = const Color(0xff9f9f9f);
 Color transparentColor = Colors.transparent;
 Color offWhiteColor = const Color.fromARGB(255, 216, 227, 242);
 Color greyColor1 = const Color(0xFFEAECF2);
+Color followingColor = Color.fromARGB(255, 28, 45, 65);

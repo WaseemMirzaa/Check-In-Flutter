@@ -6,6 +6,7 @@ import 'package:check_in/core/constant/app_assets.dart';
 import 'package:check_in/core/constant/constant.dart';
 import 'package:check_in/core/constant/temp_language.dart';
 import 'package:check_in/model/user_modal.dart';
+import 'package:check_in/ui/screens/notifications.dart';
 import 'package:check_in/ui/screens/unique_courts_screen.dart';
 import 'package:check_in/ui/widgets/about_section.dart';
 import 'package:check_in/utils/colors.dart';
@@ -18,6 +19,7 @@ import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:nb_utils/nb_utils.dart' as nbutils;
 import 'package:percent_indicator/circular_percent_indicator.dart';
+import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
 // import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:sizer/sizer.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -467,7 +469,72 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             ],
                           ),
                           const SizedBox(
-                            height: 15,
+                            height: 30,
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              GestureDetector(
+                                child: Column(
+                                  children: [
+                                    Text(
+                                      '0',
+                                      style: TextStyle(
+                                        color: greyColor,
+                                        decoration: TextDecoration.underline,
+                                        decorationColor:
+                                            greyColor, // You can customize the underline color
+                                        decorationThickness: 2.0,
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 16,
+                                      ),
+                                    ),
+                                    Text(
+                                      'Followers',
+                                      style: TextStyle(
+                                        color: silverColor,
+                                        fontWeight: FontWeight.w500,
+                                        fontSize: 16,
+                                      ),
+                                    )
+                                  ],
+                                ),
+                              ),
+                              Container(
+                                height: 40,
+                                width: 2,
+                                decoration: BoxDecoration(color: silverColor),
+                              ),
+                              GestureDetector(
+                                child: Column(
+                                  children: [
+                                    Text(
+                                      '0',
+                                      style: TextStyle(
+                                        color: greyColor,
+                                        decoration: TextDecoration.underline,
+                                        decorationColor:
+                                            greyColor, // You can customize the underline color
+                                        decorationThickness: 2.0,
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 16,
+                                      ),
+                                    ),
+                                    Text(
+                                      'Following',
+                                      style: TextStyle(
+                                        color: silverColor,
+                                        fontWeight: FontWeight.w500,
+                                        fontSize: 16,
+                                      ),
+                                    )
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(
+                            height: 30,
                           ),
                           AboutSection(userController: userController),
                         ],
