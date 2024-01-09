@@ -8,4 +8,20 @@ class DateTimeUtils {
     final String formattedTime = outputFormat.format(dateTime);
     return formattedTime;
   }
+
+//  static String formatTimestamp(Timestamp timestamp) {
+//   DateTime dateTime = timestamp.toDate();
+//   DateTime now = DateTime.now();
+
+//   if (dateTime.day == now.day &&
+//       dateTime.month == now.month &&
+//       dateTime.year == now.year) {
+//     return 'Today';
+//   } else if (dateTime.day == now.day + 1 &&
+//       dateTime.month == now.month &&
+//       dateTime.year == now.year) {
+//     return 'Tomorrow';
+//   } else {
+//     return DateFormat('MMMM d, y').format(dateTime);
+//   }}
 }

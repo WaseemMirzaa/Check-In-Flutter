@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 
 Color blackColor = Colors.black;
@@ -17,3 +15,4 @@ Color blueColor = Colors.blue;
 Color silverColor = const Color(0xff9f9f9f);
 Color transparentColor = Colors.transparent;
 Color offWhiteColor = const Color.fromARGB(255, 216, 227, 242);
+Color greyColor1 = const Color(0xFFEAECF2);
