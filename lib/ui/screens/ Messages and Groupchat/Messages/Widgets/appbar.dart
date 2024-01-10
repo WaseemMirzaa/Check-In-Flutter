@@ -1,5 +1,7 @@
+import 'package:check_in/ui/screens/notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
 
 import '../../../../../utils/Constants/images.dart';
 import '../../../../../utils/colors.dart';
@@ -20,10 +22,19 @@ class MessageAppBar extends StatelessWidget implements PreferredSizeWidget {
         poppinsText('Messages', 20, FontWeight.bold, blackColor)
       ]),
       actions: [
-        Padding(
-          padding: const EdgeInsets.only(right: 20.0),
-          child: SvgPicture.asset(
-            AppImage.messagecircle,
+        GestureDetector(
+          onTap: () {
+            pushNewScreen(
+              context,
+              screen: const NotificationScreen(),
+              withNavBar: false,
+            );
+          },
+          child: Padding(
+            padding: const EdgeInsets.only(right: 20.0),
+            child: SvgPicture.asset(
+              AppImage.messagecircle,
+            ),
           ),
         )
       ],

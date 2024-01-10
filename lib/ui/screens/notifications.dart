@@ -1,5 +1,6 @@
 import 'package:check_in/Services/notification_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -21,6 +22,9 @@ class NotificationScreen extends StatefulWidget {
 
 class _NotificationScreenState extends State<NotificationScreen> {
   NotificationService notificationService = NotificationService();
+
+  final auth = FirebaseAuth.instance;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -71,7 +75,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
         ),
         backgroundColor: Colors.white,
         body: FutureBuilder<List<dynamic>>(
-            future: notificationService.getNotifications(),
+            future: notificationService.getNotifications(auth.currentUser!.uid),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 // return const Center(child: CircularProgressIndicator());
@@ -183,19 +187,19 @@ class _NotificationScreenState extends State<NotificationScreen> {
                                                   height: 15,
                                                   width: 15,
                                                   decoration: BoxDecoration(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              999),
-                                                      color: greenColor),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            999),
+                                                  ),
                                                 )
                                               : Container(
                                                   height: 15,
                                                   width: 15,
                                                   decoration: BoxDecoration(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            999),
-                                                  ),
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              999),
+                                                      color: greenColor),
                                                 ),
                                           SizedBox(
                                             height: 5,

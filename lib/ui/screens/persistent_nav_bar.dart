@@ -150,9 +150,11 @@ class _HomeState extends State<Home> with AutomaticKeepAliveClientMixin {
   final NavBarController navBarController = Get.put(NavBarController());
 
   final List<Widget> _buildScreens = [
+    
     const CheckIn(),
     const HistoryView(),
-    const ProfileScreen()
+    const ProfileScreen(),
+    MessageScreen(),
     //KeyedSubtree(key: UniqueKey(), child: const ProfileScreen()),
   ];
 
