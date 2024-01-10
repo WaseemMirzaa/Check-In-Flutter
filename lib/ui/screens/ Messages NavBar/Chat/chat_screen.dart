@@ -1,7 +1,9 @@
 import 'package:check_in/model/Message%20and%20Group%20Message%20Model/chat_model.dart';
-import 'package:check_in/controllers/chat_controller.dart';
-import 'package:check_in/ui/screens/%20Messages%20and%20Groupchat/Chat/Widgets/appbar.dart';
-import 'package:check_in/ui/screens/%20Messages%20and%20Groupchat/Chat/Widgets/sticker_keyboard.dart';
+import 'package:check_in/controllers/Messages/chat_controller.dart';
+import 'package:check_in/ui/screens/%20Messages%20NavBar/Chat/Widgets/appbar.dart';
+import 'package:check_in/ui/screens/%20Messages%20NavBar/Chat/Widgets/image_bottomsheet.dart';
+import 'package:check_in/ui/screens/%20Messages%20NavBar/Chat/Widgets/image_date_container.dart';
+import 'package:check_in/ui/screens/%20Messages%20NavBar/Chat/Widgets/sticker_keyboard.dart';
 import 'package:check_in/utils/Constants/global_variable.dart';
 import 'package:check_in/utils/colors.dart';
 import 'package:flutter/material.dart';
@@ -54,22 +56,52 @@ class ChatScreen extends GetView<ChatController> {
                                 top: 12,
                               ),
                               child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.end,
                                 mainAxisAlignment: mymsg
                                     ? MainAxisAlignment.end
                                     : MainAxisAlignment.start,
                                 children: [
                                   mymsg
                                       ? const SizedBox()
-                                      : CircleAvatar(
-                                          backgroundColor:
-                                              greenColor.withOpacity(0.6),
-                                          backgroundImage: const NetworkImage(
-                                              'https://wac-cdn.atlassian.com/dam/jcr:ba03a215-2f45-40f5-8540-b2015223c918/Max-R_Headshot%20(1).jpg?cdnVersion=1365'),
-                                          radius: 17,
+                                      : Padding(
+                                          padding: const EdgeInsets.only(
+                                              bottom: 22.0),
+                                          child: CircleAvatar(
+                                            backgroundColor:
+                                                greenColor.withOpacity(0.6),
+                                            backgroundImage: const NetworkImage(
+                                                'https://wac-cdn.atlassian.com/dam/jcr:ba03a215-2f45-40f5-8540-b2015223c918/Max-R_Headshot%20(1).jpg?cdnVersion=1365'),
+                                            radius: 17,
+                                          ),
                                         ),
                                   horizontalGap(8),
-                                  MessageDateContainer(
-                                      index: index, chat: chat, mymsg: mymsg)
+                                  chat.type == 'message'
+                                      ? MessageDateContainer(
+                                          index: index,
+                                          chat: chat,
+                                          mymsg: mymsg)
+                                      : GestureDetector(
+                                          onTap: () {
+                                            showGeneralDialog(
+                                                barrierColor: greyColor,
+                                                context: context,
+                                                pageBuilder: (context,
+                                                    animation,
+                                                    secondaryAnimation) {
+                                                  return Padding(
+                                                    padding:
+                                                        const EdgeInsets.only(
+                                                            top: 40.0),
+                                                    child: Image.network(
+                                                        chat.message!),
+                                                  );
+                                                });
+                                          },
+                                          child: ImageDateContainer(
+                                              index: index,
+                                              chat: chat,
+                                              mymsg: mymsg),
+                                        )
                                 ],
                               ),
                             );
@@ -77,7 +109,10 @@ class ChatScreen extends GetView<ChatController> {
                     }
                   })),
           SendMessageContainer(
-            controller: controller.chatfieldController,
+            textFieldController: controller.chatfieldController,
+            imageontap: () {
+              showchatbottomSheet(context, controller);
+            },
             textfieldontap: () {
               controller.issticker.value = true;
             },

@@ -2,7 +2,7 @@ import 'package:check_in/model/Message%20and%20Group%20Message%20Model/message_m
 import 'package:check_in/utils/Constants/global_variable.dart';
 import 'package:get/get.dart';
 
-import '../Services/message_service.dart';
+import '../../Services/message_service.dart';
 
 class MessageController extends GetxController {
   final MessageService chatService;

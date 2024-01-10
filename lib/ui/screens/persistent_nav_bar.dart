@@ -1,5 +1,6 @@
 // ignore_for_file: avoid_print
 import 'package:check_in/core/constant/temp_language.dart';
+import 'package:check_in/ui/screens/News%20Feed%20NavBar/News%20Feed/news_feed_screen.dart';
 import 'package:check_in/ui/screens/check_in.dart';
 import 'package:check_in/ui/screens/profile_screen.dart';
 import 'package:check_in/ui/screens/start.dart';
@@ -10,11 +11,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
-import 'package:nb_utils/nb_utils.dart';
 
 import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
 
-import ' Messages and Groupchat/Messages/messages.dart';
+import ' Messages NavBar/Messages/messages.dart';
 import 'History.dart';
 import '../../controllers/nav_bar_controller.dart';
 
@@ -150,7 +150,9 @@ class _HomeState extends State<Home> with AutomaticKeepAliveClientMixin {
   final NavBarController navBarController = Get.put(NavBarController());
 
   final List<Widget> _buildScreens = [
+    MessageScreen(),
     const CheckIn(),
+    const NewsFeedScreen(),
     const HistoryView(),
     const ProfileScreen()
     //KeyedSubtree(key: UniqueKey(), child: const ProfileScreen()),
@@ -159,7 +161,7 @@ class _HomeState extends State<Home> with AutomaticKeepAliveClientMixin {
   List<BottomNavigationBarItem> _navBarsItems() {
     return [
       BottomNav(
-        label: 'Home',
+        label: 'Chat',
         boxColor:
             navBarController.controller.index == 0 ? greenColor : whiteColor,
         icon: "Path 28661",
@@ -167,7 +169,7 @@ class _HomeState extends State<Home> with AutomaticKeepAliveClientMixin {
             navBarController.controller.index == 0 ? whiteColor : blackColor,
       ).getBottomNavItem(),
       BottomNav(
-        label: 'History',
+        label: 'Home',
         boxColor:
             navBarController.controller.index == 1 ? greenColor : whiteColor,
         icon: "Group 12548",
@@ -175,19 +177,28 @@ class _HomeState extends State<Home> with AutomaticKeepAliveClientMixin {
             navBarController.controller.index == 1 ? whiteColor : blackColor,
       ).getBottomNavItem(),
       BottomNav(
-        label: 'Profile',
+        label: 'NewsFeed',
         boxColor:
             navBarController.controller.index == 2 ? greenColor : whiteColor,
-        icon: "Icon awesome-history",
+        icon: "calendar",
         iconColor:
             navBarController.controller.index == 2 ? whiteColor : blackColor,
       ).getBottomNavItem(),
       BottomNav(
+        label: 'History',
         boxColor:
             navBarController.controller.index == 3 ? greenColor : whiteColor,
-        icon: "Icon material-person",
+        icon: "Icon awesome-history",
         iconColor:
             navBarController.controller.index == 3 ? whiteColor : blackColor,
+      ).getBottomNavItem(),
+      BottomNav(
+        label: 'Profile',
+        boxColor:
+            navBarController.controller.index == 4 ? greenColor : whiteColor,
+        icon: "Icon material-person",
+        iconColor:
+            navBarController.controller.index == 4 ? whiteColor : blackColor,
       ).getBottomNavItem(),
     ];
   }

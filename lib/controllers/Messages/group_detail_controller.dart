@@ -3,8 +3,8 @@ import 'package:check_in/utils/Constants/global_variable.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
-import '../Services/message_service.dart';
-import '../utils/Constants/app_toast.dart';
+import '../../Services/message_service.dart';
+import '../../utils/Constants/app_toast.dart';
 
 class UsergroupDetailController extends GetxController {
   final MessageService messageService;
@@ -14,8 +14,8 @@ class UsergroupDetailController extends GetxController {
   Rx<XFile?> fileImage = Rx<XFile?>(null);
 
   /// TextEditingController
-  var nameController = TextEditingController();
-  var aboutController = TextEditingController();
+  late TextEditingController nameController;
+  late TextEditingController aboutController;
 
   /// focusnode
   FocusNode namefocusNode = FocusNode();
@@ -24,6 +24,13 @@ class UsergroupDetailController extends GetxController {
   /// loading
   RxBool loading = false.obs;
   RxBool uploadDataLoading = false.obs;
+
+  @override
+  void onInit() {
+    super.onInit();
+    nameController = TextEditingController();
+    aboutController = TextEditingController();
+  }
 
 //............ get detail
   Future<void> getGroupDetail(String docId) async {
@@ -55,5 +62,12 @@ class UsergroupDetailController extends GetxController {
       uploadDataLoading.value = false;
       errorMessage('Error updating data');
     }
+  }
+
+  @override
+  void onClose() {
+    super.onClose();
+    nameController.dispose();
+    aboutController.dispose();
   }
 }

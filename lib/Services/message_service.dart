@@ -98,49 +98,34 @@ class MessageService {
     });
   }
 
-////////////  fetch count
-  // Future<int> fetchTotalUnreadCount(String groupId) async {
-  //   print('in fetch');
-  //   try {
-  //     DocumentSnapshot<Map<String, dynamic>> snapshot = await FirebaseFirestore
-  //         .instance
-  //         .collection('messages')
-  //         .doc(groupId)
-  //         .get();
-  //     if (!snapshot.exists) {
-  //       return 0;
-  //     }
-  //     List<dynamic> memArray = snapshot.data()!['members'] ?? [];
-  //     List<int> unreadCounts = memArray.map<int>((item) {
-  //       return item['unreadCount'] ?? 0;
-  //     }).toList();
-  //     int totalCount = unreadCounts.reduce((value, element) => value + element);
-  //     unreadCount = totalCount;
-  //     print("***************************************$unreadCount");
-  //     return totalCount;
-  //   } catch (e) {
-  //     print('Error fetching data: $e');
-  //     return 0;
-  //   }
-  // }
-
 //............ Send message
   Future<void> sendMessage(String docId, Chatmodel chatmodel) async {
     final batch = FirebaseFirestore.instance.batch();
     try {
+      final docRef = _messagesCollection.doc(docId);
+      DocumentSnapshot messageSnapshot = await docRef.get();
+      if (chatmodel.type == 'image') {
+        String? image = await uploadChatImageToFirebase(
+            docId,
+            chatmodel.message!,
+            chatmodel.id!,
+            chatmodel.time!,
+            messageSnapshot);
+        chatmodel.message = image;
+      }
+
       CollectionReference chatCollection =
-          _messagesCollection.doc(docId).collection('chat');
+          _messagesCollection.doc(docId).collection(Collections.CHAT);
       batch.set(chatCollection.doc(), chatmodel.toJson());
 
       CollectionReference messageCollection = _messagesCollection;
       batch.update(messageCollection.doc(docId), {
-        MessageField.LAST_MESSAGE: chatmodel.message,
+        MessageField.LAST_MESSAGE:
+            chatmodel.type == 'image' ? 'Photo' : chatmodel.message,
         MessageField.TIME_STAMP: chatmodel.time,
       });
 
-      final docRef = _messagesCollection.doc(docId);
-      DocumentSnapshot snapshot = await docRef.get();
-      if (snapshot.get(MessageField.IS_GROUP) == true) {
+      if (messageSnapshot.get(MessageField.IS_GROUP) == true) {
         for (int i = 0; i < mem.length; i++) {
           if (mem[i][MessageField.MEMBER_UID] != chatmodel.id) {
             int current = mem[i][MessageField.MEMBER_UNREAD_COUNT];
@@ -149,7 +134,7 @@ class MessageService {
         }
         batch.update(docRef, {MessageField.MEMBERS: mem});
       } else {
-        if (snapshot.get(MessageField.SENDER_ID) == chatmodel.id) {
+        if (messageSnapshot.get(MessageField.SENDER_ID) == chatmodel.id) {
           batch.update(
               docRef, {MessageField.RECIEVER_UNREAD: FieldValue.increment(1)});
         } else {
@@ -160,6 +145,25 @@ class MessageService {
       await batch.commit();
     } catch (e) {
       print('Error sending message: $e');
+    }
+  }
+
+//............ Upload chat images
+  Future<String?> uploadChatImageToFirebase(String docId, String imagePath,
+      String uId, String time, DocumentSnapshot snapshot) async {
+    try {
+      Reference storageReference;
+      if (snapshot.get(MessageField.IS_GROUP) == true) {
+        storageReference = _storage.ref().child('group/$docId/chat/$uId/$time');
+      } else {
+        storageReference = _storage.ref().child('singlechat/$docId/$uId/$time');
+      }
+      await storageReference.putFile(File(imagePath));
+      final downloadUrl = await storageReference.getDownloadURL();
+      return downloadUrl;
+    } catch (e) {
+      log(e.toString());
+      return null;
     }
   }
 
@@ -237,7 +241,7 @@ class MessageService {
 //........... Upload Group image
   Future<String?> uploadImageToFirebase(String docId, String imagePath) async {
     try {
-      Reference storageReference = _storage.ref().child('group/$docId');
+      Reference storageReference = _storage.ref().child('group/$docId/$docId');
 
       await storageReference.putFile(File(imagePath));
       final downloadUrl = await storageReference.getDownloadURL();

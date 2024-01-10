@@ -1,7 +1,7 @@
 import 'package:check_in/model/Message%20and%20Group%20Message%20Model/group_member_model.dart';
 import 'package:get/get.dart';
 
-import '../Services/message_service.dart';
+import '../../Services/message_service.dart';
 
 class GroupmemberController extends GetxController {
   final MessageService messageService;

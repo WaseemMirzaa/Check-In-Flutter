@@ -1,6 +1,6 @@
-import 'package:check_in/controllers/group_members_controller.dart';
+import 'package:check_in/controllers/Messages/group_members_controller.dart';
 import 'package:check_in/model/Message%20and%20Group%20Message%20Model/group_member_model.dart';
-import 'package:check_in/ui/screens/%20Messages%20and%20Groupchat/Group%20Members/Widgets/group_member_tile.dart';
+import 'package:check_in/ui/screens/%20Messages%20NavBar/Group%20Members/Widgets/group_member_tile.dart';
 import 'package:check_in/utils/Constants/images.dart';
 import 'package:check_in/utils/gaps.dart';
 import 'package:flutter/material.dart';
@@ -84,7 +84,6 @@ class GroupMember extends GetView<GroupmemberController> {
                                 return GroupMemberTile(
                                   data: snapshot.data![index],
                                   ontap: (_) {
-                                    print('object');
                                     if (snapshot.data![index].iAmAdmin!) {
                                       if (!snapshot.data![index].isAdmin!) {
                                         controller.makeGroupAdmin(

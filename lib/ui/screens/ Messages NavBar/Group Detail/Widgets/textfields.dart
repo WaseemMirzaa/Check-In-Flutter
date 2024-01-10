@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 
-import '../../../../../controllers/group_detail_controller.dart';
+import '../../../../../controllers/Messages/group_detail_controller.dart';
 import '../../../../../utils/Constants/images.dart';
 import '../../../../../utils/colors.dart';
 

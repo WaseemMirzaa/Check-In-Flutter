@@ -1,9 +1,9 @@
 import 'dart:io';
 
-import 'package:check_in/controllers/group_detail_controller.dart';
-import 'package:check_in/controllers/group_members_controller.dart';
-import 'package:check_in/ui/screens/%20Messages%20and%20Groupchat/Group%20Detail/Widgets/textfields.dart';
-import 'package:check_in/ui/screens/%20Messages%20and%20Groupchat/Group%20Members/group_members.dart';
+import 'package:check_in/controllers/Messages/group_detail_controller.dart';
+import 'package:check_in/controllers/Messages/group_members_controller.dart';
+import 'package:check_in/ui/screens/%20Messages%20NavBar/Group%20Detail/Widgets/textfields.dart';
+import 'package:check_in/ui/screens/%20Messages%20NavBar/Group%20Members/group_members.dart';
 import 'package:check_in/ui/widgets/common_button.dart';
 import 'package:check_in/ui/widgets/custom_appbar.dart';
 import 'package:check_in/utils/Constants/images.dart';

@@ -1,6 +1,6 @@
 // ignore_for_file: use_build_context_synchronously
 
-import 'package:check_in/controllers/group_detail_controller.dart';
+import 'package:check_in/controllers/Messages/group_detail_controller.dart';
 import 'package:check_in/utils/gaps.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -31,7 +31,6 @@ Future<void> showbottomSheet(
                   if (pickedFile != null) {
                     controller.fileImage.value = pickedFile;
                     Navigator.pop(context);
-                    print(controller.fileImage.value!.path);
                   }
                 },
                 child: Container(
