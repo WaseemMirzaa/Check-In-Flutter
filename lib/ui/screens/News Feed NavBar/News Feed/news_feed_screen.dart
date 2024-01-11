@@ -1,6 +1,6 @@
 import 'package:check_in/ui/screens/News%20Feed%20NavBar/Create%20Post/create_post_screen.dart';
-import 'package:check_in/ui/screens/News%20Feed%20NavBar/News%20Feed/Widgets/list_tile_container.dart';
-import 'package:check_in/ui/screens/News%20Feed%20NavBar/News%20Feed/Widgets/write_something_container.dart';
+import 'package:check_in/ui/screens/News%20Feed%20NavBar/News%20Feed/Component/list_tile_container.dart';
+import 'package:check_in/ui/screens/News%20Feed%20NavBar/News%20Feed/Component/top_container.dart';
 import 'package:check_in/ui/widgets/custom_container.dart';
 import 'package:check_in/utils/Constants/images.dart';
 import 'package:check_in/utils/colors.dart';
@@ -25,7 +25,7 @@ class NewsFeedScreen extends StatelessWidget {
               TopContainer(
                 ontap: () {
                   pushNewScreen(context,
-                      screen: const CreatePost(), withNavBar: true);
+                      screen: CreatePost(), withNavBar: true);
                 },
               ),
               CustomContainer1(
@@ -52,9 +52,7 @@ class NewsFeedScreen extends StatelessWidget {
                   shrinkWrap: true,
                   itemCount: 3,
                   itemBuilder: (context, index) {
-                    return ListTileContainer(
-                      index: index,
-                    );
+                    return const ListTileContainer();
                   })
             ],
           ),

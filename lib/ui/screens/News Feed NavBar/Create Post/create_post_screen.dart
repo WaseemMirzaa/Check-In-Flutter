@@ -1,20 +1,25 @@
+import 'dart:io';
+
+import 'package:check_in/controllers/News%20Feed/create_post_controller.dart';
 import 'package:check_in/ui/widgets/custom_appbar.dart';
 import 'package:check_in/utils/Constants/images.dart';
 import 'package:check_in/utils/colors.dart';
 import 'package:check_in/utils/gaps.dart';
+import 'package:check_in/utils/loader.dart';
 import 'package:check_in/utils/styles.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:get/get.dart';
 import 'package:sizer/sizer.dart';
+import 'package:chewie/chewie.dart';
 
-class CreatePost extends StatelessWidget {
+class CreatePost extends GetView<CreatePostController> {
   const CreatePost({super.key});
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       floatingActionButton: Padding(
-        padding: const EdgeInsets.only(bottom: 35.0),
+        padding: const EdgeInsets.only(bottom: 40.0),
         child: FloatingActionButton.extended(
           onPressed: () {},
           backgroundColor: greenColor,
@@ -36,61 +41,81 @@ class CreatePost extends StatelessWidget {
       body: Column(
         children: [
           Expanded(
-            child: Column(
-              children: [
-                verticalGap(10),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 15.0),
-                  child: Row(
-                    children: [
-                      const CircleAvatar(
-                        backgroundImage: NetworkImage(
-                          'https://wac-cdn.atlassian.com/dam/jcr:ba03a215-2f45-40f5-8540-b2015223c918/Max-R_Headshot%20(1).jpg?cdnVersion=1365',
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  verticalGap(10),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                    child: Row(
+                      children: [
+                        const CircleAvatar(
+                          backgroundImage: NetworkImage(
+                            'https://wac-cdn.atlassian.com/dam/jcr:ba03a215-2f45-40f5-8540-b2015223c918/Max-R_Headshot%20(1).jpg?cdnVersion=1365',
+                          ),
+                          radius: 30,
                         ),
-                        radius: 30,
-                      ),
-                      horizontalGap(20),
-                      poppinsText('Julian Dasilva', 18, bold, blackColor)
-                    ],
+                        horizontalGap(20),
+                        poppinsText('Julian Dasilva', 18, bold, blackColor)
+                      ],
+                    ),
                   ),
-                ),
-                verticalGap(8),
-                Divider(
-                  color: greyColor,
-                ),
-                const TextField(
-                  maxLines: 6,
-                  decoration: InputDecoration(
-                      hintText: "What's on your mind?",
-                      contentPadding:
-                          EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-                      border: InputBorder.none),
-                )
-              ],
+                  verticalGap(8),
+                  Divider(
+                    color: greyColor,
+                  ),
+                  const TextField(
+                    maxLines: 6,
+                    decoration: InputDecoration(
+                        hintText: "What's on your mind?",
+                        contentPadding:
+                            EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+                        border: InputBorder.none),
+                  ),
+                  SizedBox(
+                      height: 40.h,
+                      child: Obx(() => controller.type.value == 'video'
+                          ? controller.videoLoad.value
+                              ? loaderView()
+                              : Chewie(
+                                  controller: controller.chewieController!,
+                                )
+                          : controller.type.value == 'image'
+                              ? Image.file(
+                                  File(controller.fileImage.value!.path))
+                              : const SizedBox()))
+                ],
+              ),
             ),
           ),
-          Divider(
-            color: greyColor,
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 10),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 15),
+            decoration: BoxDecoration(
+                color: whiteColor,
+                border: Border(top: BorderSide(color: greyColor))),
             child: Row(
               children: [
                 SvgPicture.asset(
                   AppImage.camera,
-                  height: 13,
-                  width: 14,
+                  height: 16,
                 ),
                 horizontalGap(5),
-                poppinsText('Photo', 13, medium, greyColor),
+                GestureDetector(
+                    onTap: () async {
+                      controller.filePicker('image');
+                    },
+                    child: poppinsText('Photo', 14, medium, greyColor)),
                 horizontalGap(10.w),
                 SvgPicture.asset(
                   AppImage.video,
                   height: 12,
-                  width: 13,
                 ),
                 horizontalGap(5),
-                poppinsText('Video', 13, medium, greyColor)
+                GestureDetector(
+                    onTap: () async {
+                      controller.filePicker('video');
+                    },
+                    child: poppinsText('Video', 14, medium, greyColor))
               ],
             ),
           )

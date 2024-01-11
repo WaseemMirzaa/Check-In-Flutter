@@ -1,8 +1,8 @@
 import 'package:check_in/model/Message%20and%20Group%20Message%20Model/message_model.dart';
 import 'package:check_in/ui/screens/%20Messages%20NavBar/Chat/chat_screen.dart';
-import 'package:check_in/ui/screens/%20Messages%20NavBar/Messages/Widgets/appbar.dart';
-import 'package:check_in/ui/screens/%20Messages%20NavBar/Messages/Widgets/message_list_tile.dart';
-import 'package:check_in/ui/screens/%20Messages%20NavBar/Messages/Widgets/search_field.dart';
+import 'package:check_in/ui/screens/%20Messages%20NavBar/Messages/Component/appbar.dart';
+import 'package:check_in/ui/screens/%20Messages%20NavBar/Messages/Component/message_list_tile.dart';
+import 'package:check_in/ui/screens/%20Messages%20NavBar/Messages/Component/search_field.dart';
 import 'package:check_in/utils/gaps.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -10,7 +10,7 @@ import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
 import '../../../../utils/loader.dart';
 import '../../../../controllers/Messages/chat_controller.dart';
 import '../../../../controllers/Messages/messages_controller.dart';
-import 'Widgets/floating_action_button.dart';
+import 'Component/floating_action_button.dart';
 
 class MessageScreen extends GetView<MessageController> {
   MessageScreen({super.key});

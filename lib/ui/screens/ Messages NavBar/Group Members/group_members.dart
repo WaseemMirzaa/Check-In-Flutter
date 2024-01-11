@@ -1,6 +1,6 @@
 import 'package:check_in/controllers/Messages/group_members_controller.dart';
 import 'package:check_in/model/Message%20and%20Group%20Message%20Model/group_member_model.dart';
-import 'package:check_in/ui/screens/%20Messages%20NavBar/Group%20Members/Widgets/group_member_tile.dart';
+import 'package:check_in/ui/screens/%20Messages%20NavBar/Group%20Members/Component/group_member_tile.dart';
 import 'package:check_in/utils/Constants/images.dart';
 import 'package:check_in/utils/gaps.dart';
 import 'package:flutter/material.dart';
@@ -11,7 +11,7 @@ import 'package:sizer/sizer.dart';
 import '../../../../utils/loader.dart';
 import '../../../../utils/styles.dart';
 import '../../../widgets/custom_appbar.dart';
-import '../Messages/Widgets/search_field.dart';
+import '../Messages/Component/search_field.dart';
 
 class GroupMember extends GetView<GroupmemberController> {
   const GroupMember({super.key});

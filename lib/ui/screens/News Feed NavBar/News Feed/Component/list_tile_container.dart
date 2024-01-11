@@ -1,7 +1,11 @@
 import 'package:check_in/controllers/News%20Feed/news_feed_controller.dart';
+import 'package:check_in/ui/screens/News%20Feed%20NavBar/All%20Comments/all_comments.dart';
+import 'package:check_in/ui/screens/News%20Feed%20NavBar/All%20Likes/all_likes_screen.dart';
 import 'package:check_in/ui/screens/News%20Feed%20NavBar/Full%20Screen%20Image/full_screen_image.dart';
+import 'package:check_in/ui/screens/News%20Feed%20NavBar/News%20Feed/Component/comment_container.dart';
+import 'package:check_in/ui/widgets/text_field.dart';
 import 'package:flutter/material.dart';
-import 'package:check_in/ui/screens/News%20Feed%20NavBar/News%20Feed/Widgets/custom_paint.dart';
+import 'package:check_in/ui/screens/News%20Feed%20NavBar/News%20Feed/Component/custom_paint.dart';
 import 'package:check_in/ui/widgets/custom_container.dart';
 import 'package:check_in/utils/Constants/images.dart';
 import 'package:check_in/utils/colors.dart';
@@ -10,14 +14,16 @@ import 'package:check_in/utils/styles.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:sizer/sizer.dart';
 
 class ListTileContainer extends GetView<NewsFeedController> {
-  int? index;
-  ListTileContainer({super.key, this.index});
+  const ListTileContainer({super.key});
 
   @override
   Widget build(BuildContext context) {
+    RxBool isVisible = false.obs;
+    RxBool isLike = false.obs;
     return CustomContainer1(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 15),
@@ -78,7 +84,7 @@ class ListTileContainer extends GetView<NewsFeedController> {
               padding: const EdgeInsets.symmetric(horizontal: 10.0),
               child: poppinsText(
                   'Me encanto la sesión de fotos que me hizo mi amigo 😍🥺',
-                  11,
+                  12,
                   medium,
                   darkBlue.withOpacity(0.8),
                   maxlines: 3),
@@ -105,10 +111,10 @@ class ListTileContainer extends GetView<NewsFeedController> {
               padding: const EdgeInsets.symmetric(horizontal: 10),
               child: Row(
                 children: [
-                  poppinsText('30 ', 10, medium, darkBlue),
-                  poppinsText('comments . ', 10, medium, darkBlue),
-                  poppinsText('5 ', 10, medium, darkBlue),
-                  poppinsText('shared', 10, medium, darkBlue),
+                  poppinsText('30 ', 11, medium, darkBlue),
+                  poppinsText('comments . ', 11, medium, darkBlue),
+                  poppinsText('5 ', 11, medium, darkBlue),
+                  poppinsText('shared', 11, medium, darkBlue),
                 ],
               ),
             ),
@@ -117,38 +123,102 @@ class ListTileContainer extends GetView<NewsFeedController> {
               padding: const EdgeInsets.symmetric(horizontal: 10),
               child: Row(
                 children: [
-                  SvgPicture.asset(
-                    AppImage.like,
-                    height: 15,
+                  GestureDetector(
+                      onTap: () {
+                        isLike.value = !isLike.value;
+                      },
+                      child: Obx(() => isLike.value
+                          ? CircleAvatar(
+                              radius: 11,
+                              backgroundColor: greenColor,
+                              child: SvgPicture.asset(
+                                AppImage.like,
+                                color: whiteColor,
+                                height: 10,
+                              ),
+                            )
+                          : SvgPicture.asset(
+                              AppImage.like,
+                              height: 18,
+                            ))),
+                  horizontalGap(8.w),
+                  GestureDetector(
+                    onTap: () {
+                      isVisible.value = !isVisible.value;
+                    },
+                    child: SvgPicture.asset(
+                      AppImage.comment,
+                      height: 16,
+                    ),
                   ),
                   horizontalGap(8.w),
                   GestureDetector(
                     onTap: () {
-                      controller.index = index!;
+                      Share.share('news feed post');
                     },
                     child: SvgPicture.asset(
-                      AppImage.comment,
-                      height: 15,
+                      AppImage.share,
+                      height: 16,
                     ),
                   ),
-                  horizontalGap(8.w),
-                  SvgPicture.asset(
-                    AppImage.share,
-                    height: 15,
-                  ),
                   const Spacer(),
-                  poppinsText('Liked by 50 People', 11, medium, greyColor),
+                  GestureDetector(
+                      onTap: () {
+                        pushNewScreen(context, screen: const AllLikesScreen());
+                      },
+                      child: poppinsText(
+                          'Liked by 50 People', 11, medium, greyColor)),
                   horizontalGap(2.w),
                   SvgPicture.asset(
                     AppImage.multiplelike,
-                    height: 14,
+                    height: 16,
                   ),
                 ],
               ),
             ),
             verticalGap(8),
             const Divider(),
-         
+            verticalGap(7),
+            Obx(() => Visibility(
+                visible: isVisible.value,
+                child: Column(
+                  children: [
+                    Container(
+                        decoration: BoxDecoration(
+                            color: greyColor.withOpacity(0.2),
+                            borderRadius: BorderRadius.circular(25)),
+                        padding: const EdgeInsets.symmetric(horizontal: 15),
+                        child: CustomTextfield1(
+                          suffixIcon: Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 12.0),
+                            child: SvgPicture.asset(
+                              AppImage.messageappbaricon,
+                              color: greenColor,
+                            ),
+                          ),
+                          hintText: 'Write a comment',
+                        )),
+                    const Padding(
+                        padding: EdgeInsets.all(10.0),
+                        child: CommentContainer()),
+                    const Padding(
+                        padding: EdgeInsets.all(10.0),
+                        child: CommentContainer()),
+                    verticalGap(10),
+                    Divider(
+                      color: greyColor,
+                      indent: 20.w,
+                      endIndent: 20.w,
+                    ),
+                    verticalGap(10),
+                    GestureDetector(
+                        onTap: () {
+                          pushNewScreen(context,
+                              screen: const AllCommentsScreen());
+                        },
+                        child: poppinsText('Show more', 15, bold, greenColor))
+                  ],
+                )))
           ],
         ),
       ),

@@ -26,8 +26,10 @@ class FullScreenImage extends StatelessWidget {
       body: Column(
         children: [
           Expanded(
-            child: Image.network(
-              'https://img.freepik.com/free-vector/set-realistic-hoodies-mannequins-metal-poles-sweatshirt-model-with-long-sleeve_1441-2010.jpg?size=626&ext=jpg',
+            child: InteractiveViewer(
+              child: Image.network(
+                'https://img.freepik.com/free-vector/set-realistic-hoodies-mannequins-metal-poles-sweatshirt-model-with-long-sleeve_1441-2010.jpg?size=626&ext=jpg',
+              ),
             ),
           ),
           Container(

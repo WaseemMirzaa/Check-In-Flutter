@@ -1,19 +1,22 @@
 import 'package:check_in/model/Message%20and%20Group%20Message%20Model/chat_model.dart';
 import 'package:check_in/controllers/Messages/chat_controller.dart';
-import 'package:check_in/ui/screens/%20Messages%20NavBar/Chat/Widgets/appbar.dart';
-import 'package:check_in/ui/screens/%20Messages%20NavBar/Chat/Widgets/image_bottomsheet.dart';
-import 'package:check_in/ui/screens/%20Messages%20NavBar/Chat/Widgets/image_date_container.dart';
-import 'package:check_in/ui/screens/%20Messages%20NavBar/Chat/Widgets/sticker_keyboard.dart';
+import 'package:check_in/ui/screens/%20Messages%20NavBar/Chat/Component/appbar.dart';
+import 'package:check_in/ui/screens/%20Messages%20NavBar/Chat/Component/image_bottomsheet.dart';
+import 'package:check_in/ui/screens/%20Messages%20NavBar/Chat/Component/image_date_container.dart';
+import 'package:check_in/ui/screens/%20Messages%20NavBar/Chat/Component/sticker_keyboard.dart';
 import 'package:check_in/utils/Constants/global_variable.dart';
 import 'package:check_in/utils/colors.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_ui_firestore/firebase_ui_firestore.dart';
 import 'package:get/get.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
+import '../../../../utils/Constants/constants.dart';
 import '../../../../utils/gaps.dart';
 import '../../../../utils/loader.dart';
 import '../Group Detail/group_detail.dart';
-import 'Widgets/message_date_container.dart';
-import 'Widgets/send_message_container.dart';
+import 'Component/message_date_container.dart';
+import 'Component/send_message_container.dart';
 
 class ChatScreen extends GetView<ChatController> {
   const ChatScreen({super.key});
@@ -33,7 +36,11 @@ class ChatScreen extends GetView<ChatController> {
       body: Column(
         children: [
           Expanded(
-              child: StreamBuilder<List<Chatmodel>>(
+              child: 
+              
+         
+         
+              StreamBuilder<List<Chatmodel>>(
                   stream: controller.getConversation(),
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
@@ -108,6 +115,7 @@ class ChatScreen extends GetView<ChatController> {
                           });
                     }
                   })),
+       
           SendMessageContainer(
             textFieldController: controller.chatfieldController,
             imageontap: () {

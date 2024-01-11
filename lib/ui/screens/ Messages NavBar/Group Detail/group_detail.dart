@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:check_in/controllers/Messages/group_detail_controller.dart';
 import 'package:check_in/controllers/Messages/group_members_controller.dart';
-import 'package:check_in/ui/screens/%20Messages%20NavBar/Group%20Detail/Widgets/textfields.dart';
+import 'package:check_in/ui/screens/%20Messages%20NavBar/Group%20Detail/Component/textfields.dart';
 import 'package:check_in/ui/screens/%20Messages%20NavBar/Group%20Members/group_members.dart';
 import 'package:check_in/ui/widgets/common_button.dart';
 import 'package:check_in/ui/widgets/custom_appbar.dart';
@@ -16,7 +16,7 @@ import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
 
-import 'Widgets/bottomsheet.dart';
+import 'Component/bottomsheet.dart';
 
 // ignore: must_be_immutable
 class GroupdetailScreen extends GetView<UsergroupDetailController> {

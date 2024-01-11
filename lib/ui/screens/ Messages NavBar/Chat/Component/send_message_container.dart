@@ -47,9 +47,7 @@ class SendMessageContainer extends GetView<ChatController> {
           horizontalGap(11),
           Expanded(
               child: TextFormField(
-            onTapOutside: (_) {
-              controller.chatFieldFocusNode.unfocus();
-            },
+           
             focusNode: controller.chatFieldFocusNode,
             onTap: textfieldontap,
             controller: textFieldController,
