@@ -100,7 +100,7 @@ class CourtsParser {
 
       var csvString = await loadAsset();
 
-      var csvData = const CsvToListConverter().convert(csvString);
+      var csvData = const CsvToListConverter().convert(csvString,eol: "\n");
 
       for (var i = 1; i < csvData.length; i++) {
         final location = CourtModel(
@@ -115,20 +115,31 @@ class CourtsParser {
           title: csvData[i][8].toString(),
         );
 
-        final court = LatLng(location.latitude, location.longitude);
-
         // Filter courts based on address
         if (location.title.toLowerCase().contains(search.toLowerCase()) ||
             location.address.toLowerCase().contains(search.toLowerCase())) {
-          filteredLocations.add(location);
+
+          final court = LatLng(location.latitude, location.longitude);
+          var isInRadius = checkIfWithinRadius(currentLocation, court);
+          if (isInRadius) {
+            // Distance in meters (50km = 50000m)
+            filteredLocations.add(location);
+          }
         }
       }
+
 
       for (var location in additionalLocations) {
         // Filter courts based on address
         if (location.title.toLowerCase().contains(search.toLowerCase()) ||
             location.address.toLowerCase().contains(search.toLowerCase())) {
-          filteredLocations.add(location);
+
+          final court = LatLng(location.latitude, location.longitude);
+          var isInRadius = checkIfWithinRadius(currentLocation, court);
+          if (isInRadius) {
+            // Distance in meters (50km = 50000m)
+            filteredLocations.add(location);
+          }
         }
       }
     } catch (e) {
