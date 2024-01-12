@@ -26,12 +26,17 @@ class AboutSection extends StatefulWidget {
 class _AboutSectionState extends State<AboutSection> {
   bool tapped = false;
   String aboutMe = '';
+  TextEditingController aboutMeController = TextEditingController();
   @override
   void initState() {
     super.initState();
-    aboutMe = (widget.userController.userModel.value.aboutMe.isEmptyOrNull)
-        ? TempLanguage.tellUsAboutGame
-        : widget.userController.userModel.value.aboutMe ?? "";
+    // aboutMe = (widget.userController.userModel.value.aboutMe.isEmptyOrNull)
+    //     ? TempLanguage.tellUsAboutGame
+    //     : widget.userController.userModel.value.aboutMe ?? "";
+
+    aboutMe = widget.userController.userModel.value.aboutMe ?? "";
+
+    aboutMeController.text = aboutMe;
   }
 
   @override
@@ -125,32 +130,48 @@ class _AboutSectionState extends State<AboutSection> {
                           TempLanguage.aboutMe, 14, semiBold, blackColor),
                       InkWell(
                         onTap: () => setState(() {
+                          if(tapped){
+                            setState(() {
+                              // userController.userModel.value.
+                              //..........
+                              aboutMe = aboutMeController.text;
+                              widget.userController.userModel.value.aboutMe = aboutMe;
+                              FirebaseFirestore.instance
+                                  .collection(Collections.USER)
+                                  .doc(FirebaseAuth.instance.currentUser!.uid)
+                                  .update({UserKey.ABOUT_ME: aboutMe});
+                            });
+                          }
                           tapped = !tapped;
                         }),
                         child: Padding(
                           padding: const EdgeInsets.only(left: 8),
                           child: SizedBox(
                             height: 1.8.h,
-                            width: 4.w,
-                            child: Image.asset(AppAssets.EDIT_ICON),
+                            // width: 15.w,
+                            child: tapped ?
+                            poppinsText(TempLanguage.save, 14, semiBold, greenColor)
+                                :
+                            Image.asset(AppAssets.EDIT_ICON,),
                           ),
                         ),
                       )
                     ],
                   ),
                   TextField(
+                    controller: aboutMeController,
                     textInputAction: TextInputAction.done,
                     onSubmitted: (value) {
-                      setState(() {
-                        // userController.userModel.value.
-                        //..........
-                        aboutMe = value;
-                        widget.userController.userModel.value.aboutMe = value;
-                        FirebaseFirestore.instance
-                            .collection(Collections.USER)
-                            .doc(FirebaseAuth.instance.currentUser!.uid)
-                            .update({UserKey.ABOUT_ME: aboutMe});
-                      });
+                      // setState(() {
+                      //   // userController.userModel.value.
+                      //   //..........
+                      //   aboutMe = value;
+                      //   widget.userController.userModel.value.aboutMe = value;
+                      //   FirebaseFirestore.instance
+                      //       .collection(Collections.USER)
+                      //       .doc(FirebaseAuth.instance.currentUser!.uid)
+                      //       .update({UserKey.ABOUT_ME: aboutMe});
+                      // });
                     },
                     maxLines:
                         widget.userController.userModel.value.isVerified ==
@@ -166,7 +187,7 @@ class _AboutSectionState extends State<AboutSection> {
                         errorBorder: InputBorder.none,
                         focusedBorder: InputBorder.none,
                         focusedErrorBorder: InputBorder.none,
-                        hintText: aboutMe,
+                        hintText: TempLanguage.tellUsAboutGame,
                         helperStyle: GoogleFonts.poppins(
                             fontSize: 14,
                             fontWeight: regular,

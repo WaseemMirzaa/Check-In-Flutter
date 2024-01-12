@@ -34,6 +34,7 @@ class TempLanguage {
   static String get agreeTo => 'I agree to the ';
   static String get agreeToTerms => 'Agree to terms & conditions';
   static String get enterUserName => 'Enter User Name';
+  static String get enterValidEmail => 'Enter Valid Email';
   static String get poweredBy => 'Powered by';
   static String get villeMarcos => 'Ville Marcos LLC';
 
@@ -53,6 +54,7 @@ class TempLanguage {
   static String get verifyProfile => "Verify Profile";
   static String get validEmail => "Enter Valid Email Address";
   static String get passwordCheck => "Password must be 6 digits long";
+  static String get invalidPassword => "Invalid Password";
   static String get checkIn => "CHECK IN";
   static String get checkOut => "CHECK OUT";
   static String get logInForFeatures => "Please log in to use more features";
@@ -63,6 +65,7 @@ class TempLanguage {
   static String get enterPassword => "Enter Password";
   static String get wentWrong => 'Something went wrong';
   static String get noDataFound => 'No data found';
+  static String get save => 'Save';
 
   static String get dearUser => "Dear User";
   static String get alertContentText =>

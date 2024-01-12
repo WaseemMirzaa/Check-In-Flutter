@@ -32,6 +32,7 @@ class _SignupViewState extends State<SignupView> {
   bool isSignUpButtonEnabled = false;
 
   int index = 0;
+  RxBool isLoading = false.obs;
 
   void changeIndex() {
     if (index == 0) {
@@ -271,20 +272,29 @@ class _SignupViewState extends State<SignupView> {
                     ),
                     SizedBox(height: 2.0.h),
                     // Add some spacing between the checkbox and the sign-up button
-                    Padding(
-                        padding: EdgeInsets.only(top: 3.6.h),
-                        child: fullWidthButton(TempLanguage.signUp, () async {
-                          if (!isSignUpButtonEnabled) {
-                            Get.snackbar(
-                                TempLanguage.error, TempLanguage.agreeToTerms);
-                          } else if (userName != '') {
-                            if (Validate(email)) {
-                              signUp(email, password, userName, context);
+                    Obx( () {
+                      return Padding(
+                          padding: EdgeInsets.only(top: 3.6.h),
+                          child: isLoading.value ? const Center(child: CircularProgressIndicator()) : fullWidthButton(TempLanguage.signUp, () async {
+                            if (!isSignUpButtonEnabled) {
+                              Get.snackbar(
+                                  TempLanguage.error, TempLanguage.agreeToTerms);
+                            } else if (userName != '') {
+                              if (Validate(email)) {
+                                isLoading.value = true;
+                                bool isSuccess = await signUp(email, password, userName, context);
+
+                                isLoading.value = false;
+                              } else {
+                                Get.snackbar(TempLanguage.error, TempLanguage.enterValidEmail);
+
+                              }
+                            } else if (userName == '') {
+                              Get.snackbar(TempLanguage.error, TempLanguage.enterUserName);
                             }
-                          } else if (userName == '') {
-                            Get.snackbar(TempLanguage.error, TempLanguage.enterUserName);
-                          }
-                        })),
+                          }));
+                    },
+                    ),
                   ],
                 ),
               ),

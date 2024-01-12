@@ -28,6 +28,7 @@ class _LoginViewState extends State<LoginView> {
 
   final auth = FirebaseAuth.instance;
   final snap = FirebaseFirestore.instance;
+  RxBool isLoading = false.obs;
 
   int index = 0;
   void changeIndex() {
@@ -135,7 +136,7 @@ class _LoginViewState extends State<LoginView> {
                           obscureText: index == 0 ? true : false,
                           validator: (v) {
                             if (v == null || v.isEmpty || v.length < 6) {
-                              return TempLanguage.passwordCheck;
+                              return TempLanguage.invalidPassword;
                             }
                             return null;
                           },
@@ -184,22 +185,24 @@ class _LoginViewState extends State<LoginView> {
                           ),
                         ],
                       ),
-                      Padding(
-                          padding: EdgeInsets.only(top: 3.6.h),
-                          child: fullWidthButton(TempLanguage.logInSpaced,
-                              () async {
-                            if (password != "" && email != "") {
-                              login(email, password, context);
-                            } else if (password == "") {
-                              Get.snackbar(TempLanguage.error,
-                                  TempLanguage.enterPassword,
-                                  snackPosition: SnackPosition.BOTTOM);
-                            } else if (email == "") {
-                              Get.snackbar(
-                                  TempLanguage.error, TempLanguage.enterEmail,
-                                  snackPosition: SnackPosition.BOTTOM);
-                            }
-                          })),
+                      Obx( () {
+                        return Padding(
+                            padding: EdgeInsets.only(top: 3.6.h),
+                            child: isLoading.value ? const Center(child: CircularProgressIndicator()) : fullWidthButton(TempLanguage.logInSpaced, () async {
+                              if (password != "" && email != "") {
+                                isLoading.value = true;
+                                await login(email, password, context);
+                                isLoading.value = false;
+                              } else if (password == "") {
+                                Get.snackbar(TempLanguage.error, TempLanguage.enterPassword,
+                                    snackPosition: SnackPosition.TOP);
+                              } else if (email == "") {
+                                Get.snackbar(TempLanguage.error, TempLanguage.enterEmail,
+                                    snackPosition: SnackPosition.TOP);
+                              }
+                            }));
+                      },
+                      ),
                     ],
                   ),
                 ),
