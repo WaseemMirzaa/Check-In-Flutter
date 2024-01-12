@@ -1,4 +1,3 @@
-
 class TempLanguage {
   static String get poppins => 'Poppins';
 
@@ -70,4 +69,19 @@ class TempLanguage {
       'We care about your privacy and data security. We use your email to maintain your own profile against it. '
       'Also we use your location to show you the nearest basketball courts in your area. '
       'Can we continue to use your data to give you best experience ?\n\nYou can change your choice anytime in the app settings. ';
+  static String get newsFeed => "News Feed";
+  static String get checkOutHot => "Check out what's Hot";
+  static String get contentThatTrendingAndPopular => "Check out what's Hot";
+  static String get noMessageFound => "No messages found.";
+  static String get typeSomething => "Type something";
+  static String get noRecent => "No Recents";
+  static String get noConversation => "No Conversation.";
+  static String get groupDetail => "Group Details";
+  static String get aboutGroup => "About Group";
+  static String get save => "Save";
+  static String get makeGroupAdmin => "Make Group Admin";
+  static String get noMemberFound => "No members found.";
+  static String get messages => "Messages";
+  static String get sendMessage => "Send message";
+  static String get search => "Search";
 }

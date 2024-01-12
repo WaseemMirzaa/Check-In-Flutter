@@ -1,3 +1,5 @@
+import 'package:check_in/core/constant/constant.dart';
+
 class Messagemodel {
   String? id;
   String? name;
@@ -18,22 +20,22 @@ class Messagemodel {
   factory Messagemodel.fromJson(
       Map<String, dynamic> json, name, image, unread) {
     return Messagemodel(
-        id: json['id'],
+        id: json[MessageField.ID],
         name: name,
         image: image,
-        lastmessage: json['lastMessage'],
+        lastmessage: json[MessageField.LAST_MESSAGE],
         unreadmsg: unread,
-        isgroup: json['isGroup'],
-        timeStamp: json['timeStamp']);
+        isgroup: json[MessageField.IS_GROUP],
+        timeStamp: json[MessageField.TIME_STAMP]);
   }
   Map<String, dynamic> toJson() {
     final data = <String, dynamic>{};
-    data['id'] = id;
-    data['recieverName'] = name;
-    data['lastMessage'] = lastmessage;
-    data['unreadMsg'] = unreadmsg;
-    data['isGroup'] = isgroup;
-    data['timeStamp'] = timeStamp;
+    data[MessageField.ID] = id;
+    data[''] = name;
+    data[MessageField.LAST_MESSAGE] = lastmessage;
+    data[''] = unreadmsg;
+    data[MessageField.IS_GROUP] = isgroup;
+    data[MessageField.TIME_STAMP] = timeStamp;
 
     return data;
   }

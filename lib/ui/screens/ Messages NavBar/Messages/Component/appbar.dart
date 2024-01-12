@@ -1,5 +1,8 @@
+import 'package:check_in/core/constant/temp_language.dart';
+import 'package:check_in/ui/screens/%20Messages%20NavBar/New%20Message/new_message.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
 
 import '../../../../../utils/Constants/images.dart';
 import '../../../../../utils/colors.dart';
@@ -17,13 +20,18 @@ class MessageAppBar extends StatelessWidget implements PreferredSizeWidget {
       title: Row(mainAxisSize: MainAxisSize.min, children: [
         SvgPicture.asset(AppImage.messageappbaricon),
         horizontalGap(15),
-        poppinsText('Messages', 20, FontWeight.bold, blackColor)
+        poppinsText(TempLanguage.messages, 15, FontWeight.bold, blackColor)
       ]),
       actions: [
         Padding(
           padding: const EdgeInsets.only(right: 20.0),
-          child: SvgPicture.asset(
-            AppImage.messagecircle,
+          child: GestureDetector(
+            onTap: () {
+              pushNewScreen(context, screen: const NewMessageScreen());
+            },
+            child: SvgPicture.asset(
+              AppImage.messagecircle,
+            ),
           ),
         )
       ],

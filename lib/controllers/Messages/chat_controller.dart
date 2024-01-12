@@ -21,7 +21,7 @@ class ChatController extends GetxController {
 
   RxBool sendMsgLoader = false.obs;
 
-  ChatController(this.chatService);
+  ChatController(this.chatService); 
 
   @override
   void onInit() {

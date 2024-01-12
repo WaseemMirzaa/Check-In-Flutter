@@ -1,4 +1,4 @@
-import 'package:check_in/utils/Constants/constants.dart';
+import 'package:check_in/core/constant/constant.dart';
 
 class GroupMemberModel {
   String? memberId;
@@ -18,7 +18,7 @@ class GroupMemberModel {
   factory GroupMemberModel.fromJson(Map<String, dynamic> json, bool iAmAdmin) {
     return GroupMemberModel(
         memberName: json[MessageField.MEMBER_NAME],
-        memberDesc: json[MessageField.ABOUT_GROUP],
+        memberDesc: json[MessageField.ABOUT_USER],
         memberImg: json[MessageField.MEMBER_IMG],
         isAdmin: json[MessageField.IS_ADMIN],
         memberId: json[MessageField.MEMBER_UID],

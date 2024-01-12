@@ -1,3 +1,5 @@
+import 'package:check_in/controllers/user_controller.dart';
+import 'package:check_in/core/constant/temp_language.dart';
 import 'package:check_in/model/Message%20and%20Group%20Message%20Model/message_model.dart';
 import 'package:check_in/ui/screens/%20Messages%20NavBar/Chat/chat_screen.dart';
 import 'package:check_in/ui/screens/%20Messages%20NavBar/Messages/Component/appbar.dart';
@@ -15,6 +17,7 @@ import 'Component/floating_action_button.dart';
 class MessageScreen extends GetView<MessageController> {
   MessageScreen({super.key});
   final ChatController chatcontroller = Get.find<ChatController>();
+  final UserController userController = Get.find<UserController>();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -39,8 +42,8 @@ class MessageScreen extends GetView<MessageController> {
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return loaderView();
-                    } else if (!snapshot.hasData) {
-                      return const Center(child: Text('No messages found.'));
+                    } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                      return Center(child: Text(TempLanguage.noMessageFound));
                     } else {
                       return ListView.separated(
                           padding: const EdgeInsets.only(top: 14, bottom: 70),
@@ -69,9 +72,10 @@ class MessageScreen extends GetView<MessageController> {
                                     chatcontroller.name = message.name!;
                                     chatcontroller.isgroup = message.isgroup!;
                                     chatcontroller.image = message.image!;
-                                    pushNewScreen(context,
-                                        screen: const ChatScreen(),
-                                       );
+                                    pushNewScreen(
+                                      context,
+                                      screen: const ChatScreen(),
+                                    );
                                   },
                                 );
                               } else {

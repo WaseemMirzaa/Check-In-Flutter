@@ -3,10 +3,10 @@
 import 'dart:developer';
 import 'dart:io';
 
+import 'package:check_in/core/constant/constant.dart';
 import 'package:check_in/model/Message%20and%20Group%20Message%20Model/chat_model.dart';
 import 'package:check_in/model/Message%20and%20Group%20Message%20Model/group_detail_model.dart';
 import 'package:check_in/model/Message%20and%20Group%20Message%20Model/group_member_model.dart';
-import 'package:check_in/utils/Constants/constants.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 

@@ -1,3 +1,5 @@
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:check_in/core/constant/temp_language.dart';
 import 'package:check_in/model/Message%20and%20Group%20Message%20Model/chat_model.dart';
 import 'package:check_in/controllers/Messages/chat_controller.dart';
 import 'package:check_in/ui/screens/%20Messages%20NavBar/Chat/Component/appbar.dart';
@@ -6,12 +8,9 @@ import 'package:check_in/ui/screens/%20Messages%20NavBar/Chat/Component/image_da
 import 'package:check_in/ui/screens/%20Messages%20NavBar/Chat/Component/sticker_keyboard.dart';
 import 'package:check_in/utils/Constants/global_variable.dart';
 import 'package:check_in/utils/colors.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:firebase_ui_firestore/firebase_ui_firestore.dart';
 import 'package:get/get.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
-import '../../../../utils/Constants/constants.dart';
 import '../../../../utils/gaps.dart';
 import '../../../../utils/loader.dart';
 import '../Group Detail/group_detail.dart';
@@ -36,17 +35,13 @@ class ChatScreen extends GetView<ChatController> {
       body: Column(
         children: [
           Expanded(
-              child: 
-              
-         
-         
-              StreamBuilder<List<Chatmodel>>(
+              child: StreamBuilder<List<Chatmodel>>(
                   stream: controller.getConversation(),
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return loaderView();
                     } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                      return const Center(child: Text('No Conversation.'));
+                      return Center(child: Text(TempLanguage.noConversation));
                     } else {
                       return ListView.builder(
                           padding: const EdgeInsets.only(bottom: 10),
@@ -76,8 +71,9 @@ class ChatScreen extends GetView<ChatController> {
                                           child: CircleAvatar(
                                             backgroundColor:
                                                 greenColor.withOpacity(0.6),
-                                            backgroundImage: const NetworkImage(
-                                                'https://wac-cdn.atlassian.com/dam/jcr:ba03a215-2f45-40f5-8540-b2015223c918/Max-R_Headshot%20(1).jpg?cdnVersion=1365'),
+                                            backgroundImage:
+                                                const CachedNetworkImageProvider(
+                                                    'https://wac-cdn.atlassian.com/dam/jcr:ba03a215-2f45-40f5-8540-b2015223c918/Max-R_Headshot%20(1).jpg?cdnVersion=1365'),
                                             radius: 17,
                                           ),
                                         ),
@@ -115,7 +111,6 @@ class ChatScreen extends GetView<ChatController> {
                           });
                     }
                   })),
-       
           SendMessageContainer(
             textFieldController: controller.chatfieldController,
             imageontap: () {

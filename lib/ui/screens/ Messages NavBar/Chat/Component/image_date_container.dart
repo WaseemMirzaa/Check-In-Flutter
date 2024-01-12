@@ -1,7 +1,7 @@
 import 'package:check_in/utils/DateTimeUtils.dart';
 import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
-
+import 'package:cached_network_image/cached_network_image.dart';
 import '../../../../../model/Message and Group Message Model/chat_model.dart';
 import '../../../../../utils/colors.dart';
 import '../../../../../utils/gaps.dart';
@@ -31,8 +31,8 @@ class ImageDateContainer extends StatelessWidget {
               border: Border.all(color: greenColor, width: 2)),
           child: ClipRRect(
             borderRadius: BorderRadius.circular(8),
-            child: Image.network(
-              chat!.message!,
+            child: CachedNetworkImage(
+              imageUrl: chat!.message!,
               fit: BoxFit.cover,
             ),
           ),
@@ -48,7 +48,7 @@ class ImageDateContainer extends StatelessWidget {
             horizontalGap(5),
             mymsg!
                 ? const CircleAvatar(
-                    backgroundImage: NetworkImage(
+                    backgroundImage: CachedNetworkImageProvider(
                         'https://wac-cdn.atlassian.com/dam/jcr:ba03a215-2f45-40f5-8540-b2015223c918/Max-R_Headshot%20(1).jpg?cdnVersion=1365'),
                     radius: 8,
                   )

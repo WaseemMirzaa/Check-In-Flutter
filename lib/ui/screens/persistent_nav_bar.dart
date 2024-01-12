@@ -224,6 +224,7 @@ class _HomeState extends State<Home> with AutomaticKeepAliveClientMixin {
         return Scaffold(
           body: _buildScreens[navBarController.currentIndex.value],
           bottomNavigationBar: BottomNavigationBar(
+            
             items: _navBarsItems(),
             currentIndex: navBarController.currentIndex.value,
             //selectedItemColor: Colors.amber[800],

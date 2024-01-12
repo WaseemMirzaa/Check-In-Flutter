@@ -1,7 +1,9 @@
 import 'dart:io';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:check_in/controllers/Messages/group_detail_controller.dart';
 import 'package:check_in/controllers/Messages/group_members_controller.dart';
+import 'package:check_in/core/constant/temp_language.dart';
 import 'package:check_in/ui/screens/%20Messages%20NavBar/Group%20Detail/Component/textfields.dart';
 import 'package:check_in/ui/screens/%20Messages%20NavBar/Group%20Members/group_members.dart';
 import 'package:check_in/ui/widgets/common_button.dart';
@@ -28,7 +30,7 @@ class GroupdetailScreen extends GetView<UsergroupDetailController> {
     controller.getGroupDetail(docId!);
     return Scaffold(
         appBar: CustomAppbar(
-          title: poppinsText('Group Details', 20, bold, blackColor),
+          title: poppinsText(TempLanguage.groupDetail, 20, bold, blackColor),
           actions: [
             GestureDetector(
                 onTap: () {
@@ -65,19 +67,18 @@ class GroupdetailScreen extends GetView<UsergroupDetailController> {
                                   CircleAvatar(
                                     backgroundColor:
                                         greenColor.withOpacity(0.6),
-                                    backgroundImage:
-                                        controller.fileImage.value != null
-                                            ? FileImage(File(controller
-                                                .fileImage
-                                                .value!
-                                                .path)) as ImageProvider
-                                            : NetworkImage(controller
-                                                        .groupDetailModel!
-                                                        .groupImg! !=
-                                                    ''
-                                                ? controller
-                                                    .groupDetailModel!.groupImg!
-                                                : AppImage.userImagePath),
+                                    backgroundImage: controller
+                                                .fileImage.value !=
+                                            null
+                                        ? FileImage(File(controller.fileImage
+                                            .value!.path)) as ImageProvider
+                                        : CachedNetworkImageProvider(controller
+                                                    .groupDetailModel!
+                                                    .groupImg! !=
+                                                ''
+                                            ? controller
+                                                .groupDetailModel!.groupImg!
+                                            : AppImage.userImagePath),
                                     radius: 65,
                                   ),
                                   controller.groupDetailModel!.isAdmin!
@@ -114,7 +115,7 @@ class GroupdetailScreen extends GetView<UsergroupDetailController> {
                                     MainAxisAlignment.spaceBetween,
                                 children: [
                                   poppinsText(
-                                      'About Group', 14, semiBold, blackColor),
+                                      TempLanguage.aboutGroup, 14, semiBold, blackColor),
                                   controller.groupDetailModel!.isAdmin!
                                       ? GestureDetector(
                                           onTap: () {

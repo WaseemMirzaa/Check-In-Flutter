@@ -3,6 +3,7 @@ import 'package:check_in/core/constant/constant.dart';
 import 'package:check_in/model/user_modal.dart';
 import 'package:check_in/ui/screens/persistent_nav_bar.dart';
 import 'package:check_in/ui/screens/start.dart';
+import 'package:check_in/utils/Constants/global_variable.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -26,7 +27,10 @@ Future<void> signUp(
         // .then((value) async =>
         //     await addUserData(email: email, fullName: userName))
         .then((value) => auth.currentUser?.updateDisplayName(userName))
-        .then((value) => snap.collection(Collections.USER).doc(auth.currentUser!.uid).set(
+        .then((value) => snap
+                .collection(Collections.USER)
+                .doc(auth.currentUser!.uid)
+                .set(
               {
                 UserKey.USER_NAME: auth.currentUser!.displayName,
                 UserKey.EMAIL: auth.currentUser!.email,
@@ -36,8 +40,8 @@ Future<void> signUp(
               },
             )
                 // .then((value) async => await toModal(context))
-                .then((value) =>
-                    pushNewScreen(context, screen: Home(), withNavBar: false)));
+                .then((value) => pushNewScreen(context,
+                    screen: const Home(), withNavBar: false)));
   } on FirebaseAuthException catch (e) {
     print('error message ${e.message}');
     Get.snackbar('Error', e.message ?? '', snackPosition: SnackPosition.BOTTOM);
@@ -51,10 +55,12 @@ Future<void> login(email, password, context) async {
     await auth
         .signInWithEmailAndPassword(email: email, password: password)
         .then((value) async {
-      // await toModal(context);
+      // Temporary --Save userid in global userid for chat
+      GlobalVariable.userid = value.user!.uid;
+      await toModal(context);
       SharedPreferences prefs = await SharedPreferences.getInstance();
       prefs.setString('email', 'useremail@gmail.com');
-      pushNewScreen(context, screen: Home());
+      pushNewScreen(context, screen: const Home());
     });
   } on FirebaseAuthException catch (e) {
     print('error message ${e.message}');
@@ -197,6 +203,7 @@ toModal(BuildContext context) async {
       .doc(auth.currentUser?.uid ?? "")
       .get();
   UserModel userModel = UserModel.fromMap(snap.data() as Map<String, dynamic>);
+  print("user model:.. ${userModel.uid}");
 }
 
 Future<void> resetPassword({required String emailText}) async {
@@ -207,7 +214,8 @@ Future<void> resetPassword({required String emailText}) async {
     await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
 
     // Display a success message and navigate back
-    Fluttertoast.showToast(msg: "Password reset link sent via Email").then((value) {
+    Fluttertoast.showToast(msg: "Password reset link sent via Email")
+        .then((value) {
       Get.back(); // Navigate back to the previous screen
     });
   } on FirebaseAuthException catch (e) {

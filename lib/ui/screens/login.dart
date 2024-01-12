@@ -186,14 +186,17 @@ class _LoginViewState extends State<LoginView> {
                       ),
                       Padding(
                           padding: EdgeInsets.only(top: 3.6.h),
-                          child: fullWidthButton(TempLanguage.logInSpaced, () async {
+                          child: fullWidthButton(TempLanguage.logInSpaced,
+                              () async {
                             if (password != "" && email != "") {
                               login(email, password, context);
                             } else if (password == "") {
-                              Get.snackbar(TempLanguage.error, TempLanguage.enterPassword,
+                              Get.snackbar(TempLanguage.error,
+                                  TempLanguage.enterPassword,
                                   snackPosition: SnackPosition.BOTTOM);
                             } else if (email == "") {
-                              Get.snackbar(TempLanguage.error, TempLanguage.enterEmail,
+                              Get.snackbar(
+                                  TempLanguage.error, TempLanguage.enterEmail,
                                   snackPosition: SnackPosition.BOTTOM);
                             }
                           })),

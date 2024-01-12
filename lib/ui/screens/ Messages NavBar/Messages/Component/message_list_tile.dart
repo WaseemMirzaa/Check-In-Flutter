@@ -1,5 +1,6 @@
 // ignore_for_file: must_be_immutable
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:sizer/sizer.dart';
@@ -37,9 +38,10 @@ class MessageListTile extends StatelessWidget {
               children: [
                 CircleAvatar(
                   backgroundColor: greenColor.withOpacity(0.6),
-                  backgroundImage: NetworkImage(message!.image! == ''
-                      ? AppImage.userImagePath
-                      : message!.image!),
+                  backgroundImage: CachedNetworkImageProvider(
+                      message!.image! == ''
+                          ? AppImage.userImagePath
+                          : message!.image!),
                   radius: 30,
                 ),
                 Padding(

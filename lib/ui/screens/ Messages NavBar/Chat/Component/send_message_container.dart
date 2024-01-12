@@ -1,4 +1,5 @@
 import 'package:check_in/controllers/Messages/chat_controller.dart';
+import 'package:check_in/core/constant/temp_language.dart';
 import 'package:check_in/utils/loader.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -47,12 +48,11 @@ class SendMessageContainer extends GetView<ChatController> {
           horizontalGap(11),
           Expanded(
               child: TextFormField(
-           
             focusNode: controller.chatFieldFocusNode,
             onTap: textfieldontap,
             controller: textFieldController,
             decoration: InputDecoration(
-                hintText: 'Type something',
+                hintText: TempLanguage.typeSomething,
                 hintStyle: TextStyle(
                     fontSize: 14, color: blackColor, fontWeight: medium),
                 border: InputBorder.none,

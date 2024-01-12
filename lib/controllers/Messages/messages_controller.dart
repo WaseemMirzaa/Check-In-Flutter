@@ -7,7 +7,6 @@ import '../../Services/message_service.dart';
 class MessageController extends GetxController {
   final MessageService chatService;
   final RxString userId = GlobalVariable.userid.obs;
-
   MessageController(this.chatService);
 
   var searchQuery = ''.obs;

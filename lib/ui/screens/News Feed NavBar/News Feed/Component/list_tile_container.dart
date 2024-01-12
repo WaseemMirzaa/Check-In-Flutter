@@ -1,11 +1,12 @@
 import 'package:check_in/controllers/News%20Feed/news_feed_controller.dart';
+import 'package:check_in/model/NewsFeed%20Model/news_feed_model.dart';
 import 'package:check_in/ui/screens/News%20Feed%20NavBar/All%20Comments/all_comments.dart';
 import 'package:check_in/ui/screens/News%20Feed%20NavBar/All%20Likes/all_likes_screen.dart';
 import 'package:check_in/ui/screens/News%20Feed%20NavBar/Full%20Screen%20Image/full_screen_image.dart';
 import 'package:check_in/ui/screens/News%20Feed%20NavBar/News%20Feed/Component/comment_container.dart';
+import 'package:check_in/ui/screens/News%20Feed%20NavBar/News%20Feed/Component/custom_paint.dart';
 import 'package:check_in/ui/widgets/text_field.dart';
 import 'package:flutter/material.dart';
-import 'package:check_in/ui/screens/News%20Feed%20NavBar/News%20Feed/Component/custom_paint.dart';
 import 'package:check_in/ui/widgets/custom_container.dart';
 import 'package:check_in/utils/Constants/images.dart';
 import 'package:check_in/utils/colors.dart';
@@ -18,7 +19,8 @@ import 'package:share_plus/share_plus.dart';
 import 'package:sizer/sizer.dart';
 
 class ListTileContainer extends GetView<NewsFeedController> {
-  const ListTileContainer({super.key});
+  NewsFeedModel? data;
+  ListTileContainer({super.key, this.data});
 
   @override
   Widget build(BuildContext context) {
@@ -34,36 +36,41 @@ class ListTileContainer extends GetView<NewsFeedController> {
               padding: const EdgeInsets.symmetric(horizontal: 8),
               child: Row(
                 children: [
-                  Stack(
-                    children: [
-                      SizedBox(
-                        height: 44,
-                        width: 43,
-                        child: CustomPaint(
-                          painter: MyPainter(),
-                          size: const Size(200, 200),
-                        ),
-                      ),
-                      Positioned(
-                        top: 1.5,
-                        left: 1,
-                        child: Container(
+                  data!.userImage == ''
+                      ? Container(
                           height: 40,
                           width: 40,
-                          decoration: const BoxDecoration(
+                          decoration: BoxDecoration(
                               shape: BoxShape.circle,
                               image: DecorationImage(
-                                image: NetworkImage(
-                                    'https://wac-cdn.atlassian.com/dam/jcr:ba03a215-2f45-40f5-8540-b2015223c918/Max-R_Headshot%20(1).jpg?cdnVersion=1365'),
-                              )),
+                                  image: NetworkImage(AppImage.userImagePath))))
+                      : Stack(
+                          children: [
+                            SizedBox(
+                              height: 44,
+                              width: 43,
+                              child: CustomPaint(
+                                painter: MyPainter(),
+                                size: const Size(200, 200),
+                              ),
+                            ),
+                            Positioned(
+                              top: 1.5,
+                              left: 1,
+                              child: Container(
+                                  height: 40,
+                                  width: 40,
+                                  decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      image: DecorationImage(
+                                          image:
+                                              NetworkImage(data!.userImage!)))),
+                            )
+                          ],
                         ),
-                      )
-                    ],
-                  ),
                   horizontalGap(10),
                   Expanded(
-                    child: poppinsText(
-                        'Daniela Fernández Rssssssss', 14, bold, darkBlue,
+                    child: poppinsText(data!.name ?? '', 14, bold, darkBlue,
                         overflow: TextOverflow.ellipsis),
                   ),
                   horizontalGap(5),
@@ -82,38 +89,39 @@ class ListTileContainer extends GetView<NewsFeedController> {
             verticalGap(8),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 10.0),
-              child: poppinsText(
-                  'Me encanto la sesión de fotos que me hizo mi amigo 😍🥺',
-                  12,
-                  medium,
+              child: poppinsText(data!.description ?? "", 12, medium,
                   darkBlue.withOpacity(0.8),
                   maxlines: 3),
             ),
             verticalGap(8),
-            GestureDetector(
-              onTap: () {
-                pushNewScreen(context, screen: const FullScreenImage());
-              },
-              child: SizedBox(
-                height: 200,
-                width: double.infinity,
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
-                  child: Image.network(
-                    'https://img.freepik.com/free-vector/set-realistic-hoodies-mannequins-metal-poles-sweatshirt-model-with-long-sleeve_1441-2010.jpg?size=626&ext=jpg',
-                    fit: BoxFit.cover,
-                  ),
-                ),
-              ),
-            ),
+            data!.isType == 'image'
+                ? GestureDetector(
+                    onTap: () {
+                      pushNewScreen(context, screen: const FullScreenImage());
+                    },
+                    child: SizedBox(
+                      height: 200,
+                      width: double.infinity,
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: Image.network(
+                          data!.postUrl ?? '',
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    ),
+                  )
+                : data!.isType == 'video'
+                    ? Container()
+                    : const SizedBox(),
             verticalGap(10),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 10),
               child: Row(
                 children: [
-                  poppinsText('30 ', 11, medium, darkBlue),
-                  poppinsText('comments . ', 11, medium, darkBlue),
-                  poppinsText('5 ', 11, medium, darkBlue),
+                  poppinsText("${data!.noOfComment}", 11, medium, darkBlue),
+                  poppinsText(' comments . ', 11, medium, darkBlue),
+                  poppinsText("${data!.noOfShared} ", 11, medium, darkBlue),
                   poppinsText('shared', 11, medium, darkBlue),
                 ],
               ),
@@ -166,8 +174,8 @@ class ListTileContainer extends GetView<NewsFeedController> {
                       onTap: () {
                         pushNewScreen(context, screen: const AllLikesScreen());
                       },
-                      child: poppinsText(
-                          'Liked by 50 People', 11, medium, greyColor)),
+                      child: poppinsText('Liked by ${data!.noOfLike} People',
+                          11, medium, greyColor)),
                   horizontalGap(2.w),
                   SvgPicture.asset(
                     AppImage.multiplelike,

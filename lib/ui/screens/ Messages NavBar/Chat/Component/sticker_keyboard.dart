@@ -1,5 +1,6 @@
 // ignore_for_file: must_be_immutable
 
+import 'package:check_in/core/constant/temp_language.dart';
 import 'package:check_in/utils/colors.dart';
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:flutter/material.dart';
@@ -24,9 +25,9 @@ class StickerKeyboard extends StatelessWidget {
                       ? 1.30
                       : 1.0),
               recentsLimit: 30,
-              noRecents: const Text(
-                'No Recents',
-                style: TextStyle(fontSize: 20, color: Colors.black26),
+              noRecents: Text(
+                TempLanguage.noRecent,
+                style: const TextStyle(fontSize: 20, color: Colors.black26),
                 textAlign: TextAlign.center,
               ),
               loadingIndicator: const SizedBox.shrink(),

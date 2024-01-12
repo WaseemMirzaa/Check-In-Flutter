@@ -1,4 +1,5 @@
 import 'package:check_in/controllers/Messages/group_members_controller.dart';
+import 'package:check_in/core/constant/temp_language.dart';
 import 'package:check_in/model/Message%20and%20Group%20Message%20Model/group_member_model.dart';
 import 'package:check_in/ui/screens/%20Messages%20NavBar/Group%20Members/Component/group_member_tile.dart';
 import 'package:check_in/utils/Constants/images.dart';
@@ -68,7 +69,7 @@ class GroupMember extends GetView<GroupmemberController> {
                       if (snapshot.connectionState == ConnectionState.waiting) {
                         return loaderView();
                       } else if (!snapshot.hasData) {
-                        return const Center(child: Text('No members found.'));
+                        return Center(child: Text(TempLanguage.noMemberFound));
                       } else {
                         return ListView.separated(
                           itemCount: snapshot.data!.length,

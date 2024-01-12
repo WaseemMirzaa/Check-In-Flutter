@@ -1,5 +1,6 @@
 // ignore_for_file: must_be_immutable
 
+import 'package:check_in/core/constant/temp_language.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
@@ -18,7 +19,8 @@ class FloatingactionButton extends StatelessWidget {
       backgroundColor: greenColor,
       label: Row(
         children: [
-          poppinsText('Send message', 12, FontWeight.normal, whiteColor),
+          poppinsText(
+              TempLanguage.sendMessage, 12, FontWeight.normal, whiteColor),
           horizontalGap(35),
           SvgPicture.asset(
             AppImage.messageappbaricon,

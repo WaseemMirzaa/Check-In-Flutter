@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
@@ -21,8 +22,8 @@ class ChatAppbar extends StatelessWidget implements PreferredSizeWidget {
         onTap: ontap,
         child: Row(mainAxisSize: MainAxisSize.min, children: [
           CircleAvatar(
-            backgroundImage:
-                NetworkImage(image == '' ? AppImage.userImagePath : image!),
+            backgroundImage: CachedNetworkImageProvider(
+                image == '' ? AppImage.userImagePath : image!),
             radius: 20,
           ),
           horizontalGap(15),
