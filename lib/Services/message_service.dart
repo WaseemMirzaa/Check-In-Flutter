@@ -211,27 +211,49 @@ class MessageService {
   }
 
 //........... Update Group detail
-  Future<bool> updateGroupdetail(
+  Future<bool> updateGroupName(
     String docId,
     String name,
+  ) async {
+    try {
+      DocumentReference ref = _messagesCollection.doc(docId);
+      await ref.update({
+        MessageField.GROUP_NAME: name,
+      });
+
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  Future<bool> updateGroupAbout(
+    String docId,
     String about,
+  ) async {
+    try {
+      DocumentReference ref = _messagesCollection.doc(docId);
+
+      await ref.update({
+        MessageField.ABOUT_GROUP: about,
+      });
+
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  Future<bool> updateGroupImage(
+    String docId,
     String imagePath,
   ) async {
     try {
       DocumentReference ref = _messagesCollection.doc(docId);
-      if (imagePath == '') {
-        await ref.update({
-          MessageField.ABOUT_GROUP: about,
-          MessageField.GROUP_NAME: name,
-        });
-      } else {
-        String? image = await uploadImageToFirebase(docId, imagePath);
-        await ref.update({
-          MessageField.ABOUT_GROUP: about,
-          MessageField.GROUP_NAME: name,
-          MessageField.GROUP_IMG: image
-        });
-      }
+
+      String? image = await uploadImageToFirebase(docId, imagePath);
+      await ref.update({MessageField.GROUP_IMG: image});
+
       return true;
     } catch (e) {
       return false;
@@ -253,14 +275,15 @@ class MessageService {
   }
 
 //........... Make Group Admin
-  Future<void> makeGroupAdmin(String docId, String memberId) async {
+  Future<void> makeGroupAdmin(
+      String docId, String memberId, bool isAdmin) async {
     final docRef = _messagesCollection.doc(docId);
     db.runTransaction((transaction) async {
       final snapshot = await transaction.get(docRef);
       List memberLst = snapshot.get(MessageField.MEMBERS);
       for (var data in memberLst) {
         if (data[MessageField.MEMBER_UID] == memberId) {
-          data[MessageField.IS_ADMIN] = true;
+          data[MessageField.IS_ADMIN] = isAdmin;
         }
       }
       transaction.update(docRef, {MessageField.MEMBERS: memberLst});

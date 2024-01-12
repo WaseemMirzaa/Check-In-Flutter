@@ -63,9 +63,12 @@ dependencies:
   csv: ^5.0.2
   app_tracking_transparency: ^2.0.4
   percent_indicator: ^4.2.3
+  cached_network_image: ^3.3.1
+  chewie: ^1.7.1
+  emoji_picker_flutter: ^1.6.3
 
   google_maps_flutter:
-      path: /Users/apple/StudioProjects/Check-In-Flutter/google_maps_flutter/google_maps_flutter
+      path: ./google_maps_flutter/google_maps_flutter
 #
 #  google_maps_flutter_platform_interface:
 #      path: /Users/apple/StudioProjects/Check-In-Flutter/google_maps_flutter/google_maps_flutter_platform_interface

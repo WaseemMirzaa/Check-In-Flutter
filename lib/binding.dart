@@ -17,7 +17,7 @@ class MyBinding implements Bindings {
     Get.lazyPut(() => ChatController(MessageService()), fenix: true);
     Get.lazyPut(() => MessageController(MessageService()), fenix: true);
     Get.lazyPut(() => GroupmemberController(MessageService()), fenix: true);
-    Get.lazyPut(() => UsergroupDetailController(MessageService()), fenix: true);
+    Get.lazyPut(() => GroupDetailController(MessageService()), fenix: true);
     Get.lazyPut(() => NewMessageController(MessageService()), fenix: true);
     Get.lazyPut(() => NewsFeedController(NewsFeedService()), fenix: true);
     Get.lazyPut(() => CreatePostController(), fenix: true);

@@ -8,7 +8,7 @@ import 'package:sizer/sizer.dart';
 
 class GroupMemberTile extends StatelessWidget {
   GroupMemberModel? data;
-  Function(dynamic)? ontap;
+  Function()? ontap;
   GroupMemberTile({super.key, this.data, this.ontap});
 
   @override
@@ -16,72 +16,90 @@ class GroupMemberTile extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 15.0),
       child: Material(
-        elevation: 5,
+        elevation: 3,
         borderRadius: BorderRadius.circular(6),
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 15),
-          height: 78,
-          width: 50,
-          decoration: BoxDecoration(borderRadius: BorderRadius.circular(10)),
-          child: Row(
-            children: [
-              CircleAvatar(
-                backgroundColor: greenColor.withOpacity(0.6),
-                backgroundImage: CachedNetworkImageProvider(data!.memberImg!),
-                radius: 30,
-              ),
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.only(left: 10),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          SizedBox(
-                            width: 43.w,
-                            child: poppinsText(data!.memberName ?? '', 15,
-                                FontWeight.bold, blackColor,
-                                overflow: TextOverflow.ellipsis),
-                          ),
-                        ],
-                      ),
-                      SizedBox(
-                        width: 45.w,
-                        child: poppinsText(data!.memberDesc ?? '', 11,
-                            FontWeight.normal, blackColor.withOpacity(0.65),
-                            overflow: TextOverflow.ellipsis),
-                      )
-                    ],
-                  ),
+        child: GestureDetector(
+          onTap: () {
+            _showDialog(context);
+          },
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 15),
+            height: 78,
+            width: 50,
+            decoration: BoxDecoration(borderRadius: BorderRadius.circular(10)),
+            child: Row(
+              children: [
+                CircleAvatar(
+                  backgroundColor: greenColor.withOpacity(0.6),
+                  backgroundImage: CachedNetworkImageProvider(data!.memberImg!),
+                  radius: 30,
                 ),
-              ),
-              data!.isAdmin!
-                  ? Container(
-                      padding: const EdgeInsets.all(7),
-                      decoration: BoxDecoration(
-                          color: greyColor.withOpacity(0.4),
-                          borderRadius: BorderRadius.circular(8)),
-                      child: Text(
-                        'Admin',
-                        style: TextStyle(color: greenColor),
-                      ),
-                    )
-                  : PopupMenuButton(
-                      itemBuilder: (BuildContext context) => [
-                            PopupMenuItem(
-                              value: 'makegroupadmin',
-                              child: Text(TempLanguage.makeGroupAdmin),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 10),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            SizedBox(
+                              width: 43.w,
+                              child: poppinsText(data!.memberName ?? '', 15,
+                                  FontWeight.bold, blackColor,
+                                  overflow: TextOverflow.ellipsis),
                             ),
                           ],
-                      elevation: 10,
-                      position: PopupMenuPosition.under,
-                      onSelected: ontap)
-            ],
+                        ),
+                        SizedBox(
+                          width: 45.w,
+                          child: poppinsText(data!.memberDesc ?? '', 11,
+                              FontWeight.normal, blackColor.withOpacity(0.65),
+                              overflow: TextOverflow.ellipsis),
+                        )
+                      ],
+                    ),
+                  ),
+                ),
+                data!.isAdmin!
+                    ? Container(
+                        padding: const EdgeInsets.all(7),
+                        decoration: BoxDecoration(
+                            color: greyColor.withOpacity(0.4),
+                            borderRadius: BorderRadius.circular(8)),
+                        child: Text(
+                          'Admin',
+                          style: TextStyle(color: greenColor),
+                        ),
+                      )
+                    : const SizedBox()
+              ],
+            ),
           ),
         ),
       ),
     );
+  }
+
+  void _showDialog(BuildContext context) {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                data!.isAdmin!
+                    ? GestureDetector(
+                        onTap: ontap,
+                        child: Text(TempLanguage.removeGroupAdmin),
+                      )
+                    : GestureDetector(
+                        onTap: ontap, child: Text(TempLanguage.makeGroupAdmin))
+              ],
+            ),
+          );
+        });
   }
 }

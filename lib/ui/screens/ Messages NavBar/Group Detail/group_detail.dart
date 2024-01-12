@@ -6,7 +6,6 @@ import 'package:check_in/controllers/Messages/group_members_controller.dart';
 import 'package:check_in/core/constant/temp_language.dart';
 import 'package:check_in/ui/screens/%20Messages%20NavBar/Group%20Detail/Component/textfields.dart';
 import 'package:check_in/ui/screens/%20Messages%20NavBar/Group%20Members/group_members.dart';
-import 'package:check_in/ui/widgets/common_button.dart';
 import 'package:check_in/ui/widgets/custom_appbar.dart';
 import 'package:check_in/utils/Constants/images.dart';
 import 'package:check_in/utils/colors.dart';
@@ -21,7 +20,7 @@ import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
 import 'Component/bottomsheet.dart';
 
 // ignore: must_be_immutable
-class GroupdetailScreen extends GetView<UsergroupDetailController> {
+class GroupdetailScreen extends GetView<GroupDetailController> {
   String? docId;
   GroupdetailScreen({super.key, this.docId});
   var groupmemberController = Get.find<GroupmemberController>();
@@ -55,8 +54,22 @@ class GroupdetailScreen extends GetView<UsergroupDetailController> {
                         child: Column(
                           children: [
                             verticalGap(40),
-                            NameTextfield(
-                              isAdmin: controller.groupDetailModel!.isAdmin,
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: NameTextfield(
+                                    readOnly: controller.nameTapped.value,
+                                    isAdmin:
+                                        controller.groupDetailModel!.isAdmin,
+                                    iconOnTap: () {
+                                      //  controller.namefocusNode.requestFocus();
+                                      controller.updateGroupName(docId!);
+                                      controller.nameTapped.value =
+                                          !controller.nameTapped.value;
+                                    },
+                                  ),
+                                ),
+                              ],
                             ),
                             verticalGap(26),
                             SizedBox(
@@ -88,7 +101,7 @@ class GroupdetailScreen extends GetView<UsergroupDetailController> {
                                           child: GestureDetector(
                                             onTap: () {
                                               showbottomSheet(
-                                                  context, controller);
+                                                  context, controller, docId!);
                                             },
                                             child: Container(
                                               height: 40,
@@ -114,20 +127,27 @@ class GroupdetailScreen extends GetView<UsergroupDetailController> {
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: [
-                                  poppinsText(
-                                      TempLanguage.aboutGroup, 14, semiBold, blackColor),
+                                  poppinsText(TempLanguage.aboutGroup, 14,
+                                      semiBold, blackColor),
                                   controller.groupDetailModel!.isAdmin!
                                       ? GestureDetector(
                                           onTap: () {
-                                            controller.aboutfocusNode
-                                                .requestFocus();
+                                            // controller.aboutfocusNode
+                                            //     .requestFocus();
+                                            controller.updateGroupAbout(docId!);
+                                            controller.aboutTapped.value =
+                                                !controller.aboutTapped.value;
                                           },
-                                          child: SvgPicture.asset(
-                                            AppImage.penicon,
-                                            height: 17,
-                                            width: 17,
-                                          ),
-                                        )
+                                          child: Obx(
+                                            () => controller.aboutTapped.value
+                                                ? poppinsText(TempLanguage.save,
+                                                    14, semiBold, greenColor)
+                                                : SvgPicture.asset(
+                                                    AppImage.penicon,
+                                                    height: 17,
+                                                    width: 17,
+                                                  ),
+                                          ))
                                       : const SizedBox()
                                 ],
                               ),
@@ -135,23 +155,24 @@ class GroupdetailScreen extends GetView<UsergroupDetailController> {
                             verticalGap(5),
                             const Divider(thickness: 2),
                             AboutTextfield(
+                              readOnly: controller.aboutTapped.value,
                               isAdmin: controller.groupDetailModel!.isAdmin,
                             )
                           ],
                         ),
                       )),
-                      controller.groupDetailModel!.isAdmin!
-                          ? Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(vertical: 10.0),
-                              child:
-                                  Obx(() => controller.uploadDataLoading.value
-                                      ? loaderView()
-                                      : fullWidthButton('Save', () {
-                                          controller.updateGroupDetail(docId!);
-                                        })),
-                            )
-                          : const SizedBox()
+                      // controller.groupDetailModel!.isAdmin!
+                      //     ? Padding(
+                      //         padding:
+                      //             const EdgeInsets.symmetric(vertical: 10.0),
+                      //         child:
+                      //             Obx(() => controller.uploadDataLoading.value
+                      //                 ? loaderView()
+                      //                 : fullWidthButton('Save', () {
+                      //                     controller.updateGroupDetail(docId!);
+                      //                   })),
+                      //       )
+                      //     : const SizedBox()
                     ],
                   ),
                 ),

@@ -84,10 +84,13 @@ class GroupMember extends GetView<GroupmemberController> {
                                       controller.searchQuery.toLowerCase())) {
                                 return GroupMemberTile(
                                   data: snapshot.data![index],
-                                  ontap: (_) {
+                                  ontap: () {
                                     if (snapshot.data![index].iAmAdmin!) {
                                       if (!snapshot.data![index].isAdmin!) {
                                         controller.makeGroupAdmin(
+                                            snapshot.data![index].memberId!);
+                                      } else {
+                                        controller.removeGroupAdmin(
                                             snapshot.data![index].memberId!);
                                       }
                                     }

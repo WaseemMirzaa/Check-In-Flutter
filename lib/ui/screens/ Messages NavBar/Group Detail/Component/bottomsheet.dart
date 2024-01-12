@@ -8,7 +8,7 @@ import 'package:nb_utils/nb_utils.dart';
 import 'package:sizer/sizer.dart';
 
 Future<void> showbottomSheet(
-    BuildContext context, UsergroupDetailController controller) {
+    BuildContext context, GroupDetailController controller, String docId) {
   final picker = ImagePicker();
 
   return showModalBottomSheet<void>(
@@ -31,7 +31,8 @@ Future<void> showbottomSheet(
                   if (pickedFile != null) {
                     controller.fileImage.value = pickedFile;
                     Navigator.pop(context);
-                  }
+                    controller.updateGroupImage(docId);
+                  } 
                 },
                 child: Container(
                   padding: const EdgeInsets.all(15),
@@ -54,6 +55,8 @@ Future<void> showbottomSheet(
                   if (pickedFile != null) {
                     controller.fileImage.value = pickedFile;
                     Navigator.pop(context);
+                    controller.updateGroupImage(docId);
+
                   }
                 },
                 child: Container(

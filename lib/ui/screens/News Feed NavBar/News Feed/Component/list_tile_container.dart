@@ -15,7 +15,7 @@ import 'package:check_in/utils/styles.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
-import 'package:share_plus/share_plus.dart';
+// import 'package:share_plus/share_plus.dart';
 import 'package:sizer/sizer.dart';
 
 class ListTileContainer extends GetView<NewsFeedController> {
@@ -162,7 +162,7 @@ class ListTileContainer extends GetView<NewsFeedController> {
                   horizontalGap(8.w),
                   GestureDetector(
                     onTap: () {
-                      Share.share('news feed post');
+                      // Share.share('news feed post');
                     },
                     child: SvgPicture.asset(
                       AppImage.share,
@@ -175,6 +175,7 @@ class ListTileContainer extends GetView<NewsFeedController> {
                         pushNewScreen(context, screen: const AllLikesScreen());
                       },
                       child: poppinsText('Liked by ${data!.noOfLike} People',
+                      
                           11, medium, greyColor)),
                   horizontalGap(2.w),
                   SvgPicture.asset(

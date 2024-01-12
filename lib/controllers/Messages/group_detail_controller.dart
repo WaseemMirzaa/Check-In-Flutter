@@ -4,14 +4,15 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../Services/message_service.dart';
-import '../../utils/Constants/app_toast.dart';
 
-class UsergroupDetailController extends GetxController {
+class GroupDetailController extends GetxController {
   final MessageService messageService;
-  UsergroupDetailController(this.messageService);
+  GroupDetailController(this.messageService);
 
   GroupDetailModel? groupDetailModel = GroupDetailModel();
   Rx<XFile?> fileImage = Rx<XFile?>(null);
+  RxBool nameTapped = false.obs;
+  RxBool aboutTapped = false.obs;
 
   /// TextEditingController
   late TextEditingController nameController;
@@ -48,21 +49,40 @@ class UsergroupDetailController extends GetxController {
     loading.value = false;
   }
 
-//............ update group detail
-  Future<void> updateGroupDetail(String docId) async {
-    uploadDataLoading.value = true;
-    String imagePath = fileImage.value == null ? '' : fileImage.value!.path;
-    final result = await messageService.updateGroupdetail(
-        docId, nameController.text, aboutController.text, imagePath);
-
-    if (result) {
-      uploadDataLoading.value = false;
-      successMessage('Data update successfully');
-    } else {
-      uploadDataLoading.value = false;
-      errorMessage('Error updating data');
-    }
+//............ update group about
+  Future<void> updateGroupAbout(String docId) async {
+    await messageService.updateGroupAbout(docId, aboutController.text);
   }
+
+//............ update group name
+  Future<void> updateGroupName(String docId) async {
+    await messageService.updateGroupName(docId, nameController.text);
+  }
+
+//............ update group image
+  Future<void> updateGroupImage(String docId) async {
+    uploadDataLoading.value = true;
+
+    String imagePath = fileImage.value == null ? '' : fileImage.value!.path;
+
+    await messageService.updateGroupImage(docId, imagePath);
+    uploadDataLoading.value = false;
+  }
+
+//............ update group detail
+  // Future<void> updateGroupDetail(String docId) async {
+  //   uploadDataLoading.value = true;
+  //   String imagePath = fileImage.value == null ? '' : fileImage.value!.path;
+  //   final result = await messageService.updateGroupdetail(
+  //       docId, nameController.text, aboutController.text, imagePath);
+  //   if (result) {
+  //     uploadDataLoading.value = false;
+  //     successMessage('Data update successfully');
+  //   } else {
+  //     uploadDataLoading.value = false;
+  //     errorMessage('Error updating data');
+  //   }
+  // }
 
   @override
   void onClose() {

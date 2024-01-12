@@ -16,6 +16,11 @@ class GroupmemberController extends GetxController {
 
 //............ make group admin
   Future<void> makeGroupAdmin(String memberId) async {
-    messageService.makeGroupAdmin(docid, memberId);
+    messageService.makeGroupAdmin(docid, memberId,true);
+  }
+
+//............ remove group admin
+  Future<void> removeGroupAdmin(String memberId) async {
+    messageService.makeGroupAdmin(docid, memberId,false);
   }
 }

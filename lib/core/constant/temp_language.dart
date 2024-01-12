@@ -81,8 +81,9 @@ class TempLanguage {
   static String get noConversation => "No Conversation.";
   static String get groupDetail => "Group Details";
   static String get aboutGroup => "About Group";
-  static String get save => "Save";
+  // static String get save => "Save";
   static String get makeGroupAdmin => "Make Group Admin";
+  static String get removeGroupAdmin => "Remove Group Admin";
   static String get noMemberFound => "No members found.";
   static String get messages => "Messages";
   static String get sendMessage => "Send message";
