@@ -7,11 +7,11 @@ import 'package:check_in/core/constant/constant.dart';
 import 'package:check_in/model/Message%20and%20Group%20Message%20Model/chat_model.dart';
 import 'package:check_in/model/Message%20and%20Group%20Message%20Model/group_detail_model.dart';
 import 'package:check_in/model/Message%20and%20Group%20Message%20Model/group_member_model.dart';
+import 'package:check_in/model/user_modal.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 
 import '../model/Message and Group Message Model/message_model.dart';
-import '../utils/Constants/global_variable.dart';
 
 List<dynamic> mem = [];
 
@@ -168,7 +168,7 @@ class MessageService {
   }
 
 //............ Get group members
-  Stream<List<GroupMemberModel>> getGroupMembers(String docId) {
+  Stream<List<GroupMemberModel>> getGroupMembers(String docId, String userId) {
     try {
       return _messagesCollection
           .doc(docId)
@@ -178,7 +178,7 @@ class MessageService {
         Map<String, dynamic> data = snapshot.data() as Map<String, dynamic>;
         List memberlst = data[MessageField.MEMBERS];
         return memberlst.map((item) {
-          if (item[MessageField.MEMBER_UID] == GlobalVariable.userid &&
+          if (item[MessageField.MEMBER_UID] == userId &&
               item[MessageField.IS_ADMIN] == true) {
             iAmAdmin = true;
           }
@@ -288,5 +288,52 @@ class MessageService {
       }
       transaction.update(docRef, {MessageField.MEMBERS: memberLst});
     });
+  }
+
+//........... Retrieve user for start new chat
+  Stream<List<UserModel>> getUsers(String name) {
+    try {
+      return db
+          .collection('USER')
+          .where('user name', isEqualTo: name)
+          .snapshots()
+          .map((snapshot) => snapshot.docs.map((doc) {
+                Map<String, dynamic> data = doc.data();
+
+                return UserModel.fromMap(data);
+              }).toList());
+    } catch (e) {
+      print('Error: $e');
+      rethrow;
+    }
+  }
+
+//........... Start new chat
+  Future<String> startNewChat(
+      List ids, String recieverName, String senderName) async {
+    Map<String, dynamic> data = {
+      MessageField.ID: '',
+      MessageField.IS_GROUP: false,
+      MessageField.LAST_MESSAGE: '',
+      MessageField.MEMBER_IDS: ids,
+      MessageField.RECIEVER_ABOUT: '',
+      MessageField.RECIEVER_ID: ids.first,
+      MessageField.RECIEVER_IMG: '',
+      MessageField.RECIEVER_NAME: recieverName,
+      MessageField.RECIEVER_UNREAD: 0,
+      MessageField.SENDER_ABOUT: '',
+      MessageField.SENDER_ID: ids.last,
+      MessageField.SENDER_IMG: '',
+      MessageField.SENDER_NAME: senderName,
+      MessageField.SENDER_UNREAD: 0,
+      MessageField.TIME_STAMP: ''
+    };
+
+    DocumentReference documentReference = await _messagesCollection.add(data);
+    String documentId = documentReference.id;
+
+    // Update the 'id' field in the model with the document ID
+    _messagesCollection.doc(documentId).update({MessageField.ID: documentId});
+    return documentId;
   }
 }

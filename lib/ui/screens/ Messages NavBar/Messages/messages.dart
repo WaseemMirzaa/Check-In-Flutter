@@ -9,6 +9,7 @@ import 'package:check_in/utils/gaps.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
+import 'package:sizer/sizer.dart';
 import '../../../../utils/loader.dart';
 import '../../../../controllers/Messages/chat_controller.dart';
 import '../../../../controllers/Messages/messages_controller.dart';
@@ -38,7 +39,7 @@ class MessageScreen extends GetView<MessageController> {
           verticalGap(20),
           Expanded(
               child: StreamBuilder<List<Messagemodel>>(
-                  stream: controller.getChatMessage(),
+                  stream: controller.getChatMessage(userController.userModel.value.uid!),
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return loaderView();
@@ -48,14 +49,15 @@ class MessageScreen extends GetView<MessageController> {
                       return ListView.separated(
                           padding: const EdgeInsets.only(top: 14, bottom: 70),
                           separatorBuilder: (_, __) {
-                            return const Padding(
-                              padding: EdgeInsets.symmetric(vertical: 6),
-                              child: Divider(
-                                indent: 20,
-                                endIndent: 20,
-                                thickness: 2,
-                              ),
-                            );
+                            return verticalGap(1.5.h);
+                            // Padding(
+                            //   padding: EdgeInsets.symmetric(vertical: 6),
+                            //   child: Divider(
+                            //     indent: 20,
+                            //     endIndent: 20,
+                            //     thickness: 2,
+                            //   ),
+                            // );
                           },
                           itemCount: snapshot.data!.length,
                           itemBuilder: (context, index) {
@@ -74,7 +76,7 @@ class MessageScreen extends GetView<MessageController> {
                                     chatcontroller.image = message.image!;
                                     pushNewScreen(
                                       context,
-                                      screen: const ChatScreen(),
+                                      screen:  ChatScreen(),
                                     );
                                   },
                                 );

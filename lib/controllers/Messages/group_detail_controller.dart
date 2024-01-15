@@ -1,5 +1,4 @@
 import 'package:check_in/model/Message%20and%20Group%20Message%20Model/group_detail_model.dart';
-import 'package:check_in/utils/Constants/global_variable.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
@@ -11,8 +10,8 @@ class GroupDetailController extends GetxController {
 
   GroupDetailModel? groupDetailModel = GroupDetailModel();
   Rx<XFile?> fileImage = Rx<XFile?>(null);
-  RxBool nameTapped = false.obs;
-  RxBool aboutTapped = false.obs;
+  late RxBool nameTapped;
+  late RxBool aboutTapped;
 
   /// TextEditingController
   late TextEditingController nameController;
@@ -29,15 +28,16 @@ class GroupDetailController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    nameTapped = false.obs;
+    aboutTapped = false.obs;
     nameController = TextEditingController();
     aboutController = TextEditingController();
   }
 
 //............ get detail
-  Future<void> getGroupDetail(String docId) async {
+  Future<void> getGroupDetail(String docId, String userId) async {
     loading.value = true;
-    GroupDetailModel res =
-        await messageService.getGroupDetails(docId, GlobalVariable.userid);
+    GroupDetailModel res = await messageService.getGroupDetails(docId, userId);
 
     /// store response in model
     groupDetailModel = res;

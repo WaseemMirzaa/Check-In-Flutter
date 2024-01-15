@@ -18,4 +18,6 @@ class AppImage {
   static String share = 'assets/images/share.svg';
   static String multiplelike = 'assets/images/Group 10.svg';
   static String like1 = 'assets/images/like1.svg';
+  static String addPeople = 'assets/images/addpeopleicon.png';
+  static String user = 'assets/images/user.jpeg';
 }

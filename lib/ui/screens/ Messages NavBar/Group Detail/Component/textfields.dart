@@ -1,11 +1,11 @@
+import 'package:check_in/core/constant/app_assets.dart';
 import 'package:check_in/core/constant/temp_language.dart';
 import 'package:check_in/utils/styles.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
+import 'package:sizer/sizer.dart';
 
 import '../../../../../controllers/Messages/group_detail_controller.dart';
-import '../../../../../utils/Constants/images.dart';
 import '../../../../../utils/colors.dart';
 
 class NameTextfield extends GetView<GroupDetailController> {
@@ -38,8 +38,11 @@ class NameTextfield extends GetView<GroupDetailController> {
                         () => controller.nameTapped.value
                             ? poppinsText(
                                 TempLanguage.save, 14, semiBold, greenColor)
-                            : SvgPicture.asset(
-                                AppImage.penicon,
+                            : SizedBox(
+                                height: 2.h,
+                                child: Image.asset(
+                                  AppAssets.EDIT_ICON,
+                                ),
                               ),
                       )))
               // Padding(
@@ -71,9 +74,9 @@ class AboutTextfield extends GetView<GroupDetailController> {
       },
       focusNode: controller.aboutfocusNode,
       enabled: true,
-      textAlign: TextAlign.center,
-      maxLines: 9,
-      minLines: 1,
+      // textAlign: TextAlign.center,
+      maxLines: 3,
+      // minLines: 1,
       controller: controller.aboutController,
       style: TextStyle(fontSize: 14, color: greyColor),
       decoration: const InputDecoration(

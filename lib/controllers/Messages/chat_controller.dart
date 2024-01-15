@@ -1,5 +1,5 @@
+import 'package:check_in/controllers/user_controller.dart';
 import 'package:check_in/model/Message%20and%20Group%20Message%20Model/chat_model.dart';
-import 'package:check_in/utils/Constants/global_variable.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
@@ -11,6 +11,7 @@ class ChatController extends GetxController {
   final RxString docId = ''.obs;
   String name = '';
   String image = '';
+  RxString sendMsgField = ''.obs;
   Rx<XFile?> fileImage = Rx<XFile?>(null);
 
   bool isgroup = false;
@@ -21,7 +22,8 @@ class ChatController extends GetxController {
 
   RxBool sendMsgLoader = false.obs;
 
-  ChatController(this.chatService); 
+  ChatController(this.chatService);
+  var userController = Get.find<UserController>();
 
   @override
   void onInit() {
@@ -32,7 +34,8 @@ class ChatController extends GetxController {
 
   //............. get all conversation
   Stream<List<Chatmodel>> getConversation() {
-    return chatService.getConversation(docId.value, GlobalVariable.userid);
+    return chatService.getConversation(
+        docId.value, userController.userModel.value.uid!);
   }
 
 //.............. send chat
@@ -40,7 +43,7 @@ class ChatController extends GetxController {
     sendMsgLoader.value = true;
 
     String time = DateTime.now().toString();
-    String uid = GlobalVariable.userid;
+    String uid = userController.userModel.value.uid!;
     String message = '';
     String type = '';
     if (chatfieldController.text.isNotEmpty) {

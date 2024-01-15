@@ -36,6 +36,7 @@ class CustomTextfield1 extends StatelessWidget {
   FocusNode? focusNode;
   TextEditingController? controller;
   Function()? onTap;
+  Function(String)? onChanged;
   Function(PointerDownEvent)? onTapOutside;
   CustomTextfield1(
       {super.key,
@@ -45,7 +46,8 @@ class CustomTextfield1 extends StatelessWidget {
       this.readOnly = false,
       this.focusNode,
       this.onTapOutside,
-      this.onTap});
+      this.onTap,
+      this.onChanged});
 
   @override
   Widget build(BuildContext context) {
@@ -55,14 +57,12 @@ class CustomTextfield1 extends StatelessWidget {
       controller: controller,
       onTapOutside: onTapOutside,
       onTap: onTap,
+      onChanged: onChanged,
       decoration: InputDecoration(
           suffixIcon: suffixIcon,
           hintText: hintText,
           hintStyle: TextStyle(
-              fontSize: 13,
-              color: blackColor,
-              fontWeight: medium,
-              fontFamily: 'Poppins'),
+              fontSize: 13, fontWeight: medium, fontFamily: 'Poppins'),
           border: InputBorder.none,
           focusedBorder: InputBorder.none),
     );

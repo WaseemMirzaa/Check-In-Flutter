@@ -88,4 +88,9 @@ class TempLanguage {
   static String get messages => "Messages";
   static String get sendMessage => "Send message";
   static String get search => "Search";
+  static String get addMember => "Add Member";
+  static String get newMessage => 'New Messages';
+  static String get to => 'To';
+  static String get chat => 'chat';
+  static String get typeToFindMember => 'Search to find member';
 }

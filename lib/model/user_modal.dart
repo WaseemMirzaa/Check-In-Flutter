@@ -13,17 +13,18 @@ class UserModel {
   String? homeCourt;
   int? goldenCheckin;
 
-  UserModel(
-      {this.userName,
-      this.email,
-      this.uid,
-      this.isVerified,
-      this.photoUrl,
-      this.checkedIn,
-      this.checkedInCourtName,
-      this.aboutMe,
-      this.homeCourt,
-      this.goldenCheckin});
+  UserModel({
+    this.userName,
+    this.email,
+    this.uid,
+    this.isVerified,
+    this.photoUrl,
+    this.checkedIn,
+    this.checkedInCourtName,
+    this.aboutMe,
+    this.homeCourt,
+    this.goldenCheckin,
+  });
 
   Map<String, dynamic> toMap() {
     return <String, dynamic>{

@@ -1,4 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:check_in/controllers/user_controller.dart';
 import 'package:check_in/core/constant/temp_language.dart';
 import 'package:check_in/model/Message%20and%20Group%20Message%20Model/chat_model.dart';
 import 'package:check_in/controllers/Messages/chat_controller.dart';
@@ -6,7 +7,6 @@ import 'package:check_in/ui/screens/%20Messages%20NavBar/Chat/Component/appbar.d
 import 'package:check_in/ui/screens/%20Messages%20NavBar/Chat/Component/image_bottomsheet.dart';
 import 'package:check_in/ui/screens/%20Messages%20NavBar/Chat/Component/image_date_container.dart';
 import 'package:check_in/ui/screens/%20Messages%20NavBar/Chat/Component/sticker_keyboard.dart';
-import 'package:check_in/utils/Constants/global_variable.dart';
 import 'package:check_in/utils/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -18,7 +18,8 @@ import 'Component/message_date_container.dart';
 import 'Component/send_message_container.dart';
 
 class ChatScreen extends GetView<ChatController> {
-  const ChatScreen({super.key});
+  ChatScreen({super.key});
+  var userController = Get.find<UserController>();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -29,7 +30,9 @@ class ChatScreen extends GetView<ChatController> {
           ontap: controller.isgroup
               ? () {
                   pushNewScreen(context,
-                      screen: GroupdetailScreen(docId: controller.docId.value));
+                          screen:
+                              GroupdetailScreen(docId: controller.docId.value))
+                      .then((_) => null);
                 }
               : () {}),
       body: Column(
@@ -50,7 +53,9 @@ class ChatScreen extends GetView<ChatController> {
                           itemBuilder: (context, index) {
                             var chat = snapshot.data![index];
                             bool mymsg =
-                                chat.id == GlobalVariable.userid ? true : false;
+                                chat.id == userController.userModel.value.uid
+                                    ? true
+                                    : false;
                             return Padding(
                               padding: EdgeInsets.only(
                                 left: mymsg ? 0 : 14,

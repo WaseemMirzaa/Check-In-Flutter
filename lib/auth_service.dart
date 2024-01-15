@@ -3,7 +3,6 @@ import 'package:check_in/core/constant/constant.dart';
 import 'package:check_in/model/user_modal.dart';
 import 'package:check_in/ui/screens/persistent_nav_bar.dart';
 import 'package:check_in/ui/screens/start.dart';
-import 'package:check_in/utils/Constants/global_variable.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -58,7 +57,7 @@ Future<void> login(email, password, context) async {
         .signInWithEmailAndPassword(email: email, password: password)
         .then((value) async {
       // Temporary --Save userid in global userid for chat
-      GlobalVariable.userid = value.user!.uid;
+      // GlobalVariable.userid = value.user!.uid;
       await toModal(context);
       SharedPreferences prefs = await SharedPreferences.getInstance();
       prefs.setString('email', 'useremail@gmail.com');

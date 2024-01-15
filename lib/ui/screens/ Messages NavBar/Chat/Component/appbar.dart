@@ -35,12 +35,12 @@ class ChatAppbar extends StatelessWidget implements PreferredSizeWidget {
               child: poppinsText(name ?? '', 15, FontWeight.bold, blackColor))
         ]),
       ),
-      actions: [
-        Padding(
-          padding: const EdgeInsets.only(right: 20),
-          child: SvgPicture.asset(AppImage.callicon),
-        )
-      ],
+      // actions: [
+      //   Padding(
+      //     padding: const EdgeInsets.only(right: 20),
+      //     child: SvgPicture.asset(AppImage.callicon),
+      //   )
+      // ],
     );
   }
 

@@ -10,17 +10,17 @@ class GroupmemberController extends GetxController {
   var searchQuery = ''.obs;
 
 //............ get groupmember
-  Stream<List<GroupMemberModel>> getGroupMember() {
-    return messageService.getGroupMembers(docid);
+  Stream<List<GroupMemberModel>> getGroupMember(String userId) {
+    return messageService.getGroupMembers(docid, userId);
   }
 
 //............ make group admin
   Future<void> makeGroupAdmin(String memberId) async {
-    messageService.makeGroupAdmin(docid, memberId,true);
+    messageService.makeGroupAdmin(docid, memberId, true);
   }
 
 //............ remove group admin
   Future<void> removeGroupAdmin(String memberId) async {
-    messageService.makeGroupAdmin(docid, memberId,false);
+    messageService.makeGroupAdmin(docid, memberId, false);
   }
 }

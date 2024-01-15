@@ -1,3 +1,4 @@
+import 'package:check_in/auth_service.dart';
 import 'package:check_in/controllers/Messages/group_members_controller.dart';
 import 'package:check_in/core/constant/temp_language.dart';
 import 'package:check_in/model/Message%20and%20Group%20Message%20Model/group_member_model.dart';
@@ -20,6 +21,13 @@ class GroupMember extends GetView<GroupmemberController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      floatingActionButton: FloatingActionButton.extended(
+        backgroundColor: greenColor,
+        onPressed: () {},
+        label: poppinsText(
+            TempLanguage.addMember, 12, FontWeight.normal, whiteColor),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       appBar: CustomAppbar(
         title: Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -38,7 +46,8 @@ class GroupMember extends GetView<GroupmemberController> {
         children: [
           verticalGap(15),
           StreamBuilder<List<GroupMemberModel>>(
-              stream: controller.getGroupMember(),
+              stream: controller
+                  .getGroupMember(userController.userModel.value.uid!),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return loaderView();
@@ -64,7 +73,8 @@ class GroupMember extends GetView<GroupmemberController> {
             child: SizedBox(
                 height: 60.h,
                 child: StreamBuilder<List<GroupMemberModel>>(
-                    stream: controller.getGroupMember(),
+                    stream: controller
+                        .getGroupMember(userController.userModel.value.uid!),
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
                         return loaderView();
@@ -93,6 +103,7 @@ class GroupMember extends GetView<GroupmemberController> {
                                         controller.removeGroupAdmin(
                                             snapshot.data![index].memberId!);
                                       }
+                                      Navigator.pop(context);
                                     }
                                   },
                                 );

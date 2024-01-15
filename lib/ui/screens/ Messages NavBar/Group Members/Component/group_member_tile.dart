@@ -1,3 +1,5 @@
+// ignore_for_file: must_be_immutable
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:check_in/core/constant/temp_language.dart';
 import 'package:check_in/model/Message%20and%20Group%20Message%20Model/group_member_model.dart';
@@ -16,7 +18,7 @@ class GroupMemberTile extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 15.0),
       child: Material(
-        elevation: 3,
+        elevation: 2,
         borderRadius: BorderRadius.circular(6),
         child: GestureDetector(
           onTap: () {

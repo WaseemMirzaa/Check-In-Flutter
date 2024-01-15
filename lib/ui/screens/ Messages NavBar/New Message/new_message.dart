@@ -1,102 +1,190 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:check_in/controllers/Messages/chat_controller.dart';
 import 'package:check_in/controllers/Messages/new_message_controller.dart';
+import 'package:check_in/controllers/user_controller.dart';
+import 'package:check_in/core/constant/temp_language.dart';
+import 'package:check_in/model/user_modal.dart';
+import 'package:check_in/ui/screens/%20Messages%20NavBar/Chat/chat_screen.dart';
 import 'package:check_in/ui/widgets/custom_appbar.dart';
 import 'package:check_in/ui/widgets/text_field.dart';
 import 'package:check_in/utils/Constants/images.dart';
 import 'package:check_in/utils/colors.dart';
 import 'package:check_in/utils/gaps.dart';
+import 'package:check_in/utils/loader.dart';
 import 'package:check_in/utils/styles.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
 import 'package:sizer/sizer.dart';
 
 class NewMessageScreen extends GetView<NewMessageController> {
-  const NewMessageScreen({super.key});
-
+  NewMessageScreen({super.key});
+  var userController = Get.find<UserController>();
+  var chatcontroller = Get.find<ChatController>();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomAppbar(
-        title: poppinsText('New Messages', 15, bold, blackColor),
+        title: poppinsText(TempLanguage.newMessage, 15, bold, blackColor),
+        actions: [
+          TextButton(
+            onPressed: () {
+              controller
+                  .startNewChat(userController.userModel.value.uid!,
+                      userController.userModel.value.userName!)
+                  .then((value) {
+                UserModel model = controller.mydata.values.first;
+                chatcontroller.docId.value = value;
+                chatcontroller.name = model.userName!;
+                chatcontroller.isgroup = false;
+                chatcontroller.image = model.photoUrl!;
+// clear map mydata
+                controller.mydata.clear();
+                pushNewScreen(context, screen: ChatScreen())
+                    .then((value) => Get.back());
+              });
+            },
+            child: poppinsText(TempLanguage.chat, 12, medium, blackColor),
+          )
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 10.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            verticalGap(10),
-            Padding(
-              padding: const EdgeInsets.only(left: 8.0),
-              child: poppinsText('To', 15, medium, blackColor),
-            ),
-            verticalGap(5),
-            Container(
-              decoration: BoxDecoration(
-                  color: greyColor.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(25)),
-              padding: const EdgeInsets.symmetric(horizontal: 15),
-              child: CustomTextfield1(
-                hintText: 'Search',
-                onTap: () {},
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          verticalGap(10),
+          Row(
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(left: 8.0),
+                child: poppinsText(TempLanguage.to, 15, medium, blackColor),
               ),
+              Obx(() => Wrap(
+                    spacing: 8.0,
+                    runSpacing: 8.0,
+                    children: controller.mydata.values.map((value) {
+                      UserModel model = value;
+                      return Chip(
+                        label: Text(model.userName!),
+                      );
+                    }).toList(),
+                  ))
+            ],
+          ),
+          verticalGap(5),
+          Container(
+            decoration: BoxDecoration(
+                color: greyColor.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(25)),
+            padding: const EdgeInsets.symmetric(horizontal: 15),
+            child: CustomTextfield1(
+              hintText: TempLanguage.search,
+              onChanged: (value) {
+                controller.searchQuery.value = value;
+                controller.getUser();
+              },
             ),
-            verticalGap(10),
-            Padding(
-              padding: const EdgeInsets.only(left: 8.0),
-              child: poppinsText('Suggested', 15, medium, blackColor),
-            ),
-            verticalGap(5),
-            Expanded(
-              child: ListView.builder(
-                  itemCount: 5,
-                  itemBuilder: (context, snapshot) {
-                    return Padding(
-                      padding: const EdgeInsets.only(bottom: 8),
-                      child: Row(
-                        children: [
-                          CircleAvatar(
-                            backgroundImage: CachedNetworkImageProvider(
-                                AppImage.userImagePath),
-                            radius: 25,
-                          ),
-                          Expanded(
-                            child: Padding(
-                              padding: const EdgeInsets.only(left: 10),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.start,
+          ),
+          verticalGap(10),
+          Obx(() => controller.searchQuery.value == ''
+              ? Center(
+                  child: poppinsText(
+                      TempLanguage.typeToFindMember, 12, regular, greyColor),
+                )
+              : Expanded(
+                  child: StreamBuilder<List<UserModel>>(
+                  stream: controller.userDataList.stream,
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return loaderView();
+                    } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                      return Center(child: Text(TempLanguage.noMemberFound));
+                    } else {
+                      return ListView.builder(
+                          itemCount: snapshot.data!.length,
+                          itemBuilder: (context, index) {
+                            return Padding(
+                              padding: const EdgeInsets.only(bottom: 8),
+                              child: Row(
                                 children: [
-                                  Row(
-                                    children: [
-                                      SizedBox(
-                                        width: 43.w,
-                                        child: poppinsText('UserNAme' ?? '', 15,
-                                            FontWeight.bold, blackColor,
-                                            overflow: TextOverflow.ellipsis),
-                                      ),
-                                    ],
+                                  CircleAvatar(
+                                    backgroundImage: snapshot
+                                                .data![index].photoUrl ==
+                                            ''
+                                        ? AssetImage(AppImage.user)
+                                            as ImageProvider
+                                        : CachedNetworkImageProvider(
+                                            snapshot.data![index].photoUrl!),
+                                    radius: 25,
                                   ),
-                                  SizedBox(
-                                    width: 45.w,
-                                    child: poppinsText(
-                                        'USerabout' ?? '',
-                                        11,
-                                        FontWeight.normal,
-                                        blackColor.withOpacity(0.65),
-                                        overflow: TextOverflow.ellipsis),
-                                  )
+                                  Expanded(
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(left: 10),
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Row(
+                                            children: [
+                                              SizedBox(
+                                                width: 60.w,
+                                                child: poppinsText(
+                                                    snapshot.data![index]
+                                                            .userName ??
+                                                        '',
+                                                    15,
+                                                    FontWeight.bold,
+                                                    blackColor,
+                                                    overflow:
+                                                        TextOverflow.ellipsis),
+                                              ),
+                                            ],
+                                          ),
+                                          // SizedBox(
+                                          //   width: 45.w,
+                                          //   child: poppinsText(
+                                          //       'USerabout' ?? '',
+                                          //       11,
+                                          //       FontWeight.normal,
+                                          //       blackColor.withOpacity(0.65),
+                                          //       overflow:
+                                          //           TextOverflow.ellipsis),
+                                          // )
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                  Obx(() => Checkbox(
+                                        value: controller.mydata.containsKey(
+                                            snapshot.data![index].uid),
+                                        onChanged: (value) {
+                                          controller.mydata.keys.contains(
+                                                  snapshot.data![index].uid)
+                                              ? controller.mydata.remove(
+                                                  snapshot.data![index].uid!)
+                                              : controller.mydata[snapshot
+                                                      .data![index].uid!] =
+                                                  snapshot.data![index];
+                                        },
+                                        fillColor:
+                                            MaterialStateProperty.resolveWith(
+                                                (states) {
+                                          if (!states.contains(
+                                              MaterialState.pressed)) {
+                                            return greenColor;
+                                          }
+                                          return null;
+                                        }),
+                                      ))
                                 ],
                               ),
-                            ),
-                          ),
-                     Radio(value: 'uservalue', groupValue: '', onChanged: (value){})
-                        ],
-                      ),
-                    );
-                  }),
-            )
-          ],
-        ),
+                            );
+                          });
+                    }
+                  },
+                )))
+        ]),
       ),
     );
   }

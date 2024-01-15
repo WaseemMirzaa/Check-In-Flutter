@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:check_in/controllers/Messages/group_detail_controller.dart';
 import 'package:check_in/controllers/Messages/group_members_controller.dart';
+import 'package:check_in/core/constant/app_assets.dart';
 import 'package:check_in/core/constant/temp_language.dart';
 import 'package:check_in/ui/screens/%20Messages%20NavBar/Group%20Detail/Component/textfields.dart';
 import 'package:check_in/ui/screens/%20Messages%20NavBar/Group%20Members/group_members.dart';
@@ -16,7 +17,9 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
+import 'package:sizer/sizer.dart';
 
+import '../../../../controllers/user_controller.dart';
 import 'Component/bottomsheet.dart';
 
 // ignore: must_be_immutable
@@ -24,9 +27,11 @@ class GroupdetailScreen extends GetView<GroupDetailController> {
   String? docId;
   GroupdetailScreen({super.key, this.docId});
   var groupmemberController = Get.find<GroupmemberController>();
+  var userController = Get.find<UserController>();
+
   @override
   Widget build(BuildContext context) {
-    controller.getGroupDetail(docId!);
+    controller.getGroupDetail(docId!, userController.userModel.value.uid!);
     return Scaffold(
         appBar: CustomAppbar(
           title: poppinsText(TempLanguage.groupDetail, 20, bold, blackColor),
@@ -121,43 +126,43 @@ class GroupdetailScreen extends GetView<GroupDetailController> {
                               ),
                             ),
                             verticalGap(60),
-                            Padding(
-                              padding: const EdgeInsets.only(left: 10.0),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  poppinsText(TempLanguage.aboutGroup, 14,
-                                      semiBold, blackColor),
-                                  controller.groupDetailModel!.isAdmin!
-                                      ? GestureDetector(
-                                          onTap: () {
-                                            // controller.aboutfocusNode
-                                            //     .requestFocus();
-                                            controller.updateGroupAbout(docId!);
-                                            controller.aboutTapped.value =
-                                                !controller.aboutTapped.value;
-                                          },
-                                          child: Obx(
-                                            () => controller.aboutTapped.value
-                                                ? poppinsText(TempLanguage.save,
-                                                    14, semiBold, greenColor)
-                                                : SvgPicture.asset(
-                                                    AppImage.penicon,
-                                                    height: 17,
-                                                    width: 17,
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                poppinsText(TempLanguage.aboutGroup, 14,
+                                    semiBold, blackColor),
+                                controller.groupDetailModel!.isAdmin!
+                                    ? GestureDetector(
+                                        onTap: () {
+                                          // controller.aboutfocusNode
+                                          //     .requestFocus();
+                                          controller.updateGroupAbout(docId!);
+                                          controller.aboutTapped.value =
+                                              !controller.aboutTapped.value;
+                                        },
+                                        child: Obx(
+                                          () => controller.aboutTapped.value
+                                              ? poppinsText(TempLanguage.save,
+                                                  14, semiBold, greenColor)
+                                              : SizedBox(
+                                                  height: 2.h,
+                                                  child: Image.asset(
+                                                    AppAssets.EDIT_ICON,
                                                   ),
-                                          ))
-                                      : const SizedBox()
-                                ],
-                              ),
+                                                ),
+                                        ))
+                                    : const SizedBox()
+                              ],
                             ),
                             verticalGap(5),
-                            const Divider(thickness: 2),
                             AboutTextfield(
                               readOnly: controller.aboutTapped.value,
                               isAdmin: controller.groupDetailModel!.isAdmin,
-                            )
+                            ),
+                            Divider(
+                              // thickness: 1,
+                              color: blackColor,
+                            ),
                           ],
                         ),
                       )),

@@ -59,17 +59,17 @@ class MessageDateContainer extends StatelessWidget {
           children: [
             poppinsText(time, 10, medium, greyColor.withOpacity(1)),
             horizontalGap(5),
-            mymsg!
-                ? poppinsText('✓', 10, medium, greyColor.withOpacity(1))
-                : const SizedBox(),
-            horizontalGap(5),
-            mymsg!
-                ? const CircleAvatar(
-                    backgroundImage: NetworkImage(
-                        'https://wac-cdn.atlassian.com/dam/jcr:ba03a215-2f45-40f5-8540-b2015223c918/Max-R_Headshot%20(1).jpg?cdnVersion=1365'),
-                    radius: 8,
-                  )
-                : const SizedBox()
+            // mymsg!
+            //     ? poppinsText('✓', 10, medium, greyColor.withOpacity(1))
+            //     : const SizedBox(),
+            // horizontalGap(5),
+            // mymsg!
+            //     ? const CircleAvatar(
+            //         backgroundImage: NetworkImage(
+            //             'https://wac-cdn.atlassian.com/dam/jcr:ba03a215-2f45-40f5-8540-b2015223c918/Max-R_Headshot%20(1).jpg?cdnVersion=1365'),
+            //         radius: 8,
+            //       )
+            //     : const SizedBox()
           ],
         )
       ],

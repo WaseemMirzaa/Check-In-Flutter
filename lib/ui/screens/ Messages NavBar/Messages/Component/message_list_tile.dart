@@ -16,16 +16,17 @@ class MessageListTile extends StatelessWidget {
   Messagemodel? message;
   Function()? ontap;
   MessageListTile({super.key, this.message, this.ontap});
-
   @override
   Widget build(BuildContext context) {
-    String dateseperate = message!.timeStamp!.split(' ')[1];
-    String time = DateTimeUtils.time24to12(dateseperate);
+    String dateseperate =
+        message!.timeStamp == '' ? '' : message!.timeStamp!.split(' ')[1];
+    String time =
+        message!.timeStamp == '' ? '' : DateTimeUtils.time24to12(dateseperate);
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 10),
       child: Material(
-        elevation: 5,
+        elevation: 2,
         borderRadius: BorderRadius.circular(6),
         child: InkWell(
           onTap: ontap,
