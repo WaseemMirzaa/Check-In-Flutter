@@ -244,7 +244,7 @@ class MessageService {
     }
   }
 
-  Future<bool> updateGroupImage(
+  Future<String> updateGroupImage(
     String docId,
     String imagePath,
   ) async {
@@ -254,9 +254,9 @@ class MessageService {
       String? image = await uploadImageToFirebase(docId, imagePath);
       await ref.update({MessageField.GROUP_IMG: image});
 
-      return true;
+      return image!;
     } catch (e) {
-      return false;
+      return '';
     }
   }
 
@@ -311,6 +311,11 @@ class MessageService {
 //........... Start new chat
   Future<String> startNewChat(
       List ids, String recieverName, String senderName) async {
+    if (await areIdsMatching(ids)) {
+      print('No data added because IDs match');
+      // Do not add data and return an indication that no data was added
+      return '';
+    }
     Map<String, dynamic> data = {
       MessageField.ID: '',
       MessageField.IS_GROUP: false,
@@ -326,6 +331,46 @@ class MessageService {
       MessageField.SENDER_IMG: '',
       MessageField.SENDER_NAME: senderName,
       MessageField.SENDER_UNREAD: 0,
+      MessageField.TIME_STAMP: ''
+    };
+
+    DocumentReference documentReference = await _messagesCollection.add(data);
+    String documentId = documentReference.id;
+
+    // Update the 'id' field in the model with the document ID
+    _messagesCollection.doc(documentId).update({MessageField.ID: documentId});
+    return documentId;
+  }
+
+  //........... Matching ids
+  Future<bool> areIdsMatching(List ids) async {
+    // Perform a query to check if any document has the same IDs
+    var resultOriginalOrder = await _messagesCollection
+        .where(MessageField.IS_GROUP, isEqualTo: false)
+        .where(MessageField.MEMBER_IDS, isEqualTo: ids)
+        .get();
+    List reversedIds = List.from(ids.reversed);
+    var resultReversedOrder = await _messagesCollection
+        .where(MessageField.IS_GROUP, isEqualTo: false)
+        .where(MessageField.MEMBER_IDS, isEqualTo: reversedIds)
+        .get();
+
+    return resultOriginalOrder.docs.isNotEmpty ||
+        resultReversedOrder.docs.isNotEmpty;
+    //  return resultOriginalOrder.docs.first. ||
+    // resultReversedOrder.docs.isNotEmpty;
+  }
+
+  Future<String> startNewGroupChat(List ids, List members) async {
+    Map<String, dynamic> data = {
+      MessageField.ABOUT_GROUP: '',
+      MessageField.GROUP_IMG: '',
+      MessageField.GROUP_NAME: '',
+      MessageField.ID: '',
+      MessageField.IS_GROUP: true,
+      MessageField.LAST_MESSAGE: '',
+      MessageField.MEMBER_IDS: ids,
+      MessageField.MEMBERS: members,
       MessageField.TIME_STAMP: ''
     };
 

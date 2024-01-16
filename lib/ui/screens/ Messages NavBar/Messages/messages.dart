@@ -13,7 +13,6 @@ import 'package:sizer/sizer.dart';
 import '../../../../utils/loader.dart';
 import '../../../../controllers/Messages/chat_controller.dart';
 import '../../../../controllers/Messages/messages_controller.dart';
-import 'Component/floating_action_button.dart';
 
 class MessageScreen extends GetView<MessageController> {
   MessageScreen({super.key});
@@ -22,9 +21,9 @@ class MessageScreen extends GetView<MessageController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      floatingActionButton: FloatingactionButton(
-        ontap: () {},
-      ),
+      // floatingActionButton: FloatingactionButton(
+      //   ontap: () {},
+      // ),
       appBar: const MessageAppBar(),
       body: Column(
         children: [
@@ -39,7 +38,8 @@ class MessageScreen extends GetView<MessageController> {
           verticalGap(20),
           Expanded(
               child: StreamBuilder<List<Messagemodel>>(
-                  stream: controller.getChatMessage(userController.userModel.value.uid!),
+                  stream: controller
+                      .getChatMessage(userController.userModel.value.uid!),
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return loaderView();
@@ -47,7 +47,7 @@ class MessageScreen extends GetView<MessageController> {
                       return Center(child: Text(TempLanguage.noMessageFound));
                     } else {
                       return ListView.separated(
-                          padding: const EdgeInsets.only(top: 14, bottom: 70),
+                          // padding: const EdgeInsets.only(top: 14),
                           separatorBuilder: (_, __) {
                             return verticalGap(1.5.h);
                             // Padding(
@@ -71,12 +71,12 @@ class MessageScreen extends GetView<MessageController> {
                                   message: snapshot.data![index],
                                   ontap: () {
                                     chatcontroller.docId.value = message.id!;
-                                    chatcontroller.name = message.name!;
+                                    chatcontroller.name.value = message.name!;
                                     chatcontroller.isgroup = message.isgroup!;
-                                    chatcontroller.image = message.image!;
+                                    chatcontroller.image.value = message.image!;
                                     pushNewScreen(
                                       context,
-                                      screen:  ChatScreen(),
+                                      screen: ChatScreen(),
                                     );
                                   },
                                 );

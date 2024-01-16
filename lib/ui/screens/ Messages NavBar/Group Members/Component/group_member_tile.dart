@@ -3,6 +3,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:check_in/core/constant/temp_language.dart';
 import 'package:check_in/model/Message%20and%20Group%20Message%20Model/group_member_model.dart';
+import 'package:check_in/utils/Constants/images.dart';
 import 'package:check_in/utils/colors.dart';
 import 'package:check_in/utils/styles.dart';
 import 'package:flutter/material.dart';
@@ -33,7 +34,9 @@ class GroupMemberTile extends StatelessWidget {
               children: [
                 CircleAvatar(
                   backgroundColor: greenColor.withOpacity(0.6),
-                  backgroundImage: CachedNetworkImageProvider(data!.memberImg!),
+                  backgroundImage: data!.memberImg == ''
+                      ? AssetImage(AppImage.user) as ImageProvider
+                      : CachedNetworkImageProvider(data!.memberImg!),
                   radius: 30,
                 ),
                 Expanded(
@@ -48,7 +51,7 @@ class GroupMemberTile extends StatelessWidget {
                             SizedBox(
                               width: 43.w,
                               child: poppinsText(data!.memberName ?? '', 15,
-                                  FontWeight.bold, blackColor,
+                                  medium, blackColor,
                                   overflow: TextOverflow.ellipsis),
                             ),
                           ],

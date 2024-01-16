@@ -60,13 +60,14 @@ class GroupDetailController extends GetxController {
   }
 
 //............ update group image
-  Future<void> updateGroupImage(String docId) async {
+  Future<String> updateGroupImage(String docId) async {
     uploadDataLoading.value = true;
 
     String imagePath = fileImage.value == null ? '' : fileImage.value!.path;
 
-    await messageService.updateGroupImage(docId, imagePath);
+    String image = await messageService.updateGroupImage(docId, imagePath);
     uploadDataLoading.value = false;
+    return image;
   }
 
 //............ update group detail

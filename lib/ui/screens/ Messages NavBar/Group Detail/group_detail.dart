@@ -1,10 +1,12 @@
 import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:check_in/controllers/Messages/chat_controller.dart';
 import 'package:check_in/controllers/Messages/group_detail_controller.dart';
 import 'package:check_in/controllers/Messages/group_members_controller.dart';
 import 'package:check_in/core/constant/app_assets.dart';
 import 'package:check_in/core/constant/temp_language.dart';
+import 'package:check_in/ui/screens/%20Messages%20NavBar/Chat/chat_screen.dart';
 import 'package:check_in/ui/screens/%20Messages%20NavBar/Group%20Detail/Component/textfields.dart';
 import 'package:check_in/ui/screens/%20Messages%20NavBar/Group%20Members/group_members.dart';
 import 'package:check_in/ui/widgets/custom_appbar.dart';
@@ -25,16 +27,28 @@ import 'Component/bottomsheet.dart';
 // ignore: must_be_immutable
 class GroupdetailScreen extends GetView<GroupDetailController> {
   String? docId;
-  GroupdetailScreen({super.key, this.docId});
+  bool? showBtn;
+  GroupdetailScreen({super.key, this.docId, this.showBtn = false});
   var groupmemberController = Get.find<GroupmemberController>();
   var userController = Get.find<UserController>();
+  var chatcontroller = Get.find<ChatController>();
 
   @override
   Widget build(BuildContext context) {
     controller.getGroupDetail(docId!, userController.userModel.value.uid!);
     return Scaffold(
+        floatingActionButton: showBtn!
+            ? FloatingActionButton(
+                backgroundColor: greenColor,
+                child: const Icon(Icons.arrow_forward),
+                onPressed: () {
+                  controller.fileImage.value = null;
+                  pushNewScreen(context, screen: ChatScreen())
+                      .then((value) => Get.back());
+                })
+            : const SizedBox(),
         appBar: CustomAppbar(
-          title: poppinsText(TempLanguage.groupDetail, 20, bold, blackColor),
+          title: poppinsText(TempLanguage.groupDetail, 15, bold, blackColor),
           actions: [
             GestureDetector(
                 onTap: () {
@@ -69,6 +83,9 @@ class GroupdetailScreen extends GetView<GroupDetailController> {
                                     iconOnTap: () {
                                       //  controller.namefocusNode.requestFocus();
                                       controller.updateGroupName(docId!);
+                                      chatcontroller.name.value =
+                                          controller.nameController.text;
+
                                       controller.nameTapped.value =
                                           !controller.nameTapped.value;
                                     },
@@ -88,15 +105,16 @@ class GroupdetailScreen extends GetView<GroupDetailController> {
                                     backgroundImage: controller
                                                 .fileImage.value !=
                                             null
-                                        ? FileImage(File(controller.fileImage
-                                            .value!.path)) as ImageProvider
-                                        : CachedNetworkImageProvider(controller
-                                                    .groupDetailModel!
-                                                    .groupImg! !=
+                                        ? FileImage(File(
+                                            controller.fileImage.value!.path))
+                                        : controller.groupDetailModel!
+                                                    .groupImg! ==
                                                 ''
-                                            ? controller
-                                                .groupDetailModel!.groupImg!
-                                            : AppImage.userImagePath),
+                                            ? AssetImage(AppImage.user)
+                                                as ImageProvider
+                                            : CachedNetworkImageProvider(
+                                                controller.groupDetailModel!
+                                                    .groupImg!),
                                     radius: 65,
                                   ),
                                   controller.groupDetailModel!.isAdmin!
@@ -106,7 +124,10 @@ class GroupdetailScreen extends GetView<GroupDetailController> {
                                           child: GestureDetector(
                                             onTap: () {
                                               showbottomSheet(
-                                                  context, controller, docId!);
+                                                  context,
+                                                  controller,
+                                                  docId!,
+                                                  chatcontroller);
                                             },
                                             child: Container(
                                               height: 40,
@@ -145,7 +166,7 @@ class GroupdetailScreen extends GetView<GroupDetailController> {
                                               ? poppinsText(TempLanguage.save,
                                                   14, semiBold, greenColor)
                                               : SizedBox(
-                                                  height: 2.h,
+                                                  height: 2.4.h,
                                                   child: Image.asset(
                                                     AppAssets.EDIT_ICON,
                                                   ),

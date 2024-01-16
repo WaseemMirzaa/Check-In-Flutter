@@ -1,5 +1,6 @@
 // ignore_for_file: use_build_context_synchronously
 
+import 'package:check_in/controllers/Messages/chat_controller.dart';
 import 'package:check_in/controllers/Messages/group_detail_controller.dart';
 import 'package:check_in/utils/gaps.dart';
 import 'package:flutter/material.dart';
@@ -8,7 +9,10 @@ import 'package:nb_utils/nb_utils.dart';
 import 'package:sizer/sizer.dart';
 
 Future<void> showbottomSheet(
-    BuildContext context, GroupDetailController controller, String docId) {
+    BuildContext context,
+    GroupDetailController controller,
+    String docId,
+    ChatController chatController) {
   final picker = ImagePicker();
 
   return showModalBottomSheet<void>(
@@ -31,8 +35,9 @@ Future<void> showbottomSheet(
                   if (pickedFile != null) {
                     controller.fileImage.value = pickedFile;
                     Navigator.pop(context);
-                    controller.updateGroupImage(docId);
-                  } 
+                    String image = await controller.updateGroupImage(docId);
+                    chatController.image.value = image;
+                  }
                 },
                 child: Container(
                   padding: const EdgeInsets.all(15),
@@ -55,8 +60,8 @@ Future<void> showbottomSheet(
                   if (pickedFile != null) {
                     controller.fileImage.value = pickedFile;
                     Navigator.pop(context);
-                    controller.updateGroupImage(docId);
-
+                    String image = await controller.updateGroupImage(docId);
+                    chatController.image.value = image;
                   }
                 },
                 child: Container(

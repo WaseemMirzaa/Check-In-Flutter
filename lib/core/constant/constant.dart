@@ -60,6 +60,7 @@ class MessageField {
   static const String SENDER_ABOUT = 'senderAbout';
   static const String IS_ADMIN = 'isAdmin';
   static const String ABOUT_USER = 'about';
+  static const String REQUEST_STATUS = 'requestStatus';
 }
 
 class ChatField {

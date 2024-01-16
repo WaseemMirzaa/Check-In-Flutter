@@ -150,8 +150,8 @@ class _HomeState extends State<Home> with AutomaticKeepAliveClientMixin {
   final NavBarController navBarController = Get.put(NavBarController());
 
   final List<Widget> _buildScreens = [
-    MessageScreen(),
     const CheckIn(),
+    MessageScreen(),
     const NewsFeedScreen(),
     const HistoryView(),
     const ProfileScreen()
@@ -161,18 +161,18 @@ class _HomeState extends State<Home> with AutomaticKeepAliveClientMixin {
   List<BottomNavigationBarItem> _navBarsItems() {
     return [
       BottomNav(
-        label: 'Chat',
+        label: 'Home',
         boxColor:
             navBarController.controller.index == 0 ? greenColor : whiteColor,
-        icon: "Path 28661",
+        icon: "Group 12548",
         iconColor:
             navBarController.controller.index == 0 ? whiteColor : blackColor,
       ).getBottomNavItem(),
       BottomNav(
-        label: 'Home',
+        label: 'Chat',
         boxColor:
             navBarController.controller.index == 1 ? greenColor : whiteColor,
-        icon: "Group 12548",
+        icon: "Path 28661",
         iconColor:
             navBarController.controller.index == 1 ? whiteColor : blackColor,
       ).getBottomNavItem(),
@@ -224,7 +224,6 @@ class _HomeState extends State<Home> with AutomaticKeepAliveClientMixin {
         return Scaffold(
           body: _buildScreens[navBarController.currentIndex.value],
           bottomNavigationBar: BottomNavigationBar(
-            
             items: _navBarsItems(),
             currentIndex: navBarController.currentIndex.value,
             //selectedItemColor: Colors.amber[800],

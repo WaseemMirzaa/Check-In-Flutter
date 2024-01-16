@@ -5,6 +5,7 @@ import 'package:check_in/controllers/user_controller.dart';
 import 'package:check_in/core/constant/temp_language.dart';
 import 'package:check_in/model/user_modal.dart';
 import 'package:check_in/ui/screens/%20Messages%20NavBar/Chat/chat_screen.dart';
+import 'package:check_in/ui/screens/%20Messages%20NavBar/Group%20Detail/group_detail.dart';
 import 'package:check_in/ui/widgets/custom_appbar.dart';
 import 'package:check_in/ui/widgets/text_field.dart';
 import 'package:check_in/utils/Constants/images.dart';
@@ -27,49 +28,76 @@ class NewMessageScreen extends GetView<NewMessageController> {
       appBar: CustomAppbar(
         title: poppinsText(TempLanguage.newMessage, 15, bold, blackColor),
         actions: [
-          TextButton(
-            onPressed: () {
-              controller
-                  .startNewChat(userController.userModel.value.uid!,
-                      userController.userModel.value.userName!)
-                  .then((value) {
-                UserModel model = controller.mydata.values.first;
-                chatcontroller.docId.value = value;
-                chatcontroller.name = model.userName!;
-                chatcontroller.isgroup = false;
-                chatcontroller.image = model.photoUrl!;
-// clear map mydata
-                controller.mydata.clear();
-                pushNewScreen(context, screen: ChatScreen())
-                    .then((value) => Get.back());
-              });
-            },
-            child: poppinsText(TempLanguage.chat, 12, medium, blackColor),
-          )
+          Obx(() => controller.mydata.isNotEmpty
+              ? TextButton(
+                  onPressed: () {
+                    if (controller.mydata.length > 1) {
+                      controller
+                          .startNewGroupChat(
+                              userController.userModel.value.uid!,
+                              userController.userModel.value.userName!)
+                          .then((value) {
+                        chatcontroller.docId.value = value;
+
+                        chatcontroller.isgroup = true;
+
+                        // clear map mydata
+                        controller.mydata.clear();
+                        pushNewScreen(context,
+                            screen: GroupdetailScreen(
+                              showBtn: true,
+                              docId: value,
+                            )).then((value) => Get.back());
+                      });
+                    } else {
+                      controller
+                          .startNewChat(userController.userModel.value.uid!,
+                              userController.userModel.value.userName!)
+                          .then((value) {
+                        UserModel model = controller.mydata.values.first;
+                        chatcontroller.docId.value = value;
+                        chatcontroller.name.value = model.userName!;
+                        chatcontroller.isgroup = false;
+                        chatcontroller.image.value = model.photoUrl!;
+                        // clear map mydata
+                        controller.mydata.clear();
+                        pushNewScreen(context, screen: ChatScreen())
+                            .then((value) => Get.back());
+                      });
+                    }
+                  },
+                  child: poppinsText(TempLanguage.chat, 12, medium, blackColor),
+                )
+              : const SizedBox())
         ],
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 10.0),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           verticalGap(10),
+          verticalGap(5),
           Row(
             children: [
               Padding(
                 padding: const EdgeInsets.only(left: 8.0),
                 child: poppinsText(TempLanguage.to, 15, medium, blackColor),
               ),
-              Obx(() => Wrap(
-                    spacing: 8.0,
-                    runSpacing: 8.0,
-                    children: controller.mydata.values.map((value) {
-                      UserModel model = value;
-                      return Chip(
-                        label: Text(model.userName!),
-                      );
-                    }).toList(),
-                  ))
             ],
           ),
+          Obx(() => Wrap(
+                spacing: 8.0,
+                runSpacing: 0.0,
+                children: controller.mydata.values.map((value) {
+                  UserModel model = value;
+                  return Chip(
+                    label: Text(model.userName!),
+                    onDeleted: () {
+                      controller.mydata
+                          .removeWhere((key, value) => model.uid == key);
+                    },
+                  );
+                }).toList(),
+              )),
           verticalGap(5),
           Container(
             decoration: BoxDecoration(
@@ -77,6 +105,7 @@ class NewMessageScreen extends GetView<NewMessageController> {
                 borderRadius: BorderRadius.circular(25)),
             padding: const EdgeInsets.symmetric(horizontal: 15),
             child: CustomTextfield1(
+              controller: controller.searchController,
               hintText: TempLanguage.search,
               onChanged: (value) {
                 controller.searchQuery.value = value;
@@ -166,6 +195,7 @@ class NewMessageScreen extends GetView<NewMessageController> {
                                               : controller.mydata[snapshot
                                                       .data![index].uid!] =
                                                   snapshot.data![index];
+                                          controller.searchController.clear();
                                         },
                                         fillColor:
                                             MaterialStateProperty.resolveWith(

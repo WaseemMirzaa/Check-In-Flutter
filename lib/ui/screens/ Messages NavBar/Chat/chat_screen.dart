@@ -116,6 +116,58 @@ class ChatScreen extends GetView<ChatController> {
                           });
                     }
                   })),
+          // Container(
+          //   height: 160,
+          //   width: 85.w,
+          //   decoration: BoxDecoration(
+          //     color: whiteColor,
+          //     borderRadius: BorderRadius.circular(10),
+          //     boxShadow: [
+          //       BoxShadow(
+          //         color: blackTranslucentColor,
+          //         offset: const Offset(0, 1),
+          //         blurRadius: 6,
+          //       ),
+          //     ],
+          //   ),
+          //   child: Padding(
+          //     padding: const EdgeInsets.all(13),
+          //     child: Column(
+          //       children: [
+          //         poppinsText(
+          //             TempLanguage.sendMessageRequest, 14, bold, blackColor),
+          //         verticalGap(7),
+          //         poppinsText(TempLanguage.sendMessageRequestToCall, 11,
+          //             regular, greyColor,
+          //             maxlines: 2, align: TextAlign.center),
+          //         verticalGap(7),
+          //         Divider(
+          //           color: blackColor,
+          //         ),
+          //         Row(
+          //           children: [
+          //             ChatButton(
+          //               text: TempLanguage.sendRequest,
+          //               textColor: whiteColor,
+          //               buttonColor: greenColor,
+          //               width: 50.w,
+          //               onTap: () {},
+          //             ),
+          //             horizontalGap(7),
+          //             ChatButton(
+          //               text: TempLanguage.ignore,
+          //               textColor: blackColor,
+          //               buttonColor: greyColor.withOpacity(0.23),
+          //               width: 25.w,
+          //               onTap: () {},
+          //             )
+          //           ],
+          //         )
+          //       ],
+          //     ),
+          //   ),
+          // ),
+
           SendMessageContainer(
             textFieldController: controller.chatfieldController,
             imageontap: () {

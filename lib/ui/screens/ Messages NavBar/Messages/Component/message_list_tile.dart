@@ -2,7 +2,6 @@
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../../../../model/Message and Group Message Model/message_model.dart';
@@ -39,10 +38,9 @@ class MessageListTile extends StatelessWidget {
               children: [
                 CircleAvatar(
                   backgroundColor: greenColor.withOpacity(0.6),
-                  backgroundImage: CachedNetworkImageProvider(
-                      message!.image! == ''
-                          ? AppImage.userImagePath
-                          : message!.image!),
+                  backgroundImage: message!.image! == ''
+                      ? AssetImage(AppImage.user) as ImageProvider
+                      : CachedNetworkImageProvider(message!.image!),
                   radius: 30,
                 ),
                 Padding(
@@ -54,7 +52,7 @@ class MessageListTile extends StatelessWidget {
                       Row(
                         children: [
                           if (message!.isgroup!) ...[
-                            SvgPicture.asset(
+                            Image.asset(
                               AppImage.chatgroupicon,
                             ),
                             horizontalGap(8)
@@ -62,7 +60,7 @@ class MessageListTile extends StatelessWidget {
                           SizedBox(
                             width: 45.w,
                             child: poppinsText(
-                                message!.name!, 15, FontWeight.bold, blackColor,
+                                message!.name!, 15, medium, blackColor,
                                 overflow: TextOverflow.ellipsis),
                           ),
                         ],
@@ -72,7 +70,7 @@ class MessageListTile extends StatelessWidget {
                         child: poppinsText(
                           message!.lastmessage!,
                           12,
-                          FontWeight.bold,
+                          medium,
                           blackColor.withOpacity(0.65),
                         ),
                       )

@@ -9,8 +9,8 @@ import '../../Services/message_service.dart';
 class ChatController extends GetxController {
   final MessageService chatService;
   final RxString docId = ''.obs;
-  String name = '';
-  String image = '';
+  RxString name = ''.obs;
+  RxString image = ''.obs;
   RxString sendMsgField = ''.obs;
   Rx<XFile?> fileImage = Rx<XFile?>(null);
 

@@ -1,7 +1,7 @@
 class AppImage {
   static String messagecircle = 'assets/images/message-circle.svg';
   static String messageappbaricon = 'assets/images/message_appbar_icon.svg';
-  static String chatgroupicon = 'assets/images/group_icon.svg';
+  static String chatgroupicon = 'assets/images/group_icon.png';
   static String callicon = 'assets/images/call-icon.svg';
   static String chatfieldicon = 'assets/images/chatfield-icon.svg';
   static String chatfieldsticker = 'assets/images/chatfield-sticker.svg';
@@ -19,5 +19,5 @@ class AppImage {
   static String multiplelike = 'assets/images/Group 10.svg';
   static String like1 = 'assets/images/like1.svg';
   static String addPeople = 'assets/images/addpeopleicon.png';
-  static String user = 'assets/images/user.jpeg';
+  static String user = 'assets/images/user.png';
 }

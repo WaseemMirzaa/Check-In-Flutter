@@ -24,7 +24,7 @@ class NameTextfield extends GetView<GroupDetailController> {
         controller.namefocusNode.unfocus();
       },
       controller: controller.nameController,
-      style: const TextStyle(fontSize: 19, fontWeight: FontWeight.bold),
+      style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
       decoration: InputDecoration(
           focusedBorder: UnderlineInputBorder(
               borderSide: BorderSide(color: greyColor.withOpacity(0.6))),

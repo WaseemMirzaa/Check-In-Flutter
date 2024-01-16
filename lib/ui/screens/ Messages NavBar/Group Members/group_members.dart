@@ -37,7 +37,7 @@ class GroupMember extends GetView<GroupmemberController> {
               color: black,
             ),
             horizontalGap(10),
-            poppinsText('Group Members', 15, bold, blackColor)
+            poppinsText(TempLanguage.groupMembers, 15, bold, blackColor)
           ],
         ),
       ),
@@ -54,8 +54,11 @@ class GroupMember extends GetView<GroupmemberController> {
                 } else {
                   return Padding(
                     padding: const EdgeInsets.only(left: 25.0),
-                    child: poppinsText("${snapshot.data!.length} Members", 22,
-                        bold, blackColor),
+                    child: poppinsText(
+                        "${snapshot.data!.length} ${TempLanguage.members}",
+                        20,
+                        medium,
+                        blackColor),
                   );
                 }
               }),

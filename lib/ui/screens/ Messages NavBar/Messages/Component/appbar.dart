@@ -31,8 +31,8 @@ class MessageAppBar extends StatelessWidget implements PreferredSizeWidget {
             },
             child: Image.asset(
               AppImage.addPeople,
-              height: 30,
-              width: 30,
+              height: 24,
+              width: 24,
             ),
           ),
         )

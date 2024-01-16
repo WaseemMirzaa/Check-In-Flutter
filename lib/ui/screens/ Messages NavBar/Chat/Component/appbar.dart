@@ -1,6 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
+import 'package:get/get.dart';
 
 import '../../../../../utils/Constants/images.dart';
 import '../../../../../utils/colors.dart';
@@ -9,8 +9,8 @@ import '../../../../../utils/styles.dart';
 import '../../../../widgets/custom_appbar.dart';
 
 class ChatAppbar extends StatelessWidget implements PreferredSizeWidget {
-  String? name;
-  String? image;
+  RxString? name;
+  RxString? image;
   bool? isgroup;
   Function()? ontap;
   ChatAppbar({super.key, this.name, this.isgroup, this.ontap, this.image});
@@ -21,18 +21,18 @@ class ChatAppbar extends StatelessWidget implements PreferredSizeWidget {
       title: GestureDetector(
         onTap: ontap,
         child: Row(mainAxisSize: MainAxisSize.min, children: [
-          CircleAvatar(
-            backgroundImage: CachedNetworkImageProvider(
-                image == '' ? AppImage.userImagePath : image!),
-            radius: 20,
-          ),
+          Obx(() => CircleAvatar(
+                backgroundImage: image!.value == ''
+                    ? AssetImage(AppImage.user) as ImageProvider
+                    : CachedNetworkImageProvider(image!.value),
+                radius: 20,
+              )),
           horizontalGap(15),
-          isgroup!
-              ? SvgPicture.asset(AppImage.chatgroupicon)
-              : const SizedBox(),
+          isgroup! ? Image.asset(AppImage.chatgroupicon) : const SizedBox(),
           horizontalGap(5),
-          Flexible(
-              child: poppinsText(name ?? '', 15, FontWeight.bold, blackColor))
+          Obx(() => Flexible(
+              child: poppinsText(
+                  name!.value ?? '', 15, FontWeight.bold, blackColor)))
         ]),
       ),
       // actions: [

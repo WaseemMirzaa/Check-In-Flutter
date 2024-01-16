@@ -93,4 +93,14 @@ class TempLanguage {
   static String get to => 'To';
   static String get chat => 'chat';
   static String get typeToFindMember => 'Search to find member';
+  static String get sendMessageRequest => 'Send Message Request to this Person';
+  static String get sendMessageRequestToCall =>
+      'Send a message request to this person to message and call them.';
+  static String get sendRequest => 'Sent Request';
+  static String get ignore => 'Ignore';
+  static String get accept => 'Accept';
+  static String get reject => 'Reject';
+  static String get delete => 'Delete';
+  static String get members => 'Members';
+  static String get groupMembers => 'Group Members';
 }
