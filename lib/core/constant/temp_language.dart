@@ -93,14 +93,22 @@ class TempLanguage {
   static String get to => 'To';
   static String get chat => 'chat';
   static String get typeToFindMember => 'Search to find member';
-  static String get sendMessageRequest => 'Send Message Request to this Person';
+  static String get inviteSent => 'Invite Sent';
+  static String get acceptMessageRequest => 'Accept message request from';
   static String get sendMessageRequestToCall =>
       'Send a message request to this person to message and call them.';
   static String get sendRequest => 'Sent Request';
   static String get ignore => 'Ignore';
   static String get accept => 'Accept';
-  static String get reject => 'Reject';
+  static String get block => 'Block';
   static String get delete => 'Delete';
   static String get members => 'Members';
   static String get groupMembers => 'Group Members';
+  static String get add => 'Add';
+  static String get requestDeleted => 'Request Deleted by';
+  static String get youBlockThisAccount => 'You blocked this account';
+  static String get requestAgain => 'Request Again';
+  static String get blockedYou => 'Blocked You';
+  static String get unblock => 'Unblock';
+  static String get messageRequest => 'Message Request';
 }

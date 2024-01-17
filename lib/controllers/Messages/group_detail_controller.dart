@@ -87,8 +87,10 @@ class GroupDetailController extends GetxController {
 
   @override
   void onClose() {
-    super.onClose();
     nameController.dispose();
     aboutController.dispose();
+    nameTapped = false.obs;
+    aboutTapped = false.obs;
+    super.onClose();
   }
 }

@@ -9,7 +9,6 @@ import 'package:check_in/utils/gaps.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
-import 'package:sizer/sizer.dart';
 import '../../../../utils/loader.dart';
 import '../../../../controllers/Messages/chat_controller.dart';
 import '../../../../controllers/Messages/messages_controller.dart';
@@ -46,44 +45,46 @@ class MessageScreen extends GetView<MessageController> {
                     } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
                       return Center(child: Text(TempLanguage.noMessageFound));
                     } else {
-                      return ListView.separated(
+                      return ListView.builder(
                           // padding: const EdgeInsets.only(top: 14),
-                          separatorBuilder: (_, __) {
-                            return verticalGap(1.5.h);
-                            // Padding(
-                            //   padding: EdgeInsets.symmetric(vertical: 6),
-                            //   child: Divider(
-                            //     indent: 20,
-                            //     endIndent: 20,
-                            //     thickness: 2,
-                            //   ),
-                            // );
-                          },
+
                           itemCount: snapshot.data!.length,
                           itemBuilder: (context, index) {
                             var message = snapshot.data![index];
-                            return Obx(() {
-                              if (snapshot.data![index].name!
-                                  .toLowerCase()
-                                  .contains(
-                                      controller.searchQuery.toLowerCase())) {
-                                return MessageListTile(
-                                  message: snapshot.data![index],
-                                  ontap: () {
-                                    chatcontroller.docId.value = message.id!;
-                                    chatcontroller.name.value = message.name!;
-                                    chatcontroller.isgroup = message.isgroup!;
-                                    chatcontroller.image.value = message.image!;
-                                    pushNewScreen(
-                                      context,
-                                      screen: ChatScreen(),
-                                    );
-                                  },
-                                );
-                              } else {
-                                return Container();
-                              }
-                            });
+                            if (message.showMessageTile!) {
+                              return Obx(() {
+                                if (snapshot.data![index].name!
+                                    .toLowerCase()
+                                    .contains(
+                                        controller.searchQuery.toLowerCase())) {
+                                  return Padding(
+                                    padding:
+                                        const EdgeInsets.symmetric(vertical: 6),
+                                    child: MessageListTile(
+                                      message: snapshot.data![index],
+                                      ontap: () {
+                                        chatcontroller.docId.value =
+                                            message.id!;
+                                        chatcontroller.name.value =
+                                            message.name!;
+                                        chatcontroller.isgroup =
+                                            message.isgroup!;
+                                        chatcontroller.image.value =
+                                            message.image!;
+                                        pushNewScreen(
+                                          context,
+                                          screen: ChatScreen(),
+                                        );
+                                      },
+                                    ),
+                                  );
+                                } else {
+                                  return Container();
+                                }
+                              });
+                            } else {
+                              return const SizedBox.shrink();
+                            }
                           });
                     }
                   }))

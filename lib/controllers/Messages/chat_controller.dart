@@ -1,5 +1,6 @@
 import 'package:check_in/controllers/user_controller.dart';
 import 'package:check_in/model/Message%20and%20Group%20Message%20Model/chat_model.dart';
+import 'package:check_in/model/Message%20and%20Group%20Message%20Model/message_model.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
@@ -36,6 +37,16 @@ class ChatController extends GetxController {
   Stream<List<Chatmodel>> getConversation() {
     return chatService.getConversation(
         docId.value, userController.userModel.value.uid!);
+  }
+
+  //............. get message request status
+  Stream<Messagemodel> getRequestStatus() {
+    return chatService.getMessageRequest(docId.value);
+  }
+
+  //............. update request status
+  void updateRequestStatus(String status, String msg,int unread) {
+    chatService.updateRequestStatus(docId.value, status, msg,unread);
   }
 
 //.............. send chat

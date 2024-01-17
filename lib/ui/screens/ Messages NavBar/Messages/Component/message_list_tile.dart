@@ -2,6 +2,7 @@
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../../../../model/Message and Group Message Model/message_model.dart';
@@ -52,7 +53,7 @@ class MessageListTile extends StatelessWidget {
                       Row(
                         children: [
                           if (message!.isgroup!) ...[
-                            Image.asset(
+                            SvgPicture.asset(
                               AppImage.chatgroupicon,
                             ),
                             horizontalGap(8)

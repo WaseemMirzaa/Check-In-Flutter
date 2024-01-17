@@ -5,11 +5,12 @@ import 'package:get/get.dart';
 
 import '../../Services/message_service.dart';
 
-class NewMessageController extends GetxController {
+class AddGroupMembersController extends GetxController {
   final MessageService chatService;
   late TextEditingController searchController;
-  NewMessageController(this.chatService);
+  AddGroupMembersController(this.chatService);
   late final RxList<UserModel> userDataList = RxList<UserModel>();
+
   RxString searchQuery = ''.obs;
 
   RxMap<String, dynamic> mydata = <String, dynamic>{}.obs;
@@ -19,35 +20,17 @@ class NewMessageController extends GetxController {
     searchController = TextEditingController();
   }
 
-//............ get user list for start new chat
+//............ get user list for add new member
   Future<void> getUser() async {
-    // chatService.getUsers(searchQuery.value).forEach((element) {
-    //   print(element);
-    // });
     await chatService.getUsers(searchQuery.value).then((value) {
       userDataList.assignAll(value);
     });
   }
 
-//............ start new chat
-  Future<String> startNewChat(String myUid, String uNAme) async {
-    UserModel model = mydata.values.first;
-    return chatService
-        .startNewChat([myUid, mydata.keys.first], uNAme, model.userName!);
-  }
-
-  Future<String> startNewGroupChat(String myUid, String uNAme) async {
-    List<Map<String, dynamic>> dataArray = [
-      {
-        MessageField.MEMBER_UID: myUid,
-        MessageField.MEMBER_NAME: uNAme,
-        MessageField.ABOUT_USER: '',
-        MessageField.MEMBER_IMG: '',
-        MessageField.IS_ADMIN: true,
-        MessageField.MEMBER_UNREAD_COUNT: 0
-      }
-    ];
-    List memberIds = [myUid];
+//............ add new member
+  Future<bool> addMember(String docId) async {
+    List<Map<String, dynamic>> dataArray = [];
+    List memberIds = [];
     mydata.forEach((id, data) {
       UserModel value = data;
 
@@ -67,12 +50,12 @@ class NewMessageController extends GetxController {
       memberIds.add(value.uid);
     });
 
-    return chatService.startNewGroupChat(memberIds, dataArray);
+    return chatService.addNewMember(memberIds, dataArray, docId);
   }
 
   @override
   void dispose() {
-    searchController.dispose();
     super.dispose();
+    searchController.dispose();
   }
 }

@@ -1,3 +1,4 @@
+import 'package:check_in/utils/colors.dart';
 import 'package:check_in/utils/styles.dart';
 import 'package:flutter/material.dart';
 
@@ -10,8 +11,8 @@ class ChatButton extends StatelessWidget {
   ChatButton(
       {super.key,
       this.buttonColor,
-      this.onTap,
-      this.text,
+      required this.onTap,
+      required this.text,
       this.textColor,
       this.width});
 
@@ -19,13 +20,13 @@ class ChatButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return SizedBox(
       height: 40,
-      width: width,
+      width: width ?? double.infinity,
       child: ElevatedButton(
         onPressed: onTap,
         style: ElevatedButton.styleFrom(
-          backgroundColor: buttonColor,
+          backgroundColor: buttonColor ?? greyColor,
         ),
-        child: poppinsText(text!, 12, regular, textColor!),
+        child: poppinsText(text ?? '', 12, medium, textColor!),
       ),
     );
   }

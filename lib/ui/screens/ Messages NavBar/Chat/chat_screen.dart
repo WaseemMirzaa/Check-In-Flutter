@@ -1,16 +1,21 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:check_in/controllers/user_controller.dart';
 import 'package:check_in/core/constant/temp_language.dart';
 import 'package:check_in/model/Message%20and%20Group%20Message%20Model/chat_model.dart';
 import 'package:check_in/controllers/Messages/chat_controller.dart';
+import 'package:check_in/model/Message%20and%20Group%20Message%20Model/message_model.dart';
 import 'package:check_in/ui/screens/%20Messages%20NavBar/Chat/Component/appbar.dart';
+import 'package:check_in/ui/screens/%20Messages%20NavBar/Chat/Component/button.dart';
 import 'package:check_in/ui/screens/%20Messages%20NavBar/Chat/Component/image_bottomsheet.dart';
 import 'package:check_in/ui/screens/%20Messages%20NavBar/Chat/Component/image_date_container.dart';
 import 'package:check_in/ui/screens/%20Messages%20NavBar/Chat/Component/sticker_keyboard.dart';
+import 'package:check_in/utils/Constants/enums.dart';
+import 'package:check_in/utils/Constants/images.dart';
 import 'package:check_in/utils/colors.dart';
+import 'package:check_in/utils/styles.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
+import 'package:sizer/sizer.dart';
 import '../../../../utils/gaps.dart';
 import '../../../../utils/loader.dart';
 import '../Group Detail/group_detail.dart';
@@ -77,8 +82,7 @@ class ChatScreen extends GetView<ChatController> {
                                             backgroundColor:
                                                 greenColor.withOpacity(0.6),
                                             backgroundImage:
-                                                const CachedNetworkImageProvider(
-                                                    'https://wac-cdn.atlassian.com/dam/jcr:ba03a215-2f45-40f5-8540-b2015223c918/Max-R_Headshot%20(1).jpg?cdnVersion=1365'),
+                                                AssetImage(AppImage.user),
                                             radius: 17,
                                           ),
                                         ),
@@ -116,77 +120,260 @@ class ChatScreen extends GetView<ChatController> {
                           });
                     }
                   })),
-          // Container(
-          //   height: 160,
-          //   width: 85.w,
-          //   decoration: BoxDecoration(
-          //     color: whiteColor,
-          //     borderRadius: BorderRadius.circular(10),
-          //     boxShadow: [
-          //       BoxShadow(
-          //         color: blackTranslucentColor,
-          //         offset: const Offset(0, 1),
-          //         blurRadius: 6,
-          //       ),
-          //     ],
-          //   ),
-          //   child: Padding(
-          //     padding: const EdgeInsets.all(13),
-          //     child: Column(
-          //       children: [
-          //         poppinsText(
-          //             TempLanguage.sendMessageRequest, 14, bold, blackColor),
-          //         verticalGap(7),
-          //         poppinsText(TempLanguage.sendMessageRequestToCall, 11,
-          //             regular, greyColor,
-          //             maxlines: 2, align: TextAlign.center),
-          //         verticalGap(7),
-          //         Divider(
-          //           color: blackColor,
-          //         ),
-          //         Row(
-          //           children: [
-          //             ChatButton(
-          //               text: TempLanguage.sendRequest,
-          //               textColor: whiteColor,
-          //               buttonColor: greenColor,
-          //               width: 50.w,
-          //               onTap: () {},
-          //             ),
-          //             horizontalGap(7),
-          //             ChatButton(
-          //               text: TempLanguage.ignore,
-          //               textColor: blackColor,
-          //               buttonColor: greyColor.withOpacity(0.23),
-          //               width: 25.w,
-          //               onTap: () {},
-          //             )
-          //           ],
-          //         )
-          //       ],
-          //     ),
-          //   ),
-          // ),
-
-          SendMessageContainer(
-            textFieldController: controller.chatfieldController,
-            imageontap: () {
-              showchatbottomSheet(context, controller);
-            },
-            textfieldontap: () {
-              controller.issticker.value = true;
-            },
-            iconontap: () {
-              controller.issticker.value = !controller.issticker.value;
-              FocusManager.instance.primaryFocus?.unfocus();
-            },
-            sendmsgontap: () {
-              if (controller.chatfieldController.text.isNotEmpty) {
-                controller.sendMessage();
-                controller.chatfieldController.clear();
-              }
-            },
-          ),
+          // for show request status dialog
+          StreamBuilder<Messagemodel>(
+              stream: controller.getRequestStatus(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const SizedBox();
+                } else if (!snapshot.hasData) {
+                  return const Center(child: Text(''));
+                } else {
+                  if (snapshot.data!.senderId ==
+                          controller.userController.userModel.value.uid &&
+                      snapshot.data!.requestStatus ==
+                          RequestStatusEnum.pending.name) {
+                    return Container(
+                      // height: 160,
+                      width: 50.w,
+                      padding: const EdgeInsets.all(13),
+                      margin: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: whiteColor,
+                        borderRadius: BorderRadius.circular(10),
+                        boxShadow: [
+                          BoxShadow(
+                            color: blackTranslucentColor,
+                            offset: const Offset(0, 1),
+                            blurRadius: 6,
+                          ),
+                        ],
+                      ),
+                      child: Column(
+                        children: [
+                          poppinsText(
+                              TempLanguage.inviteSent, 15, medium, blackColor),
+                        ],
+                      ),
+                    );
+                  } else if (snapshot.data!.senderId !=
+                          controller.userController.userModel.value.uid &&
+                      snapshot.data!.requestStatus ==
+                          RequestStatusEnum.pending.name) {
+                    return Container(
+                      // height: 160,
+                      width: 80.w,
+                      padding: const EdgeInsets.all(13),
+                      margin: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: whiteColor,
+                        borderRadius: BorderRadius.circular(10),
+                        boxShadow: [
+                          BoxShadow(
+                            color: blackTranslucentColor,
+                            offset: const Offset(0, 1),
+                            blurRadius: 6,
+                          ),
+                        ],
+                      ),
+                      child: Column(
+                        children: [
+                          poppinsText(
+                              "${TempLanguage.acceptMessageRequest} ${snapshot.data!.senderName}?",
+                              14,
+                              medium,
+                              blackColor,
+                              maxlines: 2),
+                          verticalGap(15),
+                          Row(
+                            children: [
+                              Flexible(
+                                  child: ChatButton(
+                                onTap: () {
+                                  controller.updateRequestStatus(
+                                      RequestStatusEnum.block.name, '', 0);
+                                },
+                                text: TempLanguage.block,
+                                textColor: redColor,
+                                buttonColor: greyColor.withOpacity(0.7),
+                              )),
+                              horizontalGap(2.w),
+                              Flexible(
+                                  child: ChatButton(
+                                onTap: () async {
+                                  controller.updateRequestStatus(
+                                      RequestStatusEnum.delete.name, '', 0);
+                                  Get.back();
+                                },
+                                text: TempLanguage.delete,
+                                textColor: redColor,
+                                buttonColor: greyColor.withOpacity(0.7),
+                              )),
+                              horizontalGap(2.w),
+                              Flexible(
+                                  child: ChatButton(
+                                onTap: () {
+                                  controller.updateRequestStatus(
+                                      RequestStatusEnum.accept.name, '', 0);
+                                },
+                                text: TempLanguage.accept,
+                                textColor: whiteColor,
+                                buttonColor: greyColor.withOpacity(0.7),
+                              )),
+                            ],
+                          )
+                        ],
+                      ),
+                    );
+                  } else {
+                    return const SizedBox();
+                  }
+                }
+              }),
+          StreamBuilder<Messagemodel>(
+              stream: controller.getRequestStatus(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const SizedBox();
+                } else if (!snapshot.hasData) {
+                  return const Center(child: Text(''));
+                } else {
+                  if (snapshot.data!.senderId ==
+                          controller.userController.userModel.value.uid &&
+                      snapshot.data!.requestStatus ==
+                          RequestStatusEnum.delete.name) {
+                    return Container(
+                      // height: 160,
+                      // width: 50.w,
+                      padding: const EdgeInsets.all(13),
+                      decoration: BoxDecoration(
+                        color: whiteColor,
+                        borderRadius: BorderRadius.circular(10),
+                        boxShadow: [
+                          BoxShadow(
+                            color: blackTranslucentColor,
+                            offset: const Offset(0, 1),
+                            blurRadius: 6,
+                          ),
+                        ],
+                      ),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: poppinsText(
+                                "${TempLanguage.requestDeleted} ${snapshot.data!.recieverName}",
+                                15,
+                                medium,
+                                blackColor),
+                          ),
+                          ChatButton(
+                            width: 35.w,
+                            onTap: () {
+                              controller.updateRequestStatus(
+                                  RequestStatusEnum.pending.name,
+                                  TempLanguage.messageRequest,
+                                  1);
+                            },
+                            text: "${TempLanguage.requestAgain} ",
+                            buttonColor: greenColor,
+                            textColor: whiteColor,
+                          )
+                        ],
+                      ),
+                    );
+                  } else if (snapshot.data!.senderId ==
+                          controller.userController.userModel.value.uid &&
+                      snapshot.data!.requestStatus ==
+                          RequestStatusEnum.block.name) {
+                    return Container(
+                      // height: 160,
+                      // width: 50.w,
+                      padding: const EdgeInsets.all(13),
+                      decoration: BoxDecoration(
+                        color: whiteColor,
+                        borderRadius: BorderRadius.circular(10),
+                        boxShadow: [
+                          BoxShadow(
+                            color: blackTranslucentColor,
+                            offset: const Offset(0, 1),
+                            blurRadius: 6,
+                          ),
+                        ],
+                      ),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: poppinsText(
+                                " ${snapshot.data!.recieverName} ${TempLanguage.blockedYou}",
+                                15,
+                                medium,
+                                blackColor,
+                                align: TextAlign.center),
+                          ),
+                        ],
+                      ),
+                    );
+                  } else if (snapshot.data!.senderId !=
+                          controller.userController.userModel.value.uid &&
+                      snapshot.data!.requestStatus ==
+                          RequestStatusEnum.block.name) {
+                    return Container(
+                      // height: 160,
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(13),
+                      decoration: BoxDecoration(
+                        color: whiteColor,
+                        borderRadius: BorderRadius.circular(10),
+                        boxShadow: [
+                          BoxShadow(
+                            color: blackTranslucentColor,
+                            offset: const Offset(0, 1),
+                            blurRadius: 6,
+                          ),
+                        ],
+                      ),
+                      child: Column(
+                        children: [
+                          poppinsText(TempLanguage.youBlockThisAccount, 15,
+                              medium, blackColor),
+                          verticalGap(10),
+                          ChatButton(
+                            width: 35.w,
+                            onTap: () {
+                              controller.updateRequestStatus(
+                                  RequestStatusEnum.accept.name, '', 0);
+                            },
+                            text: "${TempLanguage.unblock} ",
+                            buttonColor: greenColor,
+                            textColor: whiteColor,
+                          )
+                        ],
+                      ),
+                    );
+                  } else {
+                    return SendMessageContainer(
+                      textFieldController: controller.chatfieldController,
+                      imageontap: () {
+                        showchatbottomSheet(context, controller);
+                      },
+                      textfieldontap: () {
+                        controller.issticker.value = true;
+                      },
+                      iconontap: () {
+                        controller.issticker.value =
+                            !controller.issticker.value;
+                        FocusManager.instance.primaryFocus?.unfocus();
+                      },
+                      sendmsgontap: () {
+                        if (controller.chatfieldController.text.isNotEmpty) {
+                          controller.sendMessage();
+                          controller.chatfieldController.clear();
+                        }
+                      },
+                    );
+                  }
+                }
+              }),
           Obx(() => Offstage(
                 offstage: controller.issticker.value,
                 child: StickerKeyboard(

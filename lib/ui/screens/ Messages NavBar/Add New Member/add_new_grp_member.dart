@@ -1,11 +1,9 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:check_in/controllers/Messages/add_group_member_controller.dart';
 import 'package:check_in/controllers/Messages/chat_controller.dart';
-import 'package:check_in/controllers/Messages/new_message_controller.dart';
 import 'package:check_in/controllers/user_controller.dart';
 import 'package:check_in/core/constant/temp_language.dart';
 import 'package:check_in/model/user_modal.dart';
-import 'package:check_in/ui/screens/%20Messages%20NavBar/Chat/chat_screen.dart';
-import 'package:check_in/ui/screens/%20Messages%20NavBar/Group%20Detail/group_detail.dart';
 import 'package:check_in/ui/widgets/custom_appbar.dart';
 import 'package:check_in/ui/widgets/text_field.dart';
 import 'package:check_in/utils/Constants/images.dart';
@@ -14,62 +12,31 @@ import 'package:check_in/utils/gaps.dart';
 import 'package:check_in/utils/styles.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
 import 'package:sizer/sizer.dart';
 
-class NewMessageScreen extends GetView<NewMessageController> {
-  NewMessageScreen({super.key});
+class AddNewGroupMember extends GetView<AddGroupMembersController> {
+  String? docId;
+  AddNewGroupMember({super.key, this.docId});
   var userController = Get.find<UserController>();
   var chatcontroller = Get.find<ChatController>();
   @override
   Widget build(BuildContext context) {
-    print("${controller.searchQuery.value}sarch");
     return Scaffold(
       appBar: CustomAppbar(
         title: poppinsText(TempLanguage.newMessage, 15, bold, blackColor),
         actions: [
           Obx(() => controller.mydata.isNotEmpty
               ? TextButton(
-                  onPressed: () {
+                  onPressed: () async {
+                    bool res = await controller.addMember(docId!);
                     // clear searchQuery value
                     controller.searchQuery.value = '';
-
-                    if (controller.mydata.length > 1) {
-                      controller
-                          .startNewGroupChat(
-                              userController.userModel.value.uid!,
-                              userController.userModel.value.userName!)
-                          .then((value) {
-                        chatcontroller.docId.value = value;
-
-                        chatcontroller.isgroup = true;
-
-                        // clear map mydata
-                        controller.mydata.clear();
-                        pushNewScreen(context,
-                            screen: GroupdetailScreen(
-                              showBtn: true,
-                              docId: value,
-                            )).then((value) => Get.back());
-                      });
-                    } else {
-                      controller
-                          .startNewChat(userController.userModel.value.uid!,
-                              userController.userModel.value.userName!)
-                          .then((value) {
-                        UserModel model = controller.mydata.values.first;
-                        chatcontroller.docId.value = value;
-                        chatcontroller.name.value = model.userName!;
-                        chatcontroller.isgroup = false;
-                        chatcontroller.image.value = model.photoUrl!;
-                        // clear map mydata
-                        controller.mydata.clear();
-                        pushNewScreen(context, screen: ChatScreen())
-                            .then((value) => Get.back());
-                      });
+                    if (res) {
+                      controller.mydata.clear();
+                      Get.back();
                     }
                   },
-                  child: poppinsText(TempLanguage.chat, 12, medium, blackColor),
+                  child: poppinsText(TempLanguage.add, 12, medium, blackColor),
                 )
               : const SizedBox())
         ],

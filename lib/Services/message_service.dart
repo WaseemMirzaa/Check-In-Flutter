@@ -4,10 +4,12 @@ import 'dart:developer';
 import 'dart:io';
 
 import 'package:check_in/core/constant/constant.dart';
+import 'package:check_in/core/constant/temp_language.dart';
 import 'package:check_in/model/Message%20and%20Group%20Message%20Model/chat_model.dart';
 import 'package:check_in/model/Message%20and%20Group%20Message%20Model/group_detail_model.dart';
 import 'package:check_in/model/Message%20and%20Group%20Message%20Model/group_member_model.dart';
 import 'package:check_in/model/user_modal.dart';
+import 'package:check_in/utils/Constants/enums.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 
@@ -30,15 +32,18 @@ class MessageService {
         .map((querySnapshot) => querySnapshot.docs.map<Messagemodel>((doc) {
               num unread = 0;
               Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+              bool showMessagetile = false;
               String name, imagepath = '';
 
               if (data[MessageField.IS_GROUP] == true) {
                 name = data[MessageField.GROUP_NAME];
                 imagepath = data[MessageField.GROUP_IMG];
                 mem = data[MessageField.MEMBERS];
+
                 for (var val in mem) {
                   if (val[MessageField.MEMBER_UID] == myId) {
                     unread = val[MessageField.MEMBER_UNREAD_COUNT];
+                    showMessagetile = true;
                     break;
                   }
                 }
@@ -52,9 +57,17 @@ class MessageService {
                 unread = data[MessageField.SENDER_ID] == myId
                     ? data[MessageField.SENDER_UNREAD]
                     : data[MessageField.RECIEVER_UNREAD];
+                showMessagetile = data[MessageField.RECIEVER_ID] == myId &&
+                        data[MessageField.REQUEST_STATUS] ==
+                            RequestStatusEnum.delete.name
+                    ? false
+                    : true;
               }
-              return Messagemodel.fromJson(
-                  doc.data() as Map<String, dynamic>, name, imagepath, unread);
+              return Messagemodel.fromJson(doc.data() as Map<String, dynamic>,
+                  name: name,
+                  image: imagepath,
+                  unread: unread,
+                  showMessageTile: showMessagetile);
             }).toList());
   }
 
@@ -95,6 +108,16 @@ class MessageService {
           docRef.update({MessageField.RECIEVER_UNREAD: 0});
         }
       }
+    });
+  }
+
+//............ Get message request status
+  Stream<Messagemodel> getMessageRequest(String docId) {
+    return _messagesCollection
+        .doc(docId)
+        .snapshots()
+        .map((DocumentSnapshot document) {
+      return Messagemodel.fromJson(document.data() as Map<String, dynamic>);
     });
   }
 
@@ -182,7 +205,6 @@ class MessageService {
               item[MessageField.IS_ADMIN] == true) {
             iAmAdmin = true;
           }
-
           return GroupMemberModel.fromJson(item, iAmAdmin);
         }).toList();
       });
@@ -291,17 +313,31 @@ class MessageService {
   }
 
 //........... Retrieve user for start new chat
-  Stream<List<UserModel>> getUsers(String name) {
-    try {
-      return db
-          .collection('USER')
-          .where('user name', isEqualTo: name)
-          .snapshots()
-          .map((snapshot) => snapshot.docs.map((doc) {
-                Map<String, dynamic> data = doc.data();
+  // Stream<List<UserModel>> getUsers(String name) {
+  //   try {
+  //     return db
+  //         .collection('USER')
+  //         .where('user name', isEqualTo: name)
+  //         .snapshots()
+  //         .map((snapshot) => snapshot.docs.map((doc) {
+  //               Map<String, dynamic> data = doc.data();
+  //               return UserModel.fromMap(data);
+  //             }).toList());
+  //   } catch (e) {
+  //     print('Error: $e');
+  //     rethrow;
+  //   }
+  // }
 
-                return UserModel.fromMap(data);
-              }).toList());
+//...... foew now only for add new group member (make same for getting users for start new chat)
+  Future<List<UserModel>> getUsers(String name) async {
+    try {
+      QuerySnapshot querySnapshot =
+          await db.collection('USER').where('user name', isEqualTo: name).get();
+
+      return querySnapshot.docs
+          .map((doc) => UserModel.fromMap(doc.data() as Map<String, dynamic>))
+          .toList();
     } catch (e) {
       print('Error: $e');
       rethrow;
@@ -310,28 +346,29 @@ class MessageService {
 
 //........... Start new chat
   Future<String> startNewChat(
-      List ids, String recieverName, String senderName) async {
-    if (await areIdsMatching(ids)) {
+      List ids, String senderName, String recieverName) async {
+    if (await areIdsMatching(ids) != '') {
       print('No data added because IDs match');
       // Do not add data and return an indication that no data was added
-      return '';
+      return areIdsMatching(ids);
     }
     Map<String, dynamic> data = {
       MessageField.ID: '',
       MessageField.IS_GROUP: false,
-      MessageField.LAST_MESSAGE: '',
+      MessageField.LAST_MESSAGE: TempLanguage.messageRequest,
       MessageField.MEMBER_IDS: ids,
       MessageField.RECIEVER_ABOUT: '',
-      MessageField.RECIEVER_ID: ids.first,
+      MessageField.RECIEVER_ID: ids.last,
       MessageField.RECIEVER_IMG: '',
       MessageField.RECIEVER_NAME: recieverName,
-      MessageField.RECIEVER_UNREAD: 0,
+      MessageField.RECIEVER_UNREAD: 1,
       MessageField.SENDER_ABOUT: '',
-      MessageField.SENDER_ID: ids.last,
+      MessageField.SENDER_ID: ids.first,
       MessageField.SENDER_IMG: '',
       MessageField.SENDER_NAME: senderName,
       MessageField.SENDER_UNREAD: 0,
-      MessageField.TIME_STAMP: ''
+      MessageField.TIME_STAMP: '',
+      MessageField.REQUEST_STATUS: RequestStatusEnum.pending.name
     };
 
     DocumentReference documentReference = await _messagesCollection.add(data);
@@ -343,7 +380,7 @@ class MessageService {
   }
 
   //........... Matching ids
-  Future<bool> areIdsMatching(List ids) async {
+  Future<String> areIdsMatching(List ids) async {
     // Perform a query to check if any document has the same IDs
     var resultOriginalOrder = await _messagesCollection
         .where(MessageField.IS_GROUP, isEqualTo: false)
@@ -354,13 +391,18 @@ class MessageService {
         .where(MessageField.IS_GROUP, isEqualTo: false)
         .where(MessageField.MEMBER_IDS, isEqualTo: reversedIds)
         .get();
-
-    return resultOriginalOrder.docs.isNotEmpty ||
-        resultReversedOrder.docs.isNotEmpty;
-    //  return resultOriginalOrder.docs.first. ||
+    if (resultOriginalOrder.docs.isNotEmpty) {
+      return resultOriginalOrder.docs.first.id;
+    } else if (resultReversedOrder.docs.isNotEmpty) {
+      return resultReversedOrder.docs.first.id;
+    } else {
+      return '';
+    }
+    //  return resultOriginalOrder.docs.isNotEmpty ||
     // resultReversedOrder.docs.isNotEmpty;
   }
 
+  //........... Start new group chat
   Future<String> startNewGroupChat(List ids, List members) async {
     Map<String, dynamic> data = {
       MessageField.ABOUT_GROUP: '',
@@ -380,5 +422,39 @@ class MessageService {
     // Update the 'id' field in the model with the document ID
     _messagesCollection.doc(documentId).update({MessageField.ID: documentId});
     return documentId;
+  }
+
+  //........... Update request status
+  Future<void> updateRequestStatus(
+      String docId, String status, String msg, int unread) async {
+    try {
+      DocumentReference ref = _messagesCollection.doc(docId);
+      await ref.update({
+        MessageField.REQUEST_STATUS: status,
+        MessageField.RECIEVER_UNREAD: unread,
+        MessageField.LAST_MESSAGE: msg
+      });
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  //........... Add new member
+  Future<bool> addNewMember(List ids, List members, String docId) async {
+    try {
+      Map<String, dynamic> data = {
+        MessageField.MEMBER_IDS: FieldValue.arrayUnion(ids),
+        MessageField.MEMBERS: FieldValue.arrayUnion(members),
+      };
+
+      await _messagesCollection.doc(docId).update(data);
+
+      return true;
+    } catch (e) {
+      print("Error updating document: $e");
+
+      // Return false to indicate that the update was not successful
+      return false;
+    }
   }
 }

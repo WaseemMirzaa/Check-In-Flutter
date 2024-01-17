@@ -36,22 +36,26 @@ class CustomTextfield1 extends StatelessWidget {
   FocusNode? focusNode;
   TextEditingController? controller;
   Function()? onTap;
+  Function()? onEditingCompleted;
   Function(String)? onChanged;
   Function(PointerDownEvent)? onTapOutside;
-  CustomTextfield1(
-      {super.key,
-      this.suffixIcon,
-      this.hintText,
-      this.controller,
-      this.readOnly = false,
-      this.focusNode,
-      this.onTapOutside,
-      this.onTap,
-      this.onChanged});
+  CustomTextfield1({
+    super.key,
+    this.suffixIcon,
+    this.hintText,
+    this.controller,
+    this.readOnly = false,
+    this.focusNode,
+    this.onTapOutside,
+    this.onTap,
+    this.onChanged,
+    this.onEditingCompleted,
+  });
 
   @override
   Widget build(BuildContext context) {
     return TextFormField(
+      onEditingComplete: onEditingCompleted,
       readOnly: readOnly!,
       focusNode: focusNode,
       controller: controller,

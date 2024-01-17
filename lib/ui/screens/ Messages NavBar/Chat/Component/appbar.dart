@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 
 import '../../../../../utils/Constants/images.dart';
@@ -28,7 +29,9 @@ class ChatAppbar extends StatelessWidget implements PreferredSizeWidget {
                 radius: 20,
               )),
           horizontalGap(15),
-          isgroup! ? Image.asset(AppImage.chatgroupicon) : const SizedBox(),
+          isgroup!
+              ? SvgPicture.asset(AppImage.chatgroupicon)
+              : const SizedBox(),
           horizontalGap(5),
           Obx(() => Flexible(
               child: poppinsText(
