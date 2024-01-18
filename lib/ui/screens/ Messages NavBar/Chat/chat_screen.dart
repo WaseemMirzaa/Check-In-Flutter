@@ -192,6 +192,10 @@ class ChatScreen extends GetView<ChatController> {
                                 onTap: () {
                                   controller.updateRequestStatus(
                                       RequestStatusEnum.block.name, '', 0);
+                                  controller.sendNotificationMethod(
+                                      '',
+                                      userController.userModel.value.userName!,
+                                      '${userController.userModel.value.userName!} block you');
                                 },
                                 text: TempLanguage.block,
                                 textColor: redColor,
@@ -204,6 +208,10 @@ class ChatScreen extends GetView<ChatController> {
                                   controller.updateRequestStatus(
                                       RequestStatusEnum.delete.name, '', 0);
                                   Get.back();
+                                  controller.sendNotificationMethod(
+                                      '',
+                                      userController.userModel.value.userName!,
+                                      '${userController.userModel.value.userName!} delete message request');
                                 },
                                 text: TempLanguage.delete,
                                 textColor: redColor,
@@ -215,6 +223,10 @@ class ChatScreen extends GetView<ChatController> {
                                 onTap: () {
                                   controller.updateRequestStatus(
                                       RequestStatusEnum.accept.name, '', 0);
+                                  controller.sendNotificationMethod(
+                                      '',
+                                      userController.userModel.value.userName!,
+                                      '${userController.userModel.value.userName!} accept request');
                                 },
                                 text: TempLanguage.accept,
                                 textColor: whiteColor,
@@ -273,6 +285,10 @@ class ChatScreen extends GetView<ChatController> {
                                   RequestStatusEnum.pending.name,
                                   TempLanguage.messageRequest,
                                   1);
+                              controller.sendNotificationMethod(
+                                  '',
+                                  userController.userModel.value.userName!,
+                                  '${userController.userModel.value.userName!} send a request message');
                             },
                             text: "${TempLanguage.requestAgain} ",
                             buttonColor: greenColor,
@@ -342,6 +358,10 @@ class ChatScreen extends GetView<ChatController> {
                             onTap: () {
                               controller.updateRequestStatus(
                                   RequestStatusEnum.accept.name, '', 0);
+                              controller.sendNotificationMethod(
+                                  '',
+                                  userController.userModel.value.userName!,
+                                  "${userController.userModel.value.userName!} unblock you");
                             },
                             text: "${TempLanguage.unblock} ",
                             buttonColor: greenColor,
@@ -367,6 +387,10 @@ class ChatScreen extends GetView<ChatController> {
                       sendmsgontap: () {
                         if (controller.chatfieldController.text.isNotEmpty) {
                           controller.sendMessage();
+                          controller.sendNotificationMethod(
+                              '',
+                              userController.userModel.value.userName!,
+                              controller.chatfieldController.text);
                           controller.chatfieldController.clear();
                         }
                       },

@@ -5,6 +5,7 @@ import 'package:check_in/core/constant/temp_language.dart';
 import 'package:check_in/model/Message%20and%20Group%20Message%20Model/group_member_model.dart';
 import 'package:check_in/utils/Constants/images.dart';
 import 'package:check_in/utils/colors.dart';
+import 'package:check_in/utils/gaps.dart';
 import 'package:check_in/utils/styles.dart';
 import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
@@ -12,7 +13,8 @@ import 'package:sizer/sizer.dart';
 class GroupMemberTile extends StatelessWidget {
   GroupMemberModel? data;
   Function()? ontap;
-  GroupMemberTile({super.key, this.data, this.ontap});
+  Function()? removeMemberOntap;
+  GroupMemberTile({super.key, this.data, this.ontap, this.removeMemberOntap});
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +25,9 @@ class GroupMemberTile extends StatelessWidget {
         borderRadius: BorderRadius.circular(6),
         child: GestureDetector(
           onTap: () {
-            _showDialog(context);
+            if (data!.iAmAdmin!) {
+              _showDialog(context);
+            }
           },
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 15),
@@ -101,7 +105,11 @@ class GroupMemberTile extends StatelessWidget {
                         child: Text(TempLanguage.removeGroupAdmin),
                       )
                     : GestureDetector(
-                        onTap: ontap, child: Text(TempLanguage.makeGroupAdmin))
+                        onTap: ontap, child: Text(TempLanguage.makeGroupAdmin)),
+                verticalGap(15),
+                GestureDetector(
+                    onTap: removeMemberOntap,
+                    child: Text(TempLanguage.removeMember)),
               ],
             ),
           );

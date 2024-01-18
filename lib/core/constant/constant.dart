@@ -19,6 +19,7 @@ class UserKey {
   static const ABOUT_ME = "about me";
   static const HOME_COURT = "home court";
   static const GOLDEN_CHECK_IN = "goldenCheckin";
+  static const DEVICE_TOKEN = "deviceToken";
 }
 
 class CourtKey {
@@ -79,4 +80,8 @@ class NewsFeed {
   static const String NO_OF_LIKE = 'noOfLike';
   static const String NO_OF_COMMENT = 'noOfComment';
   static const String NO_OF_SHARED = 'noOfShared';
+}
+
+class SharedPreferenceKey {
+  static const NOTIFICATION_BADGE = "NOTIFICATION_BADGE";
 }

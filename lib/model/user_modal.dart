@@ -12,19 +12,20 @@ class UserModel {
   String? aboutMe;
   String? homeCourt;
   int? goldenCheckin;
+  List? deviceTokes;
 
-  UserModel({
-    this.userName,
-    this.email,
-    this.uid,
-    this.isVerified,
-    this.photoUrl,
-    this.checkedIn,
-    this.checkedInCourtName,
-    this.aboutMe,
-    this.homeCourt,
-    this.goldenCheckin,
-  });
+  UserModel(
+      {this.userName,
+      this.email,
+      this.uid,
+      this.isVerified,
+      this.photoUrl,
+      this.checkedIn,
+      this.checkedInCourtName,
+      this.aboutMe,
+      this.homeCourt,
+      this.goldenCheckin,
+      this.deviceTokes});
 
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
@@ -38,23 +39,24 @@ class UserModel {
       UserKey.ABOUT_ME: aboutMe,
       UserKey.HOME_COURT: homeCourt,
       UserKey.GOLDEN_CHECK_IN: goldenCheckin,
+      UserKey.DEVICE_TOKEN: deviceTokes
     };
   }
 
   factory UserModel.fromMap(Map<String, dynamic> map) {
     return UserModel(
-      userName: map[UserKey.USER_NAME] ?? "",
-      email: map[UserKey.EMAIL] ?? "",
-      uid: map[UserKey.UID] ?? "",
-      isVerified: map[UserKey.IS_VERIFIED] ??
-          true, //because all previous users are verified
-      photoUrl: map[UserKey.PHOTO_URL] ?? "",
-      checkedIn: map[UserKey.CHECKED_IN] ?? false,
-      checkedInCourtName: map[UserKey.CHECKED_IN_COURT_NAME] ?? "",
-      aboutMe: map[UserKey.ABOUT_ME] ?? "",
-      homeCourt: map[UserKey.HOME_COURT] ?? "",
-      goldenCheckin: map[UserKey.GOLDEN_CHECK_IN] ?? 0,
-    );
+        userName: map[UserKey.USER_NAME] ?? "",
+        email: map[UserKey.EMAIL] ?? "",
+        uid: map[UserKey.UID] ?? "",
+        isVerified: map[UserKey.IS_VERIFIED] ??
+            true, //because all previous users are verified
+        photoUrl: map[UserKey.PHOTO_URL] ?? "",
+        checkedIn: map[UserKey.CHECKED_IN] ?? false,
+        checkedInCourtName: map[UserKey.CHECKED_IN_COURT_NAME] ?? "",
+        aboutMe: map[UserKey.ABOUT_ME] ?? "",
+        homeCourt: map[UserKey.HOME_COURT] ?? "",
+        goldenCheckin: map[UserKey.GOLDEN_CHECK_IN] ?? 0,
+        deviceTokes: map[UserKey.DEVICE_TOKEN]);
   }
 
   UserModel copyWith({

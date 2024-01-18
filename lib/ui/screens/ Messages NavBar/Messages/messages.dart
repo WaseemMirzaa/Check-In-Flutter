@@ -30,6 +30,7 @@ class MessageScreen extends GetView<MessageController> {
             padding: const EdgeInsets.symmetric(horizontal: 10.0),
             child: SearchField(
               onchange: (query) {
+                // print(userController.userModel.value.deviceTokes!.first);
                 controller.searchQuery.value = query;
               },
             ),
@@ -71,6 +72,7 @@ class MessageScreen extends GetView<MessageController> {
                                             message.isgroup!;
                                         chatcontroller.image.value =
                                             message.image!;
+                                        chatcontroller.memberId.value = message.memberIds!;
                                         pushNewScreen(
                                           context,
                                           screen: ChatScreen(),

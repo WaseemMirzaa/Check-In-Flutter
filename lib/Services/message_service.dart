@@ -200,12 +200,19 @@ class MessageService {
         bool iAmAdmin = false;
         Map<String, dynamic> data = snapshot.data() as Map<String, dynamic>;
         List memberlst = data[MessageField.MEMBERS];
-        return memberlst.map((item) {
+        Map<String, dynamic>? userData;
+
+        for (var item in memberlst) {
           if (item[MessageField.MEMBER_UID] == userId &&
               item[MessageField.IS_ADMIN] == true) {
-            iAmAdmin = true;
+            userData = item;
+            break;
           }
-          return GroupMemberModel.fromJson(item, iAmAdmin);
+        }
+        return memberlst.map((item) {
+          return userData != null
+              ? GroupMemberModel.fromJson(item, true)
+              : GroupMemberModel.fromJson(item, false);
         }).toList();
       });
     } catch (e) {
@@ -456,5 +463,45 @@ class MessageService {
       // Return false to indicate that the update was not successful
       return false;
     }
+  }
+
+  //........... Remove new member
+  Future<void> removeMember(String id, docId) async {
+    try {
+      // Remove id from memberids array
+      await _messagesCollection.doc(docId).update({
+        MessageField.MEMBER_IDS: FieldValue.arrayRemove([id]),
+      });
+      // Get the current array of map data
+      DocumentSnapshot documentSnapshot =
+          await _messagesCollection.doc(docId).get();
+      List<Map<String, dynamic>> currentData = List<Map<String, dynamic>>.from(
+          documentSnapshot[MessageField.MEMBERS] ?? []);
+      // Find the index of the map with the specified ID
+      int indexToRemove =
+          currentData.indexWhere((map) => map[MessageField.MEMBER_UID] == id);
+      if (indexToRemove != -1) {
+        // Remove the map from the array
+        currentData.removeAt(indexToRemove);
+        // Update the document with the modified array
+        await _messagesCollection.doc(docId).update({
+          MessageField.MEMBERS: currentData,
+        });
+      }
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+//............. get device token
+  Future<String> getDeviceToken(String id) async {
+    DocumentReference userRef =
+        FirebaseFirestore.instance.collection('USER').doc(id);
+
+    DocumentSnapshot userSnapshot = await userRef.get();
+    Map<String, dynamic>? userData =
+        userSnapshot.data() as Map<String, dynamic>;
+    List<dynamic>? deviceTokens = userData[UserKey.DEVICE_TOKEN];
+    return deviceTokens!.first;
   }
 }

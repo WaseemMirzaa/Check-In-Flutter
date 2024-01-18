@@ -1,3 +1,4 @@
+import 'package:check_in/Services/push_notification_service.dart';
 import 'package:check_in/controllers/user_controller.dart';
 import 'package:check_in/core/constant/constant.dart';
 import 'package:check_in/model/user_modal.dart';
@@ -36,6 +37,8 @@ Future<bool> signUp(
                 UserKey.UID: auth.currentUser!.uid,
                 UserKey.CHECKED_IN: false,
                 UserKey.IS_VERIFIED: false,
+                UserKey.DEVICE_TOKEN:
+                    FieldValue.arrayUnion([FCMManager.fcmToken!])
               },
             )
                 // .then((value) async => await toModal(context))
@@ -56,6 +59,12 @@ Future<void> login(email, password, context) async {
     await auth
         .signInWithEmailAndPassword(email: email, password: password)
         .then((value) async {
+      // print(FCMManager.fcmToken!);
+      snap.collection(Collections.USER).doc(value.user!.uid).update(
+        {
+          UserKey.DEVICE_TOKEN: FieldValue.arrayUnion([FCMManager.fcmToken!])
+        },
+      );
       // Temporary --Save userid in global userid for chat
       // GlobalVariable.userid = value.user!.uid;
       await toModal(context);

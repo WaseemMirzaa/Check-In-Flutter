@@ -8,6 +8,7 @@ class GroupmemberController extends GetxController {
   String docid = '';
   GroupmemberController(this.messageService);
   var searchQuery = ''.obs;
+  RxBool iAmAdmin = false.obs;
 
 //............ get groupmember
   Stream<List<GroupMemberModel>> getGroupMember(String userId) {
@@ -22,5 +23,10 @@ class GroupmemberController extends GetxController {
 //............ remove group admin
   Future<void> removeGroupAdmin(String memberId) async {
     messageService.makeGroupAdmin(docid, memberId, false);
+  }
+
+//............ remove group members
+  Future<void> removeGroupMember(String memberId) async {
+    messageService.removeMember(memberId, docid);
   }
 }

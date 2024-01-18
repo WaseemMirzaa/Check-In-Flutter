@@ -12,6 +12,8 @@ class Messagemodel {
   String? requestStatus;
   String? senderName;
   String? recieverName;
+  String? recieverId;
+  List? memberIds;
   bool? showMessageTile;
   Messagemodel({
     this.name,
@@ -22,9 +24,11 @@ class Messagemodel {
     this.image,
     this.timeStamp,
     this.senderId,
+    this.recieverId,
     this.requestStatus,
     this.senderName,
     this.recieverName,
+    this.memberIds,
     this.showMessageTile,
   });
 
@@ -42,6 +46,8 @@ class Messagemodel {
       requestStatus: json[MessageField.REQUEST_STATUS],
       senderName: json[MessageField.SENDER_NAME],
       recieverName: json[MessageField.RECIEVER_NAME],
+      recieverId: json[MessageField.RECIEVER_ID],
+      memberIds: json[MessageField.MEMBER_IDS],
       showMessageTile: showMessageTile,
     );
   }
