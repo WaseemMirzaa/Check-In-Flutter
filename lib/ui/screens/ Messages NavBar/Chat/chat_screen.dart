@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:check_in/controllers/user_controller.dart';
 import 'package:check_in/core/constant/temp_language.dart';
 import 'package:check_in/model/Message%20and%20Group%20Message%20Model/chat_model.dart';
@@ -23,21 +25,55 @@ import '../Group Detail/group_detail.dart';
 import 'Component/message_date_container.dart';
 import 'Component/send_message_container.dart';
 
-class ChatScreen extends GetView<ChatController> {
+class ChatScreen extends StatefulWidget {
+  const ChatScreen({super.key});
+
+  @override
+  State<ChatScreen> createState() => _ChatScreenState();
+}
+
+class _ChatScreenState extends State<ChatScreen> {
   // RxString? name;
   // bool? isGroup;
   // RxString? image;
   // RxList? memberId;
   // RxString? senderName;
-  ChatScreen({super.key}
-      // {super.key,
-      // this.name,
-      // this.isGroup,
-      // this.image,
-      // this.memberId,
-      // this.senderName}
-      );
+  // ChatScreen({super.key}
+  // {super.key,
+  // this.name,
+  // this.isGroup,
+  // this.image,
+  // this.memberId,
+  // this.senderName}
+  // );
+//
   var userController = Get.find<UserController>();
+  var controller = Get.find<ChatController>();
+  Timer? timer;
+  @override
+  void initState() {
+    super.initState();
+    startTimer();
+  }
+
+  void startTimer() {
+    timer = Timer.periodic(const Duration(minutes: 1), (Timer t) {
+      controller.updateLastSeenMethod();
+    });
+  }
+
+  void stopTimer() {
+    if (timer != null) {
+      timer!.cancel();
+    }
+  }
+
+  @override
+  void dispose() {
+    stopTimer();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     //  for update last seen
@@ -128,8 +164,7 @@ class ChatScreen extends GetView<ChatController> {
                                           mymsg: mymsg,
                                           showLastSeen: showLastSeen,
                                           seenTime: seenTime,
-                                          isGroup:controller.isgroup
-                                        )
+                                          isGroup: controller.isgroup)
                                       : GestureDetector(
                                           onTap: () {
                                             showGeneralDialog(
