@@ -22,19 +22,34 @@ import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../../../controllers/user_controller.dart';
+import '../../../../utils/Constants/global_variable.dart';
 import 'Component/bottomsheet.dart';
 
 // ignore: must_be_immutable
 class GroupdetailScreen extends GetView<GroupDetailController> {
+  bool? isGroup;
+  String? image;
+  List? memberId;
+  String? senderName;
   String? docId;
   bool? showBtn;
-  GroupdetailScreen({super.key, this.docId, this.showBtn = false});
+  GroupdetailScreen(
+      {super.key,
+      this.isGroup,
+      this.image,
+      this.memberId,
+      this.senderName,
+      this.docId,
+      this.showBtn = false});
   var groupmemberController = Get.find<GroupmemberController>();
   var userController = Get.find<UserController>();
   var chatcontroller = Get.find<ChatController>();
 
   @override
   Widget build(BuildContext context) {
+    //   for making null docid
+    GlobalVariable.docId = '';
+
     controller.getGroupDetail(docId!, userController.userModel.value.uid!);
     return Scaffold(
         floatingActionButton: showBtn!

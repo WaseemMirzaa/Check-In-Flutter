@@ -41,13 +41,21 @@ class NewMessageScreen extends GetView<NewMessageController> {
                               userController.userModel.value.userName!)
                           .then((value) {
                         chatcontroller.docId.value = value;
-
+                        chatcontroller.senderName.value = "";
+                        chatcontroller.image.value = "";
                         chatcontroller.isgroup = true;
-
+                        chatcontroller.memberId.value =
+                            controller.mydata.keys.toList();
+                        chatcontroller.sendNotificationMethod('',
+                            '${userController.userModel.value.userName!} created new group with you');
                         // clear map mydata
                         controller.mydata.clear();
                         pushNewScreen(context,
                             screen: GroupdetailScreen(
+                              isGroup: true,
+                              image: '',
+                              memberId: controller.mydata.keys.toList().obs,
+                              senderName: "",
                               showBtn: true,
                               docId: value,
                             )).then((value) => Get.back());
@@ -60,12 +68,26 @@ class NewMessageScreen extends GetView<NewMessageController> {
                         UserModel model = controller.mydata.values.first;
                         chatcontroller.docId.value = value;
                         chatcontroller.name.value = model.userName!;
+                        chatcontroller.senderName.value =
+                            userController.userModel.value.userName!;
                         chatcontroller.isgroup = false;
                         chatcontroller.image.value = model.photoUrl!;
+                        chatcontroller.memberId.value =
+                            controller.mydata.keys.toList();
+                        //....... send notification
+                        chatcontroller.sendNotificationMethod('',
+                            '${userController.userModel.value.userName!} send a request message');
                         // clear map mydata
                         controller.mydata.clear();
-                        pushNewScreen(context, screen: ChatScreen())
-                            .then((value) => Get.back());
+                        pushNewScreen(context,
+                            screen: ChatScreen(
+                              // name: model.userName!.obs,
+                              // isGroup: false,
+                              // image: model.photoUrl!.obs,
+                              // memberId: controller.mydata.keys.toList().obs,
+                              // senderName:
+                              //     userController.userModel.value.userName!.obs,
+                            )).then((value) => Get.back());
                       });
                     }
                   },
@@ -112,7 +134,7 @@ class NewMessageScreen extends GetView<NewMessageController> {
               hintText: TempLanguage.search,
               onChanged: (value) {
                 controller.searchQuery.value = value;
-                controller.getUser();
+                controller.updateSearchQuery(value);
               },
             ),
           ),
@@ -124,7 +146,7 @@ class NewMessageScreen extends GetView<NewMessageController> {
                 )
               : Expanded(
                   child: FutureBuilder(
-                  future: controller.getUser(),
+                  future: Future.value(controller.userDataList),
                   builder: (context, snapshot) {
                     return Obx(() => controller.userDataList.isEmpty
                         ? Center(

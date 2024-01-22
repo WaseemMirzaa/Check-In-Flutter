@@ -33,12 +33,13 @@ class MessageService {
               num unread = 0;
               Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
               bool showMessagetile = false;
-              String name, imagepath = '';
+              String name, imagepath, yourname = '';
 
               if (data[MessageField.IS_GROUP] == true) {
                 name = data[MessageField.GROUP_NAME];
                 imagepath = data[MessageField.GROUP_IMG];
                 mem = data[MessageField.MEMBERS];
+                yourname = data[MessageField.GROUP_NAME];
 
                 for (var val in mem) {
                   if (val[MessageField.MEMBER_UID] == myId) {
@@ -51,6 +52,9 @@ class MessageService {
                 name = data[MessageField.SENDER_ID] == myId
                     ? data[MessageField.RECIEVER_NAME]
                     : data[MessageField.SENDER_NAME];
+                yourname = data[MessageField.SENDER_ID] == myId
+                    ? data[MessageField.SENDER_NAME]
+                    : data[MessageField.RECIEVER_NAME];
                 imagepath = data[MessageField.SENDER_ID] == myId
                     ? data[MessageField.RECIEVER_IMG]
                     : data[MessageField.SENDER_IMG];
@@ -67,7 +71,8 @@ class MessageService {
                   name: name,
                   image: imagepath,
                   unread: unread,
-                  showMessageTile: showMessagetile);
+                  showMessageTile: showMessagetile,
+                  yourName: yourname);
             }).toList());
   }
 
@@ -79,9 +84,32 @@ class MessageService {
         .orderBy(ChatField.TIME_STAMP, descending: true)
         .snapshots()
         .map((querySnapshot) => querySnapshot.docs.map<Chatmodel>((doc) {
+              // updateLastSeen(docId, uId);
               updateUnreadCount(docId, uId, 0);
               return Chatmodel.fromJson(doc.data());
             }).toList());
+  }
+
+//............ Update last Seen
+  Future<void> updateLastSeen(String docId, String uid) async {
+    print(uid);
+    final docRef = _messagesCollection.doc(docId);
+    final CollectionReference subcollectionRef =
+        docRef.collection(Collections.CHAT);
+
+    // QuerySnapshot subcollectionSnapshot = await subcollectionRef.get();
+    QuerySnapshot subcollectionSnapshot =
+        await subcollectionRef.where('id', isNotEqualTo: uid).get();
+
+    WriteBatch batch = FirebaseFirestore.instance.batch();
+
+    for (QueryDocumentSnapshot docSnapshot in subcollectionSnapshot.docs) {
+      batch.update(
+        subcollectionRef.doc(docSnapshot.id),
+        {'seenTimeStamp': DateTime.now().toString()},
+      );
+    }
+    await batch.commit();
   }
 
 //............ Update Unread Count
@@ -91,7 +119,7 @@ class MessageService {
     num unreadval,
   ) async {
     final docRef = _messagesCollection.doc(docId);
-    db.runTransaction((transaction) async {
+    FirebaseFirestore.instance.runTransaction((transaction) async {
       final snapshot = await transaction.get(docRef);
       if (snapshot.get(MessageField.IS_GROUP) == true) {
         for (int i = 0; i < mem.length; i++) {
@@ -102,6 +130,8 @@ class MessageService {
         }
         docRef.update({MessageField.MEMBERS: mem});
       } else {
+        print(uId);
+        print(snapshot.get(MessageField.SENDER_ID));
         if (snapshot.get(MessageField.SENDER_ID) == uId) {
           docRef.update({MessageField.SENDER_UNREAD: 0});
         } else {
@@ -111,6 +141,7 @@ class MessageService {
     });
   }
 
+//............
 //............ Get message request status
   Stream<Messagemodel> getMessageRequest(String docId) {
     return _messagesCollection
@@ -339,8 +370,10 @@ class MessageService {
 //...... foew now only for add new group member (make same for getting users for start new chat)
   Future<List<UserModel>> getUsers(String name) async {
     try {
-      QuerySnapshot querySnapshot =
-          await db.collection('USER').where('user name', isEqualTo: name).get();
+      QuerySnapshot querySnapshot = await db
+          .collection('USER')
+          .where('user name', isGreaterThanOrEqualTo: name)
+          .get();
 
       return querySnapshot.docs
           .map((doc) => UserModel.fromMap(doc.data() as Map<String, dynamic>))

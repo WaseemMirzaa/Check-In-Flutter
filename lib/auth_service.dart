@@ -37,8 +37,9 @@ Future<bool> signUp(
                 UserKey.UID: auth.currentUser!.uid,
                 UserKey.CHECKED_IN: false,
                 UserKey.IS_VERIFIED: false,
-                UserKey.DEVICE_TOKEN:
-                    FieldValue.arrayUnion([FCMManager.fcmToken!])
+                // UserKey.DEVICE_TOKEN:
+                //     FieldValue.arrayUnion([FCMManager.fcmToken!])
+                UserKey.DEVICE_TOKEN: [FCMManager.fcmToken!]
               },
             )
                 // .then((value) async => await toModal(context))
@@ -62,7 +63,8 @@ Future<void> login(email, password, context) async {
       // print(FCMManager.fcmToken!);
       snap.collection(Collections.USER).doc(value.user!.uid).update(
         {
-          UserKey.DEVICE_TOKEN: FieldValue.arrayUnion([FCMManager.fcmToken!])
+          // UserKey.DEVICE_TOKEN: FieldValue.arrayUnion([FCMManager.fcmToken!])
+          UserKey.DEVICE_TOKEN: [FCMManager.fcmToken!]
         },
       );
       // Temporary --Save userid in global userid for chat
@@ -93,6 +95,7 @@ Future<void> logout(context) async {
     UserKey.CHECKED_IN: false,
     CourtKey.COURT_LAT: FieldValue.delete(),
     CourtKey.COURT_LNG: FieldValue.delete(),
+    UserKey.DEVICE_TOKEN: []
   });
   auth.signOut().then(
         (value) =>

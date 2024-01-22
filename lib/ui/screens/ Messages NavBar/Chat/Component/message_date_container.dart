@@ -13,12 +13,24 @@ class MessageDateContainer extends StatelessWidget {
   int? index;
   Chatmodel? chat;
   bool? mymsg;
-  MessageDateContainer({super.key, this.index, this.chat, this.mymsg});
+  bool? showLastSeen;
+  String? seenTime;
+  bool? isGroup;
+  MessageDateContainer(
+      {super.key,
+      this.index,
+      this.chat,
+      this.mymsg,
+      this.seenTime,
+      this.showLastSeen,
+      this.isGroup});
 
   @override
   Widget build(BuildContext context) {
     String timeseperate = chat!.time!.split(' ')[1];
     String time = DateTimeUtils.time24to12(timeseperate);
+
+    //....
     // String dateseperate = chat!.time!.split(' ')[0];
     // String date = DateTimeUtils.formatTimestamp(c);
     return Column(
@@ -71,7 +83,17 @@ class MessageDateContainer extends StatelessWidget {
             //       )
             //     : const SizedBox()
           ],
-        )
+        ),
+        chat!.seenTimeStamp != '' && showLastSeen == true && isGroup == false
+            ? Container(
+                padding: const EdgeInsets.all(5),
+                decoration: BoxDecoration(
+                  border: Border.all(),
+                  borderRadius: BorderRadius.circular(15),
+                ),
+                child: poppinsText("Seen $seenTime", 9, medium, greyColor),
+              )
+            : const SizedBox()
       ],
     );
   }

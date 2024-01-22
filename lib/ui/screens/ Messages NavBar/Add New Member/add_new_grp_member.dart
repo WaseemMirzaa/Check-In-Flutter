@@ -23,7 +23,7 @@ class AddNewGroupMember extends GetView<AddGroupMembersController> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomAppbar(
-        title: poppinsText(TempLanguage.newMessage, 15, bold, blackColor),
+        title: poppinsText(TempLanguage.addMember, 15, bold, blackColor),
         actions: [
           Obx(() => controller.mydata.isNotEmpty
               ? TextButton(
@@ -79,7 +79,7 @@ class AddNewGroupMember extends GetView<AddGroupMembersController> {
               hintText: TempLanguage.search,
               onChanged: (value) {
                 controller.searchQuery.value = value;
-                controller.getUser();
+                controller.updateSearchQuery(value);
               },
             ),
           ),
@@ -91,7 +91,7 @@ class AddNewGroupMember extends GetView<AddGroupMembersController> {
                 )
               : Expanded(
                   child: FutureBuilder(
-                  future: controller.getUser(),
+                  future: Future.value(controller.userDataList),
                   builder: (context, snapshot) {
                     return Obx(() => controller.userDataList.isEmpty
                         ? Center(

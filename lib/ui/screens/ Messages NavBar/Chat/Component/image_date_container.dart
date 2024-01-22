@@ -12,7 +12,17 @@ class ImageDateContainer extends StatelessWidget {
   int? index;
   Chatmodel? chat;
   bool? mymsg;
-  ImageDateContainer({super.key, this.index, this.chat, this.mymsg});
+  bool? showLastSeen;
+  String? seenTime;
+  bool? isGroup;
+  ImageDateContainer(
+      {super.key,
+      this.index,
+      this.chat,
+      this.mymsg,
+      this.seenTime,
+      this.showLastSeen,
+      this.isGroup});
 
   @override
   Widget build(BuildContext context) {
@@ -54,7 +64,17 @@ class ImageDateContainer extends StatelessWidget {
             //       )
             //     : const SizedBox()
           ],
-        )
+        ),
+        chat!.seenTimeStamp != '' && showLastSeen == true && isGroup == false
+            ? Container(
+                padding: const EdgeInsets.all(5),
+                decoration: BoxDecoration(
+                  border: Border.all(),
+                  borderRadius: BorderRadius.circular(15),
+                ),
+                child: poppinsText("Seen $seenTime", 9, medium, greyColor),
+              )
+            : const SizedBox()
       ],
     );
   }

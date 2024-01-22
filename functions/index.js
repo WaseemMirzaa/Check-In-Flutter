@@ -110,7 +110,9 @@ exports.onAdditionalLocationWrite = functions.firestore
 
 // Cloud Function for push notification
 exports.sendNotification = functions.https.onRequest(async (req, res) => {
-  const {token, notificationType, title, body, transactionId, peer} = req.body;
+  const {token, notificationType, title, body, docId, name, isGroup, image,
+    memberIds} = req.body;
+
 
   const message = {
     notification: {
@@ -119,8 +121,11 @@ exports.sendNotification = functions.https.onRequest(async (req, res) => {
     },
     data: {
       notificationType: notificationType,
-      peer: peer,
-      transactionId: transactionId,
+      docId: docId,
+      name: name,
+      isGroup: isGroup.toString(),
+      image: image,
+      memberIds: JSON.stringify(memberIds),
     },
     apns: {
       payload: {
@@ -141,6 +146,7 @@ exports.sendNotification = functions.https.onRequest(async (req, res) => {
     console.log("Successfully sent message:", response);
     res.status(200).send("Notification sent");
   } catch (error) {
+    console.log("Successfully sent message:", req);
     console.error("Error sending message:", error);
     res.status(500).send("Error sending notification");
   }

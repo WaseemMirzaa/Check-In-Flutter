@@ -14,6 +14,7 @@ import 'package:check_in/utils/colors.dart';
 import 'package:check_in/utils/styles.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
 import 'package:sizer/sizer.dart';
 import '../../../../utils/gaps.dart';
@@ -23,10 +24,24 @@ import 'Component/message_date_container.dart';
 import 'Component/send_message_container.dart';
 
 class ChatScreen extends GetView<ChatController> {
-  ChatScreen({super.key});
+  // RxString? name;
+  // bool? isGroup;
+  // RxString? image;
+  // RxList? memberId;
+  // RxString? senderName;
+  ChatScreen({super.key}
+      // {super.key,
+      // this.name,
+      // this.isGroup,
+      // this.image,
+      // this.memberId,
+      // this.senderName}
+      );
   var userController = Get.find<UserController>();
   @override
   Widget build(BuildContext context) {
+    //  for update last seen
+    // controller.updateLastSeenMethod();
     return Scaffold(
       appBar: ChatAppbar(
           name: controller.name,
@@ -39,7 +54,9 @@ class ChatScreen extends GetView<ChatController> {
                               GroupdetailScreen(docId: controller.docId.value))
                       .then((_) => null);
                 }
-              : () {}),
+              : () {
+                  // controller.updateLastSeenMethod();
+                }),
       body: Column(
         children: [
           Expanded(
@@ -51,16 +68,33 @@ class ChatScreen extends GetView<ChatController> {
                     } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
                       return Center(child: Text(TempLanguage.noConversation));
                     } else {
+                      // Find the last seen message
+                      var lastSeenMessage = snapshot.data!.firstWhere(
+                          (message) =>
+                              message.seenTimeStamp != "" &&
+                              message.id == userController.userModel.value.uid,
+                          orElse: () => Chatmodel());
                       return ListView.builder(
                           padding: const EdgeInsets.only(bottom: 10),
                           reverse: true,
                           itemCount: snapshot.data!.length,
                           itemBuilder: (context, index) {
+                            // Check if the current message is the last seen message
+                            bool showLastSeen =
+                                snapshot.data![index] == lastSeenMessage;
+
+                            String seenTime = '';
                             var chat = snapshot.data![index];
                             bool mymsg =
                                 chat.id == userController.userModel.value.uid
                                     ? true
                                     : false;
+                            if (chat.seenTimeStamp != '') {
+                              DateTime dateTime =
+                                  DateTime.parse(chat.seenTimeStamp!);
+                              seenTime =
+                                  DateFormat('d MMM hh:mm a').format(dateTime);
+                            }
                             return Padding(
                               padding: EdgeInsets.only(
                                 left: mymsg ? 0 : 14,
@@ -91,7 +125,11 @@ class ChatScreen extends GetView<ChatController> {
                                       ? MessageDateContainer(
                                           index: index,
                                           chat: chat,
-                                          mymsg: mymsg)
+                                          mymsg: mymsg,
+                                          showLastSeen: showLastSeen,
+                                          seenTime: seenTime,
+                                          isGroup:controller.isgroup
+                                        )
                                       : GestureDetector(
                                           onTap: () {
                                             showGeneralDialog(
@@ -110,9 +148,12 @@ class ChatScreen extends GetView<ChatController> {
                                                 });
                                           },
                                           child: ImageDateContainer(
-                                              index: index,
-                                              chat: chat,
-                                              mymsg: mymsg),
+                                            index: index,
+                                            chat: chat,
+                                            mymsg: mymsg,
+                                            seenTime: seenTime,
+                                            showLastSeen: showLastSeen,
+                                          ),
                                         )
                                 ],
                               ),
@@ -192,9 +233,7 @@ class ChatScreen extends GetView<ChatController> {
                                 onTap: () {
                                   controller.updateRequestStatus(
                                       RequestStatusEnum.block.name, '', 0);
-                                  controller.sendNotificationMethod(
-                                      '',
-                                      userController.userModel.value.userName!,
+                                  controller.sendNotificationMethod('',
                                       '${userController.userModel.value.userName!} block you');
                                 },
                                 text: TempLanguage.block,
@@ -208,9 +247,7 @@ class ChatScreen extends GetView<ChatController> {
                                   controller.updateRequestStatus(
                                       RequestStatusEnum.delete.name, '', 0);
                                   Get.back();
-                                  controller.sendNotificationMethod(
-                                      '',
-                                      userController.userModel.value.userName!,
+                                  controller.sendNotificationMethod('',
                                       '${userController.userModel.value.userName!} delete message request');
                                 },
                                 text: TempLanguage.delete,
@@ -223,9 +260,7 @@ class ChatScreen extends GetView<ChatController> {
                                 onTap: () {
                                   controller.updateRequestStatus(
                                       RequestStatusEnum.accept.name, '', 0);
-                                  controller.sendNotificationMethod(
-                                      '',
-                                      userController.userModel.value.userName!,
+                                  controller.sendNotificationMethod('',
                                       '${userController.userModel.value.userName!} accept request');
                                 },
                                 text: TempLanguage.accept,
@@ -285,9 +320,7 @@ class ChatScreen extends GetView<ChatController> {
                                   RequestStatusEnum.pending.name,
                                   TempLanguage.messageRequest,
                                   1);
-                              controller.sendNotificationMethod(
-                                  '',
-                                  userController.userModel.value.userName!,
+                              controller.sendNotificationMethod('',
                                   '${userController.userModel.value.userName!} send a request message');
                             },
                             text: "${TempLanguage.requestAgain} ",
@@ -358,9 +391,7 @@ class ChatScreen extends GetView<ChatController> {
                             onTap: () {
                               controller.updateRequestStatus(
                                   RequestStatusEnum.accept.name, '', 0);
-                              controller.sendNotificationMethod(
-                                  '',
-                                  userController.userModel.value.userName!,
+                              controller.sendNotificationMethod('',
                                   "${userController.userModel.value.userName!} unblock you");
                             },
                             text: "${TempLanguage.unblock} ",
@@ -388,9 +419,7 @@ class ChatScreen extends GetView<ChatController> {
                         if (controller.chatfieldController.text.isNotEmpty) {
                           controller.sendMessage();
                           controller.sendNotificationMethod(
-                              '',
-                              userController.userModel.value.userName!,
-                              controller.chatfieldController.text);
+                              '', controller.chatfieldController.text);
                           controller.chatfieldController.clear();
                         }
                       },

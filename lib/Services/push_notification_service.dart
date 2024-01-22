@@ -1,10 +1,17 @@
 import 'dart:convert';
+import 'package:check_in/utils/Constants/global_variable.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:get/get.dart';
 import 'package:nb_utils/nb_utils.dart';
+import '../controllers/Messages/chat_controller.dart';
 import '../model/notification_model.dart';
 import 'package:http/http.dart' as http;
+
+import '../ui/screens/ Messages NavBar/Chat/chat_screen.dart';
+
+final ChatController chatcontroller = Get.find<ChatController>();
 
 class FCMManager {
   static String? fcmToken;
@@ -21,8 +28,7 @@ FlutterLocalNotificationsPlugin notificationsPlugin =
 late AndroidNotificationChannel channel;
 
 const AndroidInitializationSettings initializationSettingsAndroid =
-    AndroidInitializationSettings('@mipmap/ic_launcher');
-
+    AndroidInitializationSettings('appicon');
 DarwinInitializationSettings iosInitializationSettings =
     const DarwinInitializationSettings();
 
@@ -65,9 +71,9 @@ class PushNotificationServices {
     // request permission to receive push notifications
     NotificationSettings settings = await _fcm.requestPermission();
 
-    print('Step 1');
+    // print('Step 1');
     if (settings.authorizationStatus == AuthorizationStatus.authorized) {
-      print('Step 2');
+      // print('Step 2');
       // handle received push notification messages
       // FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
       //   print('Received message: ${message.notification?.title}');
@@ -99,18 +105,59 @@ class PushNotificationServices {
       //   }
       // });
 
-      print('Step 3');
+      // print('Step 3');
+      // FirebaseMessaging.onBackgroundMessage((RemoteMessage message) async {
+      //   log("data background is ${message.data}");
+      //   // int notificationBadge = 0;
+      //   if (message.data.isNotEmpty) {
+      //     //RemoteNotification? notification = message.notification;
+      //     String notificationType = message.data['notificationType'];
+      //     NotificationModel.type = notificationType;
+      //     NotificationModel.docId = message.data['docId'];
+      //     NotificationModel.name = message.data['name'];
+      //     NotificationModel.image = message.data['image'];
+      //     NotificationModel.isGroup = bool.parse(message.data['isGroup']);
+      //     NotificationModel.memberIds = json.decode(message.data['memberIds']);
+      //   }
+      //   notificationsPlugin.show(
+      //       1,
+      //       message.notification?.title,
+      //       message.notification?.body,
+      //       NotificationDetails(
+      //           android: AndroidNotificationDetails(
+      //             channel.id,
+      //             channel.name,
+      //             importance: Importance.high,
+      //             color: Colors.blue,
+      //             playSound: true,
+      //             icon: '@mipmap/ic_launcher',
+      //             channelShowBadge: true,
+      //           ),
+      //           iOS: const DarwinNotificationDetails(
+      //             presentSound: true,
+      //             presentAlert: true,
+      //             presentBadge: true,
+      //             // badgeNumber: notificationBadge
+      //           )));
+      // });
+
       FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
-        log("data ${message.data}");
+        log("data is:: ${message.data}");
+        print(chatcontroller.docId);
+        print("Global ${GlobalVariable.docId}");
         // int notificationBadge = 0;
         if (message.data.isNotEmpty) {
           //RemoteNotification? notification = message.notification;
           String notificationType = message.data['notificationType'];
           NotificationModel.type = notificationType;
-          NotificationModel.transactionId = message.data['transactionId'];
-          NotificationModel.peer = message.data['peer'];
-          print("notification type");
-          print(NotificationModel.type);
+          NotificationModel.docId = message.data['docId'];
+          NotificationModel.name = message.data['name'];
+          NotificationModel.image = message.data['image'];
+          NotificationModel.isGroup = bool.parse(message.data['isGroup']);
+          NotificationModel.memberIds = json.decode(message.data['memberIds']);
+
+          // print("notification type");
+          // print(NotificationModel.type);
 
           // notificationBadge = getIntAsync(
           //     SharedPreferenceKey.NOTIFICATION_BADGE,
@@ -123,26 +170,29 @@ class PushNotificationServices {
         // if (message.data['body'] != null) {
 
         // if (isAndroid) {//Ios is showing double notifications if this condition is not present
-        notificationsPlugin.show(
-            1,
-            message.notification?.title,
-            message.notification?.body,
-            NotificationDetails(
-                android: AndroidNotificationDetails(
-                  channel.id,
-                  channel.name,
-                  importance: Importance.high,
-                  color: Colors.blue,
-                  playSound: true,
-                  icon: '@mipmap/ic_launcher',
-                  channelShowBadge: true,
-                ),
-                iOS: const DarwinNotificationDetails(
-                  presentSound: true,
-                  presentAlert: true,
-                  presentBadge: true,
-                  // badgeNumber: notificationBadge
-                )));
+        if (GlobalVariable.docId != NotificationModel.docId) {
+          notificationsPlugin.show(
+              1,
+              message.notification?.title,
+              message.notification?.body,
+              NotificationDetails(
+                  android: AndroidNotificationDetails(
+                    channel.id,
+                    channel.name,
+                    importance: Importance.high,
+                    color: Colors.blue,
+                    playSound: true,
+                    icon: 'appicon',
+                    channelShowBadge: true,
+                  ),
+                  iOS: const DarwinNotificationDetails(
+                    presentSound: true,
+                    presentAlert: true,
+                    presentBadge: true,
+                    // badgeNumber: notificationBadge
+                  )));
+        }
+        //....
         // }
         // }
       });
@@ -152,13 +202,24 @@ class PushNotificationServices {
       // handle notification messages when the app is in the background or terminated
       FirebaseMessaging.onMessageOpenedApp
           .listen((RemoteMessage message) async {
-        print('Opened message: ${message.notification?.title}');
+        print('in notification');
+        //.............................
+        chatcontroller.docId.value = NotificationModel.docId;
+        chatcontroller.name.value = NotificationModel.name;
+        chatcontroller.isgroup = NotificationModel.isGroup;
+        chatcontroller.image.value = NotificationModel.image;
+        chatcontroller.memberId.value = NotificationModel.memberIds;
+        //.............................
+
+        Get.to(() => ChatScreen());
+
+        // print('Opened message: ${message.notification?.title}');
         // handle the opened message here, for example by navigating to a specific screen
         String notificationType = message.data['notificationType'];
         NotificationModel.type = notificationType;
-        print("notification type");
+        // print("notification types");
 
-        print(NotificationModel.type);
+        // print(NotificationModel.type);
         // if (notificationType == PushNotificationType.msg) {
 
         //   print('Step 4');
@@ -181,16 +242,27 @@ class PushNotificationServices {
         //   navBarController.currentIndex.value = 3;
         //   Get.to(() => Home());
         // }
-        print("2");
-        print(NotificationModel.type);
+        // print("2");
+        // print(NotificationModel.type);
       });
       //
 
-      print('Step 6');
+      // print('Step 6');
       await notificationsPlugin.initialize(initializationSettings,
           onDidReceiveNotificationResponse: (payload) async {
-        print("notification type");
-        print(NotificationModel.type);
+        // print("notification type is");
+        print('in notification');
+        // print(NotificationModel.transactionId);
+        //.............................
+        chatcontroller.docId.value = NotificationModel.docId;
+        chatcontroller.name.value = NotificationModel.name;
+        chatcontroller.isgroup = NotificationModel.isGroup;
+        chatcontroller.image.value = NotificationModel.image;
+        chatcontroller.memberId.value = NotificationModel.memberIds;
+        //.............................
+
+        Get.to(() => ChatScreen());
+
         // if (NotificationModel.type == PushNotificationType.msg) {
 
         //   print('Step 7');
@@ -214,14 +286,16 @@ class PushNotificationServices {
   }
 }
 
-Future<void> sendNotification({
-  required String token,
-  required String notificationType,
-  required String title,
-  required String msg,
-  String uid = "",
-  String transactionId = "",
-}) async {
+Future<void> sendNotification(
+    {required String token,
+    required String notificationType,
+    required String title,
+    required String msg,
+    required String docId,
+    required bool isGroup,
+    required String name,
+    required String image,
+    required List memberIds}) async {
   var completeUrl =
       'https://us-central1-check-in-7ecd7.cloudfunctions.net/sendNotification';
   final headers = {'Content-Type': 'application/json'};
@@ -230,8 +304,11 @@ Future<void> sendNotification({
     'title': title,
     'body': msg,
     'notificationType': notificationType,
-    'peer': uid,
-    'transactionId': transactionId,
+    "docId": docId,
+    "name": name,
+    "isGroup": isGroup,
+    "image": image,
+    "memberIds": memberIds
   });
 
   try {

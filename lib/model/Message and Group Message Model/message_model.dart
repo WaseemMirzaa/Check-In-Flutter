@@ -3,6 +3,7 @@ import 'package:check_in/core/constant/constant.dart';
 class Messagemodel {
   String? id;
   String? name;
+  String? yourname;
   String? image;
   String? lastmessage;
   num? unreadmsg;
@@ -17,6 +18,7 @@ class Messagemodel {
   bool? showMessageTile;
   Messagemodel({
     this.name,
+    this.yourname,
     this.lastmessage,
     this.id,
     this.unreadmsg,
@@ -33,23 +35,23 @@ class Messagemodel {
   });
 
   factory Messagemodel.fromJson(Map<String, dynamic> json,
-      {name, image, unread, showMessageTile}) {
+      {name, image, unread, showMessageTile, yourName}) {
     return Messagemodel(
-      id: json[MessageField.ID],
-      name: name ?? '',
-      image: image ?? '',
-      lastmessage: json[MessageField.LAST_MESSAGE],
-      unreadmsg: unread ?? 0,
-      isgroup: json[MessageField.IS_GROUP],
-      timeStamp: json[MessageField.TIME_STAMP],
-      senderId: json[MessageField.SENDER_ID],
-      requestStatus: json[MessageField.REQUEST_STATUS],
-      senderName: json[MessageField.SENDER_NAME],
-      recieverName: json[MessageField.RECIEVER_NAME],
-      recieverId: json[MessageField.RECIEVER_ID],
-      memberIds: json[MessageField.MEMBER_IDS],
-      showMessageTile: showMessageTile,
-    );
+        id: json[MessageField.ID],
+        name: name ?? '',
+        image: image ?? '',
+        lastmessage: json[MessageField.LAST_MESSAGE],
+        unreadmsg: unread ?? 0,
+        isgroup: json[MessageField.IS_GROUP],
+        timeStamp: json[MessageField.TIME_STAMP],
+        senderId: json[MessageField.SENDER_ID],
+        requestStatus: json[MessageField.REQUEST_STATUS],
+        senderName: json[MessageField.SENDER_NAME],
+        recieverName: json[MessageField.RECIEVER_NAME],
+        recieverId: json[MessageField.RECIEVER_ID],
+        memberIds: json[MessageField.MEMBER_IDS],
+        showMessageTile: showMessageTile,
+        yourname: yourName);
   }
   Map<String, dynamic> toJson() {
     final data = <String, dynamic>{};

@@ -1,6 +1,5 @@
 // ignore_for_file: avoid_print
 import 'package:check_in/core/constant/temp_language.dart';
-import 'package:check_in/ui/screens/News%20Feed%20NavBar/News%20Feed/news_feed_screen.dart';
 import 'package:check_in/ui/screens/check_in.dart';
 import 'package:check_in/ui/screens/profile_screen.dart';
 import 'package:check_in/ui/screens/start.dart';
@@ -152,7 +151,8 @@ class _HomeState extends State<Home> with AutomaticKeepAliveClientMixin {
   final List<Widget> _buildScreens = [
     const CheckIn(),
     MessageScreen(),
-    const NewsFeedScreen(),
+    //................ News Feed
+    // const NewsFeedScreen(),
     const HistoryView(),
     const ProfileScreen()
     //KeyedSubtree(key: UniqueKey(), child: const ProfileScreen()),
@@ -176,29 +176,31 @@ class _HomeState extends State<Home> with AutomaticKeepAliveClientMixin {
         iconColor:
             navBarController.controller.index == 1 ? whiteColor : blackColor,
       ).getBottomNavItem(),
+
+      //.......................... News Feed
+      // BottomNav(
+      //   label: 'NewsFeed',
+      //   boxColor:
+      //       navBarController.controller.index == 2 ? greenColor : whiteColor,
+      //   icon: "calendar",
+      //   iconColor:
+      //       navBarController.controller.index == 2 ? whiteColor : blackColor,
+      // ).getBottomNavItem(),
       BottomNav(
-        label: 'NewsFeed',
+        label: 'History',
         boxColor:
             navBarController.controller.index == 2 ? greenColor : whiteColor,
-        icon: "calendar",
+        icon: "Icon awesome-history",
         iconColor:
             navBarController.controller.index == 2 ? whiteColor : blackColor,
       ).getBottomNavItem(),
       BottomNav(
-        label: 'History',
-        boxColor:
-            navBarController.controller.index == 3 ? greenColor : whiteColor,
-        icon: "Icon awesome-history",
-        iconColor:
-            navBarController.controller.index == 3 ? whiteColor : blackColor,
-      ).getBottomNavItem(),
-      BottomNav(
         label: 'Profile',
         boxColor:
-            navBarController.controller.index == 4 ? greenColor : whiteColor,
+            navBarController.controller.index == 3 ? greenColor : whiteColor,
         icon: "Icon material-person",
         iconColor:
-            navBarController.controller.index == 4 ? whiteColor : blackColor,
+            navBarController.controller.index == 3 ? whiteColor : blackColor,
       ).getBottomNavItem(),
     ];
   }

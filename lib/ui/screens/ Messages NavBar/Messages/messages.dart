@@ -1,3 +1,4 @@
+import 'package:check_in/controllers/Messages/chat_controller.dart';
 import 'package:check_in/controllers/user_controller.dart';
 import 'package:check_in/core/constant/temp_language.dart';
 import 'package:check_in/model/Message%20and%20Group%20Message%20Model/message_model.dart';
@@ -9,8 +10,8 @@ import 'package:check_in/utils/gaps.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
+import '../../../../utils/Constants/global_variable.dart';
 import '../../../../utils/loader.dart';
-import '../../../../controllers/Messages/chat_controller.dart';
 import '../../../../controllers/Messages/messages_controller.dart';
 
 class MessageScreen extends GetView<MessageController> {
@@ -19,6 +20,9 @@ class MessageScreen extends GetView<MessageController> {
   final UserController userController = Get.find<UserController>();
   @override
   Widget build(BuildContext context) {
+    //   for making null docid
+
+    GlobalVariable.docId = '';
     return Scaffold(
       // floatingActionButton: FloatingactionButton(
       //   ontap: () {},
@@ -48,7 +52,6 @@ class MessageScreen extends GetView<MessageController> {
                     } else {
                       return ListView.builder(
                           // padding: const EdgeInsets.only(top: 14),
-
                           itemCount: snapshot.data!.length,
                           itemBuilder: (context, index) {
                             var message = snapshot.data![index];
@@ -64,18 +67,27 @@ class MessageScreen extends GetView<MessageController> {
                                     child: MessageListTile(
                                       message: snapshot.data![index],
                                       ontap: () {
-                                        chatcontroller.docId.value =
-                                            message.id!;
+                                        GlobalVariable.docId = chatcontroller
+                                            .docId.value = message.id!;
+                                        //.........................
                                         chatcontroller.name.value =
                                             message.name!;
                                         chatcontroller.isgroup =
                                             message.isgroup!;
                                         chatcontroller.image.value =
                                             message.image!;
-                                        chatcontroller.memberId.value = message.memberIds!;
+                                        chatcontroller.memberId.value =
+                                            message.memberIds!;
+                                        chatcontroller.senderName.value =
+                                            message.yourname!;
+                                        //...............
+                                        // chatcontroller.updateLastSeenMethod();
                                         pushNewScreen(
                                           context,
-                                          screen: ChatScreen(),
+                                          screen: ChatScreen(
+                                              //   name: message.name!.obs,isGroup: message.isgroup,
+                                              // image:message.image!.obs,memberId: message.memberIds!.obs,senderName: message.senderName!.obs,
+                                              ),
                                         );
                                       },
                                     ),

@@ -14,6 +14,7 @@ class ChatController extends GetxController {
   RxString name = ''.obs;
   RxList memberId = [].obs;
   RxString image = ''.obs;
+  RxString senderName = ''.obs;
   RxString sendMsgField = ''.obs;
   Rx<XFile?> fileImage = Rx<XFile?>(null);
   bool isgroup = false;
@@ -34,8 +35,14 @@ class ChatController extends GetxController {
     chatFieldFocusNode = FocusNode();
   }
 
+  Future<void> updateLastSeenMethod() async {
+    chatService.updateLastSeen(
+        docId.value, userController.userModel.value.uid!);
+  }
+
   //............. get all conversation
   Stream<List<Chatmodel>> getConversation() {
+    updateLastSeenMethod();
     return chatService.getConversation(
         docId.value, userController.userModel.value.uid!);
   }
@@ -50,7 +57,7 @@ class ChatController extends GetxController {
     chatService.updateRequestStatus(docId.value, status, msg, unread);
   }
 
-//.............. send chat
+  //.............. send chat
   Future<void> sendMessage() async {
     sendMsgLoader.value = true;
 
@@ -65,8 +72,8 @@ class ChatController extends GetxController {
       message = fileImage.value!.path;
       type = 'image';
     }
-    Chatmodel chatmodel =
-        Chatmodel(id: uid, message: message, time: time, type: type);
+    Chatmodel chatmodel = Chatmodel(
+        id: uid, message: message, time: time, type: type, seenTimeStamp: "");
     await chatService.sendMessage(docId.value, chatmodel);
 
     sendMsgLoader.value = false;
@@ -74,26 +81,30 @@ class ChatController extends GetxController {
 
 //.............. get device token
   Future<void> sendNotificationMethod(
-      String notificationType, String title, String msg) async {
+      String notificationType, String msg) async {
+    // print(senderName);
+    // print(memberId);
     for (var element in memberId) {
       if (element != userController.userModel.value.uid) {
-      
         String deviceToken = await chatService.getDeviceToken(element);
-        print(deviceToken);
-            sendNotification(
-        token: deviceToken,
-        notificationType: notificationType,
-        title: title,
-        msg: msg);
+        sendNotification(
+            token: deviceToken,
+            notificationType: notificationType,
+            title: senderName.value,
+            msg: msg,
+            docId: docId.value,
+            isGroup: isgroup,
+            image: image.value,
+            name: senderName.value,
+            memberIds: memberId);
       }
     }
-
   }
 
   @override
   void onClose() {
-    super.onClose();
     chatfieldController.dispose();
     chatFieldFocusNode.dispose();
+    super.onClose();
   }
 }
