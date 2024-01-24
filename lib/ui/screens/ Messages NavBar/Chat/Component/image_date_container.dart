@@ -9,7 +9,7 @@ import '../../../../../utils/styles.dart';
 
 // ignore: must_be_immutable
 class ImageDateContainer extends StatelessWidget {
-  int? index;
+  // int? index;
   Chatmodel? chat;
   bool? mymsg;
   bool? showLastSeen;
@@ -17,7 +17,7 @@ class ImageDateContainer extends StatelessWidget {
   bool? isGroup;
   ImageDateContainer(
       {super.key,
-      this.index,
+      // this.index,
       this.chat,
       this.mymsg,
       this.seenTime,

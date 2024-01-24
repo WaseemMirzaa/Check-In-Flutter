@@ -13,6 +13,7 @@ import 'package:check_in/utils/Constants/enums.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 
+import '../controllers/Messages/firestore_pagination.dart';
 import '../model/Message and Group Message Model/message_model.dart';
 
 List<dynamic> mem = [];
@@ -23,6 +24,33 @@ class MessageService {
   final CollectionReference _messagesCollection =
       FirebaseFirestore.instance.collection(Collections.MESSAGES);
   final FirebaseStorage _storage = FirebaseStorage.instance;
+
+  FirestoreQueryBuilder<Messagemodel> buildChatMessageQueryBuilder(
+      String myId, DocumentSnapshot? lastVisible) {
+    Query query = _messagesCollection
+        .where(MessageField.MEMBER_IDS, arrayContains: myId)
+        .orderBy('timestamp', descending: true);
+
+    if (lastVisible != null) {
+      query = query.startAfterDocument(lastVisible);
+    }
+
+    return FirestoreQueryBuilder<Messagemodel>(query);
+  }
+
+  FirestoreQueryBuilder<Chatmodel> buildConversationQueryBuilder(
+      String docId, DocumentSnapshot? lastVisible) {
+    Query query = _messagesCollection
+        .doc(docId)
+        .collection(Collections.CHAT)
+        .orderBy(ChatField.TIME_STAMP, descending: true);
+
+    if (lastVisible != null) {
+      query = query.startAfterDocument(lastVisible);
+    }
+
+    return FirestoreQueryBuilder<Chatmodel>(query);
+  }
 
 //............ Get Message
   Stream<List<Messagemodel>> getChatMessage(String myId) {
@@ -75,6 +103,7 @@ class MessageService {
                   yourName: yourname);
             }).toList());
   }
+
 
 //............ Get conversations
   Stream<List<Chatmodel>> getConversation(String docId, String uId) {
