@@ -182,7 +182,7 @@ class MessageService {
   }
 
 //............ Send message
-  Future<void> sendMessage(String docId, Chatmodel chatmodel) async {
+  Future<DocumentSnapshot?> sendMessage(String docId, Chatmodel chatmodel) async {
     final batch = FirebaseFirestore.instance.batch();
     try {
       final docRef = _messagesCollection.doc(docId);
@@ -197,9 +197,11 @@ class MessageService {
         chatmodel.message = image;
       }
 
-      CollectionReference chatCollection =
-          _messagesCollection.doc(docId).collection(Collections.CHAT);
-      batch.set(chatCollection.doc(), chatmodel.toJson());
+      CollectionReference chatCollection = _messagesCollection.doc(docId).collection(Collections.CHAT);
+
+      // Get a reference to the newly added document
+      DocumentReference newDocumentRef = chatCollection.doc();
+      batch.set(newDocumentRef, chatmodel.toJson());
 
       CollectionReference messageCollection = _messagesCollection;
       batch.update(messageCollection.doc(docId), {
@@ -226,8 +228,13 @@ class MessageService {
         }
       }
       await batch.commit();
+
+      // Fetch and return the snapshot of the newly added document
+      DocumentSnapshot newDocumentSnapshot = await newDocumentRef.get();
+      return newDocumentSnapshot;
     } catch (e) {
       print('Error sending message: $e');
+      return null;
     }
   }
 
@@ -413,6 +420,27 @@ class MessageService {
     }
   }
 
+  Future<List<DocumentSnapshot>> getUsersDocsWithPagination(String name, int resultsPerPage, DocumentSnapshot? lastDocument) async {
+    try {
+      Query query = db
+          .collection(Collections.USER)
+          .where(UserKey.PARAMS, arrayContains: name)
+          .limit(resultsPerPage);
+
+      if (lastDocument != null) {
+        query = query.startAfterDocument(lastDocument);
+      }
+
+      QuerySnapshot querySnapshot = await query.get();
+
+      return querySnapshot.docs;
+    } catch (e) {
+      print('Error: $e');
+      rethrow;
+    }
+  }
+
+
 //........... Start new chat
   Future<String> startNewChat(
       List ids, String senderName, String recieverName) async {
@@ -564,6 +592,6 @@ class MessageService {
     Map<String, dynamic>? userData =
         userSnapshot.data() as Map<String, dynamic>;
     List<dynamic>? deviceTokens = userData[UserKey.DEVICE_TOKEN];
-    return deviceTokens!.first;
+    return deviceTokens?.first ?? '';
   }
 }

@@ -20,6 +20,7 @@ class UserKey {
   static const HOME_COURT = "home court";
   static const GOLDEN_CHECK_IN = "goldenCheckin";
   static const DEVICE_TOKEN = "deviceToken";
+  static const PARAMS = "params";
 }
 
 class CourtKey {

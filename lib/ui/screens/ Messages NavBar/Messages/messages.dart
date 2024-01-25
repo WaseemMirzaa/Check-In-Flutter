@@ -84,7 +84,7 @@ class MessageScreen extends GetView<MessageController> {
                                         // chatcontroller.updateLastSeenMethod();
                                         pushNewScreen(
                                           context,
-                                          screen: ChatScreen(
+                                          screen: const ChatScreen(
                                               //   name: message.name!.obs,isGroup: message.isgroup,
                                               // image:message.image!.obs,memberId: message.memberIds!.obs,senderName: message.senderName!.obs,
                                               ),

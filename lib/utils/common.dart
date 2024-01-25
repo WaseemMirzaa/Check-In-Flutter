@@ -48,3 +48,13 @@ var courtsList = [
         ) ??
         false; //if showDialouge had returned null, then return false
   }
+
+List<String> setSearchParam(String caseNumber) {
+  List<String> caseSearchList = [];
+  for (int i = 0; i < caseNumber.length; i++) {
+    for (int j = i + 1; j <= caseNumber.length; j++) {
+      caseSearchList.add(caseNumber.substring(i, j));
+    }
+  }
+  return caseSearchList;
+}

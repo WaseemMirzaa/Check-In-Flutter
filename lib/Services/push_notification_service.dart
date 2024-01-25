@@ -16,9 +16,9 @@ final ChatController chatcontroller = Get.find<ChatController>();
 class FCMManager {
   static String? fcmToken;
 
-  static Future<void> getFCMToken() async {
+  static Future<String> getFCMToken() async {
     await FirebaseMessaging.instance.requestPermission();
-    fcmToken = await FirebaseMessaging.instance.getToken();
+    return await FirebaseMessaging.instance.getToken() ?? '';
   }
 }
 

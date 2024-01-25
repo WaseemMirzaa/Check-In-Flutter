@@ -17,10 +17,32 @@ import 'package:get/get.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
 import 'package:sizer/sizer.dart';
 
-class NewMessageScreen extends GetView<NewMessageController> {
+class NewMessageScreen extends StatefulWidget {
   NewMessageScreen({super.key});
+
+  @override
+  State<NewMessageScreen> createState() => _NewMessageScreenState();
+}
+
+class _NewMessageScreenState extends State<NewMessageScreen> {
   var userController = Get.find<UserController>();
+  var controller = Get.find<NewMessageController>();
   var chatcontroller = Get.find<ChatController>();
+  late ScrollController _scrollController;
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController = ScrollController()
+      ..addListener(_scrollListener);
+  }
+
+  void _scrollListener() {
+    if (_scrollController.position.pixels == _scrollController.position.maxScrollExtent) {
+      controller.fetchMore();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     print("${controller.searchQuery.value}sarch");
@@ -154,6 +176,7 @@ class NewMessageScreen extends GetView<NewMessageController> {
                                 regular, greyColor),
                           )
                         : ListView.builder(
+                            controller: _scrollController,
                             itemCount: controller.userDataList.length,
                             itemBuilder: (context, index) {
                               return Padding(

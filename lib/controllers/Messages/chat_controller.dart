@@ -2,6 +2,7 @@ import 'package:check_in/Services/push_notification_service.dart';
 import 'package:check_in/controllers/user_controller.dart';
 import 'package:check_in/model/Message%20and%20Group%20Message%20Model/chat_model.dart';
 import 'package:check_in/model/Message%20and%20Group%20Message%20Model/message_model.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
@@ -58,7 +59,7 @@ class ChatController extends GetxController {
   }
 
   //.............. send chat
-  Future<void> sendMessage() async {
+  Future<DocumentSnapshot?> sendMessage() async {
     sendMsgLoader.value = true;
 
     String time = DateTime.now().toString();
@@ -74,9 +75,10 @@ class ChatController extends GetxController {
     }
     Chatmodel chatmodel = Chatmodel(
         id: uid, message: message, time: time, type: type, seenTimeStamp: "");
-    await chatService.sendMessage(docId.value, chatmodel);
+    DocumentSnapshot? newMessageDoc = await chatService.sendMessage(docId.value, chatmodel);
 
     sendMsgLoader.value = false;
+    return newMessageDoc;
   }
 
 //.............. get device token

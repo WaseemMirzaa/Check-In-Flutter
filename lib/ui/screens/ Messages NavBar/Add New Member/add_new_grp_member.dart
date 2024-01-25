@@ -14,11 +14,34 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sizer/sizer.dart';
 
-class AddNewGroupMember extends GetView<AddGroupMembersController> {
+class AddNewGroupMember extends StatefulWidget {
   String? docId;
   AddNewGroupMember({super.key, this.docId});
+
+  @override
+  State<AddNewGroupMember> createState() => _AddNewGroupMemberState();
+}
+
+class _AddNewGroupMemberState extends State<AddNewGroupMember> {
   var userController = Get.find<UserController>();
+  var controller = Get.find<AddGroupMembersController>();
   var chatcontroller = Get.find<ChatController>();
+  late ScrollController _scrollController;
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController = ScrollController()
+      ..addListener(_scrollListener);
+  }
+
+  void _scrollListener() {
+    if (_scrollController.position.pixels ==
+        _scrollController.position.maxScrollExtent) {
+      controller.fetchMore();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -28,7 +51,7 @@ class AddNewGroupMember extends GetView<AddGroupMembersController> {
           Obx(() => controller.mydata.isNotEmpty
               ? TextButton(
                   onPressed: () async {
-                    bool res = await controller.addMember(docId!);
+                    bool res = await controller.addMember(widget.docId!);
                     // clear searchQuery value
                     controller.searchQuery.value = '';
                     if (res) {

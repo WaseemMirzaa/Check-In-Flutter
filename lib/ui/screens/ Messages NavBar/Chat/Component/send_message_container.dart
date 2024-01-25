@@ -40,8 +40,16 @@ class SendMessageContainer extends GetView<ChatController> {
         children: [
           GestureDetector(
               onTap: imageontap,
-              child: SvgPicture.asset(AppImage.chatfieldicon)),
-          horizontalGap(15),
+              //child: SvgPicture.asset(AppImage.chatfieldicon, width: 45, height: 45,)
+            child: Container(
+              decoration: BoxDecoration(
+                color: greenColor,
+                borderRadius: BorderRadius.circular(4),
+              ),
+              child: const Icon(Icons.image_outlined, color: Colors.white, size: 20,),
+            ),
+          ),
+          horizontalGap(10),
           GestureDetector(
               onTap: iconontap,
               child: SvgPicture.asset(AppImage.chatfieldsticker)),

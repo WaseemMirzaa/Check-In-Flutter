@@ -4,6 +4,7 @@ import 'package:check_in/core/constant/constant.dart';
 import 'package:check_in/model/user_modal.dart';
 import 'package:check_in/ui/screens/persistent_nav_bar.dart';
 import 'package:check_in/ui/screens/start.dart';
+import 'package:check_in/utils/common.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -27,24 +28,27 @@ Future<bool> signUp(
         // .then((value) async =>
         //     await addUserData(email: email, fullName: userName))
         .then((value) => auth.currentUser?.updateDisplayName(userName))
-        .then((value) => snap
-                .collection(Collections.USER)
-                .doc(auth.currentUser!.uid)
-                .set(
-              {
-                UserKey.USER_NAME: auth.currentUser!.displayName,
-                UserKey.EMAIL: auth.currentUser!.email,
-                UserKey.UID: auth.currentUser!.uid,
-                UserKey.CHECKED_IN: false,
-                UserKey.IS_VERIFIED: false,
-                // UserKey.DEVICE_TOKEN:
-                //     FieldValue.arrayUnion([FCMManager.fcmToken!])
-                UserKey.DEVICE_TOKEN: [FCMManager.fcmToken!]
-              },
-            )
-                // .then((value) async => await toModal(context))
-                .then((value) => pushNewScreen(context,
-                    screen: const Home(), withNavBar: false)));
+        .then((value) async {
+
+          List<String> nameSearchParams = setSearchParam(userName);
+         final token = await FCMManager.getFCMToken();
+          snap
+          .collection(Collections.USER)
+          .doc(auth.currentUser!.uid)
+          .set({
+             UserKey.USER_NAME: auth.currentUser!.displayName,
+             UserKey.EMAIL: auth.currentUser!.email,
+             UserKey.UID: auth.currentUser!.uid,
+             UserKey.CHECKED_IN: false,
+             UserKey.IS_VERIFIED: false,
+             UserKey.PARAMS: FieldValue.arrayUnion(nameSearchParams),
+             //TODO: Change it to arrayUnion
+             // UserKey.DEVICE_TOKEN:
+             //     FieldValue.arrayUnion([FCMManager.fcmToken!])
+             UserKey.DEVICE_TOKEN: [token]
+          }).then((value) => pushNewScreen(context, screen: const Home(), withNavBar: false));
+      }
+    );
   } on FirebaseAuthException catch (e) {
     print('error message ${e.message}');
     Get.snackbar('Error', e.message ?? '', snackPosition: SnackPosition.TOP);
@@ -61,12 +65,15 @@ Future<void> login(email, password, context) async {
         .signInWithEmailAndPassword(email: email, password: password)
         .then((value) async {
       // print(FCMManager.fcmToken!);
-      snap.collection(Collections.USER).doc(value.user!.uid).update(
-        {
-          // UserKey.DEVICE_TOKEN: FieldValue.arrayUnion([FCMManager.fcmToken!])
-          UserKey.DEVICE_TOKEN: [FCMManager.fcmToken!]
-        },
-      );
+      final token = await FCMManager.getFCMToken();
+      if (token.isNotEmpty) {
+        snap.collection(Collections.USER).doc(value.user!.uid).update(
+          {
+            // UserKey.DEVICE_TOKEN: FieldValue.arrayUnion([FCMManager.fcmToken!])
+            UserKey.DEVICE_TOKEN: [token]
+          },
+        );
+      }
       // Temporary --Save userid in global userid for chat
       // GlobalVariable.userid = value.user!.uid;
       await toModal(context);

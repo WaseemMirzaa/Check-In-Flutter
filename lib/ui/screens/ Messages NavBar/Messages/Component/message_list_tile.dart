@@ -23,6 +23,8 @@ class MessageListTile extends StatelessWidget {
     String time =
         message!.timeStamp == '' ? '' : DateTimeUtils.time24to12(dateseperate);
 
+    String unReadCount = message!.unreadmsg! < 10 ? '0${message!.unreadmsg.toString()}' : message!.unreadmsg.toString();
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 10),
       child: Material(
@@ -92,7 +94,7 @@ class MessageListTile extends StatelessWidget {
                             decoration: BoxDecoration(
                                 color: greenColor, shape: BoxShape.circle),
                             child: poppinsText(
-                              "0${message!.unreadmsg.toString()}",
+                              unReadCount,
                               9,
                               FontWeight.normal,
                               whiteColor,
