@@ -18,9 +18,12 @@ import 'firebase_options.dart';
 List<Map<String, dynamic>> courtlist = [];
 
 String? con;
-
+final init = Firebase.initializeApp(
+  options: Platform.isIOS ? DefaultFirebaseOptions.currentPlatform : null,
+);
 Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  await Firebase.initializeApp();
+  await init;
+  // await Firebase.initializeApp();
   await initialize();
   FlutterLocalNotificationsPlugin notification =
       FlutterLocalNotificationsPlugin();
@@ -73,15 +76,15 @@ Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
-  if (Platform.isIOS) {
-    await Firebase.initializeApp(
-      // name: "check_in",// Removing this name causes exception and show white screen on ios
-      options: DefaultFirebaseOptions.currentPlatform,
-    );
-  } else {
-    await Firebase.initializeApp();
-  }
+  await init;
+  // if (Platform.isIOS) {
+  //   await Firebase.initializeApp(
+  //     // name: "check_in",// Removing this name causes exception and show white screen on ios
+  //     options: DefaultFirebaseOptions.currentPlatform,
+  //   );
+  // } else {
+  //   await Firebase.initializeApp();
+  // }
   final PushNotificationServices pushNotificationService =
       PushNotificationServices();
   FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
