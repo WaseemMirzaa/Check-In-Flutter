@@ -180,11 +180,11 @@ class _ChatScreenState extends State<ChatScreen> {
                         [];
 
                     // Find the last seen message
-                    var lastSeenMessage = chats.firstWhere(
-                        (message) =>
-                            message.seenTimeStamp != "" &&
-                            message.id == userController.userModel.value.uid,
-                        orElse: () => Chatmodel());
+                    // var lastSeenMessage = chats.firstWhere(
+                    //     (message) =>
+                    //         message.seenTimeStamp != "" &&
+                    //         message.id == userController.userModel.value.uid,
+                    //     orElse: () => Chatmodel());
 
                     return ListView.builder(
                         padding: const EdgeInsets.only(bottom: 10),
@@ -195,7 +195,7 @@ class _ChatScreenState extends State<ChatScreen> {
                           
                           print(chat);
                           // Check if the current message is the last seen message
-                          bool showLastSeen = chats[index] == lastSeenMessage;
+                          // bool showLastSeen = chats[index] == lastSeenMessage;
 
                           String seenTime = '';
                           // var chat = snapshot.data![index];
@@ -240,7 +240,7 @@ class _ChatScreenState extends State<ChatScreen> {
                                         // index: index,
                                         chat: chat,
                                         mymsg: mymsg,
-                                        showLastSeen: showLastSeen,
+                                        // showLastSeen: showLastSeen,
                                         seenTime: seenTime,
                                         isGroup: controller.isgroup)
                                     : GestureDetector(
@@ -263,7 +263,7 @@ class _ChatScreenState extends State<ChatScreen> {
                                           chat: chat,
                                           mymsg: mymsg,
                                           seenTime: seenTime,
-                                          showLastSeen: showLastSeen,
+                                          // showLastSeen: showLastSeen,
                                         ),
                                       )
                               ],
@@ -315,7 +315,7 @@ class _ChatScreenState extends State<ChatScreen> {
                             RequestStatusEnum.pending.name) {
                       return Container(
                         // height: 160,
-                        width: 80.w,
+                        width: 90.w,
                         padding: const EdgeInsets.all(13),
                         margin: const EdgeInsets.all(10),
                         decoration: BoxDecoration(
