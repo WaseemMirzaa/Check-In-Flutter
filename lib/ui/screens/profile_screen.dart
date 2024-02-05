@@ -6,6 +6,8 @@ import 'package:check_in/core/constant/app_assets.dart';
 import 'package:check_in/core/constant/constant.dart';
 import 'package:check_in/core/constant/temp_language.dart';
 import 'package:check_in/model/user_modal.dart';
+import 'package:check_in/ui/screens/follower.dart';
+import 'package:check_in/ui/screens/following.dart';
 import 'package:check_in/ui/screens/notifications.dart';
 import 'package:check_in/ui/screens/unique_courts_screen.dart';
 import 'package:check_in/ui/widgets/about_section.dart';
@@ -51,6 +53,8 @@ class UserService {
                 photoUrl: doc.data()[UserKey.PHOTO_URL] ?? "",
                 isVerified: doc.data()[UserKey.IS_VERIFIED],
                 goldenCheckin: doc.data()[UserKey.GOLDEN_CHECK_IN] ?? 0,
+                followers: doc.data()[UserKey.FOLLOWERS],
+                following: doc.data()[UserKey.FOLLOWING],
               ))
           .toList();
     });
@@ -475,15 +479,26 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: [
                               GestureDetector(
+                                onTap: () {
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) => FollowersScreen(
+                                                userIds: userController
+                                                        .userModel
+                                                        .value
+                                                        .followers ??
+                                                    [],
+                                              )));
+                                },
                                 child: Column(
                                   children: [
                                     Text(
-                                      '0',
+                                      '${userController.userModel.value.followers!.length}',
                                       style: TextStyle(
                                         color: greyColor,
                                         decoration: TextDecoration.underline,
-                                        decorationColor:
-                                            greyColor, // You can customize the underline color
+                                        decorationColor: greyColor,
                                         decorationThickness: 2.0,
                                         fontWeight: FontWeight.w600,
                                         fontSize: 16,
@@ -506,15 +521,26 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 decoration: BoxDecoration(color: silverColor),
                               ),
                               GestureDetector(
+                                onTap: () {
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) => FollowingScreen(
+                                                userIds: userController
+                                                        .userModel
+                                                        .value
+                                                        .following ??
+                                                    [],
+                                              )));
+                                },
                                 child: Column(
                                   children: [
                                     Text(
-                                      '0',
+                                      '${userController.userModel.value.following!.length}',
                                       style: TextStyle(
                                         color: greyColor,
                                         decoration: TextDecoration.underline,
-                                        decorationColor:
-                                            greyColor, // You can customize the underline color
+                                        decorationColor: greyColor,
                                         decorationThickness: 2.0,
                                         fontWeight: FontWeight.w600,
                                         fontSize: 16,

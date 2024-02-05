@@ -16,6 +16,8 @@ class UserKey {
   static const ABOUT_ME = "about me";
   static const HOME_COURT = "home court";
   static const GOLDEN_CHECK_IN = "goldenCheckin";
+  static const FOLLOWERS = 'followers';
+  static const FOLLOWING = 'following';
 }
 
 class CourtKey {
