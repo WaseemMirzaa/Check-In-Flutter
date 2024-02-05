@@ -5,8 +5,9 @@ import 'package:check_in/core/constant/constant.dart';
 import 'package:check_in/core/constant/temp_language.dart';
 import 'package:check_in/model/Message%20and%20Group%20Message%20Model/chat_model.dart';
 import 'package:check_in/controllers/Messages/chat_controller.dart';
-import 'package:check_in/ui/screens/%20Messages%20NavBar/Chat/Component/image_date_container.dart';
-import 'package:check_in/ui/screens/%20Messages%20NavBar/Chat/Component/message_date_container.dart';
+
+import 'package:check_in/ui/screens/Messages%20NavBar/Chat/Component/image_date_container.dart';
+import 'package:check_in/ui/screens/Messages%20NavBar/Chat/Component/message_date_container.dart';
 import 'package:check_in/utils/Constants/images.dart';
 import 'package:check_in/utils/colors.dart';
 import 'package:check_in/utils/gaps.dart';
@@ -51,6 +52,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
   final StreamController<List<DocumentSnapshot>> _streamController = StreamController<List<DocumentSnapshot>>();
   final List<DocumentSnapshot> _chats = [];
+
 
   bool _isRequesting = false;
   bool _isFinish = false;
@@ -166,7 +168,8 @@ class _ChatScreenState extends State<ChatScreen> {
                 stream: _streamController.stream,
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
-                    return loaderView();
+                    // Display loading indicator only if there are messages
+                    return _chats.isNotEmpty ? loaderView() : const SizedBox();
                   } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
                     return Center(child: Text(TempLanguage.noConversation));
                   } else {
@@ -189,6 +192,7 @@ class _ChatScreenState extends State<ChatScreen> {
                         itemCount: chats.length,
                         itemBuilder: (context, index) {
                           final Chatmodel chat = chats[index];
+                          
                           print(chat);
                           // Check if the current message is the last seen message
                           bool showLastSeen = chats[index] == lastSeenMessage;
@@ -552,39 +556,51 @@ class _ChatScreenState extends State<ChatScreen> {
     );
   }
 
-  void requestNextPage() async {
-    if (!_isRequesting && !_isFinish) {
-      QuerySnapshot querySnapshot;
-      _isRequesting = true;
-      if (_chats.isEmpty) {
-        querySnapshot = await FirebaseFirestore.instance
-            .collection(Collections.MESSAGES)
-            .doc(controller.docId.value)
-            .collection(Collections.CHAT)
-            .orderBy(ChatField.TIME_STAMP, descending: true)
-            .limit(20)
-            .get();
-      } else {
-        querySnapshot = await FirebaseFirestore.instance
-            .collection(Collections.MESSAGES)
-            .doc(controller.docId.value)
-            .collection(Collections.CHAT)
-            .startAfterDocument(_chats[_chats.length - 1])
-            .limit(20)
-            .get();
-      }
+void requestNextPage() async {
+  if (!_isRequesting && !_isFinish) {
+    QuerySnapshot querySnapshot;
 
-      int oldSize = _chats.length;
-      _chats.addAll(querySnapshot.docs);
-      int newSize = _chats.length;
-      if (oldSize != newSize) {
-        _streamController.add(_chats);
-      } else {
-        _isFinish = true;
-      }
-      _isRequesting = false;
+    _isRequesting = true;
+    if (_chats.isEmpty) {
+      querySnapshot = await FirebaseFirestore.instance
+          .collection(Collections.MESSAGES)
+          .doc(controller.docId.value)
+          .collection(Collections.CHAT)
+          .orderBy(ChatField.TIME_STAMP, descending: true)
+          .limit(20)
+          .get();
+    } else {
+      querySnapshot = await FirebaseFirestore.instance
+          .collection(Collections.MESSAGES)
+          .doc(controller.docId.value)
+          .collection(Collections.CHAT)
+          .startAfterDocument(_chats[_chats.length - 1])
+          .limit(20)
+          .get();
     }
+
+    List<DocumentSnapshot> newMessages = querySnapshot.docs;
+
+    // Filter out messages that already exist in _chats
+    newMessages.removeWhere((newMessage) =>
+        _chats.any((existingMessage) =>
+            newMessage.id == existingMessage.id));
+
+    // Insert the new messages at the end of the list
+    _chats.addAll(newMessages);
+
+    if (querySnapshot.docs.isNotEmpty) {
+      // Notify the StreamController with the updated _chats list
+      _streamController.add(_chats);
+    } else {
+      // If there are no new messages, finish pagination
+      _isFinish = true;
+    }
+
+    _isRequesting = false;
   }
+}
+
 }
 
 ///previous code
