@@ -76,10 +76,10 @@ class NewMessageController extends GetxController {
     }
   }
 
-  Future<String> startNewChat(String myUid, String uNAme) async {
+  Future<String> startNewChat(String myUid, String uNAme,String UImage) async {
     UserModel model = mydata.values.first;
     return chatService
-        .startNewChat([myUid, mydata.keys.first], uNAme, model.userName!);
+        .startNewChat([myUid, mydata.keys.first], uNAme, model.userName!,model.photoUrl!,UImage);
   }
 
   Future<String> startNewGroupChat(String myUid, String uNAme) async {
