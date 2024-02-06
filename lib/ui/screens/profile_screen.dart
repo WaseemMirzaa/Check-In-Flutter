@@ -394,23 +394,31 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                             child: Text(TempLanguage.wentWrong),
                                           );
                                         } else {
-                                          return CircularPercentIndicator(
-                                            radius: 55.0,
-                                            lineWidth: 8.0,
-                                            animation: true,
-                                            percent: (0 / (totalCount ?? 10))
-                                                .clamp(0.0, 1.0),
-                                            center: const Text(
-                                              "0\nCheck ins",
-                                              textAlign: TextAlign.center,
-                                              style: TextStyle(
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 18.0,
+                                          return InkWell(
+                                            onTap: () {
+                                              Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                      builder: (context) =>
+                                                      const UniqueCourtsScreen()));
+                                            },                                            child: CircularPercentIndicator(
+                                              radius: 55.0,
+                                              lineWidth: 8.0,
+                                              animation: true,
+                                              percent: (0 / (totalCount ?? 10))
+                                                  .clamp(0.0, 1.0),
+                                              center: const Text(
+                                                "0\nCheck ins",
+                                                textAlign: TextAlign.center,
+                                                style: TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 18.0,
+                                                ),
                                               ),
+                                              circularStrokeCap:
+                                                  CircularStrokeCap.round,
+                                              progressColor: darkYellowColor,
                                             ),
-                                            circularStrokeCap:
-                                                CircularStrokeCap.round,
-                                            progressColor: darkYellowColor,
                                           );
                                         }
                                       },

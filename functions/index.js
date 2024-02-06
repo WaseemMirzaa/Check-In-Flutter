@@ -42,7 +42,7 @@ exports.deleteLastCheckedIn = functions.pubsub.schedule("every 60 minutes")
                 // console.log("lastCheckedInTime:" + lastCheckedInTime);
 
                 const hoursSinceLastCheckedIn = Math.abs(currentTime -
-                  lastCheckedInTime) / (1000 * 60 * 60);
+              lastCheckedInTime) / (1000 * 60 * 60);
 
                 // eslint-disable-next-line max-len
                 // console.log("hoursSinceLastCheckedIn:" + hoursSinceLastCheckedIn);
@@ -107,3 +107,47 @@ async function logAdditionalLocationChange(change, context) {
 exports.onAdditionalLocationWrite = functions.firestore
     .document("AdditionalLocations/{locationId}")
     .onWrite(logAdditionalLocationChange);
+
+// Cloud Function for push notification
+exports.sendNotification = functions.https.onRequest(async (req, res) => {
+  const {token, notificationType, title, body, docId, name, isGroup, image,
+    memberIds} = req.body;
+
+
+  const message = {
+    notification: {
+      title: title,
+      body: body,
+    },
+    data: {
+      notificationType: notificationType,
+      docId: docId,
+      name: name,
+      isGroup: isGroup.toString(),
+      image: image,
+      memberIds: JSON.stringify(memberIds),
+    },
+    apns: {
+      payload: {
+        aps: {
+          sound: "default",
+        },
+      },
+      headers: {
+        "apns-priority": "10",
+      },
+    },
+
+    token: token,
+  };
+
+  try {
+    const response = await admin.messaging().send(message);
+    console.log("Successfully sent message:", response);
+    res.status(200).send("Notification sent");
+  } catch (error) {
+    console.log("Successfully sent message:", req);
+    console.error("Error sending message:", error);
+    res.status(500).send("Error sending notification");
+  }
+});

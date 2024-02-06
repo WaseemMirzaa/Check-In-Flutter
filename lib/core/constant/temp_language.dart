@@ -1,4 +1,3 @@
-
 class TempLanguage {
   static String get poppins => 'Poppins';
 
@@ -35,6 +34,7 @@ class TempLanguage {
   static String get agreeTo => 'I agree to the ';
   static String get agreeToTerms => 'Agree to terms & conditions';
   static String get enterUserName => 'Enter User Name';
+  static String get enterValidEmail => 'Enter Valid Email';
   static String get poweredBy => 'Powered by';
   static String get villeMarcos => 'Ville Marcos LLC';
 
@@ -54,6 +54,7 @@ class TempLanguage {
   static String get verifyProfile => "Verify Profile";
   static String get validEmail => "Enter Valid Email Address";
   static String get passwordCheck => "Password must be 6 digits long";
+  static String get invalidPassword => "Invalid Password";
   static String get checkIn => "CHECK IN";
   static String get checkOut => "CHECK OUT";
   static String get logInForFeatures => "Please log in to use more features";
@@ -64,10 +65,51 @@ class TempLanguage {
   static String get enterPassword => "Enter Password";
   static String get wentWrong => 'Something went wrong';
   static String get noDataFound => 'No data found';
+  static String get save => 'Save';
 
   static String get dearUser => "Dear User";
   static String get alertContentText =>
       'We care about your privacy and data security. We use your email to maintain your own profile against it. '
       'Also we use your location to show you the nearest basketball courts in your area. '
       'Can we continue to use your data to give you best experience ?\n\nYou can change your choice anytime in the app settings. ';
+  static String get newsFeed => "News Feed";
+  static String get checkOutHot => "Check out what's Hot";
+  static String get contentThatTrendingAndPopular => "Check out what's Hot";
+  static String get noMessageFound => "No messages found.";
+  static String get typeSomething => "Type something";
+  static String get noRecent => "No Recents";
+  static String get noConversation => "No Conversation.";
+  static String get groupDetail => "Group Details";
+  static String get aboutGroup => "About Group";
+  // static String get save => "Save";
+  static String get makeGroupAdmin => "Make Group Admin";
+  static String get removeGroupAdmin => "Remove Group Admin";
+  static String get removeMember => "Remove Member";
+  static String get noMemberFound => "No members found.";
+  static String get messages => "Messages";
+  static String get sendMessage => "Send message";
+  static String get search => "Search";
+  static String get addMember => "Add Member";
+  static String get newMessage => 'New Messages';
+  static String get to => 'To';
+  static String get chat => 'chat';
+  static String get typeToFindMember => 'Search to find member';
+  static String get inviteSent => 'Invite Sent';
+  static String get acceptMessageRequest => 'Accept message request from';
+  static String get sendMessageRequestToCall =>
+      'Send a message request to this person to message and call them.';
+  static String get sendRequest => 'Sent Request';
+  static String get ignore => 'Ignore';
+  static String get accept => 'Accept';
+  static String get block => 'Block';
+  static String get delete => 'Delete';
+  static String get members => 'Members';
+  static String get groupMembers => 'Group Members';
+  static String get add => 'Add';
+  static String get requestDeleted => 'Request Deleted by';
+  static String get youBlockThisAccount => 'You blocked this account';
+  static String get requestAgain => 'Request Again';
+  static String get blockedYou => 'Blocked You';
+  static String get unblock => 'Unblock';
+  static String get messageRequest => 'Message Request';
 }

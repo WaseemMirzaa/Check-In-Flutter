@@ -14,6 +14,7 @@ class UserModel {
   int? goldenCheckin;
   List? followers;
   List? following;
+  List? deviceTokes;
 
   UserModel(
       {this.userName,
@@ -27,7 +28,9 @@ class UserModel {
       this.homeCourt,
       this.goldenCheckin,
       this.followers,
-      this.following});
+      this.following
+      this.goldenCheckin,
+      this.deviceTokes});
 
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
@@ -41,6 +44,7 @@ class UserModel {
       UserKey.ABOUT_ME: aboutMe,
       UserKey.HOME_COURT: homeCourt,
       UserKey.GOLDEN_CHECK_IN: goldenCheckin,
+      UserKey.DEVICE_TOKEN: deviceTokes
       UserKey.FOLLOWERS: followers,
       UserKey.FOLLOWING: following,
     };
@@ -59,6 +63,7 @@ class UserModel {
         aboutMe: map[UserKey.ABOUT_ME] ?? "",
         homeCourt: map[UserKey.HOME_COURT] ?? "",
         goldenCheckin: map[UserKey.GOLDEN_CHECK_IN] ?? 0,
+        deviceTokes: map[UserKey.DEVICE_TOKEN],
         followers: map[UserKey.FOLLOWERS] ?? [],
         following: map[UserKey.FOLLOWING] ?? []);
   }

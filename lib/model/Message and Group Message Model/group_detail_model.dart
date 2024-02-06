@@ -1,4 +1,4 @@
-import 'package:check_in/utils/Constants/constants.dart';
+import 'package:check_in/core/constant/constant.dart';
 
 class GroupDetailModel {
   String? groupName;

@@ -1,1 +1,7 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="20" height="14.05" viewBox="96 179.95 20 14.05"><g data-name="Group 12631"><path d="M108 194a6 6 0 1 0-12 0" stroke-linejoin="round" stroke-linecap="round" stroke-width="2" stroke="#34773b" fill="transparent" data-name="Path 28676"/><path d="M98 183.9a4 4 0 1 1 0 .1z" stroke-linejoin="round" stroke-linecap="round" stroke-width="2" stroke="#34773b" fill="transparent" data-name="Ellipse 452"/><path d="M116 194a6 6 0 0 0-6-6 4 4 0 0 0 0-8" stroke-linejoin="round" stroke-linecap="round" stroke-width="2" stroke="#34773b" fill="transparent" data-name="Path 28677"/></g></svg>
+<svg xmlns="http://www.w3.org/2000/svg" width="22" height="20" viewBox="0 0 22 20">
+  <g id="users-round_1_" data-name="users-round (1)" transform="translate(-1 -2)">
+    <path id="Path_3206" data-name="Path 3206" d="M18,21A8,8,0,0,0,2,21" fill="none" stroke="#34773b" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+    <circle id="Ellipse_864" data-name="Ellipse 864" cx="5" cy="5" r="5" transform="translate(5 3)" fill="none" stroke="#34773b" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+    <path id="Path_3207" data-name="Path 3207" d="M22,20a10.611,10.611,0,0,0-4-8,5,5,0,0,0-.45-8.3" fill="none" stroke="#34773b" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+  </g>
+</svg>
