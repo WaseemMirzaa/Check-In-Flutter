@@ -53,7 +53,7 @@ class _ChatScreenState extends State<ChatScreen> {
   final StreamController<List<DocumentSnapshot>> _streamController = StreamController<List<DocumentSnapshot>>();
   final List<DocumentSnapshot> _chats = [];
 
-
+  String onlineStatus = '';
   bool _isRequesting = false;
   bool _isFinish = false;
 
@@ -118,6 +118,8 @@ class _ChatScreenState extends State<ChatScreen> {
   @override
   void initState() {
     super.initState();
+     fetchOnlineStatus(userController.userModel.value.uid!);
+    
     _subscription = FirebaseFirestore.instance
         .collection(Collections.MESSAGES)
         .doc(controller.docId.value)
@@ -128,6 +130,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
     requestNextPage();
 
+
     startTimer();
   }
 
@@ -136,8 +139,27 @@ class _ChatScreenState extends State<ChatScreen> {
     stopTimer();
     _subscription?.cancel();
     _streamController.close();
+    controller.chatService.updateOnlineStatus(controller.docId.value,DateTime.now().toString(),userController.userModel.value.uid!);
+
     super.dispose();
   }
+
+void fetchOnlineStatus(String userId) async {
+  // print('in method:$userId');
+  // print(userId);
+  try {
+    // MessageService messageService = MessageService(); // Create an instance
+    String status = await controller.chatService.getOnlineStatus(controller.docId.value); // Call the method
+    controller.chatService.updateOnlineStatus(controller.docId.value,'Online',userId);
+    setState(() {
+      onlineStatus = status;
+      print('kkk:$status');
+    });
+  } catch (e) {
+    print('Error fetching online status: $e');
+  }
+}
+
 
   @override
   Widget build(BuildContext context) {
@@ -146,6 +168,7 @@ class _ChatScreenState extends State<ChatScreen> {
           name: controller.name,
           isgroup: controller.isgroup,
           image: controller.image,
+          onlineStatus: onlineStatus,
           ontap: controller.isgroup
               ? () {
                   pushNewScreen(context, screen: GroupdetailScreen(docId: controller.docId.value)).then((_) => null);
@@ -155,6 +178,7 @@ class _ChatScreenState extends State<ChatScreen> {
                 }),
       body: Column(
           children: [
+            // Container(child: Text(onlineStatus),),
            Expanded(
         child: NotificationListener<ScrollNotification>(
             onNotification: (ScrollNotification scrollInfo) {
