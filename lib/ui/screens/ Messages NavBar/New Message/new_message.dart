@@ -4,8 +4,8 @@ import 'package:check_in/controllers/Messages/new_message_controller.dart';
 import 'package:check_in/controllers/user_controller.dart';
 import 'package:check_in/core/constant/temp_language.dart';
 import 'package:check_in/model/user_modal.dart';
-import 'package:check_in/ui/screens/%20Messages%20NavBar/Chat/chat_screen.dart';
-import 'package:check_in/ui/screens/%20Messages%20NavBar/Group%20Detail/group_detail.dart';
+import 'package:check_in/ui/screens/Messages%20NavBar/Chat/chat_screen.dart';
+import 'package:check_in/ui/screens/Messages%20NavBar/Group%20Detail/group_detail.dart';
 import 'package:check_in/ui/widgets/custom_appbar.dart';
 import 'package:check_in/ui/widgets/text_field.dart';
 import 'package:check_in/utils/Constants/images.dart';
@@ -85,7 +85,7 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
                     } else {
                       controller
                           .startNewChat(userController.userModel.value.uid!,
-                              userController.userModel.value.userName!)
+                              userController.userModel.value.userName!,userController.userModel.value.photoUrl!,)
                           .then((value) {
                         UserModel model = controller.mydata.values.first;
                         chatcontroller.docId.value = value;
@@ -102,7 +102,7 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
                         // clear map mydata
                         controller.mydata.clear();
                         pushNewScreen(context,
-                            screen: ChatScreen(
+                            screen: const ChatScreen(
                               // name: model.userName!.obs,
                               // isGroup: false,
                               // image: model.photoUrl!.obs,
@@ -179,6 +179,9 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
                             controller: _scrollController,
                             itemCount: controller.userDataList.length,
                             itemBuilder: (context, index) {
+                               bool isCurrentUser =
+        controller.userDataList[index].uid == userController.userModel.value.uid;
+        if (!isCurrentUser) {
                               return Padding(
                                 padding: const EdgeInsets.only(bottom: 8),
                                 child: Row(
@@ -270,7 +273,10 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
                                   ],
                                 ),
                               );
-                            }));
+                            }else {
+      
+      return Container();
+                  }}));
                   },
                 )))
         ]),
