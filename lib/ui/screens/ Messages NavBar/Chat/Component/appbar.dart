@@ -12,9 +12,11 @@ import '../../../../widgets/custom_appbar.dart';
 class ChatAppbar extends StatelessWidget implements PreferredSizeWidget {
   RxString? name;
   RxString? image;
+  Widget? lastSeen;
   bool? isgroup;
+  String? onlineStatus;
   Function()? ontap;
-  ChatAppbar({super.key, this.name, this.isgroup, this.ontap, this.image});
+  ChatAppbar({super.key, this.name, this.isgroup, this.ontap, this.image,this.onlineStatus, this.lastSeen });
 
   @override
   Widget build(BuildContext context) {
@@ -34,8 +36,28 @@ class ChatAppbar extends StatelessWidget implements PreferredSizeWidget {
               : const SizedBox(),
           horizontalGap(5),
           Obx(() => Flexible(
-              child: poppinsText(
-                  name!.value ?? '', 15, FontWeight.bold, blackColor)))
+  child: Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      poppinsText(
+        name!.value ?? '', 
+        15, 
+        FontWeight.bold, 
+        blackColor
+      ),
+      const SizedBox(height: 8), 
+      lastSeen ?? Text(
+        onlineStatus!,
+        style: const TextStyle(
+          fontSize: 14, 
+          fontWeight: FontWeight.normal, 
+          color: Colors.black, 
+        ),
+      ),
+    ],
+  ),
+)),
+
         ]),
       ),
       // actions: [
