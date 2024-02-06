@@ -12,6 +12,7 @@ import 'package:check_in/model/user_modal.dart';
 import 'package:check_in/utils/Constants/enums.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:intl/intl.dart';
 
 import '../controllers/Messages/firestore_pagination.dart';
 import '../model/Message and Group Message Model/message_model.dart';
@@ -117,6 +118,52 @@ class MessageService {
               updateUnreadCount(docId, uId, 0);
               return Chatmodel.fromJson(doc.data());
             }).toList());
+  }
+
+  // Function to fetch the online status of a user
+  Future<String> getOnlineStatus(String docId) async {
+    
+    try {
+      
+      DocumentSnapshot snapshot = await _messagesCollection.doc(docId).get();
+      if (snapshot.exists) {
+        Map<String, dynamic>? data = snapshot.data() as Map<String, dynamic>?;
+        if (data != null && data.containsKey('senderStatus')) {
+          String status = data['senderStatus'];
+          print('wwwwwww: $data');
+          print('wwwwwww: $status');
+          if (status == 'Online') {
+            return 'Online';
+          } else if (status.isNotEmpty) {
+            DateTime lastSeen = DateTime.parse(status);
+            return 'Last Seen ${DateFormat('hh:mm a').format(lastSeen)}';
+          }
+        }
+      }
+      return '';
+    } catch (e) {
+      print('Error fetching online status: $e');
+      return ''; 
+    }
+  }
+
+  // Function to update the online status of a user
+  Future<void> updateOnlineStatus(String docId, String status,String uId) async {
+    try {
+      print(docId);
+      print(uId);
+      final docRef = _messagesCollection.doc(docId);
+       FirebaseFirestore.instance.runTransaction((transaction) async {
+        final snapshot = await transaction.get(docRef); 
+        if (snapshot.get(MessageField.SENDER_ID) == uId) {
+          docRef.update({'senderStatus': status});
+        } else {
+          docRef.update({'receiverStatus': status});
+        }});
+        print('Online status updated successfully for user $docId');
+    } catch (e) {
+      print('Error updating online status: $e');
+    }
   }
 
 //............ Update last Seen
@@ -443,10 +490,10 @@ class MessageService {
 
 //........... Start new chat
   Future<String> startNewChat(
-      List ids, String senderName, String recieverName) async {
+      List ids, String senderName, String recieverName,String photoUrl,String UIimage) async {
     if (await areIdsMatching(ids) != '') {
       print('No data added because IDs match');
-      // Do not add data and return an indication that no data was added
+      // Do not add data and return an indication that no data waSs added
       return areIdsMatching(ids);
     }
     Map<String, dynamic> data = {
@@ -456,15 +503,16 @@ class MessageService {
       MessageField.MEMBER_IDS: ids,
       MessageField.RECIEVER_ABOUT: '',
       MessageField.RECIEVER_ID: ids.last,
-      MessageField.RECIEVER_IMG: '',
+      MessageField.RECIEVER_IMG: photoUrl,
       MessageField.RECIEVER_NAME: recieverName,
       MessageField.RECIEVER_UNREAD: 1,
       MessageField.SENDER_ABOUT: '',
       MessageField.SENDER_ID: ids.first,
-      MessageField.SENDER_IMG: '',
+      MessageField.SENDER_IMG: UIimage,
       MessageField.SENDER_NAME: senderName,
       MessageField.SENDER_UNREAD: 0,
       MessageField.TIME_STAMP: '',
+  
       MessageField.REQUEST_STATUS: RequestStatusEnum.pending.name
     };
 
