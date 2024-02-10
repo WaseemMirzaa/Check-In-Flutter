@@ -25,21 +25,17 @@ Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await init;
   // await Firebase.initializeApp();
   await initialize();
-  FlutterLocalNotificationsPlugin notification =
-      FlutterLocalNotificationsPlugin();
-  AndroidNotificationChannel androidNotificationChannel =
-      const AndroidNotificationChannel(
+  FlutterLocalNotificationsPlugin notification = FlutterLocalNotificationsPlugin();
+  AndroidNotificationChannel androidNotificationChannel = const AndroidNotificationChannel(
     'high_importance_channel', // id
     'High Importance Notifications', // title
-    description:
-        'This channel is used for important notifications.', // description
-    importance: Importance.high,
-  );
+    description: 'This channel is used for important notifications.', // description
+    importance: Importance.high,);
   print("notification received in BACKGROUND");
   print(message.data);
+  
   if (message.data.isNotEmpty) {
     print('message is not empty');
-
     String notificationType = message.data['notificationType'];
     NotificationModel.type = notificationType;
     NotificationModel.docId = message.data['docId'];
@@ -47,15 +43,15 @@ Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
     NotificationModel.image = message.data['image'];
     NotificationModel.isGroup = bool.parse(message.data['isGroup']);
     NotificationModel.memberIds = json.decode(message.data['memberIds']);
-
+  
     // int notificationBadge = getIntAsync(SharedPreferenceKey.NOTIFICATION_BADGE);
     // await setValue(SharedPreferenceKey.NOTIFICATION_BADGE, notificationBadge++);
     // FlutterAppBadger.updateBadgeCount(notificationBadge++);
   }
-  notificationsPlugin.show(
-      1,
+  notificationsPlugin.show(1,
       message.notification?.title,
       message.notification?.body,
+      
       NotificationDetails(
           android: AndroidNotificationDetails(
             channel.id,
@@ -77,6 +73,7 @@ Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await init;
+
   // if (Platform.isIOS) {
   //   await Firebase.initializeApp(
   //     // name: "check_in",// Removing this name causes exception and show white screen on ios
@@ -85,13 +82,15 @@ void main() async {
   // } else {
   //   await Firebase.initializeApp();
   // }
-  final PushNotificationServices pushNotificationService =
-      PushNotificationServices();
+
+  final PushNotificationServices pushNotificationService = PushNotificationServices();
   FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
   pushNotificationService.init();
   FCMManager.getFCMToken();
+
   // SharedPreferences prefs = await SharedPreferences.getInstance();
   // var email = prefs.getString('email');
+  
   runApp(const MyApp());
 }
 

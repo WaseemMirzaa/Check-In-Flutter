@@ -39,8 +39,7 @@ class UserService {
   Stream<List<UserModel>> get users {
     return _firestore.collection(Collections.USER).snapshots().map((snapshot) {
       return snapshot.docs
-          .where((d) =>
-              d.get(UserKey.UID) == FirebaseAuth.instance.currentUser!.uid)
+          .where((d) => d.get(UserKey.UID) == FirebaseAuth.instance.currentUser!.uid)
           .map((doc) => UserModel(
                 userName: doc.data()[UserKey.USER_NAME],
                 email: doc.data()[UserKey.EMAIL],
@@ -65,8 +64,7 @@ Future<List<UserModel>?> getUniqueCourtNameMaps() async {
   List<UserModel> resultMaps = [];
 
   try {
-    List<Map<String, dynamic>> mapsArray = List<Map<String, dynamic>>.from(
-        document.data()?[CourtKey.CHECKED_COURTS]);
+    List<Map<String, dynamic>> mapsArray = List<Map<String, dynamic>>.from(document.data()?[CourtKey.CHECKED_COURTS]);
     for (var map in mapsArray) {
       int courtId = map[CourtKey.ID] ?? 0;
       bool isGold = map[CourtKey.IS_GOLDEN] ?? false;
@@ -84,8 +82,7 @@ Future<List<UserModel>?> getUniqueCourtNameMaps() async {
 Future<int> getGoldenLocationsCount() async {
   try {
     QuerySnapshot querySnapshot = await FirebaseFirestore.instance
-        .collection(
-            Collections.GOLDEN_LOCATIONS) // Replace with your collection name
+        .collection(Collections.GOLDEN_LOCATIONS) // Replace with your collection name
         .get();
 
     int count = querySnapshot.size;
@@ -102,13 +99,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
   // UserModel userd = UserModel();
   bool isVerified = false;
   getUser() async {
-    DocumentSnapshot snapshot = await FirebaseFirestore.instance
-        .collection(Collections.USER)
-        .doc(userController.userModel.value.uid)
-        .get();
+    DocumentSnapshot snapshot =
+        await FirebaseFirestore.instance.collection(Collections.USER).doc(userController.userModel.value.uid).get();
     // log("all snapshot data.......${snapshot.data()}");
-    UserModel currentUser =
-        UserModel.fromMap(snapshot.data() as Map<String, dynamic>);
+    UserModel currentUser = UserModel.fromMap(snapshot.data() as Map<String, dynamic>);
     userController.userModel.value = currentUser;
     if (mounted) setState(() {});
   }
@@ -117,8 +111,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   String? _downloadUrl;
 
   Future<void> _selectImage() async {
-    final pickedFile =
-        await ImagePicker().pickImage(source: ImageSource.gallery);
+    final pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
       setState(() {
         _imageFile = File(pickedFile.path);
@@ -139,10 +132,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
       final firestore = FirebaseFirestore.instance;
       final userId = FirebaseAuth.instance.currentUser!.uid;
-      await firestore
-          .collection(Collections.USER)
-          .doc(userId)
-          .update({UserKey.PHOTO_URL: downloadUrl});
+      await firestore.collection(Collections.USER).doc(userId).update({UserKey.PHOTO_URL: downloadUrl});
     }
   }
 
@@ -220,8 +210,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         elevation: 0,
         centerTitle: true,
         backgroundColor: whiteColor,
-        title:
-            poppinsText(TempLanguage.profile, 20, FontWeight.bold, blackColor),
+        title: poppinsText(TempLanguage.profile, 20, FontWeight.bold, blackColor),
       ),
       body: SingleChildScrollView(
         child: SizedBox(
@@ -256,12 +245,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                 decoration: BoxDecoration(
                                                     shape: BoxShape.circle,
                                                     image: DecorationImage(
-                                                        image: NetworkImage(
-                                                            _downloadUrl
-                                                                as String),
-                                                        fit: BoxFit.fill)))
-                                            : (!userController.userModel.value
-                                                    .photoUrl.isEmptyOrNull)
+                                                        image: NetworkImage(_downloadUrl as String), fit: BoxFit.fill)))
+                                            : (!userController.userModel.value.photoUrl.isEmptyOrNull)
                                                 ? Container(
                                                     height: 20.h,
                                                     width: 35.h,
@@ -269,32 +254,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                         shape: BoxShape.circle,
                                                         image: DecorationImage(
                                                             image: NetworkImage(
-                                                                userController
-                                                                        .userModel
-                                                                        .value
-                                                                        .photoUrl ??
-                                                                    ""),
+                                                                userController.userModel.value.photoUrl ?? ""),
                                                             fit: BoxFit.fill)))
                                                 : Container(
                                                     height: 20.h,
                                                     width: 35.h,
                                                     decoration: BoxDecoration(
                                                         shape: BoxShape.circle,
-                                                        border: Border.all(
-                                                            width: 2,
-                                                            color: greenColor),
+                                                        border: Border.all(width: 2, color: greenColor),
                                                         image: const DecorationImage(
-                                                            image: AssetImage(
-                                                                AppAssets
-                                                                    .LOGO_NEW),
-                                                            fit: BoxFit.fill)),
+                                                            image: AssetImage(AppAssets.LOGO_NEW), fit: BoxFit.fill)),
                                                   )),
-                                    if (userController
-                                                .userModel.value.isVerified ==
-                                            null ||
-                                        userController
-                                                .userModel.value.isVerified ==
-                                            true)
+                                    if (userController.userModel.value.isVerified == null ||
+                                        userController.userModel.value.isVerified == true)
                                       Align(
                                         alignment: Alignment.bottomRight,
                                         child: Container(
@@ -302,9 +274,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                           width: 12.1.w,
                                           decoration: const BoxDecoration(
                                               shape: BoxShape.circle,
-                                              image: DecorationImage(
-                                                  image: AssetImage(AppAssets
-                                                      .INSTAGRAM_VERIFICATION))),
+                                              image:
+                                                  DecorationImage(image: AssetImage(AppAssets.INSTAGRAM_VERIFICATION))),
                                         ),
                                       )
                                     else
@@ -343,33 +314,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     child: FutureBuilder<List<UserModel>?>(
                                       future: getUniqueCourtNameMaps(),
                                       builder: (context, snapshot) {
-                                        if (snapshot.connectionState ==
-                                            ConnectionState.waiting) {
+                                        if (snapshot.connectionState == ConnectionState.waiting) {
                                           return const SizedBox(
                                               height: 110,
                                               width: 110,
-                                              child: Center(
-                                                  child:
-                                                      CircularProgressIndicator()));
-                                        } else if (snapshot.hasData &&
-                                            snapshot.data != null) {
+                                              child: Center(child: CircularProgressIndicator()));
+                                        } else if (snapshot.hasData && snapshot.data != null) {
                                           return InkWell(
                                             onTap: () {
-                                              Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                      builder: (context) =>
-                                                          const UniqueCourtsScreen()));
+                                              Navigator.push(context,
+                                                  MaterialPageRoute(builder: (context) => const UniqueCourtsScreen()));
                                             },
                                             child: CircularPercentIndicator(
                                               radius: 55.0,
                                               lineWidth: 8.0,
                                               animation: true,
                                               percent:
-                                                  ((snapshot.data?.length ??
-                                                              0) /
-                                                          (totalCount ?? 10))
-                                                      .clamp(0.0, 1.0),
+                                                  ((snapshot.data?.length ?? 0) / (totalCount ?? 10)).clamp(0.0, 1.0),
                                               center: Text(
                                                 "${snapshot.data?.length ?? 0}\nCheck ins",
                                                 textAlign: TextAlign.center,
@@ -378,8 +339,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                   fontSize: 18.0,
                                                 ),
                                               ),
-                                              circularStrokeCap:
-                                                  CircularStrokeCap.round,
+                                              circularStrokeCap: CircularStrokeCap.round,
                                               progressColor: darkYellowColor,
                                             ),
                                           );
@@ -390,17 +350,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                         } else {
                                           return InkWell(
                                             onTap: () {
-                                              Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                      builder: (context) =>
-                                                      const UniqueCourtsScreen()));
-                                            },                                            child: CircularPercentIndicator(
+                                              Navigator.push(context,
+                                                  MaterialPageRoute(builder: (context) => const UniqueCourtsScreen()));
+                                            },
+                                            child: CircularPercentIndicator(
                                               radius: 55.0,
                                               lineWidth: 8.0,
                                               animation: true,
-                                              percent: (0 / (totalCount ?? 10))
-                                                  .clamp(0.0, 1.0),
+                                              percent: (0 / (totalCount ?? 10)).clamp(0.0, 1.0),
                                               center: const Text(
                                                 "0\nCheck ins",
                                                 textAlign: TextAlign.center,
@@ -409,8 +366,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                   fontSize: 18.0,
                                                 ),
                                               ),
-                                              circularStrokeCap:
-                                                  CircularStrokeCap.round,
+                                              circularStrokeCap: CircularStrokeCap.round,
                                               progressColor: darkYellowColor,
                                             ),
                                           );
@@ -424,46 +380,28 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   InkWell(
                                     onTap: () {
                                       Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  const UniqueCourtsScreen()));
+                                          context, MaterialPageRoute(builder: (context) => const UniqueCourtsScreen()));
                                     },
                                     child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
-                                        poppinsText("Golden\nCourt", 22,
-                                            FontWeight.bold, blackColor),
+                                        poppinsText("Golden\nCourt", 22, FontWeight.bold, blackColor),
                                         FutureBuilder<List<UserModel>?>(
                                           future: getUniqueCourtNameMaps(),
                                           builder: (context, snapshot) {
-                                            if (snapshot.connectionState ==
-                                                ConnectionState.waiting) {
+                                            if (snapshot.connectionState == ConnectionState.waiting) {
                                               // return const Center(child: CircularProgressIndicator());
-                                              return const Center(
-                                                  child:
-                                                      CircularProgressIndicator());
-                                            } else if (snapshot.hasData &&
-                                                snapshot.data != null) {
-                                              return poppinsText(
-                                                  "${snapshot.data?.length ?? 0} Check ins",
-                                                  12,
-                                                  FontWeight.normal,
-                                                  blackColor);
+                                              return const Center(child: CircularProgressIndicator());
+                                            } else if (snapshot.hasData && snapshot.data != null) {
+                                              return poppinsText("${snapshot.data?.length ?? 0} Check ins", 12,
+                                                  FontWeight.normal, blackColor);
                                             } else if (snapshot.hasError) {
                                               return Center(
-                                                child: Text(
-                                                    TempLanguage.wentWrong),
+                                                child: Text(TempLanguage.wentWrong),
                                               );
                                             } else {
-                                              return poppinsText(
-                                                  "0 Check ins",
-                                                  12,
-                                                  FontWeight.normal,
-                                                  blackColor);
+                                              return poppinsText("0 Check ins", 12, FontWeight.normal, blackColor);
                                             }
                                           },
                                         ),

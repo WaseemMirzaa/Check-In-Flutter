@@ -16,7 +16,7 @@ class ChatAppbar extends StatelessWidget implements PreferredSizeWidget {
   bool? isgroup;
   String? onlineStatus;
   Function()? ontap;
-  ChatAppbar({super.key, this.name, this.isgroup, this.ontap, this.image,this.onlineStatus, this.lastSeen });
+  ChatAppbar({super.key, this.name, this.isgroup, this.ontap, this.image, this.onlineStatus, this.lastSeen});
 
   @override
   Widget build(BuildContext context) {
@@ -31,33 +31,28 @@ class ChatAppbar extends StatelessWidget implements PreferredSizeWidget {
                 radius: 20,
               )),
           horizontalGap(15),
-          isgroup!
-              ? SvgPicture.asset(AppImage.chatgroupicon)
-              : const SizedBox(),
+          isgroup! ? SvgPicture.asset(AppImage.chatgroupicon) : const SizedBox(),
           horizontalGap(5),
           Obx(() => Flexible(
-  child: Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      poppinsText(
-        name!.value ?? '', 
-        15, 
-        FontWeight.bold, 
-        blackColor
-      ),
-      const SizedBox(height: 8), 
-      lastSeen ?? Text(
-        onlineStatus!,
-        style: const TextStyle(
-          fontSize: 14, 
-          fontWeight: FontWeight.normal, 
-          color: Colors.black, 
-        ),
-      ),
-    ],
-  ),
-)),
-
+                child: isgroup!
+                    ? poppinsText(name!.value ?? '', 15, FontWeight.bold, blackColor)
+                    : Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          poppinsText(name!.value ?? '', 15, FontWeight.bold, blackColor),
+                          const SizedBox(height: 8),
+                          lastSeen ??
+                              Text(
+                                onlineStatus!,
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.normal,
+                                  color: Colors.black,
+                                ),
+                              ),
+                        ],
+                      ),
+              )),
         ]),
       ),
       // actions: [

@@ -19,7 +19,7 @@ import '../Chat/chat_screen.dart';
 import '../Group Detail/group_detail.dart';
 
 class NewMessageScreen extends StatefulWidget {
-  NewMessageScreen({super.key});
+  const NewMessageScreen({super.key});
 
   @override
   State<NewMessageScreen> createState() => _NewMessageScreenState();
