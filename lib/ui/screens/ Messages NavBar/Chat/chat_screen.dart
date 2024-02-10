@@ -5,9 +5,6 @@ import 'package:check_in/core/constant/constant.dart';
 import 'package:check_in/core/constant/temp_language.dart';
 import 'package:check_in/model/Message%20and%20Group%20Message%20Model/chat_model.dart';
 import 'package:check_in/controllers/Messages/chat_controller.dart';
-
-import 'package:check_in/ui/screens/Messages%20NavBar/Chat/Component/image_date_container.dart';
-import 'package:check_in/ui/screens/Messages%20NavBar/Chat/Component/message_date_container.dart';
 import 'package:check_in/utils/Constants/images.dart';
 import 'package:check_in/utils/colors.dart';
 import 'package:check_in/utils/gaps.dart';
@@ -26,6 +23,8 @@ import '../Group Detail/group_detail.dart';
 import 'Component/appbar.dart';
 import 'Component/button.dart';
 import 'Component/image_bottomsheet.dart';
+import 'Component/image_date_container.dart';
+import 'Component/message_date_container.dart';
 import 'Component/send_message_container.dart';
 import 'Component/sticker_keyboard.dart';
 
@@ -644,8 +643,6 @@ void requestNextPage() async {
 //   // );
 // //
 
-
-
 //   var userController = Get.find<UserController>();
 //   var controller = Get.find<ChatController>();
 //   Timer? timer;
@@ -895,10 +892,6 @@ void requestNextPage() async {
 //           //     })),
 
 //           //.....
-
-
-
-
 
           // // for show request status dialog
           // StreamBuilder<Messagemodel>(

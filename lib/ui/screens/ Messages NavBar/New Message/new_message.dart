@@ -4,8 +4,6 @@ import 'package:check_in/controllers/Messages/new_message_controller.dart';
 import 'package:check_in/controllers/user_controller.dart';
 import 'package:check_in/core/constant/temp_language.dart';
 import 'package:check_in/model/user_modal.dart';
-import 'package:check_in/ui/screens/Messages%20NavBar/Chat/chat_screen.dart';
-import 'package:check_in/ui/screens/Messages%20NavBar/Group%20Detail/group_detail.dart';
 import 'package:check_in/ui/widgets/custom_appbar.dart';
 import 'package:check_in/ui/widgets/text_field.dart';
 import 'package:check_in/utils/Constants/images.dart';
@@ -16,6 +14,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
 import 'package:sizer/sizer.dart';
+
+import '../Chat/chat_screen.dart';
+import '../Group Detail/group_detail.dart';
 
 class NewMessageScreen extends StatefulWidget {
   NewMessageScreen({super.key});
@@ -83,9 +84,8 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
                             )).then((value) => Get.back());
                       });
                     } else {
-                      controller
-                          .startNewChat(userController.userModel.value.uid!,
-                              userController.userModel.value.userName!,userController.userModel.value.photoUrl!,)
+                      controller.startNewChat(userController.userModel.value.uid!,
+                        userController.userModel.value.userName!,userController.userModel.value.photoUrl!,)
                           .then((value) {
                         UserModel model = controller.mydata.values.first;
                         chatcontroller.docId.value = value;
@@ -121,8 +121,11 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 10.0),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          
           verticalGap(10),
+          
           verticalGap(5),
+          
           Row(
             children: [
               Padding(
@@ -131,6 +134,7 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
               ),
             ],
           ),
+          
           Obx(() => Wrap(
                 spacing: 8.0,
                 runSpacing: 0.0,
