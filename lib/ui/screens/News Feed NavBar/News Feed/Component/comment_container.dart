@@ -30,7 +30,7 @@ class CommentContainer extends StatelessWidget {
                     color: darkBlue.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(10)),
                 child: poppinsText('Hi Cassie! Would you be available ', 12,
-                    medium, blackColor,
+                    medium, appBlackColor,
                     maxlines: 5))
           ],
         ),

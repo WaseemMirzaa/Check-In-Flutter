@@ -12,11 +12,13 @@ import 'package:check_in/utils/gaps.dart';
 import 'package:check_in/utils/styles.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:nb_utils/nb_utils.dart';
 import 'package:sizer/sizer.dart';
 
 class AddNewGroupMember extends StatefulWidget {
   String? docId;
-  AddNewGroupMember({super.key, this.docId});
+  List? memberIds;
+  AddNewGroupMember({super.key, this.docId, this.memberIds});
 
   @override
   State<AddNewGroupMember> createState() => _AddNewGroupMemberState();
@@ -31,13 +33,11 @@ class _AddNewGroupMemberState extends State<AddNewGroupMember> {
   @override
   void initState() {
     super.initState();
-    _scrollController = ScrollController()
-      ..addListener(_scrollListener);
+    _scrollController = ScrollController()..addListener(_scrollListener);
   }
 
   void _scrollListener() {
-    if (_scrollController.position.pixels ==
-        _scrollController.position.maxScrollExtent) {
+    if (_scrollController.position.pixels == _scrollController.position.maxScrollExtent) {
       controller.fetchMore();
     }
   }
@@ -46,20 +46,19 @@ class _AddNewGroupMemberState extends State<AddNewGroupMember> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomAppbar(
-        title: poppinsText(TempLanguage.addMember, 15, bold, blackColor),
+        title: poppinsText(TempLanguage.addMember, 15, bold, appBlackColor),
         actions: [
           Obx(() => controller.mydata.isNotEmpty
               ? TextButton(
                   onPressed: () async {
                     bool res = await controller.addMember(widget.docId!);
-                    // clear searchQuery value
                     controller.searchQuery.value = '';
                     if (res) {
                       controller.mydata.clear();
                       Get.back();
                     }
                   },
-                  child: poppinsText(TempLanguage.add, 12, medium, blackColor),
+                  child: poppinsText(TempLanguage.add, 12, medium, appBlackColor),
                 )
               : const SizedBox())
         ],
@@ -73,7 +72,7 @@ class _AddNewGroupMemberState extends State<AddNewGroupMember> {
             children: [
               Padding(
                 padding: const EdgeInsets.only(left: 8.0),
-                child: poppinsText(TempLanguage.to, 15, medium, blackColor),
+                child: poppinsText(TempLanguage.to, 15, medium, appBlackColor),
               ),
             ],
           ),
@@ -85,17 +84,14 @@ class _AddNewGroupMemberState extends State<AddNewGroupMember> {
                   return Chip(
                     label: Text(model.userName!),
                     onDeleted: () {
-                      controller.mydata
-                          .removeWhere((key, value) => model.uid == key);
+                      controller.mydata.removeWhere((key, value) => model.uid == key);
                     },
                   );
                 }).toList(),
               )),
           verticalGap(5),
           Container(
-            decoration: BoxDecoration(
-                color: greyColor.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(25)),
+            decoration: BoxDecoration(color: greyColor.withOpacity(0.1), borderRadius: BorderRadius.circular(25)),
             padding: const EdgeInsets.symmetric(horizontal: 15),
             child: CustomTextfield1(
               controller: controller.searchController,
@@ -109,8 +105,7 @@ class _AddNewGroupMemberState extends State<AddNewGroupMember> {
           verticalGap(10),
           Obx(() => controller.searchQuery.value == ''
               ? Center(
-                  child: poppinsText(
-                      TempLanguage.typeToFindMember, 12, regular, greyColor),
+                  child: poppinsText(TempLanguage.typeToFindMember, 12, regular, greyColor),
                 )
               : Expanded(
                   child: FutureBuilder(
@@ -118,102 +113,88 @@ class _AddNewGroupMemberState extends State<AddNewGroupMember> {
                   builder: (context, snapshot) {
                     return Obx(() => controller.userDataList.isEmpty
                         ? Center(
-                            child: poppinsText(TempLanguage.noMemberFound, 12,
-                                regular, greyColor),
+                            child: poppinsText(TempLanguage.noMemberFound, 12, regular, greyColor),
                           )
                         : ListView.builder(
                             itemCount: controller.userDataList.length,
                             itemBuilder: (context, index) {
+                              //  print(controller.userDataList[index].uid);
                               return Padding(
                                 padding: const EdgeInsets.only(bottom: 8),
-                                child: Row(
-                                  children: [
-                                    CircleAvatar(
-                                      backgroundImage: controller
-                                                  .userDataList[index]
-                                                  .photoUrl ==
-                                              ''
-                                          ? AssetImage(AppImage.user)
-                                              as ImageProvider
-                                          : CachedNetworkImageProvider(
-                                              controller.userDataList[index]
-                                                  .photoUrl!),
-                                      radius: 25,
-                                    ),
-                                    Expanded(
-                                      child: Padding(
-                                        padding:
-                                            const EdgeInsets.only(left: 10),
-                                        child: Column(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Row(
-                                              children: [
-                                                SizedBox(
-                                                  width: 60.w,
-                                                  child: poppinsText(
-                                                      controller
-                                                              .userDataList[
-                                                                  index]
-                                                              .userName ??
-                                                          '',
-                                                      15,
-                                                      FontWeight.bold,
-                                                      blackColor,
-                                                      overflow: TextOverflow
-                                                          .ellipsis),
-                                                ),
-                                              ],
-                                            ),
-                                            // SizedBox(
-                                            //   width: 45.w,
-                                            //   child: poppinsText(
-                                            //       'USerabout' ?? '',
-                                            //       11,
-                                            //       FontWeight.normal,
-                                            //       blackColor.withOpacity(0.65),
-                                            //       overflow:
-                                            //           TextOverflow.ellipsis),
-                                            // )
-                                          ],
-                                        ),
+                                child: Row(children: [
+                                  CircleAvatar(
+                                    backgroundImage: controller.userDataList[index].photoUrl == ''
+                                        ? AssetImage(AppImage.user) as ImageProvider
+                                        : CachedNetworkImageProvider(controller.userDataList[index].photoUrl!),
+                                    radius: 25,
+                                  ),
+                                  Expanded(
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(left: 10),
+                                      child: Column(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Row(
+                                            children: [
+                                              SizedBox(
+                                                width: 60.w,
+                                                child: poppinsText(controller.userDataList[index].userName ?? '', 15,
+                                                    FontWeight.bold, appBlackColor,
+                                                    overflow: TextOverflow.ellipsis),
+                                              ),
+                                            ],
+                                          ),
+                                          //....... condition to check whether the user is already added in group
+                                          if (widget.memberIds!.contains(controller.userDataList[index].uid)) ...[
+                                            SizedBox(
+                                              width: 45.w,
+                                              child: poppinsText('User already added', 11, FontWeight.normal,
+                                                  blackColor.withOpacity(0.65),
+                                                  overflow: TextOverflow.ellipsis),
+                                            )
+                                          ]
+                                          // SizedBox(
+                                          //   width: 45.w,
+                                          //   child: poppinsText(
+                                          //       'USerabout' ?? '',
+                                          //       11,
+                                          //       FontWeight.normal,
+                                          //       blackColor.withOpacity(0.65),
+                                          //       overflow:
+                                          //           TextOverflow.ellipsis),
+                                          // )
+                                        ],
                                       ),
                                     ),
-                                    Obx(() => Checkbox(
-                                          value: controller.mydata.containsKey(
-                                              controller
-                                                  .userDataList[index].uid),
-                                          onChanged: (value) {
-                                            controller.mydata.keys.contains(
-                                                    controller
-                                                        .userDataList[index]
-                                                        .uid)
-                                                ? controller.mydata.remove(
-                                                    controller
-                                                        .userDataList[index]
-                                                        .uid!)
-                                                : controller.mydata[controller
-                                                        .userDataList[index]
-                                                        .uid!] =
-                                                    controller
-                                                        .userDataList[index];
-                                            controller.searchController.clear();
-                                          },
-                                          fillColor:
-                                              MaterialStateProperty.resolveWith(
-                                                  (states) {
-                                            if (!states.contains(
-                                                MaterialState.pressed)) {
-                                              return greenColor;
-                                            }
-                                            return null;
-                                          }),
-                                        ))
-                                  ],
-                                ),
+                                  ),
+                                  //....... condition to check whether the user is already added in group
+                                  widget.memberIds!.contains(controller.userDataList[index].uid)
+                                      ? const SizedBox()
+                                      : Obx(() => Checkbox(
+                                            value: controller.mydata.containsKey(controller.userDataList[index].uid),
+                                            onChanged: (value) {
+                                              if (controller.mydata.keys.contains(controller.userDataList[index].uid)) {
+                                                controller.mydata.remove(controller.userDataList[index].uid!);
+                                              } else {
+                                                controller.mydata[controller.userDataList[index].uid!] =
+                                                    controller.userDataList[index];
+                                              }
+                                              controller.searchController.clear();
+                                            },
+                                            side: BorderSide(width: 1, color: appBlackColor),
+                                            activeColor: appGreenColor,
+                                            // fillColor:
+                                            //     MaterialStateProperty.resolveWith(
+                                            //         (states) {
+                                            //   if (!states.contains(
+                                            //       MaterialState.pressed)) {
+                                            //     return appGreenColor;
+                                            //   }
+                                            //   return null;
+                                            // }),
+                                          ))
+                                ]),
                               );
                             }));
                   },

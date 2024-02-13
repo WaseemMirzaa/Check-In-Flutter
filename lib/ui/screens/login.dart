@@ -44,9 +44,9 @@ class _LoginViewState extends State<LoginView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: whiteColor,
+      backgroundColor: appWhiteColor,
       appBar: AppBar(
-        backgroundColor: whiteColor,
+        backgroundColor: appWhiteColor,
         leading: Row(
           children: [
             const SizedBox(
@@ -177,7 +177,7 @@ class _LoginViewState extends State<LoginView> {
                               style: TextStyle(
                                 fontFamily: TempLanguage.poppins,
                                 fontSize: 1.7.h,
-                                color: blackColor,
+                                color: appBlackColor,
                                 fontWeight: FontWeight.w500,
                               ),
                               softWrap: false,

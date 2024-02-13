@@ -8,6 +8,7 @@ import 'package:check_in/utils/colors.dart';
 import 'package:check_in/utils/gaps.dart';
 import 'package:check_in/utils/styles.dart';
 import 'package:flutter/material.dart';
+import 'package:nb_utils/nb_utils.dart';
 import 'package:sizer/sizer.dart';
 
 class GroupMemberTile extends StatelessWidget {
@@ -25,7 +26,7 @@ class GroupMemberTile extends StatelessWidget {
         borderRadius: BorderRadius.circular(6),
         child: GestureDetector(
           onTap: () {
-            if (data!.iAmAdmin!) {
+            if (data!.iAmAdmin! && !data!.isOwner!) {
               _showDialog(context);
             }
           },
@@ -37,8 +38,8 @@ class GroupMemberTile extends StatelessWidget {
             child: Row(
               children: [
                 CircleAvatar(
-                  backgroundColor: greenColor.withOpacity(0.6),
-                  backgroundImage: data!.memberImg == ''
+                  backgroundColor: appGreenColor.withOpacity(0.6),
+                  backgroundImage: data!.memberImg.isEmptyOrNull
                       ? AssetImage(AppImage.user) as ImageProvider
                       : CachedNetworkImageProvider(data!.memberImg!),
                   radius: 30,
@@ -55,7 +56,7 @@ class GroupMemberTile extends StatelessWidget {
                             SizedBox(
                               width: 43.w,
                               child: poppinsText(data!.memberName ?? '', 15,
-                                  medium, blackColor,
+                                  medium, appBlackColor,
                                   overflow: TextOverflow.ellipsis),
                             ),
                           ],
@@ -63,7 +64,7 @@ class GroupMemberTile extends StatelessWidget {
                         SizedBox(
                           width: 45.w,
                           child: poppinsText(data!.memberDesc ?? '', 11,
-                              FontWeight.normal, blackColor.withOpacity(0.65),
+                              FontWeight.normal, appBlackColor.withOpacity(0.65),
                               overflow: TextOverflow.ellipsis),
                         )
                       ],
@@ -78,7 +79,7 @@ class GroupMemberTile extends StatelessWidget {
                             borderRadius: BorderRadius.circular(8)),
                         child: Text(
                           'Admin',
-                          style: TextStyle(color: greenColor),
+                          style: TextStyle(color: appGreenColor),
                         ),
                       )
                     : const SizedBox()

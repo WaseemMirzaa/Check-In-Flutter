@@ -1,3 +1,4 @@
+import 'package:check_in/core/constant/constant.dart';
 import 'package:check_in/model/Message%20and%20Group%20Message%20Model/group_member_model.dart';
 import 'package:get/get.dart';
 
@@ -8,11 +9,19 @@ class GroupmemberController extends GetxController {
   String docid = '';
   GroupmemberController(this.messageService);
   var searchQuery = ''.obs;
-  RxBool iAmAdmin = false.obs;
+  RxList memberIds = [].obs;
+  // RxBool iAmAdmin = false.obs;
 
 //............ get groupmember
   Stream<List<GroupMemberModel>> getGroupMember(String userId) {
-    return messageService.getGroupMembers(docid, userId);
+    var data = messageService.getGroupMembers(docid, userId);
+    data.listen((groupMembers) {
+      memberIds.clear(); // Clear existing member IDs
+      for (var member in groupMembers) {
+        memberIds.add(member.memberId); // Add member IDs to the list
+      }
+    });
+    return data;
   }
 
 //............ make group admin

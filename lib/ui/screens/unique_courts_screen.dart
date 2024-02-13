@@ -121,7 +121,7 @@ class UniqueCourtsScreen extends StatelessWidget {
                                   style: TextStyle(
                                     fontFamily: TempLanguage.poppins,
                                     fontSize: 1.6.h,
-                                    color: blackColor,
+                                    color: appBlackColor,
                                     fontWeight: FontWeight.w600,
                                   ),
                                   children: [
@@ -129,7 +129,7 @@ class UniqueCourtsScreen extends StatelessWidget {
                                       style: TextStyle(
                                         fontFamily: TempLanguage.poppins,
                                         fontSize: 1.1.h,
-                                        color: greenColor,
+                                        color: appGreenColor,
                                         height: 1.7,
                                       ),
                                       children: [

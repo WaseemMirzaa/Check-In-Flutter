@@ -16,11 +16,13 @@ class NewMessageController extends GetxController {
   late final RxList<UserModel> userDataList = RxList<UserModel>();
   RxString searchQuery = ''.obs;
   DocumentSnapshot? _lastDocument;
-
+  List<Map<String, dynamic>> dataArray =[];
+  List memberIds = [];
   final DOCUMENT_PER_PAGE = 20;
   final DELAY_IN_MILLISECONDS = 300;
 
   RxMap<String, dynamic> mydata = <String, dynamic>{}.obs;
+  // RxMap<String, dynamic> dataArray = <String, dynamic>{}.obs;
 
   // StreamController to manage the text input stream
   final _searchQuerySubject = BehaviorSubject<String>();
@@ -82,38 +84,43 @@ class NewMessageController extends GetxController {
         .startNewChat([myUid, mydata.keys.first], uNAme, model.userName!,model.photoUrl!,UImage);
   }
 
-  Future<String> startNewGroupChat(String myUid, String uNAme) async {
-    List<Map<String, dynamic>> dataArray = [
+  Future<String> startNewGroupChat(String myUid, String uNAme, String memberImage,String about) async {
+    dataArray = [
       {
         MessageField.MEMBER_UID: myUid,
         MessageField.MEMBER_NAME: uNAme,
-        MessageField.ABOUT_USER: '',
-        MessageField.MEMBER_IMG: '',
+        MessageField.ABOUT_USER: about,
+        MessageField.MEMBER_IMG: memberImage,
         MessageField.IS_ADMIN: true,
+        MessageField.IS_OWNER:true,
         MessageField.MEMBER_UNREAD_COUNT: 0
       }
     ];
-    List memberIds = [myUid];
+    memberIds = [myUid];
     mydata.forEach((id, data) {
       UserModel value = data;
-
       String uid = value.uid!;
       String name = value.userName!;
       String about = value.aboutMe!;
+      String image = value.photoUrl!;
 
       Map<String, dynamic> userData = {
         MessageField.MEMBER_UID: uid,
         MessageField.MEMBER_NAME: name,
         MessageField.ABOUT_USER: about,
-        MessageField.MEMBER_IMG: '',
+        MessageField.MEMBER_IMG: image,
         MessageField.IS_ADMIN: false,
+        MessageField.IS_OWNER: false,
+
         MessageField.MEMBER_UNREAD_COUNT: 0
       };
       dataArray.add(userData);
       memberIds.add(value.uid);
+
     });
 
-    return chatService.startNewGroupChat(memberIds, dataArray);
+     return '';
+    // return chatService.startNewGroupChat(memberIds, dataArray);
   }
 
   // Method to update the search query

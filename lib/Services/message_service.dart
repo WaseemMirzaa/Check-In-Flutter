@@ -11,6 +11,7 @@ import 'package:check_in/model/Message%20and%20Group%20Message%20Model/group_mem
 import 'package:check_in/model/user_modal.dart';
 import 'package:check_in/utils/Constants/enums.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:intl/intl.dart';
 
@@ -57,6 +58,7 @@ class MessageService {
   Stream<List<Messagemodel>> getChatMessage(String myId) {
     return _messagesCollection
         .where(MessageField.MEMBER_IDS, arrayContains: myId)
+        // .orderBy(MessageField.TIME_STAMP, descending: true)
         .snapshots()
         .map((querySnapshot) => querySnapshot.docs.map<Messagemodel>((doc) {
               num unread = 0;
@@ -122,7 +124,6 @@ class MessageService {
 
   // Function to fetch the online status of a user
   Future<String> getOnlineStatus(String docId) async {
-    
     try {
       
       DocumentSnapshot snapshot = await _messagesCollection.doc(docId).get();
@@ -548,24 +549,25 @@ class MessageService {
   }
 
   //........... Start new group chat
-  Future<String> startNewGroupChat(List ids, List members) async {
+  Future<String> startNewGroupChat(List ids, List members, String groupName, String groupInfo, String groupImage) async {
     Map<String, dynamic> data = {
-      MessageField.ABOUT_GROUP: '',
+      MessageField.ABOUT_GROUP: groupInfo,
       MessageField.GROUP_IMG: '',
-      MessageField.GROUP_NAME: '',
+      MessageField.GROUP_NAME: groupName,
       MessageField.ID: '',
       MessageField.IS_GROUP: true,
       MessageField.LAST_MESSAGE: '',
       MessageField.MEMBER_IDS: ids,
       MessageField.MEMBERS: members,
-      MessageField.TIME_STAMP: ''
+      MessageField.TIME_STAMP: '',
     };
 
     DocumentReference documentReference = await _messagesCollection.add(data);
     String documentId = documentReference.id;
+    String? image = await uploadImageToFirebase(documentId, groupImage);
 
     // Update the 'id' field in the model with the document ID
-    _messagesCollection.doc(documentId).update({MessageField.ID: documentId});
+    _messagesCollection.doc(documentId).update({MessageField.ID: documentId,MessageField.GROUP_IMG: image});
     return documentId;
   }
 
@@ -582,6 +584,39 @@ class MessageService {
     } catch (e) {
       rethrow;
     }
+  }
+
+  Future<bool> updateCollection(String collectionName, String docID, Map<String, dynamic> list ) async{
+    try{
+      await db.collection(collectionName).doc(docID).update(list);
+      return true;
+    }catch (e) {
+      log("The error while Updatation is: $e");
+      return false;
+    }
+  }
+
+
+  Future<bool> removeCurrentUserFromMemberIds(String docID) async {
+    // Get current user UID
+    String currentUserUid = FirebaseAuth.instance.currentUser!.uid;
+
+    // Reference to your Firestore collection
+    CollectionReference messagesCollection = FirebaseFirestore.instance.collection(Collections.MESSAGES);
+
+    // Retrieve the document containing memberIds
+    DocumentReference documentReference = messagesCollection.doc(docID);
+    DocumentSnapshot documentSnapshot = await documentReference.get();
+
+    // Get the current memberIds
+    List<dynamic> memberIds = documentSnapshot[MessageField.MEMBER_IDS];
+
+    // Remove current user UID from the list
+    memberIds.remove(currentUserUid);
+
+    // Update the document with the new memberIds
+    await documentReference.update({MessageField.MEMBER_IDS: memberIds});
+    return true;
   }
 
   //........... Add new member

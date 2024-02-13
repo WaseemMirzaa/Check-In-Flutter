@@ -43,15 +43,15 @@ class _TermsAndConditionsState extends State<TermsAndConditions> {
         ),
         elevation: 0,
         centerTitle: true,
-        backgroundColor: whiteColor,
+        backgroundColor: appWhiteColor,
         title: poppinsText(
-            TempLanguage.termsAndConditions, 20, FontWeight.bold, blackColor),
+            TempLanguage.termsAndConditions, 20, FontWeight.bold, appBlackColor),
       ),
       body: Container(
         margin: const EdgeInsets.only(top: 10),
         padding: const EdgeInsets.only(top: 10, left: 10, right: 10),
         decoration: BoxDecoration(
-          color: whiteColor,
+          color: appWhiteColor,
           borderRadius: const BorderRadius.only(
             topRight: Radius.circular(30),
             topLeft: Radius.circular(30),

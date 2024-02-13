@@ -572,10 +572,10 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
       }
 
       Get.snackbar("Checked In", "You have checked into this court.",
-          backgroundColor: whiteColor,
+          backgroundColor: appWhiteColor,
           borderWidth: 4,
-          borderColor: blackColor,
-          colorText: blackColor);
+          borderColor: appBlackColor,
+          colorText: appBlackColor);
       // print(index);
       // print(withinRadius);
     }
@@ -593,10 +593,10 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
 
       Get.snackbar(
           TempLanguage.checkOutToastTitle, TempLanguage.checkOutToastMessage,
-          backgroundColor: whiteColor,
+          backgroundColor: appWhiteColor,
           borderWidth: 4,
-          borderColor: blackColor,
-          colorText: blackColor);
+          borderColor: appBlackColor,
+          colorText: appBlackColor);
     }
   }
 
@@ -638,7 +638,7 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
     return Scaffold(
       key: _scaffoldState,
       drawer: Drawer(
-        backgroundColor: whiteColor,
+        backgroundColor: appWhiteColor,
         child: SizedBox(
           height: 300,
           child: ListView(
@@ -647,7 +647,7 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
             children: [
               DrawerHeader(
                 decoration: BoxDecoration(
-                  color: whiteColor,
+                  color: appWhiteColor,
                 ),
                 child: Image.asset(
                   AppAssets.LOGO_NEW,
@@ -844,12 +844,12 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
                                 height: 40,
                                 width: 40,
                                 decoration: BoxDecoration(
-                                  color: greenColor,
+                                  color: appGreenColor,
                                   shape: BoxShape.circle,
                                 ),
                                 child: Icon(
                                   Icons.menu,
-                                  color: whiteColor,
+                                  color: appWhiteColor,
                                 ),
                               ),
                             ),
@@ -875,12 +875,12 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
                                 height: 40,
                                 width: 40,
                                 decoration: BoxDecoration(
-                                  color: greenColor,
+                                  color: appGreenColor,
                                   shape: BoxShape.circle,
                                 ),
                                 child: Icon(
                                   Icons.refresh,
-                                  color: whiteColor,
+                                  color: appWhiteColor,
                                 ),
                               ),
                             ),
@@ -911,7 +911,7 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
                                     errorBorder: InputBorder.none,
                                     focusedBorder: InputBorder.none,
                                     focusedErrorBorder: InputBorder.none,
-                                    fillColor: whiteColor,
+                                    fillColor: appWhiteColor,
                                     hintText: TempLanguage.findCourts,
                                     hintStyle: GoogleFonts.poppins(
                                         fontSize: 12,
@@ -1057,7 +1057,7 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
                                         TempLanguage.logInForFeatures,
                                         16,
                                         FontWeight.w500,
-                                        blackColor),
+                                        appBlackColor),
                                     actions: [
                                       TextButton(
                                         onPressed: () {
@@ -1079,10 +1079,10 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
                               ? _buttonPress()
                               : Get.snackbar(TempLanguage.notAtCourtToastTitle,
                                   TempLanguage.notAtCourtToastMessage,
-                                  backgroundColor: whiteColor,
+                                  backgroundColor: appWhiteColor,
                                   borderWidth: 4,
-                                  borderColor: blackColor,
-                                  colorText: blackColor);
+                                  borderColor: appBlackColor,
+                                  colorText: appBlackColor);
                         }
                       }),
                     ),
@@ -1100,7 +1100,7 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
                 backgroundColor: blueAccentColor,
                 child: Icon(
                   Icons.gps_fixed,
-                  color: whiteColor,
+                  color: appWhiteColor,
                 ),
               ),
             ),

@@ -56,7 +56,7 @@ class _MyNavigationBarState extends State<MyNavigationBar> {
           ],
           type: BottomNavigationBarType.shifting,
           currentIndex: _selectedIndex,
-          selectedItemColor: blackColor,
+          selectedItemColor: appBlackColor,
           iconSize: 40,
           onTap: _onItemTapped,
           elevation: 5),

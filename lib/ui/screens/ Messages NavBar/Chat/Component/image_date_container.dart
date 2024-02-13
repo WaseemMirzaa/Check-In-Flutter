@@ -8,41 +8,54 @@ import '../../../../../utils/gaps.dart';
 import '../../../../../utils/styles.dart';
 
 // ignore: must_be_immutable
-class ImageDateContainer extends StatelessWidget {
+class ImageDateContainer extends StatefulWidget {
   // int? index;
   Chatmodel? chat;
   bool? mymsg;
   bool? showLastSeen;
-  String? seenTime;
+
   bool? isGroup;
   ImageDateContainer(
       {super.key,
       // this.index,
       this.chat,
       this.mymsg,
-      this.seenTime,
+
       this.showLastSeen,
       this.isGroup});
 
   @override
+  State<ImageDateContainer> createState() => _ImageDateContainerState();
+}
+
+class _ImageDateContainerState extends State<ImageDateContainer> {
+  // @override
+  // void initState() {
+  //   // TODO: implement initState
+  //   super.initState();
+  //   setState(() {
+  //
+  //   });
+  // }
+  @override
   Widget build(BuildContext context) {
-    String timeseperate = chat!.time!.split(' ')[1];
+    String timeseperate = widget.chat!.time!.split(' ')[1];
     String time = DateTimeUtils.time24to12(timeseperate);
     return Column(
       crossAxisAlignment:
-          mymsg! ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+          widget.mymsg! ? CrossAxisAlignment.end : CrossAxisAlignment.start,
       children: [
         Container(
           height: 200,
           width: 40.w,
           decoration: BoxDecoration(
-              color: greenColor.withOpacity(0.3),
+              color: appGreenColor.withOpacity(0.3),
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: greenColor, width: 2)),
+              border: Border.all(color: appGreenColor, width: 2)),
           child: ClipRRect(
             borderRadius: BorderRadius.circular(8),
             child: CachedNetworkImage(
-              imageUrl: chat!.message!,
+              imageUrl: widget.chat!.message!,
               fit: BoxFit.cover,
             ),
           ),
@@ -65,16 +78,16 @@ class ImageDateContainer extends StatelessWidget {
             //     : const SizedBox()
           ],
         ),
-        chat!.seenTimeStamp != '' && showLastSeen == true && isGroup == false
-            ? Container(
-                padding: const EdgeInsets.all(5),
-                decoration: BoxDecoration(
-                  border: Border.all(),
-                  borderRadius: BorderRadius.circular(15),
-                ),
-                child: poppinsText("Seen $seenTime", 9, medium, greyColor),
-              )
-            : const SizedBox()
+        // widget.chat!.seenTimeStamp != '' && widget.showLastSeen == true && widget.isGroup == false
+        //     ? Container(
+        //         padding: const EdgeInsets.all(5),
+        //         decoration: BoxDecoration(
+        //           border: Border.all(),
+        //           borderRadius: BorderRadius.circular(15),
+        //         ),
+        //         child: poppinsText("Seen ${widget.seenTime}", 9, medium, greyColor),
+        //       )
+        //     : const SizedBox()
       ],
     );
   }

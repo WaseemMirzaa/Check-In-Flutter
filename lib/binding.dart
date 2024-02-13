@@ -6,7 +6,6 @@ import 'package:check_in/controllers/News%20Feed/create_post_controller.dart';
 import 'package:check_in/controllers/News%20Feed/news_feed_controller.dart';
 import 'package:check_in/controllers/user_controller.dart';
 import 'package:get/get.dart';
-
 import 'Services/message_service.dart';
 import 'controllers/Messages/chat_controller.dart';
 import 'controllers/Messages/group_members_controller.dart';

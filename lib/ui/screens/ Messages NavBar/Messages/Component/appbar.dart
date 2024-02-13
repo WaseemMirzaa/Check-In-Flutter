@@ -21,7 +21,7 @@ class MessageAppBar extends StatelessWidget implements PreferredSizeWidget {
       title: Row(mainAxisSize: MainAxisSize.min, children: [
         SvgPicture.asset(AppImage.messageappbaricon),
         horizontalGap(15),
-        poppinsText(TempLanguage.messages, 15, FontWeight.bold, blackColor)
+        poppinsText(TempLanguage.messages, 15, FontWeight.bold, appBlackColor)
       ]),
       actions: [
         Padding(

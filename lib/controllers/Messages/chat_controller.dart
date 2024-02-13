@@ -96,7 +96,7 @@ class ChatController extends GetxController {
             msg: msg,
             docId: docId.value,
             isGroup: isgroup,
-            image: image.value,
+            image:'',
             name: senderName.value,
             memberIds: memberId);
       }

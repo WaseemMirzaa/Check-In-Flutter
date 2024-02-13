@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 
-Color blackColor = Colors.black;
+Color appBlackColor = Colors.black;
 Color blackTranslucentColor = const Color(0x29000000);
-Color whiteColor = Colors.white;
-Color greenColor = const Color(0xff007A33);
+Color appWhiteColor = Colors.white;
+Color appGreenColor = const Color(0xff007A33);
+Color appRedColor =  Colors.red;
 Color lightGreenColor = Colors.green;
 Color greyColor = const Color(0xff707070);
 Color textColor = const Color(0xff777777);
@@ -17,4 +18,3 @@ Color transparentColor = Colors.transparent;
 Color offWhiteColor = const Color.fromARGB(255, 216, 227, 242);
 Color greyColor1 = const Color(0xFFEAECF2);
 Color darkBlue = const Color(0xff19295C);
-

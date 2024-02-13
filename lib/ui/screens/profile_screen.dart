@@ -133,6 +133,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
       final firestore = FirebaseFirestore.instance;
       final userId = FirebaseAuth.instance.currentUser!.uid;
       await firestore.collection(Collections.USER).doc(userId).update({UserKey.PHOTO_URL: downloadUrl});
+      CollectionReference messagesRef = FirebaseFirestore.instance.collection(Collections.MESSAGES);
+
+      QuerySnapshot messagesQuery = await messagesRef.where(MessageField.SENDER_ID, isEqualTo: userController.userModel.value.uid).get();
+
+      // Iterate through the documents and update senderImage field
+      messagesQuery.docs.forEach((doc) async {
+        // Update the senderImage field with the new image URL
+        await messagesRef.doc(doc.id).update({
+          MessageField.SENDER_IMG: downloadUrl,
+        });
+      });
+      await firestore.collection(Collections.MESSAGES).where(MessageField.SENDER_ID, isEqualTo: userController.userModel.value.uid);
     }
   }
 
@@ -209,8 +221,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
       appBar: AppBar(
         elevation: 0,
         centerTitle: true,
-        backgroundColor: whiteColor,
-        title: poppinsText(TempLanguage.profile, 20, FontWeight.bold, blackColor),
+        backgroundColor: appWhiteColor,
+        title: poppinsText(TempLanguage.profile, 20, FontWeight.bold, appBlackColor),
       ),
       body: SingleChildScrollView(
         child: SizedBox(
@@ -261,7 +273,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                     width: 35.h,
                                                     decoration: BoxDecoration(
                                                         shape: BoxShape.circle,
-                                                        border: Border.all(width: 2, color: greenColor),
+                                                        border: Border.all(width: 2, color: appGreenColor),
                                                         image: const DecorationImage(
                                                             image: AssetImage(AppAssets.LOGO_NEW), fit: BoxFit.fill)),
                                                   )),
@@ -274,8 +286,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                           width: 12.1.w,
                                           decoration: const BoxDecoration(
                                               shape: BoxShape.circle,
-                                              image:
-                                                  DecorationImage(image: AssetImage(AppAssets.INSTAGRAM_VERIFICATION))),
+                                              image: DecorationImage(image: AssetImage(AppAssets.INSTAGRAM_VERIFICATION))),
                                         ),
                                       )
                                     else
@@ -290,7 +301,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   userController.userModel.value.userName ?? "",
                                   32,
                                   FontWeight.bold,
-                                  blackColor),
+                                  appBlackColor),
                               // poppinsText(
                               //     "@${userController.userModel.value.email.substring(0, userController.userModel.value.email.indexOf('@'))}",
                               //     12,
@@ -386,7 +397,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                       mainAxisAlignment: MainAxisAlignment.center,
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
-                                        poppinsText("Golden\nCourt", 22, FontWeight.bold, blackColor),
+                                        poppinsText("Golden\nCourt", 22, FontWeight.bold, appBlackColor),
                                         FutureBuilder<List<UserModel>?>(
                                           future: getUniqueCourtNameMaps(),
                                           builder: (context, snapshot) {
@@ -395,13 +406,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                               return const Center(child: CircularProgressIndicator());
                                             } else if (snapshot.hasData && snapshot.data != null) {
                                               return poppinsText("${snapshot.data?.length ?? 0} Check ins", 12,
-                                                  FontWeight.normal, blackColor);
+                                                  FontWeight.normal, appBlackColor);
                                             } else if (snapshot.hasError) {
                                               return Center(
                                                 child: Text(TempLanguage.wentWrong),
                                               );
                                             } else {
-                                              return poppinsText("0 Check ins", 12, FontWeight.normal, blackColor);
+                                              return poppinsText("0 Check ins", 12, FontWeight.normal, appBlackColor);
                                             }
                                           },
                                         ),

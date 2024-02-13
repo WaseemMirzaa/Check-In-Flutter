@@ -40,7 +40,7 @@ class MessageListTile extends StatelessWidget {
             child: Row(
               children: [
                 CircleAvatar(
-                  backgroundColor: greenColor.withOpacity(0.6),
+                  backgroundColor: appGreenColor.withOpacity(0.6),
                   backgroundImage: message!.image! == ''
                       ? AssetImage(AppImage.user) as ImageProvider
                       : CachedNetworkImageProvider(message!.image!),
@@ -63,7 +63,7 @@ class MessageListTile extends StatelessWidget {
                           SizedBox(
                             width: 45.w,
                             child: poppinsText(
-                                message!.name!, 15, medium, blackColor,
+                                message!.name!, 15, medium, appBlackColor,
                                 overflow: TextOverflow.ellipsis),
                           ),
                         ],
@@ -74,7 +74,7 @@ class MessageListTile extends StatelessWidget {
                           message!.lastmessage!,
                           12,
                           medium,
-                          blackColor.withOpacity(0.65),
+                          appBlackColor.withOpacity(0.65),
                         ),
                       )
                     ],
@@ -92,12 +92,12 @@ class MessageListTile extends StatelessWidget {
                         : Container(
                             padding: const EdgeInsets.all(4),
                             decoration: BoxDecoration(
-                                color: greenColor, shape: BoxShape.circle),
+                                color: appGreenColor, shape: BoxShape.circle),
                             child: poppinsText(
                               unReadCount,
                               9,
                               FontWeight.normal,
-                              whiteColor,
+                              appWhiteColor,
                             ),
                           ),
                     poppinsText(time, 10, FontWeight.normal,

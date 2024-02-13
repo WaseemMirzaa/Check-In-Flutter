@@ -239,7 +239,7 @@ class _AddHomeCourtState extends State<AddHomeCourt>
     return Scaffold(
       key: _scaffoldState,
       drawer: Drawer(
-        backgroundColor: whiteColor,
+        backgroundColor: appWhiteColor,
         child: SizedBox(
           height: 300,
           child: ListView(
@@ -248,7 +248,7 @@ class _AddHomeCourtState extends State<AddHomeCourt>
             children: [
               DrawerHeader(
                 decoration: BoxDecoration(
-                  color: whiteColor,
+                  color: appWhiteColor,
                 ),
                 child: Image.asset(
                   AppAssets.LOGO_NEW,
@@ -372,12 +372,12 @@ class _AddHomeCourtState extends State<AddHomeCourt>
                               height: 40,
                               width: 40,
                               decoration: BoxDecoration(
-                                color: greenColor,
+                                color: appGreenColor,
                                 shape: BoxShape.circle,
                               ),
                               child: Icon(
                                 Icons.arrow_back_ios_new,
-                                color: whiteColor,
+                                color: appWhiteColor,
                               ),
                             ),
                           ),
@@ -407,7 +407,7 @@ class _AddHomeCourtState extends State<AddHomeCourt>
                                     errorBorder: InputBorder.none,
                                     focusedBorder: InputBorder.none,
                                     focusedErrorBorder: InputBorder.none,
-                                    fillColor: whiteColor,
+                                    fillColor: appWhiteColor,
                                     hintText: TempLanguage.findCourts,
                                     hintStyle: GoogleFonts.poppins(
                                         fontSize: 12,
@@ -604,7 +604,7 @@ class _AddHomeCourtState extends State<AddHomeCourt>
                 backgroundColor: blueAccentColor,
                 child: Icon(
                   Icons.gps_fixed,
-                  color: whiteColor,
+                  color: appWhiteColor,
                 ),
               ),
             ),

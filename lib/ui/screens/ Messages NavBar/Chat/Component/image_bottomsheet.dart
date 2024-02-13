@@ -31,7 +31,7 @@ Future<void> showchatbottomSheet(
                   if (pickedFile != null) {
                     controller.fileImage.value = pickedFile;
                     Navigator.pop(context);
-                    controller.sendMessage();
+                    await controller.sendMessage();
                   }
                 },
                 child: Container(
@@ -55,7 +55,7 @@ Future<void> showchatbottomSheet(
                   if (pickedFile != null) {
                     controller.fileImage.value = pickedFile;
                     Navigator.pop(context);
-                    controller.sendMessage();
+                    await controller.sendMessage();
                   }
                 },
                 child: Container(

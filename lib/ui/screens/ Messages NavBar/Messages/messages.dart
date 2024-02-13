@@ -67,8 +67,7 @@ class MessageScreen extends GetView<MessageController> {
                                     child: MessageListTile(
                                       message: snapshot.data![index],
                                       ontap: () {
-                                        GlobalVariable.docId = chatcontroller
-                                            .docId.value = message.id!;
+                                        GlobalVariable.docId = chatcontroller.docId.value = message.id!;
                                         //.........................
                                         chatcontroller.name.value =
                                             message.name!;
@@ -84,7 +83,8 @@ class MessageScreen extends GetView<MessageController> {
                                         // chatcontroller.updateLastSeenMethod();
                                         pushNewScreen(
                                           context,
-                                          screen: const ChatScreen(
+                                          screen: ChatScreen(
+                                            recieverImage: message.image,
                                               //   name: message.name!.obs,isGroup: message.isgroup,
                                               // image:message.image!.obs,memberId: message.memberIds!.obs,senderName: message.senderName!.obs,
                                               ),

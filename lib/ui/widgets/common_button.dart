@@ -6,7 +6,7 @@ Container fullWidthButton(String label, VoidCallback onTap) {
   return Container(
     height: 50,
     decoration: BoxDecoration(
-      color: greenColor,
+      color: appGreenColor,
       borderRadius: BorderRadius.circular(11.0),
       boxShadow: [
         BoxShadow(
@@ -27,7 +27,7 @@ Container fullWidthButton(String label, VoidCallback onTap) {
             style: TextStyle(
               fontFamily: 'Poppins',
               fontSize: 14,
-              color: whiteColor,
+              color: appWhiteColor,
               fontWeight: FontWeight.w500,
             ),
             textAlign: TextAlign.center,

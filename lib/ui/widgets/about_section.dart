@@ -42,7 +42,7 @@ class _AboutSectionState extends State<AboutSection> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        poppinsText(TempLanguage.homeCourt, 14, semiBold, greenColor),
+        poppinsText(TempLanguage.homeCourt, 14, semiBold, appGreenColor),
         verticalGap(0.8.h),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 30),
@@ -57,7 +57,7 @@ class _AboutSectionState extends State<AboutSection> {
                           : widget.userController.userModel.value.homeCourt ?? "",
                       14,
                       semiBold,
-                      blackColor),
+                      appBlackColor),
                   InkWell(
                     onTap: () {
                       pushNewScreen(context, screen: const AddHomeCourt(), withNavBar: false);
@@ -91,7 +91,7 @@ class _AboutSectionState extends State<AboutSection> {
               ),
               height: 20.h,
               decoration: BoxDecoration(
-                color: whiteColor,
+                color: appWhiteColor,
                 borderRadius: const BorderRadius.only(topLeft: Radius.circular(10), topRight: Radius.circular(10)),
                 boxShadow: [
                   BoxShadow(
@@ -108,7 +108,7 @@ class _AboutSectionState extends State<AboutSection> {
                     width: 100,
                     height: 0.5.h,
                     decoration: BoxDecoration(
-                        color: greenColor,
+                        color: appGreenColor,
                         borderRadius:
                             const BorderRadius.only(bottomLeft: Radius.circular(5), bottomRight: Radius.circular(5))),
                   ),
@@ -118,7 +118,7 @@ class _AboutSectionState extends State<AboutSection> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      poppinsText(TempLanguage.aboutMe, 14, semiBold, blackColor),
+                      poppinsText(TempLanguage.aboutMe, 14, semiBold, appBlackColor),
                       InkWell(
                         onTap: () => setState(() {
                           if (tapped) {
@@ -138,7 +138,7 @@ class _AboutSectionState extends State<AboutSection> {
                         child: Padding(
                             padding: const EdgeInsets.only(left: 8),
                             child: tapped
-                                ? Expanded(child: poppinsText(TempLanguage.save, 14, semiBold, greenColor))
+                                ? Expanded(child: poppinsText(TempLanguage.save, 14, semiBold, appGreenColor))
                                 : const ImageIcon(
                                     AssetImage(
                                       AppAssets.EDIT_ICON,

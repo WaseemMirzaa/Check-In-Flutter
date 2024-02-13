@@ -14,38 +14,39 @@ class ChatAppbar extends StatelessWidget implements PreferredSizeWidget {
   RxString? image;
   Widget? lastSeen;
   bool? isgroup;
+  Widget? widget;
   String? onlineStatus;
   Function()? ontap;
-  ChatAppbar({super.key, this.name, this.isgroup, this.ontap, this.image, this.onlineStatus, this.lastSeen});
+  ChatAppbar({super.key, this.name, this.isgroup, this.ontap, this.image, this.onlineStatus, this.lastSeen, this.widget,});
 
   @override
   Widget build(BuildContext context) {
     return CustomAppbar(
       title: GestureDetector(
         onTap: ontap,
-        child: Row(mainAxisSize: MainAxisSize.min, children: [
+        child: Row(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
           Obx(() => CircleAvatar(
-                backgroundImage: image!.value == ''
-                    ? AssetImage(AppImage.user) as ImageProvider
-                    : CachedNetworkImageProvider(image!.value),
-                radius: 20,
+                backgroundImage: image!.value == '' ? AssetImage(AppImage.user) as ImageProvider : CachedNetworkImageProvider(image!.value), radius: 20,
               )),
-          horizontalGap(15),
+          horizontalGap(10),
           isgroup! ? SvgPicture.asset(AppImage.chatgroupicon) : const SizedBox(),
-          horizontalGap(5),
+          horizontalGap(2),
           Obx(() => Flexible(
                 child: isgroup!
-                    ? poppinsText(name!.value ?? '', 15, FontWeight.bold, blackColor)
+                    ? poppinsText(name!.value ?? '', 16, FontWeight.bold, appBlackColor)
                     : Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          poppinsText(name!.value ?? '', 15, FontWeight.bold, blackColor),
-                          const SizedBox(height: 8),
-                          lastSeen ??
+                          poppinsText(name!.value ?? '', 16, FontWeight.bold, appBlackColor),
+                          const SizedBox(height: 2),
+                           widget ?? lastSeen ??
                               Text(
                                 onlineStatus!,
                                 style: const TextStyle(
-                                  fontSize: 14,
+                                  fontSize: 10,
                                   fontWeight: FontWeight.normal,
                                   color: Colors.black,
                                 ),

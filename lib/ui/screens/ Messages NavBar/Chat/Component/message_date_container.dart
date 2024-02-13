@@ -14,14 +14,14 @@ class MessageDateContainer extends StatelessWidget {
   Chatmodel? chat;
   bool? mymsg;
   bool? showLastSeen;
-  String? seenTime;
+
   bool? isGroup;
   MessageDateContainer(
       {super.key,
       // this.index,
       this.chat,
       this.mymsg,
-      this.seenTime,
+
       this.showLastSeen,
       this.isGroup});
 
@@ -53,15 +53,15 @@ class MessageDateContainer extends StatelessWidget {
                     topRight: const Radius.circular(15),
                     bottomLeft: Radius.circular(mymsg! ? 15 : 0),
                     bottomRight: Radius.circular(mymsg! ? 0 : 15)),
-                color: mymsg! ? greenColor : greyColor1.withOpacity(1),
+                color: mymsg! ? appGreenColor : greyColor1.withOpacity(1),
               ),
               padding: const EdgeInsets.all(15),
               child: poppinsText(chat!.message!, 12, FontWeight.normal,
-                  mymsg! ? whiteColor : greyColor.withOpacity(1)),
+                  mymsg! ? appWhiteColor : greyColor.withOpacity(1)),
             ),
             mymsg!
                 ? CustomPaint(
-                    painter: CustomShape(bgcolor: greenColor),
+                    painter: CustomShape(bgcolor: appGreenColor),
                   )
                 : const SizedBox()
           ],
@@ -84,16 +84,16 @@ class MessageDateContainer extends StatelessWidget {
             //     : const SizedBox()
           ],
         ),
-        chat!.seenTimeStamp != '' && showLastSeen == true && isGroup == false
-            ? Container(
-                padding: const EdgeInsets.all(5),
-                decoration: BoxDecoration(
-                  border: Border.all(),
-                  borderRadius: BorderRadius.circular(15),
-                ),
-                child: poppinsText("Seen $seenTime", 9, medium, greyColor),
-              )
-            : const SizedBox()
+        // chat!.seenTimeStamp != '' && showLastSeen == true && isGroup == false
+        //     ? Container(
+        //         padding: const EdgeInsets.all(5),
+        //         decoration: BoxDecoration(
+        //           border: Border.all(),
+        //           borderRadius: BorderRadius.circular(15),
+        //         ),
+        //         child: poppinsText("Seen $seenTime", 9, medium, greyColor),
+        //       )
+        //     : const SizedBox()
       ],
     );
   }

@@ -5,7 +5,7 @@ import 'package:check_in/core/constant/constant.dart';
 import 'package:check_in/core/constant/temp_language.dart';
 import 'package:check_in/model/Message%20and%20Group%20Message%20Model/chat_model.dart';
 import 'package:check_in/controllers/Messages/chat_controller.dart';
-import 'package:check_in/utils/Constants/images.dart';
+import 'package:check_in/ui/screens/%20Messages%20NavBar/edit_group_detail/edit_group_details.dart';
 import 'package:check_in/utils/colors.dart';
 import 'package:check_in/utils/gaps.dart';
 import 'package:check_in/utils/loader.dart';
@@ -15,14 +15,13 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
 import 'package:sizer/sizer.dart';
-
+import 'package:image_picker/image_picker.dart';
+import 'package:nb_utils/nb_utils.dart';
 import '../../../../model/Message and Group Message Model/message_model.dart';
 import '../../../../utils/Constants/enums.dart';
 import '../../../../utils/styles.dart';
-import '../Group Detail/group_detail.dart';
 import 'Component/appbar.dart';
 import 'Component/button.dart';
-import 'Component/image_bottomsheet.dart';
 import 'Component/image_date_container.dart';
 import 'Component/message_date_container.dart';
 import 'Component/send_message_container.dart';
@@ -37,7 +36,9 @@ final chatQuery = FirebaseFirestore.instance
     );
 
 class ChatScreen extends StatefulWidget {
-  const ChatScreen({super.key});
+   ChatScreen({super.key , this.recieverImage, this.isFirstTime = false});
+  String? recieverImage;
+  bool isFirstTime;
 
   @override
   State<ChatScreen> createState() => _ChatScreenState();
@@ -117,20 +118,21 @@ class _ChatScreenState extends State<ChatScreen> {
   @override
   void initState() {
     super.initState();
-     fetchOnlineStatus(userController.userModel.value.uid!);
-    
-    _subscription = FirebaseFirestore.instance
-        .collection(Collections.MESSAGES)
-        .doc(controller.docId.value)
-        .collection(Collections.CHAT)
-        .orderBy(ChatField.TIME_STAMP, descending: true)
-        .snapshots()
-        .listen((data) => onChangeData(data.docChanges));
+    if(widget.isFirstTime){
+      null;
+    }else {
+      fetchOnlineStatus(userController.userModel.value.uid!);
+      _subscription = FirebaseFirestore.instance
+          .collection(Collections.MESSAGES)
+          .doc(controller.docId.value)
+          .collection(Collections.CHAT)
+          .orderBy(ChatField.TIME_STAMP, descending: true)
+          .snapshots()
+          .listen((data) => onChangeData(data.docChanges));
 
-    requestNextPage();
-
-
-    startTimer();
+      // requestNextPage();
+      startTimer();
+    }
   }
 
   @override
@@ -139,11 +141,10 @@ class _ChatScreenState extends State<ChatScreen> {
     _subscription?.cancel();
     _streamController.close();
     controller.chatService.updateOnlineStatus(controller.docId.value,DateTime.now().toString(),userController.userModel.value.uid!);
-
     super.dispose();
   }
 
-void fetchOnlineStatus(String userId) async {
+ fetchOnlineStatus(String userId) async {
   // print('in method:$userId');
   // print(userId);
   try {
@@ -151,14 +152,58 @@ void fetchOnlineStatus(String userId) async {
     String status = await controller.chatService.getOnlineStatus(controller.docId.value); // Call the method
     controller.chatService.updateOnlineStatus(controller.docId.value,'Online',userId);
     setState(() {
+
+    });
       onlineStatus = status;
       print('kkk:$status');
-    });
+
   } catch (e) {
     print('Error fetching online status: $e');
   }
 }
 
+  Stream<String> getOnlineStatus(String docId) async* {
+    final messageCollection = FirebaseFirestore.instance.collection(Collections.MESSAGES);
+    DocumentSnapshot snapshot = await messageCollection.doc(controller.docId.value).get();
+
+    if (snapshot.exists) {
+      final Map<String, dynamic>? data = snapshot.data() as Map<String, dynamic>?;
+
+      if (data != null && data.containsKey('senderStatus')) {
+        final status = data['senderStatus'];
+
+        if (status == 'Online') {
+          yield 'Online';
+        } else if (status.isNotEmpty) {
+          final lastSeen = DateTime.parse(status);
+          yield 'Last Seen ${DateFormat('hh:mm a').format(lastSeen)}';
+        }
+      }
+    }
+
+    // Move the updateOnlineStatus call here, outside the if block
+    updateOnlineStatus(controller.docId.value, 'Online', docId);
+  }
+  Stream<String> updateOnlineStatus(String docId, String status, String uId) async* {
+    try {
+      final docRef = FirebaseFirestore.instance.collection(Collections.MESSAGES).doc(docId);
+      await FirebaseFirestore.instance.runTransaction((transaction) async {
+        final snapshot = await transaction.get(docRef);
+        if (snapshot.get(MessageField.SENDER_ID) == uId) {
+          docRef.update({'senderStatus': status});
+          onlineStatus = status;
+        } else {
+          docRef.update({'receiverStatus': status});
+          onlineStatus = status;
+        }
+      });
+      print('Online status updated successfully for user $docId');
+    } catch (e) {
+      print('Error updating online status: $e');
+      // You can yield an error message or an empty string here if needed
+      yield '';
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -167,10 +212,39 @@ void fetchOnlineStatus(String userId) async {
           name: controller.name,
           isgroup: controller.isgroup,
           image: controller.image,
-          onlineStatus: onlineStatus,
+          // onlineStatus: onlineStatus,
+          widget:  controller.isgroup ? null : StreamBuilder(
+            stream: getOnlineStatus(userController.userModel.value.uid!),
+            builder: (context, AsyncSnapshot<String> snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                // Handle loading state
+                return const CircularProgressIndicator();
+              } else {
+                // Handle active state
+                if (snapshot.hasError) {
+                  // Handle error state
+                  return Text('Error: ${snapshot.error}');
+                } else {
+                  print("888888 ${snapshot.data}");
+                  onlineStatus = snapshot.data!;
+                  print("status online is $onlineStatus");
+
+                  // Handle data state
+                  return Text(
+                    onlineStatus ?? 'Unknown Status',
+                    style: const TextStyle(
+                      fontSize: 10,
+                      fontWeight: FontWeight.normal,
+                      color: Colors.black,
+                    ),
+                  );
+                }
+              }
+            },
+          ),
           ontap: controller.isgroup
               ? () {
-                  pushNewScreen(context, screen: GroupdetailScreen(docId: controller.docId.value)).then((_) => null);
+                  pushNewScreen(context, screen: EditGroupDetails(docId: controller.docId.value)).then((_) => null);
                 }
               : () {
                   // controller.updateLastSeenMethod();
@@ -179,7 +253,8 @@ void fetchOnlineStatus(String userId) async {
           children: [
             // Container(child: Text(onlineStatus),),
            Expanded(
-        child: NotificationListener<ScrollNotification>(
+        child:
+        NotificationListener<ScrollNotification>(
             onNotification: (ScrollNotification scrollInfo) {
               if (scrollInfo.metrics.maxScrollExtent ==
                   scrollInfo.metrics.pixels) {
@@ -215,23 +290,23 @@ void fetchOnlineStatus(String userId) async {
                         itemCount: chats.length,
                         itemBuilder: (context, index) {
                           final Chatmodel chat = chats[index];
-                          
-                          print(chat);
+
+                          print("chatting ${chat.message}");
                           // Check if the current message is the last seen message
                           // bool showLastSeen = chats[index] == lastSeenMessage;
 
-                          String seenTime = '';
+                          // String seenTime = '';
                           // var chat = snapshot.data![index];
                           bool mymsg =
                               chat.id == userController.userModel.value.uid
                                   ? true
                                   : false;
-                          if (chat.seenTimeStamp != '') {
-                            DateTime dateTime =
-                                DateTime.parse(chat.seenTimeStamp!);
-                            seenTime =
-                                DateFormat('d MMM hh:mm a').format(dateTime);
-                          }
+                          // if (chat.seenTimeStamp != '') {
+                          //   DateTime dateTime =
+                          //       DateTime.parse(chat.seenTimeStamp!);
+                          //   seenTime =
+                          //       DateFormat('d MMM hh:mm a').format(dateTime);
+                          // }
                           return Padding(
                             padding: EdgeInsets.only(
                               left: mymsg ? 0 : 14,
@@ -246,14 +321,23 @@ void fetchOnlineStatus(String userId) async {
                               children: [
                                 mymsg
                                     ? const SizedBox()
-                                    : Padding(
+                                    : controller.isgroup ? Padding(
+                          padding:
+                          const EdgeInsets.only(bottom: 22.0),
+                          child: CircleAvatar(
+                          backgroundColor:
+                          appGreenColor.withOpacity(0.6),
+                          backgroundImage: widget.recieverImage!.isNotEmpty ? NetworkImage(widget.recieverImage!) :null,
+                          radius: 17,
+                          ),
+                          ) :
+                                Padding(
                                         padding:
                                             const EdgeInsets.only(bottom: 22.0),
                                         child: CircleAvatar(
                                           backgroundColor:
-                                              greenColor.withOpacity(0.6),
-                                          backgroundImage:
-                                              AssetImage(AppImage.user),
+                                              appGreenColor.withOpacity(0.6),
+                                          backgroundImage: widget.recieverImage!.isNotEmpty ? NetworkImage(widget.recieverImage!) :null,
                                           radius: 17,
                                         ),
                                       ),
@@ -264,9 +348,10 @@ void fetchOnlineStatus(String userId) async {
                                         chat: chat,
                                         mymsg: mymsg,
                                         // showLastSeen: showLastSeen,
-                                        seenTime: seenTime,
+
                                         isGroup: controller.isgroup)
-                                    : GestureDetector(
+                                    :
+                                GestureDetector(
                                         onTap: () {
                                           showGeneralDialog(
                                               barrierColor: greyColor,
@@ -282,10 +367,9 @@ void fetchOnlineStatus(String userId) async {
                                               });
                                         },
                                         child: ImageDateContainer(
-                                          // index: index,
                                           chat: chat,
                                           mymsg: mymsg,
-                                          seenTime: seenTime,
+
                                           // showLastSeen: showLastSeen,
                                         ),
                                       )
@@ -315,7 +399,7 @@ void fetchOnlineStatus(String userId) async {
                         padding: const EdgeInsets.all(13),
                         margin: const EdgeInsets.all(10),
                         decoration: BoxDecoration(
-                          color: whiteColor,
+                          color: appWhiteColor,
                           borderRadius: BorderRadius.circular(10),
                           boxShadow: [
                             BoxShadow(
@@ -328,7 +412,7 @@ void fetchOnlineStatus(String userId) async {
                         child: Column(
                           children: [
                             poppinsText(
-                                TempLanguage.inviteSent, 15, medium, blackColor),
+                                TempLanguage.inviteSent, 15, medium, appBlackColor),
                           ],
                         ),
                       );
@@ -342,7 +426,7 @@ void fetchOnlineStatus(String userId) async {
                         padding: const EdgeInsets.all(13),
                         margin: const EdgeInsets.all(10),
                         decoration: BoxDecoration(
-                          color: whiteColor,
+                          color: appWhiteColor,
                           borderRadius: BorderRadius.circular(10),
                           boxShadow: [
                             BoxShadow(
@@ -358,7 +442,7 @@ void fetchOnlineStatus(String userId) async {
                                 "${TempLanguage.acceptMessageRequest} ${snapshot.data!.senderName}?",
                                 14,
                                 medium,
-                                blackColor,
+                                appBlackColor,
                                 maxlines: 2),
                             verticalGap(15),
                             Row(
@@ -372,7 +456,7 @@ void fetchOnlineStatus(String userId) async {
                                             '${userController.userModel.value.userName!} block you');
                                       },
                                       text: TempLanguage.block,
-                                      textColor: redColor,
+                                      textColor: appRedColor,
                                       buttonColor: greyColor.withOpacity(0.7),
                                     )),
                                 horizontalGap(2.w),
@@ -386,7 +470,7 @@ void fetchOnlineStatus(String userId) async {
                                             '${userController.userModel.value.userName!} delete message request');
                                       },
                                       text: TempLanguage.delete,
-                                      textColor: redColor,
+                                      textColor: appRedColor,
                                       buttonColor: greyColor.withOpacity(0.7),
                                     )),
                                 horizontalGap(2.w),
@@ -399,7 +483,7 @@ void fetchOnlineStatus(String userId) async {
                                             '${userController.userModel.value.userName!} accept request');
                                       },
                                       text: TempLanguage.accept,
-                                      textColor: whiteColor,
+                                      textColor: appWhiteColor,
                                       buttonColor: greyColor.withOpacity(0.7),
                                     )),
                               ],
@@ -412,6 +496,7 @@ void fetchOnlineStatus(String userId) async {
                     }
                   }
                 }),
+
             StreamBuilder<Messagemodel>(
                 stream: controller.getRequestStatus(),
                 builder: (context, snapshot) {
@@ -429,7 +514,7 @@ void fetchOnlineStatus(String userId) async {
                         // width: 50.w,
                         padding: const EdgeInsets.all(13),
                         decoration: BoxDecoration(
-                          color: whiteColor,
+                          color: appWhiteColor,
                           borderRadius: BorderRadius.circular(10),
                           boxShadow: [
                             BoxShadow(
@@ -446,7 +531,7 @@ void fetchOnlineStatus(String userId) async {
                                   "${TempLanguage.requestDeleted} ${snapshot.data!.recieverName}",
                                   15,
                                   medium,
-                                  blackColor),
+                                  appBlackColor),
                             ),
                             ChatButton(
                               width: 35.w,
@@ -459,8 +544,8 @@ void fetchOnlineStatus(String userId) async {
                                     '${userController.userModel.value.userName!} send a request message');
                               },
                               text: "${TempLanguage.requestAgain} ",
-                              buttonColor: greenColor,
-                              textColor: whiteColor,
+                              buttonColor: appGreenColor,
+                              textColor: appWhiteColor,
                             )
                           ],
                         ),
@@ -474,7 +559,7 @@ void fetchOnlineStatus(String userId) async {
                         // width: 50.w,
                         padding: const EdgeInsets.all(13),
                         decoration: BoxDecoration(
-                          color: whiteColor,
+                          color: appWhiteColor,
                           borderRadius: BorderRadius.circular(10),
                           boxShadow: [
                             BoxShadow(
@@ -491,7 +576,7 @@ void fetchOnlineStatus(String userId) async {
                                   " ${snapshot.data!.recieverName} ${TempLanguage.blockedYou}",
                                   15,
                                   medium,
-                                  blackColor,
+                                  appBlackColor,
                                   align: TextAlign.center),
                             ),
                           ],
@@ -506,7 +591,7 @@ void fetchOnlineStatus(String userId) async {
                         width: double.infinity,
                         padding: const EdgeInsets.all(13),
                         decoration: BoxDecoration(
-                          color: whiteColor,
+                          color: appWhiteColor,
                           borderRadius: BorderRadius.circular(10),
                           boxShadow: [
                             BoxShadow(
@@ -519,7 +604,7 @@ void fetchOnlineStatus(String userId) async {
                         child: Column(
                           children: [
                             poppinsText(TempLanguage.youBlockThisAccount, 15,
-                                medium, blackColor),
+                                medium, appBlackColor),
                             verticalGap(10),
                             ChatButton(
                               width: 35.w,
@@ -530,8 +615,8 @@ void fetchOnlineStatus(String userId) async {
                                     "${userController.userModel.value.userName!} unblock you");
                               },
                               text: "${TempLanguage.unblock} ",
-                              buttonColor: greenColor,
-                              textColor: whiteColor,
+                              buttonColor: appGreenColor,
+                              textColor: appWhiteColor,
                             )
                           ],
                         ),
@@ -539,8 +624,9 @@ void fetchOnlineStatus(String userId) async {
                     } else {
                       return SendMessageContainer(
                         textFieldController: controller.chatfieldController,
-                        imageontap: () {
-                          showchatbottomSheet(context, controller);
+                        imageontap: () async{
+
+                          chatBottomSheet(context, controller);
                         },
                         textfieldontap: () {
                           controller.issticker.value = true;
@@ -624,550 +710,75 @@ void requestNextPage() async {
   }
 }
 
+  Future<void> chatBottomSheet(
+      BuildContext context, ChatController controller) {
+    final picker = ImagePicker();
+
+    return showModalBottomSheet<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return Container(
+          height: 150,
+          decoration: const BoxDecoration(
+              borderRadius: BorderRadius.only(
+                  topRight: Radius.circular(10), topLeft: Radius.circular(10))),
+          child: Center(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                //.................Camera
+                GestureDetector(
+                  onTap: () async {
+                    final pickedFile =
+                    await picker.pickImage(source: ImageSource.camera);
+                    if (pickedFile != null) {
+                      controller.fileImage.value = pickedFile;
+                      Navigator.pop(context);
+                      await controller.sendMessage();
+                    }
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.all(15),
+                    decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(width: 2, color: black)),
+                    child: const Icon(
+                      Icons.camera_alt,
+                      size: 40,
+                    ),
+                  ),
+                ),
+                horizontalGap(10.w),
+
+                //.................Gallery
+                GestureDetector(
+                  onTap: () async {
+                    final pickedFile =
+                    await picker.pickImage(source: ImageSource.gallery);
+                    if (pickedFile != null) {
+                      controller.fileImage.value = pickedFile;
+                      Navigator.pop(context);
+                      await controller.sendMessage();
+                    }
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.all(15),
+                    decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(width: 2, color: black)),
+                    child: const Icon(
+                      Icons.image,
+                      size: 40,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+
 }
-
-///previous code
-// class _ChatScreenState extends State<ChatScreen> {
-//   // RxString? name;
-//   // bool? isGroup;
-//   // RxString? image;
-//   // RxList? memberId;
-//   // RxString? senderName;
-//   // ChatScreen({super.key}
-//   // {super.key,
-//   // this.name,
-//   // this.isGroup,
-//   // this.image,
-//   // this.memberId,
-//   // this.senderName}
-//   // );
-// //
-
-//   var userController = Get.find<UserController>();
-//   var controller = Get.find<ChatController>();
-//   Timer? timer;
-//   @override
-//   void initState() {
-//     super.initState();
-//     startTimer();
-//   }
-
-//   void startTimer() {
-//     timer = Timer.periodic(const Duration(minutes: 1), (Timer t) {
-//       controller.updateLastSeenMethod();
-//     });
-//   }
-
-//   void stopTimer() {
-//     if (timer != null) {
-//       timer!.cancel();
-//     }
-//   }
-
-//   @override
-//   void dispose() {
-//     stopTimer();
-//     super.dispose();
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     //  for update last seen
-//     // controller.updateLastSeenMethod();
-//     return Scaffold(
-//       appBar: ChatAppbar(
-//           name: controller.name,
-//           isgroup: controller.isgroup,
-//           image: controller.image,
-//           ontap: controller.isgroup
-//               ? () {
-//                   pushNewScreen(context,
-//                           screen:
-//                               GroupdetailScreen(docId: controller.docId.value))
-//                       .then((_) => null);
-//                 }
-//               : () {
-//                   // controller.updateLastSeenMethod();
-//                 }),
-//       body: Column(
-//         children: [
-//           Expanded(
-//               child: FirestoreListView(
-//                   reverse: true,
-//                   query: chatQuery
-//                       .doc(controller.docId.value)
-//                       .collection(Collections.CHAT)
-//                       .orderBy(ChatField.TIME_STAMP, descending: true),
-//                   pageSize: 10,
-//                   emptyBuilder: (context) =>
-//                       const Center(child: Text('no data')),
-//                   errorBuilder: (context, error, stackTrace) =>
-//                       const Center(child: Text('error')),
-//                   loadingBuilder: (context) =>
-//                       const Center(child: CircularProgressIndicator()),
-//                   itemBuilder: (context, snapshot) {
-//                     Chatmodel chatmodel = Chatmodel.fromJson(snapshot.data());
-
-//                     // var lastSeenMessage = snapshot.data().firstWhere(
-//                     //     (message) =>
-//                     //         message.seenTimeStamp != "" &&
-//                     //         message.id == userController.userModel.value.uid,
-//                     //     orElse: () => Chatmodel());    
-                
-//                     var lastSeenMessage = chatmodel.seenTimeStamp != '' &&
-//                             chatmodel.id == userController.userModel.value.uid 
-//                         ? chatmodel
-//                         : Chatmodel();
-
-//                     // Check if the current message is the last seen message
-//                     bool showLastSeen = chatmodel == lastSeenMessage;
-
-//                     String seenTime = '';
-//                     var chat = chatmodel;
-//                     bool mymsg = chat.id == userController.userModel.value.uid
-//                         ? true
-//                         : false;
-//                     if (chat.seenTimeStamp != '') {
-//                       DateTime dateTime = DateTime.parse(chat.seenTimeStamp!);
-//                       seenTime = DateFormat('d MMM hh:mm a').format(dateTime);
-//                     }
-//                     return Padding(
-//                       padding: EdgeInsets.only(
-//                         left: mymsg ? 0 : 14,
-//                         right: mymsg ? 14 : 0,
-//                         top: 12,
-//                       ),
-//                       child: Row(
-//                         crossAxisAlignment: CrossAxisAlignment.end,
-//                         mainAxisAlignment: mymsg
-//                             ? MainAxisAlignment.end
-//                             : MainAxisAlignment.start,
-//                         children: [
-//                           mymsg
-//                               ? const SizedBox()
-//                               : Padding(
-//                                   padding: const EdgeInsets.only(bottom: 22.0),
-//                                   child: CircleAvatar(
-//                                     backgroundColor:
-//                                         greenColor.withOpacity(0.6),
-//                                     backgroundImage: AssetImage(AppImage.user),
-//                                     radius: 17,
-//                                   ),
-//                                 ),
-//                           horizontalGap(8),
-//                           chat.type == 'message'
-//                               ? MessageDateContainer(
-//                                   // index: index,
-//                                   chat: chat,
-//                                   mymsg: mymsg,
-//                                   showLastSeen: showLastSeen,
-//                                   seenTime: seenTime,
-//                                   isGroup: controller.isgroup)
-//                               : GestureDetector(
-//                                   onTap: () {
-//                                     showGeneralDialog(
-//                                         barrierColor: greyColor,
-//                                         context: context,
-//                                         pageBuilder: (context, animation,
-//                                             secondaryAnimation) {
-//                                           return Padding(
-//                                             padding: const EdgeInsets.only(
-//                                                 top: 40.0),
-//                                             child: Image.network(chat.message!),
-//                                           );
-//                                         });
-//                                   },
-//                                   child: ImageDateContainer(
-//                                     // index: index,
-//                                     chat: chat,
-//                                     mymsg: mymsg,
-//                                     seenTime: seenTime,
-//                                     showLastSeen: showLastSeen,
-//                                   ),
-//                                 )
-//                         ],
-//                       ),
-//                     );
-//                   })),
-
-//           //  StreamBuilder<List<Chatmodel>>(
-//           //     stream: controller.getConversation(),
-//           //     builder: (context, snapshot) {
-//           //       if (snapshot.connectionState == ConnectionState.waiting) {
-//           //         return loaderView();
-//           //       } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-//           //         return Center(child: Text(TempLanguage.noConversation));
-//           //       } else {
-//           //         // Find the last seen message
-//           // var lastSeenMessage = snapshot.data!.firstWhere(
-//           //     (message) =>
-//           //         message.seenTimeStamp != "" &&
-//           //         message.id == userController.userModel.value.uid,
-//           //     orElse: () => Chatmodel());
-//           //         return ListView.builder(
-//           //             padding: const EdgeInsets.only(bottom: 10),
-//           //             reverse: true,
-//           //             itemCount: snapshot.data!.length,
-//           //             itemBuilder: (context, index) {
-//           //               // Check if the current message is the last seen message
-//           //               bool showLastSeen =
-//           //                   snapshot.data![index] == lastSeenMessage;
-
-//           //               String seenTime = '';
-//           //               var chat = snapshot.data![index];
-//           //               bool mymsg =
-//           //                   chat.id == userController.userModel.value.uid
-//           //                       ? true
-//           //                       : false;
-//           //               if (chat.seenTimeStamp != '') {
-//           //                 DateTime dateTime =
-//           //                     DateTime.parse(chat.seenTimeStamp!);
-//           //                 seenTime =
-//           //                     DateFormat('d MMM hh:mm a').format(dateTime);
-//           //               }
-//           //               return Padding(
-//           //                 padding: EdgeInsets.only(
-//           //                   left: mymsg ? 0 : 14,
-//           //                   right: mymsg ? 14 : 0,
-//           //                   top: 12,
-//           //                 ),
-//           //                 child: Row(
-//           //                   crossAxisAlignment: CrossAxisAlignment.end,
-//           //                   mainAxisAlignment: mymsg
-//           //                       ? MainAxisAlignment.end
-//           //                       : MainAxisAlignment.start,
-//           //                   children: [
-//           //                     mymsg
-//           //                         ? const SizedBox()
-//           //                         : Padding(
-//           //                             padding: const EdgeInsets.only(
-//           //                                 bottom: 22.0),
-//           //                             child: CircleAvatar(
-//           //                               backgroundColor:
-//           //                                   greenColor.withOpacity(0.6),
-//           //                               backgroundImage:
-//           //                                   AssetImage(AppImage.user),
-//           //                               radius: 17,
-//           //                             ),
-//           //                           ),
-//           //                     horizontalGap(8),
-//           //                     chat.type == 'message'
-//           //                         ? MessageDateContainer(
-//           //                             index: index,
-//           //                             chat: chat,
-//           //                             mymsg: mymsg,
-//           //                             showLastSeen: showLastSeen,
-//           //                             seenTime: seenTime,
-//           //                             isGroup: controller.isgroup)
-//           //                         : GestureDetector(
-//           //                             onTap: () {
-//           //                               showGeneralDialog(
-//           //                                   barrierColor: greyColor,
-//           //                                   context: context,
-//           //                                   pageBuilder: (context,
-//           //                                       animation,
-//           //                                       secondaryAnimation) {
-//           //                                     return Padding(
-//           //                                       padding:
-//           //                                           const EdgeInsets.only(
-//           //                                               top: 40.0),
-//           //                                       child: Image.network(
-//           //                                           chat.message!),
-//           //                                     );
-//           //                                   });
-//           //                             },
-//           //                             child: ImageDateContainer(
-//           //                               index: index,
-//           //                               chat: chat,
-//           //                               mymsg: mymsg,
-//           //                               seenTime: seenTime,
-//           //                               showLastSeen: showLastSeen,
-//           //                             ),
-//           //                           )
-//           //                   ],
-//           //                 ),
-//           //               );
-//           //             });
-//           //       }
-//           //     })),
-
-//           //.....
-
-          // // for show request status dialog
-          // StreamBuilder<Messagemodel>(
-          //     stream: controller.getRequestStatus(),
-          //     builder: (context, snapshot) {
-          //       if (snapshot.connectionState == ConnectionState.waiting) {
-          //         return const SizedBox();
-          //       } else if (!snapshot.hasData) {
-          //         return const Center(child: Text(''));
-          //       } else {
-          //         if (snapshot.data!.senderId ==
-          //                 controller.userController.userModel.value.uid &&
-          //             snapshot.data!.requestStatus ==
-          //                 RequestStatusEnum.pending.name) {
-          //           return Container(
-          //             // height: 160,
-          //             width: 50.w,
-          //             padding: const EdgeInsets.all(13),
-          //             margin: const EdgeInsets.all(10),
-          //             decoration: BoxDecoration(
-          //               color: whiteColor,
-          //               borderRadius: BorderRadius.circular(10),
-          //               boxShadow: [
-          //                 BoxShadow(
-          //                   color: blackTranslucentColor,
-          //                   offset: const Offset(0, 1),
-          //                   blurRadius: 6,
-          //                 ),
-          //               ],
-          //             ),
-          //             child: Column(
-          //               children: [
-          //                 poppinsText(
-          //                     TempLanguage.inviteSent, 15, medium, blackColor),
-          //               ],
-          //             ),
-          //           );
-          //         } else if (snapshot.data!.senderId !=
-          //                 controller.userController.userModel.value.uid &&
-          //             snapshot.data!.requestStatus ==
-          //                 RequestStatusEnum.pending.name) {
-          //           return Container(
-          //             // height: 160,
-          //             width: 80.w,
-          //             padding: const EdgeInsets.all(13),
-          //             margin: const EdgeInsets.all(10),
-          //             decoration: BoxDecoration(
-          //               color: whiteColor,
-          //               borderRadius: BorderRadius.circular(10),
-          //               boxShadow: [
-          //                 BoxShadow(
-          //                   color: blackTranslucentColor,
-          //                   offset: const Offset(0, 1),
-          //                   blurRadius: 6,
-          //                 ),
-          //               ],
-          //             ),
-          //             child: Column(
-          //               children: [
-          //                 poppinsText(
-          //                     "${TempLanguage.acceptMessageRequest} ${snapshot.data!.senderName}?",
-          //                     14,
-          //                     medium,
-          //                     blackColor,
-          //                     maxlines: 2),
-          //                 verticalGap(15),
-          //                 Row(
-          //                   children: [
-          //                     Flexible(
-          //                         child: ChatButton(
-          //                       onTap: () {
-          //                         controller.updateRequestStatus(
-          //                             RequestStatusEnum.block.name, '', 0);
-          //                         controller.sendNotificationMethod('',
-          //                             '${userController.userModel.value.userName!} block you');
-          //                       },
-          //                       text: TempLanguage.block,
-          //                       textColor: redColor,
-          //                       buttonColor: greyColor.withOpacity(0.7),
-          //                     )),
-          //                     horizontalGap(2.w),
-          //                     Flexible(
-          //                         child: ChatButton(
-          //                       onTap: () async {
-          //                         controller.updateRequestStatus(
-          //                             RequestStatusEnum.delete.name, '', 0);
-          //                         Get.back();
-          //                         controller.sendNotificationMethod('',
-          //                             '${userController.userModel.value.userName!} delete message request');
-          //                       },
-          //                       text: TempLanguage.delete,
-          //                       textColor: redColor,
-          //                       buttonColor: greyColor.withOpacity(0.7),
-          //                     )),
-          //                     horizontalGap(2.w),
-          //                     Flexible(
-          //                         child: ChatButton(
-          //                       onTap: () {
-          //                         controller.updateRequestStatus(
-          //                             RequestStatusEnum.accept.name, '', 0);
-          //                         controller.sendNotificationMethod('',
-          //                             '${userController.userModel.value.userName!} accept request');
-          //                       },
-          //                       text: TempLanguage.accept,
-          //                       textColor: whiteColor,
-          //                       buttonColor: greyColor.withOpacity(0.7),
-          //                     )),
-          //                   ],
-          //                 )
-          //               ],
-          //             ),
-          //           );
-          //         } else {
-          //           return const SizedBox();
-          //         }
-          //       }
-          //     }),
-          // StreamBuilder<Messagemodel>(
-          //     stream: controller.getRequestStatus(),
-          //     builder: (context, snapshot) {
-          //       if (snapshot.connectionState == ConnectionState.waiting) {
-          //         return const SizedBox();
-          //       } else if (!snapshot.hasData) {
-          //         return const Center(child: Text(''));
-          //       } else {
-          //         if (snapshot.data!.senderId ==
-          //                 controller.userController.userModel.value.uid &&
-          //             snapshot.data!.requestStatus ==
-          //                 RequestStatusEnum.delete.name) {
-          //           return Container(
-          //             // height: 160,
-          //             // width: 50.w,
-          //             padding: const EdgeInsets.all(13),
-          //             decoration: BoxDecoration(
-          //               color: whiteColor,
-          //               borderRadius: BorderRadius.circular(10),
-          //               boxShadow: [
-          //                 BoxShadow(
-          //                   color: blackTranslucentColor,
-          //                   offset: const Offset(0, 1),
-          //                   blurRadius: 6,
-          //                 ),
-          //               ],
-          //             ),
-          //             child: Row(
-          //               children: [
-          //                 Expanded(
-          //                   child: poppinsText(
-          //                       "${TempLanguage.requestDeleted} ${snapshot.data!.recieverName}",
-          //                       15,
-          //                       medium,
-          //                       blackColor),
-          //                 ),
-          //                 ChatButton(
-          //                   width: 35.w,
-          //                   onTap: () {
-          //                     controller.updateRequestStatus(
-          //                         RequestStatusEnum.pending.name,
-          //                         TempLanguage.messageRequest,
-          //                         1);
-          //                     controller.sendNotificationMethod('',
-          //                         '${userController.userModel.value.userName!} send a request message');
-          //                   },
-          //                   text: "${TempLanguage.requestAgain} ",
-          //                   buttonColor: greenColor,
-          //                   textColor: whiteColor,
-          //                 )
-          //               ],
-          //             ),
-          //           );
-          //         } else if (snapshot.data!.senderId ==
-          //                 controller.userController.userModel.value.uid &&
-          //             snapshot.data!.requestStatus ==
-          //                 RequestStatusEnum.block.name) {
-          //           return Container(
-          //             // height: 160,
-          //             // width: 50.w,
-          //             padding: const EdgeInsets.all(13),
-          //             decoration: BoxDecoration(
-          //               color: whiteColor,
-          //               borderRadius: BorderRadius.circular(10),
-          //               boxShadow: [
-          //                 BoxShadow(
-          //                   color: blackTranslucentColor,
-          //                   offset: const Offset(0, 1),
-          //                   blurRadius: 6,
-          //                 ),
-          //               ],
-          //             ),
-          //             child: Row(
-          //               children: [
-          //                 Expanded(
-          //                   child: poppinsText(
-          //                       " ${snapshot.data!.recieverName} ${TempLanguage.blockedYou}",
-          //                       15,
-          //                       medium,
-          //                       blackColor,
-          //                       align: TextAlign.center),
-          //                 ),
-          //               ],
-          //             ),
-          //           );
-          //         } else if (snapshot.data!.senderId !=
-          //                 controller.userController.userModel.value.uid &&
-          //             snapshot.data!.requestStatus ==
-          //                 RequestStatusEnum.block.name) {
-          //           return Container(
-          //             // height: 160,
-          //             width: double.infinity,
-          //             padding: const EdgeInsets.all(13),
-          //             decoration: BoxDecoration(
-          //               color: whiteColor,
-          //               borderRadius: BorderRadius.circular(10),
-          //               boxShadow: [
-          //                 BoxShadow(
-          //                   color: blackTranslucentColor,
-          //                   offset: const Offset(0, 1),
-          //                   blurRadius: 6,
-          //                 ),
-          //               ],
-          //             ),
-          //             child: Column(
-          //               children: [
-          //                 poppinsText(TempLanguage.youBlockThisAccount, 15,
-          //                     medium, blackColor),
-          //                 verticalGap(10),
-          //                 ChatButton(
-          //                   width: 35.w,
-          //                   onTap: () {
-          //                     controller.updateRequestStatus(
-          //                         RequestStatusEnum.accept.name, '', 0);
-          //                     controller.sendNotificationMethod('',
-          //                         "${userController.userModel.value.userName!} unblock you");
-          //                   },
-          //                   text: "${TempLanguage.unblock} ",
-          //                   buttonColor: greenColor,
-          //                   textColor: whiteColor,
-          //                 )
-          //               ],
-          //             ),
-          //           );
-          //         } else {
-          //           return SendMessageContainer(
-          //             textFieldController: controller.chatfieldController,
-          //             imageontap: () {
-          //               showchatbottomSheet(context, controller);
-          //             },
-          //             textfieldontap: () {
-          //               controller.issticker.value = true;
-          //             },
-          //             iconontap: () {
-          //               controller.issticker.value =
-          //                   !controller.issticker.value;
-          //               FocusManager.instance.primaryFocus?.unfocus();
-          //             },
-          //             sendmsgontap: () {
-          //               if (controller.chatfieldController.text.isNotEmpty) {
-          //                 controller.sendMessage();
-          //                 controller.sendNotificationMethod(
-          //                     '', controller.chatfieldController.text);
-          //                 controller.chatfieldController.clear();
-          //               }
-          //             },
-          //           );
-          //         }
-          //       }
-          //     }),
-          // Obx(() => Offstage(
-          //       offstage: controller.issticker.value,
-          //       child: StickerKeyboard(
-          //         controller: controller.chatfieldController,
-          //       ),
-          //     ))
-        // ],
-//       ),
-//     );
-//   }
-// }
-///previous code

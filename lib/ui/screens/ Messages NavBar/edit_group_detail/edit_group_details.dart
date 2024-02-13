@@ -1,14 +1,14 @@
 import 'dart:io';
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:check_in/controllers/Messages/chat_controller.dart';
 import 'package:check_in/controllers/Messages/group_detail_controller.dart';
 import 'package:check_in/controllers/Messages/group_members_controller.dart';
+import 'package:check_in/controllers/Messages/messages_controller.dart';
 import 'package:check_in/core/constant/app_assets.dart';
 import 'package:check_in/core/constant/temp_language.dart';
-import 'package:check_in/ui/screens/%20Messages%20NavBar/Chat/chat_screen.dart';
-import 'package:check_in/ui/screens/%20Messages%20NavBar/Group%20Detail/Component/textfields.dart';
 import 'package:check_in/ui/screens/%20Messages%20NavBar/Group%20Members/group_members.dart';
+import 'package:check_in/ui/screens/%20Messages%20NavBar/edit_group_detail/Component/textfields.dart';
+import 'package:check_in/ui/screens/persistent_nav_bar.dart';
 import 'package:check_in/ui/widgets/custom_appbar.dart';
 import 'package:check_in/utils/Constants/images.dart';
 import 'package:check_in/utils/colors.dart';
@@ -18,7 +18,6 @@ import 'package:check_in/utils/styles.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
-import 'package:nb_utils/nb_utils.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
 import 'package:sizer/sizer.dart';
 
@@ -27,7 +26,7 @@ import '../../../../utils/Constants/global_variable.dart';
 import 'Component/bottomsheet.dart';
 
 // ignore: must_be_immutable
-class GroupdetailScreen extends GetView<GroupDetailController> {
+class EditGroupDetails extends GetView<GroupDetailController> {
   bool? isGroup;
   String? image;
   List? memberId;
@@ -35,7 +34,7 @@ class GroupdetailScreen extends GetView<GroupDetailController> {
   String? docId;
   bool? showBtn;
   List<Map<String, dynamic>>? dataArray;
-  GroupdetailScreen(
+  EditGroupDetails(
       {super.key,
       this.isGroup,
       this.image,
@@ -47,41 +46,28 @@ class GroupdetailScreen extends GetView<GroupDetailController> {
   var groupmemberController = Get.find<GroupmemberController>();
   var userController = Get.find<UserController>();
   var chatcontroller = Get.find<ChatController>();
+  var messageController = Get.find<MessageController>();
 
 
   @override
   Widget build(BuildContext context) {
-    //   for making null docid
     GlobalVariable.docId = '';
-
     controller.getGroupDetail(docId!, userController.userModel.value.uid!);
     return Scaffold(
-        floatingActionButton: showBtn!
-            ? FloatingActionButton(
-                backgroundColor: appGreenColor,
-                child: const Icon(Icons.arrow_forward),
+        floatingActionButton: FloatingActionButton(
+                backgroundColor: appRedColor,
+                child: const Icon(Icons.logout),
                 onPressed: () {
-                  if(controller.nameController.text.isEmpty){
-                    Fluttertoast.showToast(msg: 'Group title is empty');
-
-                  }else if(controller.aboutController.text.isEmpty){
-                    Fluttertoast.showToast(msg: 'Fill about group info');
-                  }else {
-                    controller.fileImage.value = null;
-                    chatcontroller.chatService.startNewGroupChat(
-                        memberId!, dataArray!).then((value) {
-                      pushNewScreen(context, screen: ChatScreen())
-                          .then((value) => Get.back());
-                    });
-                  }})
-            : const SizedBox(),
+                  // messageController.leftGroup(chatcontroller.docId.value).then((value) =>  pushNewScreen(context, screen: const Home()));
+                  groupmemberController.removeGroupMember(userController.userModel.value.uid!).then((value) =>  pushNewScreen(context, screen: const Home()));
+                  }),
         appBar: CustomAppbar(
           title: poppinsText(TempLanguage.groupDetail, 15, bold, appBlackColor),
           actions: [
             GestureDetector(
                 onTap: () {
                   groupmemberController.docid = docId!;
-                  pushNewScreen(context, screen: const GroupMember());
+                  pushNewScreen(context, screen:  GroupMember(isAdmin: controller.groupDetailModel!.isAdmin!,));
                 },
                 child: Padding(
                   padding: const EdgeInsets.only(right: 20.0),
@@ -90,9 +76,11 @@ class GroupdetailScreen extends GetView<GroupDetailController> {
           ],
         ),
         body: Obx(
-          () => controller.loading.value
+          () =>
+          controller.loading.value
               ? loaderView()
-              : Padding(
+              :
+          Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20.0),
                   child: Column(
                     children: [

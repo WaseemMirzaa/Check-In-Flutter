@@ -34,8 +34,8 @@ class StickerKeyboard extends StatelessWidget {
               tabIndicatorAnimDuration: kTabScrollDuration,
               categoryIcons: const CategoryIcons(),
               checkPlatformCompatibility: true,
-              iconColorSelected: greenColor,
-              backspaceColor: greenColor),
+              iconColorSelected: appGreenColor,
+              backspaceColor: appGreenColor),
         ));
   }
 }
