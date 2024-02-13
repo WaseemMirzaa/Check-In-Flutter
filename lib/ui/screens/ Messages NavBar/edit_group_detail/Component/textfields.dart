@@ -37,7 +37,7 @@ class NameTextfield extends GetView<GroupDetailController> {
                       child: Obx(
                         () => controller.nameTapped.value
                             ? poppinsText(
-                                TempLanguage.save, 14, semiBold, greenColor)
+                                TempLanguage.save, 14, semiBold, appGreenColor)
                             : SizedBox(
                                 height: 2.h,
                                 child: Image.asset(

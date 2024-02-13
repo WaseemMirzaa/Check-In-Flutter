@@ -18,6 +18,7 @@ import 'package:check_in/utils/styles.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
+import 'package:nb_utils/nb_utils.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
 import 'package:sizer/sizer.dart';
 
@@ -33,6 +34,7 @@ class GroupdetailScreen extends GetView<GroupDetailController> {
   String? senderName;
   String? docId;
   bool? showBtn;
+  List<Map<String, dynamic>>? dataArray;
   GroupdetailScreen(
       {super.key,
       this.isGroup,
@@ -40,10 +42,12 @@ class GroupdetailScreen extends GetView<GroupDetailController> {
       this.memberId,
       this.senderName,
       this.docId,
+        this.dataArray,
       this.showBtn = false});
   var groupmemberController = Get.find<GroupmemberController>();
   var userController = Get.find<UserController>();
   var chatcontroller = Get.find<ChatController>();
+
 
   @override
   Widget build(BuildContext context) {
@@ -54,16 +58,25 @@ class GroupdetailScreen extends GetView<GroupDetailController> {
     return Scaffold(
         floatingActionButton: showBtn!
             ? FloatingActionButton(
-                backgroundColor: greenColor,
+                backgroundColor: appGreenColor,
                 child: const Icon(Icons.arrow_forward),
                 onPressed: () {
-                  controller.fileImage.value = null;
-                  pushNewScreen(context, screen: ChatScreen())
-                      .then((value) => Get.back());
-                })
+                  if(controller.nameController.text.isEmpty){
+                    Fluttertoast.showToast(msg: 'Group title is empty');
+
+                  }else if(controller.aboutController.text.isEmpty){
+                    Fluttertoast.showToast(msg: 'Fill about group info');
+                  }else {
+                    controller.fileImage.value = null;
+                    chatcontroller.chatService.startNewGroupChat(
+                        memberId!, dataArray!).then((value) {
+                      pushNewScreen(context, screen: ChatScreen())
+                          .then((value) => Get.back());
+                    });
+                  }})
             : const SizedBox(),
         appBar: CustomAppbar(
-          title: poppinsText(TempLanguage.groupDetail, 15, bold, blackColor),
+          title: poppinsText(TempLanguage.groupDetail, 15, bold, appBlackColor),
           actions: [
             GestureDetector(
                 onTap: () {
@@ -116,7 +129,7 @@ class GroupdetailScreen extends GetView<GroupDetailController> {
                                 children: [
                                   CircleAvatar(
                                     backgroundColor:
-                                        greenColor.withOpacity(0.6),
+                                        appGreenColor.withOpacity(0.6),
                                     backgroundImage: controller
                                                 .fileImage.value !=
                                             null
@@ -148,11 +161,11 @@ class GroupdetailScreen extends GetView<GroupDetailController> {
                                               height: 40,
                                               width: 40,
                                               decoration: BoxDecoration(
-                                                  color: greenColor,
+                                                  color: appGreenColor,
                                                   shape: BoxShape.circle),
                                               child: Icon(
                                                 Icons.camera_alt,
-                                                color: whiteColor,
+                                                color: appWhiteColor,
                                               ),
                                             ),
                                           ),
@@ -166,7 +179,7 @@ class GroupdetailScreen extends GetView<GroupDetailController> {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 poppinsText(TempLanguage.aboutGroup, 14,
-                                    semiBold, blackColor),
+                                    semiBold, appBlackColor),
                                 controller.groupDetailModel!.isAdmin!
                                     ? GestureDetector(
                                         onTap: () {
@@ -179,7 +192,7 @@ class GroupdetailScreen extends GetView<GroupDetailController> {
                                         child: Obx(
                                           () => controller.aboutTapped.value
                                               ? poppinsText(TempLanguage.save,
-                                                  14, semiBold, greenColor)
+                                                  14, semiBold, appGreenColor)
                                               : SizedBox(
                                                   height: 2.4.h,
                                                   child: Image.asset(
@@ -197,7 +210,7 @@ class GroupdetailScreen extends GetView<GroupDetailController> {
                             ),
                             Divider(
                               // thickness: 1,
-                              color: blackColor,
+                              color: appBlackColor,
                             ),
                           ],
                         ),
