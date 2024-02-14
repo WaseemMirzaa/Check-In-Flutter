@@ -37,16 +37,15 @@ class ChatController extends GetxController {
   }
 
   Future<void> updateLastSeenMethod() async {
-    chatService.updateLastSeen(
-        docId.value, userController.userModel.value.uid!);
+    chatService.updateLastSeen(docId.value, userController.userModel.value.uid!);
   }
 
   //............. get all conversation
-  Stream<List<Chatmodel>> getConversation() {
-    updateLastSeenMethod();
-    return chatService.getConversation(
-        docId.value, userController.userModel.value.uid!);
-  }
+  // Stream<List<Chatmodel>> getConversation() {
+  //   updateLastSeenMethod();
+  //   return chatService.getConversation(
+  //       docId.value, userController.userModel.value.uid!);
+  // }
 
   //............. get message request status
   Stream<Messagemodel> getRequestStatus() {
@@ -73,17 +72,20 @@ class ChatController extends GetxController {
       message = fileImage.value!.path;
       type = 'image';
     }
-    Chatmodel chatmodel = Chatmodel(
-        id: uid, message: message, time: time, type: type, seenTimeStamp: "");
-    DocumentSnapshot? newMessageDoc = await chatService.sendMessage(docId.value, chatmodel);
+    Chatmodel? chatmodel = Chatmodel(id: uid, message: message, time: time, type: type, seenTimeStamp: "");
+    try {
+      DocumentSnapshot? newMessageDoc = await chatService.sendMessage(docId.value, chatmodel, memberId);
+      sendMsgLoader.value = false;
+      return newMessageDoc;
+    } catch (e) {
+      print('--------- Err0rrrrrrrr');
+    }
 
-    sendMsgLoader.value = false;
-    return newMessageDoc;
+    return null;
   }
 
 //.............. get device token
-  Future<void> sendNotificationMethod(
-      String notificationType, String msg) async {
+  Future<void> sendNotificationMethod(String notificationType, String msg) async {
     // print(senderName);
     // print(memberId);
     for (var element in memberId) {
@@ -96,7 +98,7 @@ class ChatController extends GetxController {
             msg: msg,
             docId: docId.value,
             isGroup: isgroup,
-            image:'',
+            image: '',
             name: senderName.value,
             memberIds: memberId);
       }

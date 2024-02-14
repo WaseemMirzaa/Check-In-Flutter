@@ -17,19 +17,28 @@ class ChatAppbar extends StatelessWidget implements PreferredSizeWidget {
   Widget? widget;
   String? onlineStatus;
   Function()? ontap;
-  ChatAppbar({super.key, this.name, this.isgroup, this.ontap, this.image, this.onlineStatus, this.lastSeen, this.widget,});
+  ChatAppbar({
+    super.key,
+    this.name,
+    this.isgroup,
+    this.ontap,
+    this.image,
+    this.onlineStatus,
+    this.lastSeen,
+    this.widget,
+  });
 
   @override
   Widget build(BuildContext context) {
     return CustomAppbar(
       title: GestureDetector(
         onTap: ontap,
-        child: Row(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
+        child: Row(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.center, children: [
           Obx(() => CircleAvatar(
-                backgroundImage: image!.value == '' ? AssetImage(AppImage.user) as ImageProvider : CachedNetworkImageProvider(image!.value), radius: 20,
+                backgroundImage: image!.value == ''
+                    ? AssetImage(AppImage.user) as ImageProvider
+                    : CachedNetworkImageProvider(image!.value),
+                radius: 20,
               )),
           horizontalGap(10),
           isgroup! ? SvgPicture.asset(AppImage.chatgroupicon) : const SizedBox(),
@@ -42,7 +51,8 @@ class ChatAppbar extends StatelessWidget implements PreferredSizeWidget {
                         children: [
                           poppinsText(name!.value ?? '', 16, FontWeight.bold, appBlackColor),
                           const SizedBox(height: 2),
-                           widget ?? lastSeen ??
+                          widget ??
+                              lastSeen ??
                               Text(
                                 onlineStatus!,
                                 style: const TextStyle(
@@ -56,6 +66,8 @@ class ChatAppbar extends StatelessWidget implements PreferredSizeWidget {
               )),
         ]),
       ),
+    
+    
       // actions: [
       //   Padding(
       //     padding: const EdgeInsets.only(right: 20),

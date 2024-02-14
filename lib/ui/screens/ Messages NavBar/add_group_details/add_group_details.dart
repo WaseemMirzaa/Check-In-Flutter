@@ -2,18 +2,19 @@ import 'dart:io';
 
 import 'package:check_in/controllers/Messages/chat_controller.dart';
 import 'package:check_in/controllers/Messages/group_detail_controller.dart';
+import 'package:check_in/controllers/Messages/new_message_controller.dart';
 import 'package:check_in/controllers/user_controller.dart';
 import 'package:check_in/core/constant/app_assets.dart';
+import 'package:check_in/core/constant/constant.dart';
 import 'package:check_in/core/constant/temp_language.dart';
 import 'package:check_in/ui/screens/%20Messages%20NavBar/Chat/chat_screen.dart';
-import 'package:check_in/ui/screens/persistent_nav_bar.dart';
 import 'package:check_in/ui/widgets/custom_appbar.dart';
 import 'package:check_in/utils/Constants/images.dart';
 import 'package:check_in/utils/colors.dart';
 import 'package:check_in/utils/gaps.dart';
 import 'package:check_in/utils/styles.dart';
-import 'package:get/get.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:nb_utils/nb_utils.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
@@ -37,27 +38,45 @@ class AddGroupDetails extends GetView<GroupDetailController> {
   // var groupmemberController = Get.find<GroupmemberController>();
   var userController = Get.find<UserController>();
   var chatcontroller = Get.find<ChatController>();
-
+  var newMessageController = Get.find<NewMessageController>();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        floatingActionButton: FloatingActionButton(
+        floatingActionButton: Obx(() => FloatingActionButton(
             backgroundColor: appGreenColor,
-            child: const Icon(Icons.arrow_forward),
+            child: controller.loadNewGroup.value
+                ? const CircularProgressIndicator(
+                    color: whiteColor,
+                  )
+                : const Icon(Icons.arrow_forward),
             onPressed: () {
+              controller.loadNewGroup.value = true;
               if (controller.nameController.text.isEmpty) {
                 Fluttertoast.showToast(msg: 'Group title is empty');
+                controller.loadNewGroup.value = false;
               } else if (controller.aboutController.text.isEmpty) {
                 Fluttertoast.showToast(msg: 'Fill about group info');
-              } else {
+                controller.loadNewGroup.value = false;
+              } else { 
                 final chatGood = chatcontroller.chatService
                     .startNewGroupChat(memberId!, dataArray!, controller.nameController.text,
-                        controller.aboutController.text, controller.fileImage.value!.path)
+                        controller.aboutController.text, controller.fileImage.value?.path ?? '')
                     .then((value) {
-                  pushNewScreen(context, screen: ChatScreen());
+                  chatcontroller.docId.value = value[MessageField.ID] ?? '';
+                  chatcontroller.name.value = controller.nameController.text;
+                  chatcontroller.image.value = value[MessageField.GROUP_IMG] ?? '';
                   controller.nameController.clear();
                   controller.aboutController.clear();
                   controller.fileImage.value = null;
+                  //
+                  newMessageController.mydata.clear();
+                  newMessageController.searchQuery.value = '';
+                  controller.loadNewGroup.value = false;
+
+                  pushNewScreen(context, screen: ChatScreen()).then((_) {
+                    Get.back();
+                    Get.back();
+                  });
                 });
                 if (chatGood != null) {
                   chatcontroller.sendNotificationMethod(
@@ -66,7 +85,7 @@ class AddGroupDetails extends GetView<GroupDetailController> {
                   null;
                 }
               }
-            }),
+            })),
         appBar: CustomAppbar(
           title: poppinsText(TempLanguage.groupDetail, 15, bold, appBlackColor),
         ),
@@ -87,7 +106,7 @@ class AddGroupDetails extends GetView<GroupDetailController> {
                           controller.namefocusNode.unfocus();
                         },
                         controller: controller.nameController,
-                        style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                        style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
                         decoration: InputDecoration(
                             focusedBorder:
                                 UnderlineInputBorder(borderSide: BorderSide(color: greyColor.withOpacity(0.6))),
@@ -98,7 +117,7 @@ class AddGroupDetails extends GetView<GroupDetailController> {
                                   controller.nameTapped.value = !controller.nameTapped.value;
                                 },
                                 child: Padding(
-                                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
+                                    padding: const EdgeInsets.only(top: 20, bottom: 10, left: 30),
                                     child: Obx(
                                       () => SizedBox(
                                           height: 2.h,
@@ -164,7 +183,7 @@ class AddGroupDetails extends GetView<GroupDetailController> {
                               child: controller.aboutTapped.value
                                   ? poppinsText(TempLanguage.save, 14, semiBold, appGreenColor)
                                   : SizedBox(
-                                      height: 2.h,
+                                      height: 2.3.h,
                                       child: Image.asset(
                                         AppAssets.EDIT_ICON,
                                       ),

@@ -25,6 +25,8 @@ class GroupDetailController extends GetxController {
   RxBool loading = false.obs;
   RxBool uploadDataLoading = false.obs;
 
+  /// load while start new groupchat
+  RxBool loadNewGroup = false.obs;
   @override
   void onInit() {
     super.onInit();
@@ -35,9 +37,9 @@ class GroupDetailController extends GetxController {
   }
 
 //............ get detail
-  Future<void> getGroupDetail(String docId, String userId) async {
+  Future<void> getGroupDetail(String docId, String userId,List mem) async {
     loading.value = true;
-    GroupDetailModel res = await messageService.getGroupDetails(docId, userId);
+    GroupDetailModel res = await messageService.getGroupDetails(docId, userId,mem);
 
     /// store response in model
     groupDetailModel = res;

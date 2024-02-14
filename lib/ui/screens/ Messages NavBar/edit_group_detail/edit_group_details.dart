@@ -41,33 +41,37 @@ class EditGroupDetails extends GetView<GroupDetailController> {
       this.memberId,
       this.senderName,
       this.docId,
-        this.dataArray,
+      this.dataArray,
       this.showBtn = false});
   var groupmemberController = Get.find<GroupmemberController>();
   var userController = Get.find<UserController>();
   var chatcontroller = Get.find<ChatController>();
   var messageController = Get.find<MessageController>();
 
-
   @override
   Widget build(BuildContext context) {
     GlobalVariable.docId = '';
-    controller.getGroupDetail(docId!, userController.userModel.value.uid!);
+    controller.getGroupDetail(docId!, userController.userModel.value.uid!, memberId!);
     return Scaffold(
         floatingActionButton: FloatingActionButton(
-                backgroundColor: appRedColor,
-                child: const Icon(Icons.logout),
-                onPressed: () {
-                  // messageController.leftGroup(chatcontroller.docId.value).then((value) =>  pushNewScreen(context, screen: const Home()));
-                  groupmemberController.removeGroupMember(userController.userModel.value.uid!).then((value) =>  pushNewScreen(context, screen: const Home()));
-                  }),
+            backgroundColor: appRedColor,
+            child: const Icon(Icons.logout),
+            onPressed: () {
+              // messageController.leftGroup(chatcontroller.docId.value).then((value) =>  pushNewScreen(context, screen: const Home()));
+              groupmemberController
+                  .removeGroupMember(userController.userModel.value.uid!)
+                  .then((value) => pushNewScreen(context, screen: const Home()));
+            }),
         appBar: CustomAppbar(
           title: poppinsText(TempLanguage.groupDetail, 15, bold, appBlackColor),
           actions: [
             GestureDetector(
                 onTap: () {
                   groupmemberController.docid = docId!;
-                  pushNewScreen(context, screen:  GroupMember(isAdmin: controller.groupDetailModel!.isAdmin!,));
+                  pushNewScreen(context,
+                      screen: GroupMember(
+                        isAdmin: controller.groupDetailModel!.isAdmin!,
+                      ));
                 },
                 child: Padding(
                   padding: const EdgeInsets.only(right: 20.0),
@@ -76,11 +80,9 @@ class EditGroupDetails extends GetView<GroupDetailController> {
           ],
         ),
         body: Obx(
-          () =>
-          controller.loading.value
+          () => controller.loading.value
               ? loaderView()
-              :
-          Padding(
+              : Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20.0),
                   child: Column(
                     children: [
@@ -94,16 +96,13 @@ class EditGroupDetails extends GetView<GroupDetailController> {
                                 Expanded(
                                   child: NameTextfield(
                                     readOnly: controller.nameTapped.value,
-                                    isAdmin:
-                                        controller.groupDetailModel!.isAdmin,
+                                    isAdmin: controller.groupDetailModel!.isAdmin,
                                     iconOnTap: () {
                                       //  controller.namefocusNode.requestFocus();
                                       controller.updateGroupName(docId!);
-                                      chatcontroller.name.value =
-                                          controller.nameController.text;
+                                      chatcontroller.name.value = controller.nameController.text;
 
-                                      controller.nameTapped.value =
-                                          !controller.nameTapped.value;
+                                      controller.nameTapped.value = !controller.nameTapped.value;
                                     },
                                   ),
                                 ),
@@ -116,21 +115,12 @@ class EditGroupDetails extends GetView<GroupDetailController> {
                               child: Stack(
                                 children: [
                                   CircleAvatar(
-                                    backgroundColor:
-                                        appGreenColor.withOpacity(0.6),
-                                    backgroundImage: controller
-                                                .fileImage.value !=
-                                            null
-                                        ? FileImage(File(
-                                            controller.fileImage.value!.path))
-                                        : controller.groupDetailModel!
-                                                    .groupImg! ==
-                                                ''
-                                            ? AssetImage(AppImage.user)
-                                                as ImageProvider
-                                            : CachedNetworkImageProvider(
-                                                controller.groupDetailModel!
-                                                    .groupImg!),
+                                    backgroundColor: appGreenColor.withOpacity(0.6),
+                                    backgroundImage: controller.fileImage.value != null
+                                        ? FileImage(File(controller.fileImage.value!.path))
+                                        : controller.groupDetailModel!.groupImg! == ''
+                                            ? AssetImage(AppImage.user) as ImageProvider
+                                            : CachedNetworkImageProvider(controller.groupDetailModel!.groupImg!),
                                     radius: 65,
                                   ),
                                   controller.groupDetailModel!.isAdmin!
@@ -139,18 +129,12 @@ class EditGroupDetails extends GetView<GroupDetailController> {
                                           bottom: 1,
                                           child: GestureDetector(
                                             onTap: () {
-                                              showbottomSheet(
-                                                  context,
-                                                  controller,
-                                                  docId!,
-                                                  chatcontroller);
+                                              showbottomSheet(context, controller, docId!, chatcontroller);
                                             },
                                             child: Container(
                                               height: 40,
                                               width: 40,
-                                              decoration: BoxDecoration(
-                                                  color: appGreenColor,
-                                                  shape: BoxShape.circle),
+                                              decoration: BoxDecoration(color: appGreenColor, shape: BoxShape.circle),
                                               child: Icon(
                                                 Icons.camera_alt,
                                                 color: appWhiteColor,
@@ -166,21 +150,18 @@ class EditGroupDetails extends GetView<GroupDetailController> {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                poppinsText(TempLanguage.aboutGroup, 14,
-                                    semiBold, appBlackColor),
+                                poppinsText(TempLanguage.aboutGroup, 14, semiBold, appBlackColor),
                                 controller.groupDetailModel!.isAdmin!
                                     ? GestureDetector(
                                         onTap: () {
                                           // controller.aboutfocusNode
                                           //     .requestFocus();
                                           controller.updateGroupAbout(docId!);
-                                          controller.aboutTapped.value =
-                                              !controller.aboutTapped.value;
+                                          controller.aboutTapped.value = !controller.aboutTapped.value;
                                         },
                                         child: Obx(
                                           () => controller.aboutTapped.value
-                                              ? poppinsText(TempLanguage.save,
-                                                  14, semiBold, appGreenColor)
+                                              ? poppinsText(TempLanguage.save, 14, semiBold, appGreenColor)
                                               : SizedBox(
                                                   height: 2.4.h,
                                                   child: Image.asset(

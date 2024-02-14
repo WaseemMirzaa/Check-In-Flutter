@@ -16,7 +16,7 @@ class NewMessageController extends GetxController {
   late final RxList<UserModel> userDataList = RxList<UserModel>();
   RxString searchQuery = ''.obs;
   DocumentSnapshot? _lastDocument;
-  List<Map<String, dynamic>> dataArray =[];
+  List<Map<String, dynamic>> dataArray = [];
   List memberIds = [];
   final DOCUMENT_PER_PAGE = 20;
   final DELAY_IN_MILLISECONDS = 300;
@@ -40,16 +40,13 @@ class NewMessageController extends GetxController {
         .distinct()
         .switchMap((query) => Stream.fromFuture(chatService.getUsersDocsWithPagination(query, DOCUMENT_PER_PAGE, null)))
         .listen((docs) {
+      List<UserModel> users = docs.map((doc) => UserModel.fromMap(doc.data() as Map<String, dynamic>)).toList();
 
-          List<UserModel> users = docs
-          .map((doc) => UserModel.fromMap(doc.data() as Map<String, dynamic>))
-          .toList();
-
-          if (docs.isNotEmpty) {
-             userDataList.clear();
-             _lastDocument = docs.last;
-             userDataList.addAll(users);
-          }
+      if (docs.isNotEmpty) {
+        userDataList.clear();
+        _lastDocument = docs.last;
+        userDataList.addAll(users);
+      }
     });
   }
 
@@ -66,11 +63,10 @@ class NewMessageController extends GetxController {
 //............ start new chat
 
   Future<void> fetchMore() async {
-    List<DocumentSnapshot> docs = await chatService.getUsersDocsWithPagination(searchController.text, DOCUMENT_PER_PAGE, _lastDocument);
+    List<DocumentSnapshot> docs =
+        await chatService.getUsersDocsWithPagination(searchController.text, DOCUMENT_PER_PAGE, _lastDocument);
 
-    List<UserModel> users = docs
-        .map((doc) => UserModel.fromMap(doc.data() as Map<String, dynamic>))
-        .toList();
+    List<UserModel> users = docs.map((doc) => UserModel.fromMap(doc.data() as Map<String, dynamic>)).toList();
 
     if (docs.isNotEmpty) {
       _lastDocument = docs.last;
@@ -78,13 +74,12 @@ class NewMessageController extends GetxController {
     }
   }
 
-  Future<String> startNewChat(String myUid, String uNAme,String UImage) async {
+  Future<String> startNewChat(String myUid, String uNAme, String UImage) async {
     UserModel model = mydata.values.first;
-    return chatService
-        .startNewChat([myUid, mydata.keys.first], uNAme, model.userName!,model.photoUrl!,UImage);
+    return chatService.startNewChat([myUid, mydata.keys.first], uNAme, model.userName!, model.photoUrl!, UImage);
   }
 
-  Future<String> startNewGroupChat(String myUid, String uNAme, String memberImage,String about) async {
+  Future<String> startNewGroupChat(String myUid, String uNAme, String memberImage, String about) async {
     dataArray = [
       {
         MessageField.MEMBER_UID: myUid,
@@ -92,7 +87,7 @@ class NewMessageController extends GetxController {
         MessageField.ABOUT_USER: about,
         MessageField.MEMBER_IMG: memberImage,
         MessageField.IS_ADMIN: true,
-        MessageField.IS_OWNER:true,
+        MessageField.IS_OWNER: true,
         MessageField.MEMBER_UNREAD_COUNT: 0
       }
     ];
@@ -111,15 +106,13 @@ class NewMessageController extends GetxController {
         MessageField.MEMBER_IMG: image,
         MessageField.IS_ADMIN: false,
         MessageField.IS_OWNER: false,
-
         MessageField.MEMBER_UNREAD_COUNT: 0
       };
       dataArray.add(userData);
       memberIds.add(value.uid);
-
     });
 
-     return '';
+    return '';
     // return chatService.startNewGroupChat(memberIds, dataArray);
   }
 
