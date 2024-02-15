@@ -37,9 +37,9 @@ class GroupDetailController extends GetxController {
   }
 
 //............ get detail
-  Future<void> getGroupDetail(String docId, String userId,List mem) async {
+  Future<void> getGroupDetail(String docId, String userId) async {
     loading.value = true;
-    GroupDetailModel res = await messageService.getGroupDetails(docId, userId,mem);
+    GroupDetailModel res = await messageService.getGroupDetails(docId, userId);
 
     /// store response in model
     groupDetailModel = res;

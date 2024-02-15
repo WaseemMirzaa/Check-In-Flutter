@@ -22,15 +22,12 @@ class FCMManager {
   }
 }
 
-FlutterLocalNotificationsPlugin notificationsPlugin =
-    FlutterLocalNotificationsPlugin();
+FlutterLocalNotificationsPlugin notificationsPlugin = FlutterLocalNotificationsPlugin();
 
 late AndroidNotificationChannel channel;
 
-const AndroidInitializationSettings initializationSettingsAndroid =
-    AndroidInitializationSettings('appicon');
-DarwinInitializationSettings iosInitializationSettings =
-    const DarwinInitializationSettings();
+const AndroidInitializationSettings initializationSettingsAndroid = AndroidInitializationSettings('appicon');
+DarwinInitializationSettings iosInitializationSettings = const DarwinInitializationSettings();
 
 final InitializationSettings initializationSettings = InitializationSettings(
   android: initializationSettingsAndroid,
@@ -44,8 +41,7 @@ class PushNotificationServices {
 
   Future<void> init() async {
     await notificationsPlugin
-        .resolvePlatformSpecificImplementation<
-            IOSFlutterLocalNotificationsPlugin>()
+        .resolvePlatformSpecificImplementation<IOSFlutterLocalNotificationsPlugin>()
         ?.requestPermissions(
           alert: true,
           badge: true,
@@ -54,8 +50,7 @@ class PushNotificationServices {
 
     /// Update the iOS foreground notification presentation options to allow
     /// heads up ui.screens.Tabs.notifications.
-    await FirebaseMessaging.instance
-        .setForegroundNotificationPresentationOptions(
+    await FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
       alert: true,
       badge: true,
       sound: true,
@@ -64,8 +59,7 @@ class PushNotificationServices {
     channel = const AndroidNotificationChannel(
       'high_importance_channel', // id
       'High Importance Notifications', // title
-      description:
-          'This channel is used for important notifications.', // description
+      description: 'This channel is used for important notifications.', // description
       importance: Importance.high,
     );
     // request permission to receive push notifications
@@ -200,8 +194,7 @@ class PushNotificationServices {
       // FirebaseMessaging.onBackgroundMessage((message) => null)
 
       // handle notification messages when the app is in the background or terminated
-      FirebaseMessaging.onMessageOpenedApp
-          .listen((RemoteMessage message) async {
+      FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) async {
         print('in notification');
         //.............................
         chatcontroller.docId.value = NotificationModel.docId;
@@ -248,8 +241,7 @@ class PushNotificationServices {
       //
 
       // print('Step 6');
-      await notificationsPlugin.initialize(initializationSettings,
-          onDidReceiveNotificationResponse: (payload) async {
+      await notificationsPlugin.initialize(initializationSettings, onDidReceiveNotificationResponse: (payload) async {
         // print("notification type is");
         print('in notification');
         // print(NotificationModel.transactionId);
@@ -296,14 +288,13 @@ Future<void> sendNotification(
     required String name,
     required String image,
     required List memberIds}) async {
-  var completeUrl =
-      'https://us-central1-check-in-7ecd7.cloudfunctions.net/sendNotification';
+  var completeUrl = 'https://us-central1-check-in-7ecd7.cloudfunctions.net/sendNotification';
   final headers = {'Content-Type': 'application/json'};
   final body = jsonEncode({
     'token': token,
     'title': title,
     'body': msg,
-    'notificationType': notificationType,
+    'notificationType': 'message',
     "docId": docId,
     "name": name,
     "isGroup": isGroup,
@@ -312,8 +303,7 @@ Future<void> sendNotification(
   });
 
   try {
-    final response =
-        await http.post(Uri.parse(completeUrl), headers: headers, body: body);
+    final response = await http.post(Uri.parse(completeUrl), headers: headers, body: body);
     if (response.statusCode == 200) {
       print('Notification sent');
     } else {

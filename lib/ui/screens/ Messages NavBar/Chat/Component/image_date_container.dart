@@ -1,5 +1,7 @@
 import 'package:check_in/utils/DateTimeUtils.dart';
+import 'package:check_in/utils/loader.dart';
 import 'package:flutter/material.dart';
+import 'package:nb_utils/nb_utils.dart';
 import 'package:sizer/sizer.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import '../../../../../model/Message and Group Message Model/chat_model.dart';
@@ -20,7 +22,6 @@ class ImageDateContainer extends StatefulWidget {
       // this.index,
       this.chat,
       this.mymsg,
-
       this.showLastSeen,
       this.isGroup});
 
@@ -42,8 +43,7 @@ class _ImageDateContainerState extends State<ImageDateContainer> {
     String timeseperate = widget.chat!.time!.split(' ')[1];
     String time = DateTimeUtils.time24to12(timeseperate);
     return Column(
-      crossAxisAlignment:
-          widget.mymsg! ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+      crossAxisAlignment: widget.mymsg! ? CrossAxisAlignment.end : CrossAxisAlignment.start,
       children: [
         Container(
           height: 200,
@@ -55,8 +55,9 @@ class _ImageDateContainerState extends State<ImageDateContainer> {
           child: ClipRRect(
             borderRadius: BorderRadius.circular(8),
             child: CachedNetworkImage(
-              imageUrl: widget.chat!.message!,
+              imageUrl: widget.chat!.thumbnail!,
               fit: BoxFit.cover,
+              placeholder: (context, url) => loaderView(loaderColor: whiteColor),
             ),
           ),
         ),

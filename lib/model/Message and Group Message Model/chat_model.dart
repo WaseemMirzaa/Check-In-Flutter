@@ -3,15 +3,9 @@ class Chatmodel {
   String? message;
   String? type;
   String? time;
-  // String? image;
+  String? thumbnail;
   String? seenTimeStamp;
-  Chatmodel(
-      {this.message,
-      this.id,
-      this.time,
-      this.type,
-      // this.image,
-      this.seenTimeStamp});
+  Chatmodel({this.message, this.id, this.time, this.type, this.thumbnail, this.seenTimeStamp});
 
   factory Chatmodel.fromJson(Map<String, dynamic> json) {
     return Chatmodel(
@@ -19,9 +13,8 @@ class Chatmodel {
         message: json['message'],
         time: json['timeStamp'],
         type: json['type'],
-        seenTimeStamp: json['seenTimeStamp']
-        // image:json[]
-        );
+        seenTimeStamp: json['seenTimeStamp'],
+        thumbnail: json['thumbnail']);
   }
   Map<String, dynamic> toJson() {
     final data = <String, dynamic>{};
@@ -30,6 +23,7 @@ class Chatmodel {
     data['timeStamp'] = time;
     data['type'] = type;
     data['seenTimeStamp'] = seenTimeStamp;
+    data['thumbnail'] = thumbnail;
 
     return data;
   }

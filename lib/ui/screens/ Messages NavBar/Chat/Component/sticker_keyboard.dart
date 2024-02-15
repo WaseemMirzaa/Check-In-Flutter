@@ -9,6 +9,7 @@ import 'package:flutter/foundation.dart' as foundation;
 
 class StickerKeyboard extends StatelessWidget {
   TextEditingController? controller;
+
   StickerKeyboard({super.key, this.controller});
 
   @override
@@ -20,10 +21,7 @@ class StickerKeyboard extends StatelessWidget {
           textEditingController: controller,
           config: Config(
               columns: 7,
-              emojiSizeMax: 25 *
-                  (foundation.defaultTargetPlatform == TargetPlatform.iOS
-                      ? 1.30
-                      : 1.0),
+              emojiSizeMax: 25 * (foundation.defaultTargetPlatform == TargetPlatform.iOS ? 1.30 : 1.0),
               recentsLimit: 30,
               noRecents: Text(
                 TempLanguage.noRecent,

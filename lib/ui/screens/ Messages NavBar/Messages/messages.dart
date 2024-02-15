@@ -42,8 +42,7 @@ class MessageScreen extends GetView<MessageController> {
           verticalGap(20),
           Expanded(
               child: StreamBuilder<List<Messagemodel>>(
-                  stream: controller
-                      .getChatMessage(userController.userModel.value.uid!),
+                  stream: controller.getChatMessage(userController.userModel.value.uid!),
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return loaderView();
@@ -59,35 +58,29 @@ class MessageScreen extends GetView<MessageController> {
                               return Obx(() {
                                 if (snapshot.data![index].name!
                                     .toLowerCase()
-                                    .contains(
-                                        controller.searchQuery.toLowerCase())) {
+                                    .contains(controller.searchQuery.toLowerCase())) {
                                   return Padding(
-                                    padding:
-                                        const EdgeInsets.symmetric(vertical: 6),
+                                    padding: const EdgeInsets.symmetric(vertical: 6),
                                     child: MessageListTile(
                                       message: snapshot.data![index],
                                       ontap: () {
                                         GlobalVariable.docId = chatcontroller.docId.value = message.id!;
                                         //.........................
-                                        chatcontroller.name.value =
-                                            message.name!;
-                                        chatcontroller.isgroup =
-                                            message.isgroup!;
-                                        chatcontroller.image.value =
-                                            message.image!;
-                                        chatcontroller.memberId.value =
-                                            message.memberIds!;
-                                        chatcontroller.senderName.value =
-                                            message.yourname!;
+                                        chatcontroller.name.value = message.name!;
+                                        chatcontroller.isgroup = message.isgroup!;
+                                        chatcontroller.image.value = message.image!;
+                                        chatcontroller.memberId.value = message.memberIds!;
+                                        chatcontroller.senderName.value = message.yourname!;
+                                        chatcontroller.members.value = message.members ?? [];
                                         //...............
                                         // chatcontroller.updateLastSeenMethod();
                                         pushNewScreen(
                                           context,
                                           screen: ChatScreen(
                                             recieverImage: message.image,
-                                              //   name: message.name!.obs,isGroup: message.isgroup,
-                                              // image:message.image!.obs,memberId: message.memberIds!.obs,senderName: message.senderName!.obs,
-                                              ),
+                                            //   name: message.name!.obs,isGroup: message.isgroup,
+                                            // image:message.image!.obs,memberId: message.memberIds!.obs,senderName: message.senderName!.obs,
+                                          ),
                                         );
                                       },
                                     ),

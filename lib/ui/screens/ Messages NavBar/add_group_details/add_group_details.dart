@@ -57,7 +57,8 @@ class AddGroupDetails extends GetView<GroupDetailController> {
               } else if (controller.aboutController.text.isEmpty) {
                 Fluttertoast.showToast(msg: 'Fill about group info');
                 controller.loadNewGroup.value = false;
-              } else { 
+              } else {
+                print('new    --$dataArray');
                 final chatGood = chatcontroller.chatService
                     .startNewGroupChat(memberId!, dataArray!, controller.nameController.text,
                         controller.aboutController.text, controller.fileImage.value?.path ?? '')

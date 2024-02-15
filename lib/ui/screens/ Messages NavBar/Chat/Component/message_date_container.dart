@@ -21,7 +21,6 @@ class MessageDateContainer extends StatelessWidget {
       // this.index,
       this.chat,
       this.mymsg,
-
       this.showLastSeen,
       this.isGroup});
 
@@ -34,8 +33,7 @@ class MessageDateContainer extends StatelessWidget {
     // String dateseperate = chat!.time!.split(' ')[0];
     // String date = DateTimeUtils.formatTimestamp(c);
     return Column(
-      crossAxisAlignment:
-          mymsg! ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+      crossAxisAlignment: mymsg! ? CrossAxisAlignment.end : CrossAxisAlignment.start,
       children: [
         Row(
           crossAxisAlignment: CrossAxisAlignment.end,
@@ -56,8 +54,8 @@ class MessageDateContainer extends StatelessWidget {
                 color: mymsg! ? appGreenColor : greyColor1.withOpacity(1),
               ),
               padding: const EdgeInsets.all(15),
-              child: poppinsText(chat!.message!, 12, FontWeight.normal,
-                  mymsg! ? appWhiteColor : greyColor.withOpacity(1)),
+              child:
+                  poppinsText(chat!.message!, 12, FontWeight.normal, mymsg! ? appWhiteColor : greyColor.withOpacity(1)),
             ),
             mymsg!
                 ? CustomPaint(

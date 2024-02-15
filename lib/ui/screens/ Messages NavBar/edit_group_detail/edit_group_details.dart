@@ -29,7 +29,7 @@ import 'Component/bottomsheet.dart';
 class EditGroupDetails extends GetView<GroupDetailController> {
   bool? isGroup;
   String? image;
-  List? memberId;
+  // List? members;
   String? senderName;
   String? docId;
   bool? showBtn;
@@ -38,7 +38,7 @@ class EditGroupDetails extends GetView<GroupDetailController> {
       {super.key,
       this.isGroup,
       this.image,
-      this.memberId,
+      // this.members,
       this.senderName,
       this.docId,
       this.dataArray,
@@ -51,7 +51,7 @@ class EditGroupDetails extends GetView<GroupDetailController> {
   @override
   Widget build(BuildContext context) {
     GlobalVariable.docId = '';
-    controller.getGroupDetail(docId!, userController.userModel.value.uid!, memberId!);
+    controller.getGroupDetail(docId!, userController.userModel.value.uid!);
     return Scaffold(
         floatingActionButton: FloatingActionButton(
             backgroundColor: appRedColor,

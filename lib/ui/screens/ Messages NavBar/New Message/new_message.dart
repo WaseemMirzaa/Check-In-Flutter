@@ -66,11 +66,12 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
                           .then((value) {
                         chatcontroller.isgroup = true;
                         chatcontroller.memberId.value == controller.mydata.keys.toList();
+                        chatcontroller.members.value = controller.dataArray;
                         //
                         groupDetailController.nameController.clear();
                         groupDetailController.aboutController.clear();
                         groupDetailController.fileImage.value = null;
-
+                        print('ddddddd ${controller.dataArray}');
                         pushNewScreen(context,
                             screen: AddGroupDetails(
                               image: '',
@@ -90,6 +91,7 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
                         userController.userModel.value.photoUrl!,
                       )
                           .then((value) {
+                        print("valuee$value");
                         UserModel model = controller.mydata.values.first;
                         chatcontroller.docId.value = value;
                         chatcontroller.name.value = model.userName!;
