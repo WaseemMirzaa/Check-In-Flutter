@@ -16,15 +16,15 @@ class FloatingactionButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FloatingActionButton.extended(
-      backgroundColor: greenColor,
+      backgroundColor: appGreenColor,
       label: Row(
         children: [
           poppinsText(
-              TempLanguage.sendMessage, 12, FontWeight.normal, whiteColor),
+              TempLanguage.sendMessage, 12, FontWeight.normal, appWhiteColor),
           horizontalGap(35),
           SvgPicture.asset(
             AppImage.messageappbaricon,
-            color: whiteColor,
+            color: appWhiteColor,
           ),
         ],
       ),

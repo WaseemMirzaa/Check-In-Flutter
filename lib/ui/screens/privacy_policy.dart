@@ -43,14 +43,14 @@ class _PrivacyPolicyState extends State<PrivacyPolicy> {
         ),
         elevation: 0,
         centerTitle: true,
-        backgroundColor: whiteColor,
-        title: poppinsText(TempLanguage.privacyPolicy, 20, FontWeight.bold, blackColor),
+        backgroundColor: appWhiteColor,
+        title: poppinsText(TempLanguage.privacyPolicy, 20, FontWeight.bold, appBlackColor),
       ),
       body: Container(
         margin: const EdgeInsets.only(top: 10),
         padding: const EdgeInsets.only(top: 10, left: 10, right: 10),
         decoration: BoxDecoration(
-          color: whiteColor,
+          color: appWhiteColor,
           borderRadius: const BorderRadius.only(
             topRight: Radius.circular(30),
             topLeft: Radius.circular(30),

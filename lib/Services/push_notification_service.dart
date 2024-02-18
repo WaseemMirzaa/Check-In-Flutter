@@ -1,10 +1,8 @@
 import 'dart:convert';
-import 'package:check_in/utils/Constants/global_variable.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
-import 'package:nb_utils/nb_utils.dart';
 import '../controllers/Messages/chat_controller.dart';
 import '../model/notification_model.dart';
 import 'package:http/http.dart' as http;
@@ -39,8 +37,6 @@ final InitializationSettings initializationSettings = InitializationSettings(
 
 class PushNotificationServices {
   final FirebaseMessaging _fcm = FirebaseMessaging.instance;
-
-  static NotificationModel notificationModel = NotificationModel();
 
   Future<void> init() async {
     await notificationsPlugin
@@ -142,9 +138,6 @@ class PushNotificationServices {
       // });
 
       FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
-        log("data is:: ${message.data}");
-        print(chatcontroller.docId);
-        print("Global ${GlobalVariable.docId}");
         // int notificationBadge = 0;
         if (message.data.isNotEmpty) {
           //RemoteNotification? notification = message.notification;
@@ -158,7 +151,6 @@ class PushNotificationServices {
 
           // print("notification type");
           // print(NotificationModel.type);
-
           // notificationBadge = getIntAsync(
           //     SharedPreferenceKey.NOTIFICATION_BADGE,
           //     defaultValue: 0);
@@ -168,9 +160,8 @@ class PushNotificationServices {
         }
 
         // if (message.data['body'] != null) {
-
         // if (isAndroid) {//Ios is showing double notifications if this condition is not present
-        if (GlobalVariable.docId != NotificationModel.docId) {
+        if (chatcontroller.docId.value != NotificationModel.docId) {
           notificationsPlugin.show(
               1,
               message.notification?.title,
@@ -193,6 +184,7 @@ class PushNotificationServices {
                   )));
         }
         //....
+        
         // }
         // }
       });
@@ -202,7 +194,6 @@ class PushNotificationServices {
       // handle notification messages when the app is in the background or terminated
       FirebaseMessaging.onMessageOpenedApp
           .listen((RemoteMessage message) async {
-        print('in notification');
         //.............................
         chatcontroller.docId.value = NotificationModel.docId;
         chatcontroller.name.value = NotificationModel.name;
@@ -218,10 +209,8 @@ class PushNotificationServices {
         String notificationType = message.data['notificationType'];
         NotificationModel.type = notificationType;
         // print("notification types");
-
         // print(NotificationModel.type);
         // if (notificationType == PushNotificationType.msg) {
-
         //   print('Step 4');
         //   String transac = message.data['transactionId'];
         //   UserModel userModel =
@@ -236,7 +225,6 @@ class PushNotificationServices {
         //       arguments:
         //           ChatPageArguments(peer: userModel, transactionId: transac)));
         // } else {
-
         //   print('Step 5');
         //   navBarController.controller.index = 3;
         //   navBarController.currentIndex.value = 3;
@@ -251,7 +239,6 @@ class PushNotificationServices {
       await notificationsPlugin.initialize(initializationSettings,
           onDidReceiveNotificationResponse: (payload) async {
         // print("notification type is");
-        print('in notification');
         // print(NotificationModel.transactionId);
         //.............................
         chatcontroller.docId.value = NotificationModel.docId;
@@ -264,7 +251,6 @@ class PushNotificationServices {
         Get.to(() => ChatScreen());
 
         // if (NotificationModel.type == PushNotificationType.msg) {
-
         //   print('Step 7');
         //   String transac = NotificationModel.transactionId;
         //   UserModel userModel =
@@ -275,7 +261,6 @@ class PushNotificationServices {
         //       arguments:
         //           ChatPageArguments(peer: userModel, transactionId: transac)));
         // } else {
-
         //   print('Step 8');
         //   navBarController.controller.index = 3;
         //   navBarController.currentIndex.value = 3;
@@ -303,7 +288,7 @@ Future<void> sendNotification(
     'token': token,
     'title': title,
     'body': msg,
-    'notificationType': notificationType,
+    'notificationType': 'message',
     "docId": docId,
     "name": name,
     "isGroup": isGroup,

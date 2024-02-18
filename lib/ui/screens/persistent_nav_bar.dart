@@ -92,7 +92,7 @@ class CustomNavBarWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-          color: whiteColor,
+          color: appWhiteColor,
           borderRadius: const BorderRadius.only(topLeft: Radius.circular(40))),
       child: SizedBox(
         width: double.infinity,
@@ -108,7 +108,7 @@ class CustomNavBarWidget extends StatelessWidget {
                         context: context,
                         builder: (context) => AlertDialog(
                               title: poppinsText(TempLanguage.logInForFeatures,
-                                  16, FontWeight.w500, blackColor),
+                                  16, FontWeight.w500, appBlackColor),
                               actions: [
                                 TextButton(
                                   onPressed: () {
@@ -163,18 +163,18 @@ class _HomeState extends State<Home> with AutomaticKeepAliveClientMixin {
       BottomNav(
         label: 'Home',
         boxColor:
-            navBarController.controller.index == 0 ? greenColor : whiteColor,
+            navBarController.controller.index == 0 ? appGreenColor : appWhiteColor,
         icon: "Group 12548",
         iconColor:
-            navBarController.controller.index == 0 ? whiteColor : blackColor,
+            navBarController.controller.index == 0 ? appWhiteColor : appBlackColor,
       ).getBottomNavItem(),
       BottomNav(
         label: 'Chat',
         boxColor:
-            navBarController.controller.index == 1 ? greenColor : whiteColor,
+            navBarController.controller.index == 1 ? appGreenColor : appWhiteColor,
         icon: "Path 28661",
         iconColor:
-            navBarController.controller.index == 1 ? whiteColor : blackColor,
+            navBarController.controller.index == 1 ? appWhiteColor : appBlackColor,
       ).getBottomNavItem(),
 
       //.......................... News Feed
@@ -189,18 +189,18 @@ class _HomeState extends State<Home> with AutomaticKeepAliveClientMixin {
       BottomNav(
         label: 'History',
         boxColor:
-            navBarController.controller.index == 2 ? greenColor : whiteColor,
+            navBarController.controller.index == 2 ? appGreenColor : appWhiteColor,
         icon: "Icon awesome-history",
         iconColor:
-            navBarController.controller.index == 2 ? whiteColor : blackColor,
+            navBarController.controller.index == 2 ? appWhiteColor : appBlackColor,
       ).getBottomNavItem(),
       BottomNav(
         label: 'Profile',
         boxColor:
-            navBarController.controller.index == 3 ? greenColor : whiteColor,
+            navBarController.controller.index == 3 ? appGreenColor : appWhiteColor,
         icon: "Icon material-person",
         iconColor:
-            navBarController.controller.index == 3 ? whiteColor : blackColor,
+            navBarController.controller.index == 3 ? appWhiteColor : appBlackColor,
       ).getBottomNavItem(),
     ];
   }
@@ -237,7 +237,7 @@ class _HomeState extends State<Home> with AutomaticKeepAliveClientMixin {
                     context: context,
                     builder: (context) => AlertDialog(
                           title: poppinsText(TempLanguage.logInForFeatures, 16,
-                              FontWeight.w500, blackColor),
+                              FontWeight.w500, appBlackColor),
                           actions: [
                             TextButton(
                               onPressed: () {

@@ -25,6 +25,8 @@ class GroupDetailController extends GetxController {
   RxBool loading = false.obs;
   RxBool uploadDataLoading = false.obs;
 
+  /// load while start new groupchat
+  RxBool loadNewGroup = false.obs;
   @override
   void onInit() {
     super.onInit();

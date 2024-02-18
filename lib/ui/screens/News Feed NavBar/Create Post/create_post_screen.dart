@@ -22,21 +22,21 @@ class CreatePost extends GetView<CreatePostController> {
         padding: const EdgeInsets.only(bottom: 40.0),
         child: FloatingActionButton.extended(
           onPressed: () {},
-          backgroundColor: greenColor,
+          backgroundColor: appGreenColor,
           label: Row(
             children: [
-              poppinsText('Send', 12, FontWeight.normal, whiteColor),
+              poppinsText('Send', 12, FontWeight.normal, appWhiteColor),
               horizontalGap(20),
               SvgPicture.asset(
                 AppImage.messageappbaricon,
-                color: whiteColor,
+                color: appWhiteColor,
               ),
             ],
           ),
         ),
       ),
       appBar: CustomAppbar(
-        title: poppinsText('Create Post', 15, FontWeight.bold, blackColor),
+        title: poppinsText('Create Post', 15, FontWeight.bold, appBlackColor),
       ),
       body: Column(
         children: [
@@ -56,7 +56,7 @@ class CreatePost extends GetView<CreatePostController> {
                           radius: 30,
                         ),
                         horizontalGap(20),
-                        poppinsText('Julian Dasilva', 18, bold, blackColor)
+                        poppinsText('Julian Dasilva', 18, bold, appBlackColor)
                       ],
                     ),
                   ),
@@ -91,7 +91,7 @@ class CreatePost extends GetView<CreatePostController> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 15),
             decoration: BoxDecoration(
-                color: whiteColor,
+                color: appWhiteColor,
                 border: Border(top: BorderSide(color: greyColor))),
             child: Row(
               children: [

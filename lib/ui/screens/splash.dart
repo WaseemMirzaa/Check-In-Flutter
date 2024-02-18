@@ -28,7 +28,7 @@ class _SplashState extends State<Splash> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: whiteColor,
+      color: appWhiteColor,
       child: Stack(
         children: [
           Positioned.fill(
@@ -61,14 +61,14 @@ class _SplashState extends State<Splash> {
                   const SizedBox(height: 0),
                   Text(
                     TempLanguage.poweredBy,
-                    style: TextStyle(fontSize: 12, color: blackColor),
+                    style: TextStyle(fontSize: 12, color: appBlackColor),
                   ),
                   const SizedBox(height: 4),
                   Text(
                     TempLanguage.villeMarcos,
                     style: TextStyle(
                         fontSize: 16,
-                        color: blackColor,
+                        color: appBlackColor,
                         fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 30),

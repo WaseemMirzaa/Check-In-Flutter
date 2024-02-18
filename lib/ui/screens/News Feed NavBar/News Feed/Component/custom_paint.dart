@@ -5,7 +5,7 @@ import 'dart:math' as math;
 class MyPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
-    Paint paint = Paint()..color = greenColor;
+    Paint paint = Paint()..color = appGreenColor;
     canvas.drawArc(
       Rect.fromCenter(
         center: Offset(size.height / 2, size.width / 2),

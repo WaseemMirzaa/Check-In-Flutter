@@ -23,7 +23,7 @@ class NewsFeedScreen extends GetView<NewsFeedController> {
         appBar: CustomAppbar(
           showicon: false,
           title: poppinsText(
-              TempLanguage.newsFeed, 15, FontWeight.bold, blackColor),
+              TempLanguage.newsFeed, 15, FontWeight.bold, appBlackColor),
         ),
         body: SingleChildScrollView(
           child: Column(
@@ -44,7 +44,7 @@ class NewsFeedScreen extends GetView<NewsFeedController> {
                     Column(
                       children: [
                         poppinsText(
-                            TempLanguage.checkOutHot, 20, bold, blackColor),
+                            TempLanguage.checkOutHot, 20, bold, appBlackColor),
                         poppinsText(TempLanguage.contentThatTrendingAndPopular,
                             9, medium, greyColor),
                       ],

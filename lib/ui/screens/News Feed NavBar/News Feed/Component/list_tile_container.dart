@@ -138,10 +138,10 @@ class ListTileContainer extends GetView<NewsFeedController> {
                       child: Obx(() => isLike.value
                           ? CircleAvatar(
                               radius: 11,
-                              backgroundColor: greenColor,
+                              backgroundColor: appGreenColor,
                               child: SvgPicture.asset(
                                 AppImage.like,
-                                color: whiteColor,
+                                color: appWhiteColor,
                                 height: 10,
                               ),
                             )
@@ -202,7 +202,7 @@ class ListTileContainer extends GetView<NewsFeedController> {
                             padding: const EdgeInsets.symmetric(vertical: 12.0),
                             child: SvgPicture.asset(
                               AppImage.messageappbaricon,
-                              color: greenColor,
+                              color: appGreenColor,
                             ),
                           ),
                           hintText: 'Write a comment',
@@ -225,7 +225,7 @@ class ListTileContainer extends GetView<NewsFeedController> {
                           pushNewScreen(context,
                               screen: const AllCommentsScreen());
                         },
-                        child: poppinsText('Show more', 15, bold, greenColor))
+                        child: poppinsText('Show more', 15, bold, appGreenColor))
                   ],
                 )))
           ],

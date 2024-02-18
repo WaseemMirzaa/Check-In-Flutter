@@ -70,7 +70,9 @@ dependencies:
   flutter_local_notifications: ^16.2.0
   flutter_app_badger: ^1.5.0
   rxdart: ^0.26.0
-  
+  flutter_image_compress: ^2.1.0
+  dartz: ^0.10.1
+  wakelock_plus: ^1.1.4
   google_maps_flutter:
       path: ./google_maps_flutter/google_maps_flutter
 #

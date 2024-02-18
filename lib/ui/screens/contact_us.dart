@@ -48,10 +48,10 @@ class _ContactUsState extends State<ContactUs> {
       await launchUrl(params);
     } else {
       Get.snackbar(TempLanguage.emailErrorToastTitle, TempLanguage.emailErrorToastMessage,
-          backgroundColor: whiteColor,
+          backgroundColor: appWhiteColor,
           borderWidth: 4,
           borderColor: redColor,
-          colorText: blackColor);
+          colorText: appBlackColor);
       print('Could not launch email app.');
     }
   }
@@ -79,8 +79,8 @@ class _ContactUsState extends State<ContactUs> {
         ),
         elevation: 0,
         centerTitle: true,
-        backgroundColor: whiteColor,
-        title: poppinsText(TempLanguage.contactUs, 20, FontWeight.bold, blackColor),
+        backgroundColor: appWhiteColor,
+        title: poppinsText(TempLanguage.contactUs, 20, FontWeight.bold, appBlackColor),
       ),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -89,8 +89,8 @@ class _ContactUsState extends State<ContactUs> {
             padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 36),
             child: Column(
               children: [
-                customTextField(TempLanguage.nameCap, greenColor, nameController),
-                customTextField(TempLanguage.emailCap, greenColor, emailController),
+                customTextField(TempLanguage.nameCap, appGreenColor, nameController),
+                customTextField(TempLanguage.emailCap, appGreenColor, emailController),
               ],
             ),
           ),

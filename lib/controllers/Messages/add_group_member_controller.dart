@@ -82,13 +82,15 @@ class AddGroupMembersController extends GetxController {
       String uid = value.uid!;
       String name = value.userName!;
       String about = value.aboutMe!;
+      String image = value.photoUrl!;
 
       Map<String, dynamic> userData = {
         MessageField.MEMBER_UID: uid,
         MessageField.MEMBER_NAME: name,
         MessageField.ABOUT_USER: about,
-        MessageField.MEMBER_IMG: '',
+        MessageField.MEMBER_IMG: image,
         MessageField.IS_ADMIN: false,
+        MessageField.IS_OWNER: false,
         MessageField.MEMBER_UNREAD_COUNT: 0
       };
       dataArray.add(userData);

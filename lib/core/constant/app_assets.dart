@@ -1,4 +1,5 @@
 class AppAssets {
+  static const defaulImg = 'https://firebasestorage.googleapis.com/v0/b/check-in-7ecd7.appspot.com/o/profile%2Fu19X1PhO6LNyEOa3skVtKU07hir2?alt=media&token=ece7bf8a-362b-4464-bda8-5ccbc11c6318';
   static const LOGO = 'assets/images/logo.png';
   static const LOGO_NEW = 'assets/images/logo-new.png';
   static const APPLE = 'assets/images/apple.png';

@@ -28,7 +28,7 @@ class SendMessageContainer extends GetView<ChatController> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: BoxDecoration(color: whiteColor, boxShadow: [
+      decoration: BoxDecoration(color: appWhiteColor, boxShadow: [
         BoxShadow(
           color: greyColor.withOpacity(0.4),
           offset: const Offset(0, -2),
@@ -43,7 +43,7 @@ class SendMessageContainer extends GetView<ChatController> {
               //child: SvgPicture.asset(AppImage.chatfieldicon, width: 45, height: 45,)
             child: Container(
               decoration: BoxDecoration(
-                color: greenColor,
+                color: appGreenColor,
                 borderRadius: BorderRadius.circular(4),
               ),
               child: const Icon(Icons.image_outlined, color: Colors.white, size: 20,),

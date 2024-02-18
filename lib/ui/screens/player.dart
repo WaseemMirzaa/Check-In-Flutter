@@ -45,8 +45,8 @@ class _PlayerScreenState extends State<PlayerScreen> {
         ),
         elevation: 0,
         centerTitle: true,
-        backgroundColor: whiteColor,
-        title: poppinsText(TempLanguage.player, 20, FontWeight.bold, blackColor),
+        backgroundColor: appWhiteColor,
+        title: poppinsText(TempLanguage.player, 20, FontWeight.bold, appBlackColor),
       ),
       body: SingleChildScrollView(
         child: SizedBox(
@@ -69,7 +69,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
                             border: widget.user.photoUrl == ""
-                                ? Border.all(width: 2, color: greenColor)
+                                ? Border.all(width: 2, color: appGreenColor)
                                 : null,
                             image: widget.user.photoUrl != ""
                                 ? DecorationImage(
@@ -106,17 +106,17 @@ class _PlayerScreenState extends State<PlayerScreen> {
                   ),
                   verticalGap(0.5.h),
                   poppinsText(
-                      widget.user.name, 32, FontWeight.bold, blackColor),
+                      widget.user.name, 32, FontWeight.bold, appBlackColor),
                   poppinsText(
                       "@${widget.user.email.substring(0, widget.user.email.indexOf('@'))}",
                       12,
                       FontWeight.normal,
-                      blackColor),
+                      appBlackColor),
                 ],
               ),
               Column(
                 children: [
-                  poppinsText(TempLanguage.homeCourt, 14, semiBold, greenColor),
+                  poppinsText(TempLanguage.homeCourt, 14, semiBold, appGreenColor),
                   verticalGap(0.8.h),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 30),
@@ -131,7 +131,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
                                     : widget.user.court,
                                 14,
                                 semiBold,
-                                blackColor),
+                                appBlackColor),
                             // InkWell(
                             //   onTap: () {
                             //     pushNewScreen(context,
@@ -168,7 +168,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
                             const EdgeInsets.only(left: 30, right: 30, top: 30),
                         height: 200,
                         decoration: BoxDecoration(
-                          color: whiteColor,
+                          color: appWhiteColor,
                           borderRadius: const BorderRadius.only(
                               topLeft: Radius.circular(10),
                               topRight: Radius.circular(10)),
@@ -188,7 +188,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 poppinsText(
-                                    TempLanguage.aboutMe, 14, semiBold, blackColor),
+                                    TempLanguage.aboutMe, 14, semiBold, appBlackColor),
                               ],
                             ),
                             TextFormField(
@@ -219,7 +219,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
                       ),
                       Container(
                         width: 100,
-                        color: greenColor,
+                        color: appGreenColor,
                         height: 2,
                       ),
                     ],

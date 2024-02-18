@@ -75,10 +75,10 @@ class _StartViewState extends State<StartView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: whiteColor,
+      backgroundColor: appWhiteColor,
       appBar: widget.isBack
           ? AppBar(
-              backgroundColor: whiteColor,
+              backgroundColor: appWhiteColor,
               leading: Row(
                 children: [
                   const SizedBox(
@@ -128,7 +128,7 @@ class _StartViewState extends State<StartView> {
                     child: Container(
                       height: 6.h,
                       decoration: BoxDecoration(
-                        color: whiteColor,
+                        color: appWhiteColor,
                         borderRadius: BorderRadius.circular(11.0),
                         border: Border.all(
                             width: 1.0, color: greyColor),
@@ -154,7 +154,7 @@ class _StartViewState extends State<StartView> {
                               style: TextStyle(
                                 fontFamily: TempLanguage.poppins,
                                 fontSize: 1.7.h,
-                                color: blackColor,
+                                color: appBlackColor,
                                 fontWeight: FontWeight.w500,
                               ),
                               textAlign: TextAlign.center,

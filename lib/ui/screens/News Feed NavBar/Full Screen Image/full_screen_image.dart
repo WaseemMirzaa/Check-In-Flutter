@@ -12,10 +12,10 @@ class FullScreenImage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: blackColor,
+      backgroundColor: appBlackColor,
       appBar: CustomAppbar(
-        backgroundColor: blackColor,
-        iconColor: whiteColor,
+        backgroundColor: appBlackColor,
+        iconColor: appWhiteColor,
         actions: const [
           Padding(
             padding: EdgeInsets.only(right: 10),
@@ -45,16 +45,16 @@ class FullScreenImage extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       poppinsText(
-                          'Daniela Fernández Ramos', 14, bold, whiteColor),
+                          'Daniela Fernández Ramos', 14, bold, appWhiteColor),
                       verticalGap(8),
                       poppinsText(
                           'Me encanto la sesión de fotos que me hizo mi amig😍🥺 sssss',
                           10,
                           medium,
-                          whiteColor,
+                          appWhiteColor,
                           maxlines: 3),
                       verticalGap(6),
-                      poppinsText('THU AT 11:50', 10, medium, whiteColor)
+                      poppinsText('THU AT 11:50', 10, medium, appWhiteColor)
                     ],
                   ),
                 ),
@@ -65,9 +65,9 @@ class FullScreenImage extends StatelessWidget {
                       height: 23,
                     ),
                     horizontalGap(5),
-                    poppinsText('31K', 12, medium, whiteColor),
+                    poppinsText('31K', 12, medium, appWhiteColor),
                     const Spacer(),
-                    poppinsText('356 Comments', 12, medium, whiteColor)
+                    poppinsText('356 Comments', 12, medium, appWhiteColor)
                   ],
                 )
               ],

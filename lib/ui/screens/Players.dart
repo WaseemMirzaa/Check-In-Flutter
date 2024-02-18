@@ -106,9 +106,9 @@ class _PlayersViewState extends State<PlayersView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: whiteColor,
+      backgroundColor: appWhiteColor,
       appBar: AppBar(
-        backgroundColor: whiteColor,
+        backgroundColor: appWhiteColor,
         leading: IconButton(
             padding: const EdgeInsets.only(left: 10),
             onPressed: () {
@@ -127,7 +127,7 @@ class _PlayersViewState extends State<PlayersView> {
           style: TextStyle(
             fontFamily: TempLanguage.poppins,
             fontSize: 20,
-            color: blackColor,
+            color: appBlackColor,
             fontWeight: FontWeight.w700,
           ),
           textAlign: TextAlign.right,
@@ -147,7 +147,7 @@ class _PlayersViewState extends State<PlayersView> {
                   style: TextStyle(
                     fontFamily: TempLanguage.poppins,
                     fontSize: 15,
-                    color: greenColor,
+                    color: appGreenColor,
                     fontWeight: FontWeight.w500,
                   ),
                   textAlign: TextAlign.right,
@@ -217,7 +217,7 @@ class _PlayersViewState extends State<PlayersView> {
                                   child: Container(
                                     height: 115,
                                     decoration: BoxDecoration(
-                                      color: whiteColor,
+                                      color: appWhiteColor,
                                       borderRadius: BorderRadius.circular(6.0),
                                       boxShadow: [
                                         BoxShadow(
@@ -245,7 +245,7 @@ class _PlayersViewState extends State<PlayersView> {
                                                     border: user.photoUrl == ""
                                                         ? Border.all(
                                                             width: 2,
-                                                            color: greenColor)
+                                                            color: appGreenColor)
                                                         : null,
                                                   ),
                                                   child: ClipOval(
@@ -308,7 +308,7 @@ class _PlayersViewState extends State<PlayersView> {
                                                 fontFamily:
                                                     TempLanguage.poppins,
                                                 fontSize: 13,
-                                                color: blackColor,
+                                                color: appBlackColor,
                                                 fontWeight: FontWeight.w600,
                                               ),
                                               children: [
@@ -327,7 +327,7 @@ class _PlayersViewState extends State<PlayersView> {
                                                     fontFamily:
                                                         TempLanguage.poppins,
                                                     fontSize: 10,
-                                                    color: greenColor,
+                                                    color: appGreenColor,
                                                     height: 1.7,
                                                   ),
                                                   children: [

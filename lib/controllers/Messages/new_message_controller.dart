@@ -16,11 +16,13 @@ class NewMessageController extends GetxController {
   late final RxList<UserModel> userDataList = RxList<UserModel>();
   RxString searchQuery = ''.obs;
   DocumentSnapshot? _lastDocument;
-
+  List<Map<String, dynamic>> dataArray = [];
+  List memberIds = [];
   final DOCUMENT_PER_PAGE = 20;
   final DELAY_IN_MILLISECONDS = 300;
 
   RxMap<String, dynamic> mydata = <String, dynamic>{}.obs;
+  // RxMap<String, dynamic> dataArray = <String, dynamic>{}.obs;
 
   // StreamController to manage the text input stream
   final _searchQuerySubject = BehaviorSubject<String>();
@@ -36,18 +38,18 @@ class NewMessageController extends GetxController {
     _userSubscription = _searchQuerySubject
         .debounceTime(Duration(milliseconds: DELAY_IN_MILLISECONDS))
         .distinct()
-        .switchMap((query) => Stream.fromFuture(chatService.getUsersDocsWithPagination(query, DOCUMENT_PER_PAGE, null)))
+        .switchMap((query) => Stream.fromFuture(chatService
+            .getUsersDocsWithPagination(query, DOCUMENT_PER_PAGE, null)))
         .listen((docs) {
-
-          List<UserModel> users = docs
+      List<UserModel> users = docs
           .map((doc) => UserModel.fromMap(doc.data() as Map<String, dynamic>))
           .toList();
 
-          if (docs.isNotEmpty) {
-             userDataList.clear();
-             _lastDocument = docs.last;
-             userDataList.addAll(users);
-          }
+      if (docs.isNotEmpty) {
+        userDataList.clear();
+        _lastDocument = docs.last;
+        userDataList.addAll(users);
+      }
     });
   }
 
@@ -61,10 +63,9 @@ class NewMessageController extends GetxController {
   //   });
   // }
 
-//............ start new chat
-
   Future<void> fetchMore() async {
-    List<DocumentSnapshot> docs = await chatService.getUsersDocsWithPagination(searchController.text, DOCUMENT_PER_PAGE, _lastDocument);
+    List<DocumentSnapshot> docs = await chatService.getUsersDocsWithPagination(
+        searchController.text, DOCUMENT_PER_PAGE, _lastDocument);
 
     List<UserModel> users = docs
         .map((doc) => UserModel.fromMap(doc.data() as Map<String, dynamic>))
@@ -76,44 +77,59 @@ class NewMessageController extends GetxController {
     }
   }
 
-  Future<String> startNewChat(String myUid, String uNAme) async {
-    UserModel model = mydata.values.first;
-    return chatService
-        .startNewChat([myUid, mydata.keys.first], uNAme, model.userName!);
+//............ start new chat
+  Future<Map<String, dynamic>> startNewChat(
+      String myUid, String uNAme, String UImage) async {
+    //....... matching ids to check whether chat already exist or not
+    var response = await chatService.areIdsMatching([myUid, mydata.keys.first]);
+    if (response != '') {
+      // Do not add data and
+      return {'isNewChat': false, 'docId': response};
+    } else {
+      UserModel model = mydata.values.first;
+      var res = await chatService.startNewChat([myUid, mydata.keys.first],
+          uNAme, model.userName!, model.photoUrl!, UImage);
+      return {'isNewChat': true, 'docId': res};
+    }
   }
 
-  Future<String> startNewGroupChat(String myUid, String uNAme) async {
-    List<Map<String, dynamic>> dataArray = [
+//........... start new group chat
+  Future<String> startNewGroupChat(
+      String myUid, String uNAme, String memberImage, String about) async {
+    dataArray = [
       {
         MessageField.MEMBER_UID: myUid,
         MessageField.MEMBER_NAME: uNAme,
-        MessageField.ABOUT_USER: '',
-        MessageField.MEMBER_IMG: '',
+        MessageField.ABOUT_USER: about,
+        MessageField.MEMBER_IMG: memberImage,
         MessageField.IS_ADMIN: true,
+        MessageField.IS_OWNER: true,
         MessageField.MEMBER_UNREAD_COUNT: 0
       }
     ];
-    List memberIds = [myUid];
+    memberIds = [myUid];
     mydata.forEach((id, data) {
       UserModel value = data;
-
       String uid = value.uid!;
       String name = value.userName!;
       String about = value.aboutMe!;
+      String image = value.photoUrl!;
 
       Map<String, dynamic> userData = {
         MessageField.MEMBER_UID: uid,
         MessageField.MEMBER_NAME: name,
         MessageField.ABOUT_USER: about,
-        MessageField.MEMBER_IMG: '',
+        MessageField.MEMBER_IMG: image,
         MessageField.IS_ADMIN: false,
+        MessageField.IS_OWNER: false,
         MessageField.MEMBER_UNREAD_COUNT: 0
       };
       dataArray.add(userData);
       memberIds.add(value.uid);
     });
 
-    return chatService.startNewGroupChat(memberIds, dataArray);
+    return '';
+    // return chatService.startNewGroupChat(memberIds, dataArray);
   }
 
   // Method to update the search query

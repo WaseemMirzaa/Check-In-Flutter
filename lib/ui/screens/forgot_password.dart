@@ -35,9 +35,9 @@ class _ForgotPasswordState extends State<ForgotPassword> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: whiteColor,
+      backgroundColor: appWhiteColor,
       appBar: AppBar(
-        backgroundColor: whiteColor,
+        backgroundColor: appWhiteColor,
         leading: Row(
           children: [
             const SizedBox(
@@ -55,7 +55,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
             )
           ],
         ),
-        title: poppinsText(TempLanguage.forgotPassword, 20, FontWeight.bold, blackColor),
+        title: poppinsText(TempLanguage.forgotPassword, 20, FontWeight.bold, appBlackColor),
         centerTitle: true,
         elevation: 0,
       ),

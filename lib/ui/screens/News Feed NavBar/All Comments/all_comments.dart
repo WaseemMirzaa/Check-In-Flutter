@@ -21,7 +21,7 @@ class AllCommentsScreen extends StatelessWidget {
               height: 20,
             ),
             const Spacer(),
-            poppinsText('Comments', 15, bold, blackColor),
+            poppinsText('Comments', 15, bold, appBlackColor),
             const Spacer(
               flex: 3,
             )
@@ -44,7 +44,7 @@ class AllCommentsScreen extends StatelessWidget {
           ),
           Container(
             decoration: BoxDecoration(
-              color: whiteColor,
+              color: appWhiteColor,
               borderRadius: const BorderRadius.only(
                   topLeft: Radius.circular(20), topRight: Radius.circular(20)),
               boxShadow: [
@@ -67,7 +67,7 @@ class AllCommentsScreen extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(vertical: 12.0),
                     child: SvgPicture.asset(
                       AppImage.messageappbaricon,
-                      color: greenColor,
+                      color: appGreenColor,
                     ),
                   ),
                 )),

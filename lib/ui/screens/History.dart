@@ -62,14 +62,14 @@ class _HistoryViewState extends State<HistoryView> {
     // fetchData();
     return Scaffold(
         appBar: AppBar(
-          backgroundColor: whiteColor,
+          backgroundColor: appWhiteColor,
           centerTitle: true,
           title: Text(
             TempLanguage.history,
             style: TextStyle(
               fontFamily: TempLanguage.poppins,
               fontSize: 20,
-              color: blackColor,
+              color: appBlackColor,
               fontWeight: FontWeight.w700,
             ),
             textAlign: TextAlign.right,
@@ -102,7 +102,7 @@ class _HistoryViewState extends State<HistoryView> {
                               child: Container(
                                 height: 14.h,
                                 decoration: BoxDecoration(
-                                  color: whiteColor,
+                                  color: appWhiteColor,
                                   borderRadius: BorderRadius.circular(6.0),
                                   boxShadow: [
                                     BoxShadow(
@@ -136,7 +136,7 @@ class _HistoryViewState extends State<HistoryView> {
                                         style: TextStyle(
                                           fontFamily: TempLanguage.poppins,
                                           fontSize: 1.6.h,
-                                          color: blackColor,
+                                          color: appBlackColor,
                                           fontWeight: FontWeight.w600,
                                         ),
                                         children: [
@@ -144,7 +144,7 @@ class _HistoryViewState extends State<HistoryView> {
                                             style: TextStyle(
                                               fontFamily: TempLanguage.poppins,
                                               fontSize: 1.1.h,
-                                              color: greenColor,
+                                              color: appGreenColor,
                                               height: 1.7,
                                             ),
                                             children: [

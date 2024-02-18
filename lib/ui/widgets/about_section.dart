@@ -16,8 +16,7 @@ import '../screens/add_home_court.dart';
 
 class AboutSection extends StatefulWidget {
   final UserController userController;
-  const AboutSection({Key? key, required this.userController})
-      : super(key: key);
+  const AboutSection({Key? key, required this.userController}) : super(key: key);
 
   @override
   State<AboutSection> createState() => _AboutSectionState();
@@ -43,7 +42,7 @@ class _AboutSectionState extends State<AboutSection> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        poppinsText(TempLanguage.homeCourt, 14, semiBold, greenColor),
+        poppinsText(TempLanguage.homeCourt, 14, semiBold, appGreenColor),
         verticalGap(0.8.h),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 30),
@@ -53,18 +52,15 @@ class _AboutSectionState extends State<AboutSection> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   poppinsText(
-                      (widget.userController.userModel.value.homeCourt
-                              .isEmptyOrNull)
+                      (widget.userController.userModel.value.homeCourt.isEmptyOrNull)
                           ? ""
-                          : widget.userController.userModel.value.homeCourt ??
-                              "",
+                          : widget.userController.userModel.value.homeCourt ?? "",
                       14,
                       semiBold,
-                      blackColor),
+                      appBlackColor),
                   InkWell(
                     onTap: () {
-                      pushNewScreen(context,
-                          screen: const AddHomeCourt(), withNavBar: false);
+                      pushNewScreen(context, screen: const AddHomeCourt(), withNavBar: false);
                     },
                     child: SizedBox(
                       height: 2.3.h,
@@ -74,7 +70,6 @@ class _AboutSectionState extends State<AboutSection> {
                   )
                 ],
               ),
-              
               verticalGap(1.3.h),
               Container(
                 height: 1,
@@ -96,10 +91,8 @@ class _AboutSectionState extends State<AboutSection> {
               ),
               height: 20.h,
               decoration: BoxDecoration(
-                color: whiteColor,
-                borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(10),
-                    topRight: Radius.circular(10)),
+                color: appWhiteColor,
+                borderRadius: const BorderRadius.only(topLeft: Radius.circular(10), topRight: Radius.circular(10)),
                 boxShadow: [
                   BoxShadow(
                     color: greyColor.withOpacity(0.2),
@@ -115,10 +108,9 @@ class _AboutSectionState extends State<AboutSection> {
                     width: 100,
                     height: 0.5.h,
                     decoration: BoxDecoration(
-                        color: greenColor,
-                        borderRadius: const BorderRadius.only(
-                            bottomLeft: Radius.circular(5),
-                            bottomRight: Radius.circular(5))),
+                        color: appGreenColor,
+                        borderRadius:
+                            const BorderRadius.only(bottomLeft: Radius.circular(5), bottomRight: Radius.circular(5))),
                   ),
                   SizedBox(
                     height: 2.h,
@@ -126,11 +118,10 @@ class _AboutSectionState extends State<AboutSection> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      poppinsText(
-                          TempLanguage.aboutMe, 14, semiBold, blackColor),
+                      poppinsText(TempLanguage.aboutMe, 14, semiBold, appBlackColor),
                       InkWell(
                         onTap: () => setState(() {
-                          if(tapped){
+                          if (tapped) {
                             setState(() {
                               // userController.userModel.value.
                               //..........
@@ -145,16 +136,15 @@ class _AboutSectionState extends State<AboutSection> {
                           tapped = !tapped;
                         }),
                         child: Padding(
-                          padding: const EdgeInsets.only(left: 8),
-                          child: SizedBox(
-                            height: 1.8.h,
-                            // width: 15.w,
-                            child: tapped ?
-                            poppinsText(TempLanguage.save, 14, semiBold, greenColor)
-                                :
-                            Image.asset(AppAssets.EDIT_ICON,),
-                          ),
-                        ),
+                            padding: const EdgeInsets.only(left: 8),
+                            child: tapped
+                                ? Expanded(child: poppinsText(TempLanguage.save, 14, semiBold, appGreenColor))
+                                : const ImageIcon(
+                                    AssetImage(
+                                      AppAssets.EDIT_ICON,
+                                    ),
+                                    size: 20,
+                                  )),
                       )
                     ],
                   ),
@@ -173,11 +163,7 @@ class _AboutSectionState extends State<AboutSection> {
                       //       .update({UserKey.ABOUT_ME: aboutMe});
                       // });
                     },
-                    maxLines:
-                        widget.userController.userModel.value.isVerified ==
-                                false
-                            ? 3
-                            : 5,
+                    maxLines: widget.userController.userModel.value.isVerified == false ? 3 : 5,
                     onChanged: (val) {},
                     decoration: InputDecoration(
                         border: InputBorder.none,
@@ -188,10 +174,7 @@ class _AboutSectionState extends State<AboutSection> {
                         focusedBorder: InputBorder.none,
                         focusedErrorBorder: InputBorder.none,
                         hintText: TempLanguage.tellUsAboutGame,
-                        helperStyle: GoogleFonts.poppins(
-                            fontSize: 14,
-                            fontWeight: regular,
-                            color: silverColor)),
+                        helperStyle: GoogleFonts.poppins(fontSize: 14, fontWeight: regular, color: silverColor)),
                   ),
                   // verticalGap(20),
                   Container(

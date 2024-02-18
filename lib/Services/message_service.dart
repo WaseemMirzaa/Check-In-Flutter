@@ -11,12 +11,14 @@ import 'package:check_in/model/Message%20and%20Group%20Message%20Model/group_mem
 import 'package:check_in/model/user_modal.dart';
 import 'package:check_in/utils/Constants/enums.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:intl/intl.dart';
 
 import '../controllers/Messages/firestore_pagination.dart';
 import '../model/Message and Group Message Model/message_model.dart';
 
-List<dynamic> mem = [];
+// List<dynamic> mem = [];
 
 class MessageService {
   int unreadCount = 0;
@@ -54,8 +56,10 @@ class MessageService {
 
 //............ Get Message
   Stream<List<Messagemodel>> getChatMessage(String myId) {
+    List<dynamic> mem = [];
     return _messagesCollection
         .where(MessageField.MEMBER_IDS, arrayContains: myId)
+        .orderBy(MessageField.TIME_STAMP, descending: true)
         .snapshots()
         .map((querySnapshot) => querySnapshot.docs.map<Messagemodel>((doc) {
               num unread = 0;
@@ -104,9 +108,31 @@ class MessageService {
             }).toList());
   }
 
+//............ Get Single Message
+  Future<Messagemodel> getSingleMessage(String docId, String uId) async {
+    DocumentSnapshot documentSnapshot =
+        await _messagesCollection.doc(docId).get();
+
+    if (documentSnapshot.exists) {
+      Map<String, dynamic> data =
+          documentSnapshot.data() as Map<String, dynamic>;
+      String imagepath = '';
+      if (data[MessageField.IS_GROUP] == true) {
+        imagepath = data[MessageField.GROUP_IMG];
+      } else {
+        imagepath = data[MessageField.SENDER_ID] == uId
+            ? data[MessageField.RECIEVER_IMG]
+            : data[MessageField.SENDER_IMG];
+      }
+      return Messagemodel.fromJson(data, image: imagepath);
+    } else {
+      log('Document not exist');
+      throw Exception('Document does not exist for ID: $docId');
+    }
+  }
 
 //............ Get conversations
-  Stream<List<Chatmodel>> getConversation(String docId, String uId) {
+  Stream<List<Chatmodel>> getConversation(String docId, String uId, List mem) {
     return _messagesCollection
         .doc(docId)
         .collection(Collections.CHAT)
@@ -114,9 +140,55 @@ class MessageService {
         .snapshots()
         .map((querySnapshot) => querySnapshot.docs.map<Chatmodel>((doc) {
               // updateLastSeen(docId, uId);
-              updateUnreadCount(docId, uId, 0);
+
               return Chatmodel.fromJson(doc.data());
             }).toList());
+  }
+
+  // Function to fetch the online status of a user
+  Future<String> getOnlineStatus(String docId) async {
+    try {
+      DocumentSnapshot snapshot = await _messagesCollection.doc(docId).get();
+      if (snapshot.exists) {
+        Map<String, dynamic>? data = snapshot.data() as Map<String, dynamic>?;
+        if (data != null && data.containsKey('senderStatus')) {
+          String status = data['senderStatus'];
+          print('wwwwwww: $data');
+          print('wwwwwww: $status');
+          if (status == 'Online') {
+            return 'Online';
+          } else if (status.isNotEmpty) {
+            DateTime lastSeen = DateTime.parse(status);
+            return 'Last Seen ${DateFormat('hh:mm a').format(lastSeen)}';
+          }
+        }
+      }
+      return '';
+    } catch (e) {
+      print('Error fetching online status: $e');
+      return '';
+    }
+  }
+
+  // Function to update the online status of a user
+  Future<void> updateOnlineStatus(
+      String docId, String status, String uId) async {
+    try {
+      print(docId);
+      print(uId);
+      final docRef = _messagesCollection.doc(docId);
+      FirebaseFirestore.instance.runTransaction((transaction) async {
+        final snapshot = await transaction.get(docRef);
+        if (snapshot.get(MessageField.SENDER_ID) == uId) {
+          docRef.update({'senderStatus': status});
+        } else {
+          docRef.update({'receiverStatus': status});
+        }
+      });
+      print('Online status updated successfully for user $docId');
+    } catch (e) {
+      print('Error updating online status: $e');
+    }
   }
 
 //............ Update last Seen
@@ -143,15 +215,14 @@ class MessageService {
 
 //............ Update Unread Count
   Future<void> updateUnreadCount(
-    String docId,
-    String uId,
-    num unreadval,
-  ) async {
+      String docId, String uId, num unreadval, List mem) async {
     final docRef = _messagesCollection.doc(docId);
     FirebaseFirestore.instance.runTransaction((transaction) async {
       final snapshot = await transaction.get(docRef);
       if (snapshot.get(MessageField.IS_GROUP) == true) {
         for (int i = 0; i < mem.length; i++) {
+          print(mem);
+          print(mem[i]);
           if (mem[i][MessageField.MEMBER_UID] == uId) {
             mem[i][MessageField.MEMBER_UNREAD_COUNT] = 0;
             break;
@@ -170,7 +241,6 @@ class MessageService {
     });
   }
 
-//............
 //............ Get message request status
   Stream<Messagemodel> getMessageRequest(String docId) {
     return _messagesCollection
@@ -182,78 +252,93 @@ class MessageService {
   }
 
 //............ Send message
-  Future<DocumentSnapshot?> sendMessage(String docId, Chatmodel chatmodel) async {
+  Future<DocumentSnapshot?> sendMessage(
+      String docId, Chatmodel chatmodel, List mem) async {
     final batch = FirebaseFirestore.instance.batch();
-    try {
-      final docRef = _messagesCollection.doc(docId);
-      DocumentSnapshot messageSnapshot = await docRef.get();
-      if (chatmodel.type == 'image') {
-        String? image = await uploadChatImageToFirebase(
-            docId,
-            chatmodel.message!,
-            chatmodel.id!,
-            chatmodel.time!,
-            messageSnapshot);
-        chatmodel.message = image;
-      }
 
-      CollectionReference chatCollection = _messagesCollection.doc(docId).collection(Collections.CHAT);
-
-      // Get a reference to the newly added document
-      DocumentReference newDocumentRef = chatCollection.doc();
-      batch.set(newDocumentRef, chatmodel.toJson());
-
-      CollectionReference messageCollection = _messagesCollection;
-      batch.update(messageCollection.doc(docId), {
-        MessageField.LAST_MESSAGE:
-            chatmodel.type == 'image' ? 'Photo' : chatmodel.message,
-        MessageField.TIME_STAMP: chatmodel.time,
-      });
-
-      if (messageSnapshot.get(MessageField.IS_GROUP) == true) {
-        for (int i = 0; i < mem.length; i++) {
-          if (mem[i][MessageField.MEMBER_UID] != chatmodel.id) {
-            int current = mem[i][MessageField.MEMBER_UNREAD_COUNT];
-            mem[i][MessageField.MEMBER_UNREAD_COUNT] = current + 1;
-          }
-        }
-        batch.update(docRef, {MessageField.MEMBERS: mem});
-      } else {
-        if (messageSnapshot.get(MessageField.SENDER_ID) == chatmodel.id) {
-          batch.update(
-              docRef, {MessageField.RECIEVER_UNREAD: FieldValue.increment(1)});
-        } else {
-          batch.update(
-              docRef, {MessageField.SENDER_UNREAD: FieldValue.increment(1)});
-        }
-      }
-      await batch.commit();
-
-      // Fetch and return the snapshot of the newly added document
-      DocumentSnapshot newDocumentSnapshot = await newDocumentRef.get();
-      return newDocumentSnapshot;
-    } catch (e) {
-      print('Error sending message: $e');
-      return null;
+    print("member$mem");
+    final docRef = _messagesCollection.doc(docId);
+    DocumentSnapshot messageSnapshot = await docRef.get();
+    if (chatmodel.type == 'image') {
+      var image = await uploadChatImageToFirebase(
+          docId,
+          chatmodel.message!,
+          chatmodel.id!,
+          chatmodel.time!,
+          messageSnapshot,
+          chatmodel.thumbnail!);
+      chatmodel.message = image['original'];
+      chatmodel.thumbnail = image['thumbnail'];
     }
+
+    CollectionReference chatCollection =
+        _messagesCollection.doc(docId).collection(Collections.CHAT);
+
+    // Get a reference to the newly added document
+    DocumentReference newDocumentRef = chatCollection.doc();
+    batch.set(newDocumentRef, chatmodel.toJson());
+
+    CollectionReference messageCollection = _messagesCollection;
+    //   update lastseen and timestamp
+    batch.update(messageCollection.doc(docId), {
+      MessageField.LAST_MESSAGE:
+          chatmodel.type == 'image' ? 'Photo' : chatmodel.message,
+      MessageField.TIME_STAMP: chatmodel.time,
+    });
+
+    if (messageSnapshot.get(MessageField.IS_GROUP) == true) {
+      for (int i = 0; i < mem.length; i++) {
+        if (mem[i][MessageField.MEMBER_UID] != chatmodel.id) {
+          int current = mem[i][MessageField.MEMBER_UNREAD_COUNT];
+          mem[i][MessageField.MEMBER_UNREAD_COUNT] = current + 1;
+        }
+      }
+      batch.update(docRef, {MessageField.MEMBERS: mem});
+    } else {
+      if (messageSnapshot.get(MessageField.SENDER_ID) == chatmodel.id) {
+        batch.update(
+            docRef, {MessageField.RECIEVER_UNREAD: FieldValue.increment(1)});
+      } else {
+        batch.update(
+            docRef, {MessageField.SENDER_UNREAD: FieldValue.increment(1)});
+      }
+    }
+    await batch.commit();
+
+    // Fetch and return the snapshot of the newly added document
+    DocumentSnapshot newDocumentSnapshot = await newDocumentRef.get();
+    return newDocumentSnapshot;
   }
 
 //............ Upload chat images
-  Future<String?> uploadChatImageToFirebase(String docId, String imagePath,
-      String uId, String time, DocumentSnapshot snapshot) async {
+  Future<Map<String, String>> uploadChatImageToFirebase(
+      String docId,
+      String imagePath,
+      String uId,
+      String time,
+      DocumentSnapshot snapshot,
+      String thumnail) async {
     try {
       Reference storageReference;
+      Reference thumbnailStorageReference;
       if (snapshot.get(MessageField.IS_GROUP) == true) {
         storageReference = _storage.ref().child('group/$docId/chat/$uId/$time');
+        thumbnailStorageReference =
+            _storage.ref().child('group/$docId/chat/$uId/$time/thumbnail');
       } else {
         storageReference = _storage.ref().child('singlechat/$docId/$uId/$time');
+        thumbnailStorageReference =
+            _storage.ref().child('singlechat/$docId/$uId/$time/thumbnail');
       }
       await storageReference.putFile(File(imagePath));
+      await thumbnailStorageReference.putFile(File(thumnail));
       final downloadUrl = await storageReference.getDownloadURL();
-      return downloadUrl;
+      final downloadThumbnailUrl =
+          await thumbnailStorageReference.getDownloadURL();
+      return {'original': downloadUrl, 'thumbnail': downloadThumbnailUrl};
     } catch (e) {
       log(e.toString());
-      return null;
+      return {};
     }
   }
 
@@ -289,6 +374,7 @@ class MessageService {
 
 //........... Get Group detail
   Future<GroupDetailModel> getGroupDetails(String docId, String myId) async {
+    List mem;
     try {
       bool isAdmin = false;
       DocumentSnapshot snapshot = await _messagesCollection.doc(docId).get();
@@ -420,7 +506,8 @@ class MessageService {
     }
   }
 
-  Future<List<DocumentSnapshot>> getUsersDocsWithPagination(String name, int resultsPerPage, DocumentSnapshot? lastDocument) async {
+  Future<List<DocumentSnapshot>> getUsersDocsWithPagination(
+      String name, int resultsPerPage, DocumentSnapshot? lastDocument) async {
     try {
       Query query = db
           .collection(Collections.USER)
@@ -440,15 +527,14 @@ class MessageService {
     }
   }
 
-
 //........... Start new chat
-  Future<String> startNewChat(
-      List ids, String senderName, String recieverName) async {
-    if (await areIdsMatching(ids) != '') {
-      print('No data added because IDs match');
-      // Do not add data and return an indication that no data was added
-      return areIdsMatching(ids);
-    }
+  Future<String> startNewChat(List ids, String senderName, String recieverName,
+      String photoUrl, String UIimage) async {
+    // if (await areIdsMatching(ids) != '') {
+    //   print('No data added because IDs match');
+    //   // Do not add data and return an indication that no data waSs added
+    //   return {'NewChat': 'No', 'docId': areIdsMatching(ids)};
+    // }
     Map<String, dynamic> data = {
       MessageField.ID: '',
       MessageField.IS_GROUP: false,
@@ -456,15 +542,15 @@ class MessageService {
       MessageField.MEMBER_IDS: ids,
       MessageField.RECIEVER_ABOUT: '',
       MessageField.RECIEVER_ID: ids.last,
-      MessageField.RECIEVER_IMG: '',
+      MessageField.RECIEVER_IMG: photoUrl,
       MessageField.RECIEVER_NAME: recieverName,
       MessageField.RECIEVER_UNREAD: 1,
       MessageField.SENDER_ABOUT: '',
       MessageField.SENDER_ID: ids.first,
-      MessageField.SENDER_IMG: '',
+      MessageField.SENDER_IMG: UIimage,
       MessageField.SENDER_NAME: senderName,
       MessageField.SENDER_UNREAD: 0,
-      MessageField.TIME_STAMP: '',
+      MessageField.TIME_STAMP: DateTime.now().toString(),
       MessageField.REQUEST_STATUS: RequestStatusEnum.pending.name
     };
 
@@ -500,32 +586,42 @@ class MessageService {
   }
 
   //........... Start new group chat
-  Future<String> startNewGroupChat(List ids, List members) async {
+  Future<Map<String, String>> startNewGroupChat(List ids, List members,
+      String groupName, groupInfo, String groupImage) async {
+    print('members $members');
     Map<String, dynamic> data = {
-      MessageField.ABOUT_GROUP: '',
+      MessageField.ABOUT_GROUP: groupInfo,
       MessageField.GROUP_IMG: '',
-      MessageField.GROUP_NAME: '',
+      MessageField.GROUP_NAME: groupName,
       MessageField.ID: '',
       MessageField.IS_GROUP: true,
       MessageField.LAST_MESSAGE: '',
       MessageField.MEMBER_IDS: ids,
       MessageField.MEMBERS: members,
-      MessageField.TIME_STAMP: ''
+      MessageField.TIME_STAMP: DateTime.now().toString(),
     };
 
     DocumentReference documentReference = await _messagesCollection.add(data);
     String documentId = documentReference.id;
 
+    String? image = '';
+    groupImage != ''
+        ? image = await uploadImageToFirebase(documentId, groupImage)
+        : image = '';
+
     // Update the 'id' field in the model with the document ID
-    _messagesCollection.doc(documentId).update({MessageField.ID: documentId});
-    return documentId;
+    _messagesCollection
+        .doc(documentId)
+        .update({MessageField.ID: documentId, MessageField.GROUP_IMG: image});
+    return {MessageField.ID: documentId, MessageField.GROUP_IMG: image ?? ''};
   }
 
   //........... Update request status
   Future<void> updateRequestStatus(
-      String docId, String status, String msg, int unread) async {
+      String docId, String status, String msg, int unread, String uid) async {
     try {
       DocumentReference ref = _messagesCollection.doc(docId);
+
       await ref.update({
         MessageField.REQUEST_STATUS: status,
         MessageField.RECIEVER_UNREAD: unread,
@@ -534,6 +630,40 @@ class MessageService {
     } catch (e) {
       rethrow;
     }
+  }
+
+  Future<bool> updateCollection(
+      String collectionName, String docID, Map<String, dynamic> list) async {
+    try {
+      await db.collection(collectionName).doc(docID).update(list);
+      return true;
+    } catch (e) {
+      log("The error while Updatation is: $e");
+      return false;
+    }
+  }
+
+  Future<bool> removeCurrentUserFromMemberIds(String docID) async {
+    // Get current user UID
+    String currentUserUid = FirebaseAuth.instance.currentUser!.uid;
+
+    // Reference to your Firestore collection
+    CollectionReference messagesCollection =
+        FirebaseFirestore.instance.collection(Collections.MESSAGES);
+
+    // Retrieve the document containing memberIds
+    DocumentReference documentReference = messagesCollection.doc(docID);
+    DocumentSnapshot documentSnapshot = await documentReference.get();
+
+    // Get the current memberIds
+    List<dynamic> memberIds = documentSnapshot[MessageField.MEMBER_IDS];
+
+    // Remove current user UID from the list
+    memberIds.remove(currentUserUid);
+
+    // Update the document with the new memberIds
+    await documentReference.update({MessageField.MEMBER_IDS: memberIds});
+    return true;
   }
 
   //........... Add new member

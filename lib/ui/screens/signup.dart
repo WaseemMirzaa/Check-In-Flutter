@@ -50,9 +50,9 @@ class _SignupViewState extends State<SignupView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: whiteColor,
+      backgroundColor: appWhiteColor,
       appBar: AppBar(
-        backgroundColor: whiteColor,
+        backgroundColor: appWhiteColor,
         leading: Row(
           children: [
             const SizedBox(

@@ -12,7 +12,7 @@ class CustomContainer1 extends StatelessWidget {
       width: double.infinity,
       margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
       decoration: BoxDecoration(
-          color: whiteColor,
+          color: appWhiteColor,
           boxShadow: [
             BoxShadow(
                 color: greyColor.withOpacity(0.3),
