@@ -49,7 +49,7 @@ class AddGroupDetails extends GetView<GroupDetailController> {
                     color: whiteColor,
                   )
                 : const Icon(Icons.arrow_forward),
-            onPressed: () {
+            onPressed: () async {
               controller.loadNewGroup.value = true;
               if (controller.nameController.text.isEmpty) {
                 Fluttertoast.showToast(msg: 'Group title is empty');
@@ -58,14 +58,18 @@ class AddGroupDetails extends GetView<GroupDetailController> {
                 Fluttertoast.showToast(msg: 'Fill about group info');
                 controller.loadNewGroup.value = false;
               } else {
-                print('new    --$dataArray');
-                final chatGood = chatcontroller.chatService
-                    .startNewGroupChat(memberId!, dataArray!, controller.nameController.text,
-                        controller.aboutController.text, controller.fileImage.value?.path ?? '')
+                final chatGood = await chatcontroller.chatService
+                    .startNewGroupChat(
+                        memberId!,
+                        dataArray!,
+                        controller.nameController.text,
+                        controller.aboutController.text,
+                        controller.fileImage.value?.path ?? '')
                     .then((value) {
                   chatcontroller.docId.value = value[MessageField.ID] ?? '';
                   chatcontroller.name.value = controller.nameController.text;
-                  chatcontroller.image.value = value[MessageField.GROUP_IMG] ?? '';
+                  chatcontroller.image.value =
+                      value[MessageField.GROUP_IMG] ?? '';
                   controller.nameController.clear();
                   controller.aboutController.clear();
                   controller.fileImage.value = null;
@@ -73,15 +77,15 @@ class AddGroupDetails extends GetView<GroupDetailController> {
                   newMessageController.mydata.clear();
                   newMessageController.searchQuery.value = '';
                   controller.loadNewGroup.value = false;
-
+                  chatcontroller.sendNotificationMethod('',
+                      '${userController.userModel.value.userName!} created new group with you');
                   pushNewScreen(context, screen: ChatScreen()).then((_) {
                     Get.back();
                     Get.back();
                   });
                 });
+                print('chatgood$chatGood');
                 if (chatGood != null) {
-                  chatcontroller.sendNotificationMethod(
-                      '', '${userController.userModel.value.userName!} created new group with you');
                 } else {
                   null;
                 }
@@ -107,23 +111,30 @@ class AddGroupDetails extends GetView<GroupDetailController> {
                           controller.namefocusNode.unfocus();
                         },
                         controller: controller.nameController,
-                        style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                        style: const TextStyle(
+                            fontSize: 15, fontWeight: FontWeight.bold),
                         decoration: InputDecoration(
-                            focusedBorder:
-                                UnderlineInputBorder(borderSide: BorderSide(color: greyColor.withOpacity(0.6))),
+                            focusedBorder: UnderlineInputBorder(
+                                borderSide: BorderSide(
+                                    color: greyColor.withOpacity(0.6))),
                             suffixIcon: GestureDetector(
                                 onTap: () {
-                                  chatcontroller.name.value = controller.nameController.text;
-                                  chatcontroller.senderName.value = controller.nameController.text;
-                                  controller.nameTapped.value = !controller.nameTapped.value;
+                                  chatcontroller.name.value =
+                                      controller.nameController.text;
+                                  chatcontroller.senderName.value =
+                                      controller.nameController.text;
+                                  controller.nameTapped.value =
+                                      !controller.nameTapped.value;
                                 },
                                 child: Padding(
-                                    padding: const EdgeInsets.only(top: 20, bottom: 10, left: 30),
+                                    padding: const EdgeInsets.only(
+                                        top: 20, bottom: 10, left: 30),
                                     child: Obx(
                                       () => SizedBox(
                                           height: 2.h,
                                           child: controller.nameTapped.value
-                                              ? poppinsText(TempLanguage.save, 14, semiBold, appGreenColor)
+                                              ? poppinsText(TempLanguage.save,
+                                                  14, semiBold, appGreenColor)
                                               : SizedBox(
                                                   height: 2.h,
                                                   child: Image.asset(
@@ -144,8 +155,10 @@ class AddGroupDetails extends GetView<GroupDetailController> {
                           Obx(
                             () => CircleAvatar(
                               backgroundColor: appGreenColor.withOpacity(0.6),
-                              backgroundImage: controller.fileImage.value != null
-                                  ? FileImage(File(controller.fileImage.value!.path))
+                              backgroundImage: controller.fileImage.value !=
+                                      null
+                                  ? FileImage(
+                                      File(controller.fileImage.value!.path))
                                   : AssetImage(AppImage.user) as ImageProvider,
                               radius: 65,
                             ),
@@ -156,12 +169,15 @@ class AddGroupDetails extends GetView<GroupDetailController> {
                             bottom: 1,
                             child: GestureDetector(
                               onTap: () {
-                                pickImageSheet(context, controller, chatcontroller);
+                                pickImageSheet(
+                                    context, controller, chatcontroller);
                               },
                               child: Container(
                                 height: 40,
                                 width: 40,
-                                decoration: BoxDecoration(color: appGreenColor, shape: BoxShape.circle),
+                                decoration: BoxDecoration(
+                                    color: appGreenColor,
+                                    shape: BoxShape.circle),
                                 child: Icon(
                                   Icons.camera_alt,
                                   color: appWhiteColor,
@@ -176,13 +192,16 @@ class AddGroupDetails extends GetView<GroupDetailController> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        poppinsText(TempLanguage.aboutGroup, 14, semiBold, appBlackColor),
+                        poppinsText(TempLanguage.aboutGroup, 14, semiBold,
+                            appBlackColor),
                         Obx(() => GestureDetector(
                               onTap: () {
-                                controller.aboutTapped.value = !controller.aboutTapped.value;
+                                controller.aboutTapped.value =
+                                    !controller.aboutTapped.value;
                               },
                               child: controller.aboutTapped.value
-                                  ? poppinsText(TempLanguage.save, 14, semiBold, appGreenColor)
+                                  ? poppinsText(TempLanguage.save, 14, semiBold,
+                                      appGreenColor)
                                   : SizedBox(
                                       height: 2.3.h,
                                       child: Image.asset(
@@ -194,7 +213,9 @@ class AddGroupDetails extends GetView<GroupDetailController> {
                     ),
                     verticalGap(5),
                     Obx(() => TextFormField(
-                          readOnly: controller.aboutTapped.value == true ? false : true,
+                          readOnly: controller.aboutTapped.value == true
+                              ? false
+                              : true,
                           onTapOutside: (val) {
                             controller.aboutfocusNode.unfocus();
                           },
@@ -203,8 +224,9 @@ class AddGroupDetails extends GetView<GroupDetailController> {
                           controller: controller.aboutController,
                           style: TextStyle(fontSize: 14, color: greyColor),
                           decoration: InputDecoration(
-                            focusedBorder:
-                                UnderlineInputBorder(borderSide: BorderSide(color: greyColor.withOpacity(0.6))),
+                            focusedBorder: UnderlineInputBorder(
+                                borderSide: BorderSide(
+                                    color: greyColor.withOpacity(0.6))),
                           ),
                         ))
                   ],
@@ -215,7 +237,8 @@ class AddGroupDetails extends GetView<GroupDetailController> {
         ));
   }
 
-  Future<void> pickImageSheet(BuildContext context, GroupDetailController controller, ChatController chatController) {
+  Future<void> pickImageSheet(BuildContext context,
+      GroupDetailController controller, ChatController chatController) {
     final picker = ImagePicker();
 
     return showModalBottomSheet<void>(
@@ -224,7 +247,8 @@ class AddGroupDetails extends GetView<GroupDetailController> {
         return Container(
           height: 150,
           decoration: const BoxDecoration(
-              borderRadius: BorderRadius.only(topRight: Radius.circular(10), topLeft: Radius.circular(10))),
+              borderRadius: BorderRadius.only(
+                  topRight: Radius.circular(10), topLeft: Radius.circular(10))),
           child: Center(
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -232,7 +256,8 @@ class AddGroupDetails extends GetView<GroupDetailController> {
                 //.................Camera
                 GestureDetector(
                   onTap: () async {
-                    final pickedFile = await picker.pickImage(source: ImageSource.camera);
+                    final pickedFile =
+                        await picker.pickImage(source: ImageSource.camera);
                     if (pickedFile != null) {
                       controller.fileImage.value = pickedFile;
                       Navigator.pop(context);
@@ -244,7 +269,9 @@ class AddGroupDetails extends GetView<GroupDetailController> {
                   },
                   child: Container(
                     padding: const EdgeInsets.all(15),
-                    decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(width: 2, color: black)),
+                    decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(width: 2, color: black)),
                     child: const Icon(
                       Icons.camera_alt,
                       size: 40,
@@ -256,7 +283,8 @@ class AddGroupDetails extends GetView<GroupDetailController> {
                 //.................Gallery
                 GestureDetector(
                   onTap: () async {
-                    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+                    final pickedFile =
+                        await picker.pickImage(source: ImageSource.gallery);
                     if (pickedFile != null) {
                       controller.fileImage.value = pickedFile;
                       Navigator.pop(context);
@@ -264,7 +292,9 @@ class AddGroupDetails extends GetView<GroupDetailController> {
                   },
                   child: Container(
                     padding: const EdgeInsets.all(15),
-                    decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(width: 2, color: black)),
+                    decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(width: 2, color: black)),
                     child: const Icon(
                       Icons.image,
                       size: 40,

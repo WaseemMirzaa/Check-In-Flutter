@@ -77,7 +77,7 @@ class MessageScreen extends GetView<MessageController> {
                                         pushNewScreen(
                                           context,
                                           screen: ChatScreen(
-                                            recieverImage: message.image,
+                                        
                                             //   name: message.name!.obs,isGroup: message.isgroup,
                                             // image:message.image!.obs,memberId: message.memberIds!.obs,senderName: message.senderName!.obs,
                                           ),

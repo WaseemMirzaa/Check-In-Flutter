@@ -6,7 +6,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:get/get.dart';
-import 'package:image_picker/image_picker.dart';
 
 import '../../Services/message_service.dart';
 
@@ -42,11 +41,24 @@ class ChatController extends GetxController {
   //   chatService.updateLastSeen(docId.value, userController.userModel.value.uid!);
   // }
 
+  //............. get message with docID
+  Future<void> getSingleMessage() async {
+    var res = await chatService.getSingleMessage(
+        docId.value, userController.userModel.value.uid!);
+    Messagemodel model = res;
+    if (isgroup) {
+      members.value = model.members!;
+    }
+    image.value = model.image!;
+  }
+
   //............. get all conversation
   Stream<List<Chatmodel>> getConversation() {
-    chatService.updateUnreadCount(docId.value, userController.userModel.value.uid!, 0, members);
+    chatService.updateUnreadCount(
+        docId.value, userController.userModel.value.uid!, 0, members);
     // updateLastSeenMethod();
-    return chatService.getConversation(docId.value, userController.userModel.value.uid!, members);
+    return chatService.getConversation(
+        docId.value, userController.userModel.value.uid!, members);
   }
 
   //............. get message request status
@@ -56,7 +68,8 @@ class ChatController extends GetxController {
 
   //............. update request status
   void updateRequestStatus(String status, String msg, int unread) {
-    chatService.updateRequestStatus(docId.value, status, msg, unread, userController.userModel.value.uid!);
+    chatService.updateRequestStatus(
+        docId.value, status, msg, unread, userController.userModel.value.uid!);
   }
 
   String thumbnailPath = '';
@@ -80,10 +93,16 @@ class ChatController extends GetxController {
       type = 'image';
     }
 
-    Chatmodel? chatmodel =
-        Chatmodel(id: uid, message: message, time: time, type: type, thumbnail: thumbnailPath, seenTimeStamp: "");
+    Chatmodel? chatmodel = Chatmodel(
+        id: uid,
+        message: message,
+        time: time,
+        type: type,
+        thumbnail: thumbnailPath,
+        seenTimeStamp: "");
     // try {
-    DocumentSnapshot? newMessageDoc = await chatService.sendMessage(docId.value, chatmodel, members);
+    DocumentSnapshot? newMessageDoc =
+        await chatService.sendMessage(docId.value, chatmodel, members);
     sendMsgLoader.value = false;
     return newMessageDoc;
     // } catch (e) {
@@ -120,7 +139,8 @@ class ChatController extends GetxController {
   }
 
 //.............. get device token
-  Future<void> sendNotificationMethod(String notificationType, String msg) async {
+  Future<void> sendNotificationMethod(String notificationType, String msg,
+      {String? image}) async {
     // print(senderName);
     // print(memberId);
     for (var element in memberId) {
@@ -133,7 +153,7 @@ class ChatController extends GetxController {
             msg: msg,
             docId: docId.value,
             isGroup: isgroup,
-            image: '',
+            image: image ?? '',
             name: senderName.value,
             memberIds: memberId);
       }

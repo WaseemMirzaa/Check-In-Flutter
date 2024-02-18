@@ -38,9 +38,12 @@ class NewMessageController extends GetxController {
     _userSubscription = _searchQuerySubject
         .debounceTime(Duration(milliseconds: DELAY_IN_MILLISECONDS))
         .distinct()
-        .switchMap((query) => Stream.fromFuture(chatService.getUsersDocsWithPagination(query, DOCUMENT_PER_PAGE, null)))
+        .switchMap((query) => Stream.fromFuture(chatService
+            .getUsersDocsWithPagination(query, DOCUMENT_PER_PAGE, null)))
         .listen((docs) {
-      List<UserModel> users = docs.map((doc) => UserModel.fromMap(doc.data() as Map<String, dynamic>)).toList();
+      List<UserModel> users = docs
+          .map((doc) => UserModel.fromMap(doc.data() as Map<String, dynamic>))
+          .toList();
 
       if (docs.isNotEmpty) {
         userDataList.clear();
@@ -60,13 +63,13 @@ class NewMessageController extends GetxController {
   //   });
   // }
 
-//............ start new chat
-
   Future<void> fetchMore() async {
-    List<DocumentSnapshot> docs =
-        await chatService.getUsersDocsWithPagination(searchController.text, DOCUMENT_PER_PAGE, _lastDocument);
+    List<DocumentSnapshot> docs = await chatService.getUsersDocsWithPagination(
+        searchController.text, DOCUMENT_PER_PAGE, _lastDocument);
 
-    List<UserModel> users = docs.map((doc) => UserModel.fromMap(doc.data() as Map<String, dynamic>)).toList();
+    List<UserModel> users = docs
+        .map((doc) => UserModel.fromMap(doc.data() as Map<String, dynamic>))
+        .toList();
 
     if (docs.isNotEmpty) {
       _lastDocument = docs.last;
@@ -74,12 +77,25 @@ class NewMessageController extends GetxController {
     }
   }
 
-  Future<String> startNewChat(String myUid, String uNAme, String UImage) async {
-    UserModel model = mydata.values.first;
-    return chatService.startNewChat([myUid, mydata.keys.first], uNAme, model.userName!, model.photoUrl!, UImage);
+//............ start new chat
+  Future<Map<String, dynamic>> startNewChat(
+      String myUid, String uNAme, String UImage) async {
+    //....... matching ids to check whether chat already exist or not
+    var response = await chatService.areIdsMatching([myUid, mydata.keys.first]);
+    if (response != '') {
+      // Do not add data and
+      return {'isNewChat': false, 'docId': response};
+    } else {
+      UserModel model = mydata.values.first;
+      var res = await chatService.startNewChat([myUid, mydata.keys.first],
+          uNAme, model.userName!, model.photoUrl!, UImage);
+      return {'isNewChat': true, 'docId': res};
+    }
   }
 
-  Future<String> startNewGroupChat(String myUid, String uNAme, String memberImage, String about) async {
+//........... start new group chat
+  Future<String> startNewGroupChat(
+      String myUid, String uNAme, String memberImage, String about) async {
     dataArray = [
       {
         MessageField.MEMBER_UID: myUid,

@@ -1,10 +1,8 @@
 import 'dart:convert';
-import 'package:check_in/utils/Constants/global_variable.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
-import 'package:nb_utils/nb_utils.dart';
 import '../controllers/Messages/chat_controller.dart';
 import '../model/notification_model.dart';
 import 'package:http/http.dart' as http;
@@ -22,12 +20,15 @@ class FCMManager {
   }
 }
 
-FlutterLocalNotificationsPlugin notificationsPlugin = FlutterLocalNotificationsPlugin();
+FlutterLocalNotificationsPlugin notificationsPlugin =
+    FlutterLocalNotificationsPlugin();
 
 late AndroidNotificationChannel channel;
 
-const AndroidInitializationSettings initializationSettingsAndroid = AndroidInitializationSettings('appicon');
-DarwinInitializationSettings iosInitializationSettings = const DarwinInitializationSettings();
+const AndroidInitializationSettings initializationSettingsAndroid =
+    AndroidInitializationSettings('appicon');
+DarwinInitializationSettings iosInitializationSettings =
+    const DarwinInitializationSettings();
 
 final InitializationSettings initializationSettings = InitializationSettings(
   android: initializationSettingsAndroid,
@@ -37,11 +38,10 @@ final InitializationSettings initializationSettings = InitializationSettings(
 class PushNotificationServices {
   final FirebaseMessaging _fcm = FirebaseMessaging.instance;
 
-  static NotificationModel notificationModel = NotificationModel();
-
   Future<void> init() async {
     await notificationsPlugin
-        .resolvePlatformSpecificImplementation<IOSFlutterLocalNotificationsPlugin>()
+        .resolvePlatformSpecificImplementation<
+            IOSFlutterLocalNotificationsPlugin>()
         ?.requestPermissions(
           alert: true,
           badge: true,
@@ -50,7 +50,8 @@ class PushNotificationServices {
 
     /// Update the iOS foreground notification presentation options to allow
     /// heads up ui.screens.Tabs.notifications.
-    await FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
+    await FirebaseMessaging.instance
+        .setForegroundNotificationPresentationOptions(
       alert: true,
       badge: true,
       sound: true,
@@ -59,7 +60,8 @@ class PushNotificationServices {
     channel = const AndroidNotificationChannel(
       'high_importance_channel', // id
       'High Importance Notifications', // title
-      description: 'This channel is used for important notifications.', // description
+      description:
+          'This channel is used for important notifications.', // description
       importance: Importance.high,
     );
     // request permission to receive push notifications
@@ -136,9 +138,6 @@ class PushNotificationServices {
       // });
 
       FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
-        log("data is:: ${message.data}");
-        print(chatcontroller.docId);
-        print("Global ${GlobalVariable.docId}");
         // int notificationBadge = 0;
         if (message.data.isNotEmpty) {
           //RemoteNotification? notification = message.notification;
@@ -152,7 +151,6 @@ class PushNotificationServices {
 
           // print("notification type");
           // print(NotificationModel.type);
-
           // notificationBadge = getIntAsync(
           //     SharedPreferenceKey.NOTIFICATION_BADGE,
           //     defaultValue: 0);
@@ -162,9 +160,8 @@ class PushNotificationServices {
         }
 
         // if (message.data['body'] != null) {
-
         // if (isAndroid) {//Ios is showing double notifications if this condition is not present
-        if (GlobalVariable.docId != NotificationModel.docId) {
+        if (chatcontroller.docId.value != NotificationModel.docId) {
           notificationsPlugin.show(
               1,
               message.notification?.title,
@@ -187,6 +184,7 @@ class PushNotificationServices {
                   )));
         }
         //....
+        
         // }
         // }
       });
@@ -194,8 +192,8 @@ class PushNotificationServices {
       // FirebaseMessaging.onBackgroundMessage((message) => null)
 
       // handle notification messages when the app is in the background or terminated
-      FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) async {
-        print('in notification');
+      FirebaseMessaging.onMessageOpenedApp
+          .listen((RemoteMessage message) async {
         //.............................
         chatcontroller.docId.value = NotificationModel.docId;
         chatcontroller.name.value = NotificationModel.name;
@@ -211,10 +209,8 @@ class PushNotificationServices {
         String notificationType = message.data['notificationType'];
         NotificationModel.type = notificationType;
         // print("notification types");
-
         // print(NotificationModel.type);
         // if (notificationType == PushNotificationType.msg) {
-
         //   print('Step 4');
         //   String transac = message.data['transactionId'];
         //   UserModel userModel =
@@ -229,7 +225,6 @@ class PushNotificationServices {
         //       arguments:
         //           ChatPageArguments(peer: userModel, transactionId: transac)));
         // } else {
-
         //   print('Step 5');
         //   navBarController.controller.index = 3;
         //   navBarController.currentIndex.value = 3;
@@ -241,9 +236,9 @@ class PushNotificationServices {
       //
 
       // print('Step 6');
-      await notificationsPlugin.initialize(initializationSettings, onDidReceiveNotificationResponse: (payload) async {
+      await notificationsPlugin.initialize(initializationSettings,
+          onDidReceiveNotificationResponse: (payload) async {
         // print("notification type is");
-        print('in notification');
         // print(NotificationModel.transactionId);
         //.............................
         chatcontroller.docId.value = NotificationModel.docId;
@@ -256,7 +251,6 @@ class PushNotificationServices {
         Get.to(() => ChatScreen());
 
         // if (NotificationModel.type == PushNotificationType.msg) {
-
         //   print('Step 7');
         //   String transac = NotificationModel.transactionId;
         //   UserModel userModel =
@@ -267,7 +261,6 @@ class PushNotificationServices {
         //       arguments:
         //           ChatPageArguments(peer: userModel, transactionId: transac)));
         // } else {
-
         //   print('Step 8');
         //   navBarController.controller.index = 3;
         //   navBarController.currentIndex.value = 3;
@@ -288,7 +281,8 @@ Future<void> sendNotification(
     required String name,
     required String image,
     required List memberIds}) async {
-  var completeUrl = 'https://us-central1-check-in-7ecd7.cloudfunctions.net/sendNotification';
+  var completeUrl =
+      'https://us-central1-check-in-7ecd7.cloudfunctions.net/sendNotification';
   final headers = {'Content-Type': 'application/json'};
   final body = jsonEncode({
     'token': token,
@@ -303,7 +297,8 @@ Future<void> sendNotification(
   });
 
   try {
-    final response = await http.post(Uri.parse(completeUrl), headers: headers, body: body);
+    final response =
+        await http.post(Uri.parse(completeUrl), headers: headers, body: body);
     if (response.statusCode == 200) {
       print('Notification sent');
     } else {

@@ -30,15 +30,20 @@ import 'Component/message_date_container.dart';
 import 'Component/send_message_container.dart';
 import 'Component/sticker_keyboard.dart';
 
-final chatQuery = FirebaseFirestore.instance.collection(Collections.MESSAGES).withConverter<Chatmodel>(
-      fromFirestore: (snapshot, options) => Chatmodel.fromJson(snapshot.data()!),
+final chatQuery = FirebaseFirestore.instance
+    .collection(Collections.MESSAGES)
+    .withConverter<Chatmodel>(
+      fromFirestore: (snapshot, options) =>
+          Chatmodel.fromJson(snapshot.data()!),
       toFirestore: (value, options) => value.toJson(),
     );
 
 class ChatScreen extends StatefulWidget {
-  ChatScreen({super.key, this.recieverImage, this.isFirstTime = false});
-  String? recieverImage;
-  bool isFirstTime;
+  const ChatScreen({
+    super.key,
+  });
+
+  // bool isFirstTime;
 
   @override
   State<ChatScreen> createState() => _ChatScreenState();
@@ -116,11 +121,17 @@ class _ChatScreenState extends State<ChatScreen> {
     //   if (widget.isFirstTime) {
     //     null;
     //   } else {
+
+    controller.getSingleMessage();
     controller.issticker.value = true;
     controller.chatfieldController.addListener(() {
       controller.sendMsgField.value = controller.chatfieldController.text;
     });
-    fetchOnlineStatus(userController.userModel.value.uid!);
+
+    !controller.isgroup
+        ? fetchOnlineStatus(userController.userModel.value.uid!)
+        : null;
+
     //     _subscription = FirebaseFirestore.instance
     //         .collection(Collections.MESSAGES)
     //         .doc(controller.docId.value)
@@ -133,26 +144,28 @@ class _ChatScreenState extends State<ChatScreen> {
     //   }
   }
 
-  // @override
-  // void dispose() {
-  //   stopTimer();
-  //   _subscription?.cancel();
-  //   _streamController.close();
-  //   // controller.chatService
-  //   //     .updateOnlineStatus(controller.docId.value, DateTime.now().toString(), userController.userModel.value.uid!);
-  //   super.dispose();
-  // }
+  @override
+  void dispose() {
+    controller.docId.value = '';
+    //   stopTimer();
+    //   _subscription?.cancel();
+    //   _streamController.close();
+    //   // controller.chatService
+    //   //     .updateOnlineStatus(controller.docId.value, DateTime.now().toString(), userController.userModel.value.uid!);
+    super.dispose();
+  }
 
   fetchOnlineStatus(String userId) async {
     // print('in method:$userId');
     // print(userId);
     try {
       // MessageService messageService = MessageService(); // Create an instance
-      String status = await controller.chatService.getOnlineStatus(controller.docId.value); // Call the method
-      controller.chatService.updateOnlineStatus(controller.docId.value, DateTime.now().toString(), userId);
+      String status = await controller.chatService
+          .getOnlineStatus(controller.docId.value); // Call the method
+      controller.chatService.updateOnlineStatus(
+          controller.docId.value, DateTime.now().toString(), userId);
       setState(() {});
       onlineStatus = status;
-      print('kkk:$status');
     } catch (e) {
       print('Error fetching online status: $e');
     }
@@ -179,7 +192,9 @@ class _ChatScreenState extends State<ChatScreen> {
 
   void updateOnlineStatus(String docId, String status, String uId) async {
     try {
-      final docRef = FirebaseFirestore.instance.collection(Collections.MESSAGES).doc(docId);
+      final docRef = FirebaseFirestore.instance
+          .collection(Collections.MESSAGES)
+          .doc(docId);
       await FirebaseFirestore.instance.runTransaction((transaction) async {
         final snapshot = await transaction.get(docRef);
         if (snapshot.get(MessageField.SENDER_ID) == uId) {
@@ -223,36 +238,44 @@ class _ChatScreenState extends State<ChatScreen> {
                 : () {
                     // controller.updateLastSeenMethod();
                   },
-            child: Row(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.center, children: [
-              Obx(() => CircleAvatar(
-                    backgroundImage: controller.image.value == ''
-                        ? AssetImage(AppImage.user) as ImageProvider
-                        : CachedNetworkImageProvider(controller.image.value),
-                    radius: 20,
-                  )),
-              horizontalGap(10),
-              controller.isgroup ? SvgPicture.asset(AppImage.chatgroupicon) : const SizedBox(),
-              horizontalGap(2),
-              Obx(() => Flexible(
-                    child: controller.isgroup
-                        ? poppinsText(controller.name.value ?? '', 16, FontWeight.bold, appBlackColor)
-                        : Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              poppinsText(controller.name.value ?? '', 16, FontWeight.bold, appBlackColor),
-                              const SizedBox(height: 2),
-                              Text(
-                                onlineStatus,
-                                style: const TextStyle(
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.normal,
-                                  color: Colors.black,
-                                ),
+            child: Row(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Obx(() => CircleAvatar(
+                        backgroundImage: controller.image.value == ''
+                            ? AssetImage(AppImage.user) as ImageProvider
+                            : CachedNetworkImageProvider(
+                                controller.image.value),
+                        radius: 20,
+                      )),
+                  horizontalGap(10),
+                  controller.isgroup
+                      ? SvgPicture.asset(AppImage.chatgroupicon)
+                      : const SizedBox(),
+                  horizontalGap(2),
+                  Obx(() => Flexible(
+                        child: controller.isgroup
+                            ? poppinsText(controller.name.value ?? '', 16,
+                                FontWeight.bold, appBlackColor)
+                            : Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  poppinsText(controller.name.value ?? '', 16,
+                                      FontWeight.bold, appBlackColor),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    onlineStatus,
+                                    style: const TextStyle(
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.normal,
+                                      color: Colors.black,
+                                    ),
+                                  ),
+                                ],
                               ),
-                            ],
-                          ),
-                  )),
-            ]),
+                      )),
+                ]),
           )),
 
           // ChatAppbar(
@@ -311,7 +334,6 @@ class _ChatScreenState extends State<ChatScreen> {
                 child: StreamBuilder<List<Chatmodel>>(
                     stream: controller.getConversation(),
                     builder: (context, snapshot) {
-                      print("snapshot $snapshot");
                       if (snapshot.connectionState == ConnectionState.waiting) {
                         // Display loading indicator only if there are messages
                         return
@@ -349,7 +371,10 @@ class _ChatScreenState extends State<ChatScreen> {
                               //   seenTime =
                               //       DateFormat('d MMM hh:mm a').format(dateTime);
                               // }
-                              bool mymsg = chat.id == userController.userModel.value.uid ? true : false;
+                              bool mymsg =
+                                  chat.id == userController.userModel.value.uid
+                                      ? true
+                                      : false;
 
                               return Padding(
                                 padding: EdgeInsets.only(
@@ -359,17 +384,24 @@ class _ChatScreenState extends State<ChatScreen> {
                                 ),
                                 child: Row(
                                   crossAxisAlignment: CrossAxisAlignment.end,
-                                  mainAxisAlignment: mymsg ? MainAxisAlignment.end : MainAxisAlignment.start,
+                                  mainAxisAlignment: mymsg
+                                      ? MainAxisAlignment.end
+                                      : MainAxisAlignment.start,
                                   children: [
                                     mymsg
                                         ? const SizedBox()
                                         : Padding(
-                                            padding: const EdgeInsets.only(bottom: 22.0),
+                                            padding: const EdgeInsets.only(
+                                                bottom: 22.0),
                                             child: CircleAvatar(
-                                              backgroundColor: appGreenColor.withOpacity(0.6),
-                                              backgroundImage: widget.recieverImage != ''
+                                              backgroundColor: appGreenColor
+                                                  .withOpacity(0.6),
+                                              backgroundImage: controller
+                                                              .image.value !=
+                                                          '' &&
+                                                      !controller.isgroup
                                                   ? NetworkImage(
-                                                      widget.recieverImage ?? '',
+                                                      controller.image.value,
                                                     )
                                                   : _showGroupImage(chat.id!),
                                               radius: 17,
@@ -389,22 +421,37 @@ class _ChatScreenState extends State<ChatScreen> {
                                               showGeneralDialog(
                                                   barrierColor: greyColor,
                                                   context: context,
-                                                  pageBuilder: (context, animation, secondaryAnimation) {
+                                                  pageBuilder: (context,
+                                                      animation,
+                                                      secondaryAnimation) {
                                                     return Padding(
-                                                      padding: const EdgeInsets.only(top: 40.0),
+                                                      padding:
+                                                          const EdgeInsets.only(
+                                                              top: 40.0),
                                                       child: Image.network(
                                                         chat.message!,
-                                                        loadingBuilder: (BuildContext context, Widget child,
-                                                            ImageChunkEvent? loadingProgress) {
-                                                          if (loadingProgress == null) {
+                                                        loadingBuilder:
+                                                            (BuildContext
+                                                                    context,
+                                                                Widget child,
+                                                                ImageChunkEvent?
+                                                                    loadingProgress) {
+                                                          if (loadingProgress ==
+                                                              null) {
                                                             return child;
                                                           } else {
                                                             return Center(
-                                                              child: CircularProgressIndicator(
-                                                                color: whiteColor,
-                                                                value: loadingProgress.expectedTotalBytes != null
-                                                                    ? loadingProgress.cumulativeBytesLoaded /
-                                                                        loadingProgress.expectedTotalBytes!
+                                                              child:
+                                                                  CircularProgressIndicator(
+                                                                color:
+                                                                    whiteColor,
+                                                                value: loadingProgress
+                                                                            .expectedTotalBytes !=
+                                                                        null
+                                                                    ? loadingProgress
+                                                                            .cumulativeBytesLoaded /
+                                                                        loadingProgress
+                                                                            .expectedTotalBytes!
                                                                     : null,
                                                               ),
                                                             );
@@ -438,8 +485,10 @@ class _ChatScreenState extends State<ChatScreen> {
                   } else if (!snapshot.hasData) {
                     return const Center(child: Text(''));
                   } else {
-                    if (snapshot.data!.senderId == controller.userController.userModel.value.uid &&
-                        snapshot.data!.requestStatus == RequestStatusEnum.pending.name) {
+                    if (snapshot.data!.senderId ==
+                            controller.userController.userModel.value.uid &&
+                        snapshot.data!.requestStatus ==
+                            RequestStatusEnum.pending.name) {
                       return Container(
                         // height: 160,
                         width: 50.w,
@@ -458,12 +507,15 @@ class _ChatScreenState extends State<ChatScreen> {
                         ),
                         child: Column(
                           children: [
-                            poppinsText(TempLanguage.inviteSent, 15, medium, appBlackColor),
+                            poppinsText(TempLanguage.inviteSent, 15, medium,
+                                appBlackColor),
                           ],
                         ),
                       );
-                    } else if (snapshot.data!.senderId != controller.userController.userModel.value.uid &&
-                        snapshot.data!.requestStatus == RequestStatusEnum.pending.name) {
+                    } else if (snapshot.data!.senderId !=
+                            controller.userController.userModel.value.uid &&
+                        snapshot.data!.requestStatus ==
+                            RequestStatusEnum.pending.name) {
                       return Container(
                         // height: 160,
                         width: 90.w,
@@ -482,8 +534,11 @@ class _ChatScreenState extends State<ChatScreen> {
                         ),
                         child: Column(
                           children: [
-                            poppinsText("${TempLanguage.acceptMessageRequest} ${snapshot.data!.senderName}?", 14,
-                                medium, appBlackColor,
+                            poppinsText(
+                                "${TempLanguage.acceptMessageRequest} ${snapshot.data!.senderName}?",
+                                14,
+                                medium,
+                                appBlackColor,
                                 maxlines: 2),
                             verticalGap(15),
                             Row(
@@ -491,9 +546,12 @@ class _ChatScreenState extends State<ChatScreen> {
                                 Flexible(
                                     child: ChatButton(
                                   onTap: () {
-                                    controller.updateRequestStatus(RequestStatusEnum.block.name, 'Blocked', 0);
-                                    controller.sendNotificationMethod(
-                                        '', '${userController.userModel.value.userName!} block you');
+                                    controller.updateRequestStatus(
+                                        RequestStatusEnum.block.name,
+                                        'Blocked',
+                                        0);
+                                    controller.sendNotificationMethod('',
+                                        '${userController.userModel.value.userName!} block you');
                                   },
                                   text: TempLanguage.block,
                                   textColor: appRedColor,
@@ -503,10 +561,13 @@ class _ChatScreenState extends State<ChatScreen> {
                                 Flexible(
                                     child: ChatButton(
                                   onTap: () async {
-                                    controller.updateRequestStatus(RequestStatusEnum.delete.name, 'Request Deleted', 0);
+                                    controller.updateRequestStatus(
+                                        RequestStatusEnum.delete.name,
+                                        'Request Deleted',
+                                        0);
                                     Get.back();
-                                    controller.sendNotificationMethod(
-                                        '', '${userController.userModel.value.userName!} delete message request');
+                                    controller.sendNotificationMethod('',
+                                        '${userController.userModel.value.userName!} delete message request');
                                   },
                                   text: TempLanguage.delete,
                                   textColor: appRedColor,
@@ -517,9 +578,11 @@ class _ChatScreenState extends State<ChatScreen> {
                                     child: ChatButton(
                                   onTap: () {
                                     controller.updateRequestStatus(
-                                        RequestStatusEnum.accept.name, 'Request Accepted', 1);
-                                    controller.sendNotificationMethod(
-                                        '', '${userController.userModel.value.userName!} accept request');
+                                        RequestStatusEnum.accept.name,
+                                        'Request Accepted',
+                                        1);
+                                    controller.sendNotificationMethod('',
+                                        '${userController.userModel.value.userName!} accept request');
                                   },
                                   text: TempLanguage.accept,
                                   textColor: appWhiteColor,
@@ -544,8 +607,10 @@ class _ChatScreenState extends State<ChatScreen> {
                   } else if (!snapshot.hasData) {
                     return const Center(child: Text(''));
                   } else {
-                    if (snapshot.data!.senderId == controller.userController.userModel.value.uid &&
-                        snapshot.data!.requestStatus == RequestStatusEnum.delete.name) {
+                    if (snapshot.data!.senderId ==
+                            controller.userController.userModel.value.uid &&
+                        snapshot.data!.requestStatus ==
+                            RequestStatusEnum.delete.name) {
                       return Container(
                         // height: 160,
                         // width: 50.w,
@@ -564,16 +629,21 @@ class _ChatScreenState extends State<ChatScreen> {
                         child: Row(
                           children: [
                             Expanded(
-                              child: poppinsText("${TempLanguage.requestDeleted} ${snapshot.data!.recieverName}", 15,
-                                  medium, appBlackColor),
+                              child: poppinsText(
+                                  "${TempLanguage.requestDeleted} ${snapshot.data!.recieverName}",
+                                  15,
+                                  medium,
+                                  appBlackColor),
                             ),
                             ChatButton(
                               width: 35.w,
                               onTap: () {
                                 controller.updateRequestStatus(
-                                    RequestStatusEnum.pending.name, TempLanguage.messageRequest, 1);
-                                controller.sendNotificationMethod(
-                                    '', '${userController.userModel.value.userName!} send a request message');
+                                    RequestStatusEnum.pending.name,
+                                    TempLanguage.messageRequest,
+                                    1);
+                                controller.sendNotificationMethod('',
+                                    '${userController.userModel.value.userName!} send a request message');
                               },
                               text: "${TempLanguage.requestAgain} ",
                               buttonColor: appGreenColor,
@@ -582,8 +652,10 @@ class _ChatScreenState extends State<ChatScreen> {
                           ],
                         ),
                       );
-                    } else if (snapshot.data!.senderId == controller.userController.userModel.value.uid &&
-                        snapshot.data!.requestStatus == RequestStatusEnum.block.name) {
+                    } else if (snapshot.data!.senderId ==
+                            controller.userController.userModel.value.uid &&
+                        snapshot.data!.requestStatus ==
+                            RequestStatusEnum.block.name) {
                       return Container(
                         // height: 160,
                         // width: 50.w,
@@ -602,15 +674,20 @@ class _ChatScreenState extends State<ChatScreen> {
                         child: Row(
                           children: [
                             Expanded(
-                              child: poppinsText(" ${snapshot.data!.recieverName} ${TempLanguage.blockedYou}", 15,
-                                  medium, appBlackColor,
+                              child: poppinsText(
+                                  " ${snapshot.data!.recieverName} ${TempLanguage.blockedYou}",
+                                  15,
+                                  medium,
+                                  appBlackColor,
                                   align: TextAlign.center),
                             ),
                           ],
                         ),
                       );
-                    } else if (snapshot.data!.senderId != controller.userController.userModel.value.uid &&
-                        snapshot.data!.requestStatus == RequestStatusEnum.block.name) {
+                    } else if (snapshot.data!.senderId !=
+                            controller.userController.userModel.value.uid &&
+                        snapshot.data!.requestStatus ==
+                            RequestStatusEnum.block.name) {
                       return Container(
                         // height: 160,
                         width: double.infinity,
@@ -628,14 +705,18 @@ class _ChatScreenState extends State<ChatScreen> {
                         ),
                         child: Column(
                           children: [
-                            poppinsText(TempLanguage.youBlockThisAccount, 15, medium, appBlackColor),
+                            poppinsText(TempLanguage.youBlockThisAccount, 15,
+                                medium, appBlackColor),
                             verticalGap(10),
                             ChatButton(
                               width: 35.w,
                               onTap: () {
-                                controller.updateRequestStatus(RequestStatusEnum.accept.name, 'Unblocked', 0);
-                                controller.sendNotificationMethod(
-                                    '', "${userController.userModel.value.userName!} unblock you");
+                                controller.updateRequestStatus(
+                                    RequestStatusEnum.accept.name,
+                                    'Unblocked',
+                                    0);
+                                controller.sendNotificationMethod('',
+                                    "${userController.userModel.value.userName!} unblock you");
                               },
                               text: "${TempLanguage.unblock} ",
                               buttonColor: appGreenColor,
@@ -654,14 +735,16 @@ class _ChatScreenState extends State<ChatScreen> {
                           controller.issticker.value = true;
                         },
                         iconontap: () {
-                          controller.issticker.value = !controller.issticker.value;
+                          controller.issticker.value =
+                              !controller.issticker.value;
                           FocusManager.instance.primaryFocus?.unfocus();
                         },
                         sendmsgontap: () async {
                           if (controller.chatfieldController.text.isNotEmpty) {
                             await controller.sendMessage();
                             controller.sendMsgField.value = '';
-                            controller.sendNotificationMethod('', controller.chatfieldController.text);
+                            controller.sendNotificationMethod(
+                                '', controller.chatfieldController.text);
                             controller.chatfieldController.clear();
 
                             // if (newMessageDoc != null) {
@@ -724,16 +807,20 @@ class _ChatScreenState extends State<ChatScreen> {
   NetworkImage? _showGroupImage(String chatId) {
     // Iterate through the members list to find the user with matching ID
     for (var member in controller.members) {
+      print("group member image --->  ${member['image']}");
       if (member['uid'] == chatId) {
         // Return the user image URL if found
-        return member['image'] == null ? AssetImage(AppImage.user) as NetworkImage : NetworkImage(member['image']);
+        return member['image'] == null
+            ? AssetImage(AppImage.user) as NetworkImage
+            : NetworkImage(member['image']);
       }
     }
     // Return null if no user with matching ID is found
     return null;
   }
 
-  Future<void> chatBottomSheet(BuildContext context, ChatController controller) {
+  Future<void> chatBottomSheet(
+      BuildContext context, ChatController controller) {
     final picker = ImagePicker();
 
     return showModalBottomSheet<void>(
@@ -742,7 +829,8 @@ class _ChatScreenState extends State<ChatScreen> {
         return Container(
           height: 150,
           decoration: const BoxDecoration(
-              borderRadius: BorderRadius.only(topRight: Radius.circular(10), topLeft: Radius.circular(10))),
+              borderRadius: BorderRadius.only(
+                  topRight: Radius.circular(10), topLeft: Radius.circular(10))),
           child: Center(
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -750,16 +838,23 @@ class _ChatScreenState extends State<ChatScreen> {
                 //.................Camera
                 GestureDetector(
                   onTap: () async {
-                    final pickedFile = await picker.pickImage(source: ImageSource.camera);
+                    final pickedFile =
+                        await picker.pickImage(source: ImageSource.camera);
                     if (pickedFile != null) {
                       controller.fileImage.value = pickedFile;
                       Navigator.pop(context);
                       await controller.sendMessage();
+                      controller.sendNotificationMethod(
+                        '',
+                        'Photo',
+                      );
                     }
                   },
                   child: Container(
                     padding: const EdgeInsets.all(15),
-                    decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(width: 2, color: black)),
+                    decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(width: 2, color: black)),
                     child: const Icon(
                       Icons.camera_alt,
                       size: 40,
@@ -771,16 +866,23 @@ class _ChatScreenState extends State<ChatScreen> {
                 //.................Gallery
                 GestureDetector(
                   onTap: () async {
-                    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+                    final pickedFile =
+                        await picker.pickImage(source: ImageSource.gallery);
                     if (pickedFile != null) {
                       controller.fileImage.value = pickedFile;
                       Navigator.pop(context);
                       await controller.sendMessage();
+                      controller.sendNotificationMethod(
+                        '',
+                        'Photo',
+                      );
                     }
                   },
                   child: Container(
                     padding: const EdgeInsets.all(15),
-                    decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(width: 2, color: black)),
+                    decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(width: 2, color: black)),
                     child: const Icon(
                       Icons.image,
                       size: 40,
