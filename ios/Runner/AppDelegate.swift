@@ -1,6 +1,7 @@
 import UIKit
 import Flutter
 import GoogleMaps // Import the Google Maps module
+import FirebaseMessaging
 
 @UIApplicationMain
 @objc class AppDelegate: FlutterAppDelegate {
