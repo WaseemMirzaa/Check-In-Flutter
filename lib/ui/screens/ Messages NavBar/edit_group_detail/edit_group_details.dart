@@ -57,10 +57,20 @@ class EditGroupDetails extends GetView<GroupDetailController> {
             backgroundColor: appRedColor,
             child: const Icon(Icons.logout),
             onPressed: () {
-              // messageController.leftGroup(chatcontroller.docId.value).then((value) =>  pushNewScreen(context, screen: const Home()));
-              groupmemberController
-                  .removeGroupMember(userController.userModel.value.uid!)
-                  .then((value) => pushNewScreen(context, screen: const Home()));
+              showAdaptiveDialog(context: context, builder: (context)=>AlertDialog.adaptive(
+                title: Text('Group Left',style: TextStyle(fontWeight: FontWeight.w700,color: appBlackColor),),
+                content: Text('Do you really want to left the group?',style: TextStyle(fontSize: 14,color: appBlackColor),
+                ),
+                actions: [
+                  TextButton(onPressed: (){Navigator.pop(context);}, child: const Text('No')),
+                  TextButton(onPressed: () async{
+                   await groupmemberController
+                        .removeGroupMember(userController.userModel.value.uid!)
+                        .then((value) => pushNewScreen(context, screen: const Home()));
+                  }, child: const Text('Yes')),
+                ],
+              ));
+
             }),
         appBar: CustomAppbar(
           title: poppinsText(TempLanguage.groupDetail, 15, bold, appBlackColor),
@@ -95,15 +105,14 @@ class EditGroupDetails extends GetView<GroupDetailController> {
                               children: [
                                 Expanded(
                                   child: NameTextfield(
-                                    readOnly: controller.nameTapped.value,
+                                    readOnly: controller.nameTapped.value ? true : false,
                                     isAdmin: controller.groupDetailModel!.isAdmin,
-                                    iconOnTap: () {
-                                      //  controller.namefocusNode.requestFocus();
+                                    iconOnTap: controller.groupDetailModel!.isAdmin! ? () {
                                       controller.updateGroupName(docId!);
                                       chatcontroller.name.value = controller.nameController.text;
 
                                       controller.nameTapped.value = !controller.nameTapped.value;
-                                    },
+                                    } : null,
                                   ),
                                 ),
                               ],

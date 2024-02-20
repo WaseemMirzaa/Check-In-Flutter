@@ -15,6 +15,7 @@ class ChatController extends GetxController {
   RxString name = ''.obs;
   RxList memberId = [].obs;
   RxList members = [].obs;
+  RxString otherUserId=''.obs;
   RxString image = ''.obs;
   RxString senderName = ''.obs;
   RxString sendMsgField = ''.obs;
@@ -49,6 +50,9 @@ class ChatController extends GetxController {
     if (isgroup) {
       members.value = model.members!;
     }
+    else{
+      userController.userModel.value.uid==model.senderId?otherUserId.value=model.recieverId!:otherUserId.value=model.senderId!
+    ;}
     image.value = model.image!;
   }
 

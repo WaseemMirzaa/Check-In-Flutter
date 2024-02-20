@@ -7,6 +7,8 @@ import 'package:check_in/core/constant/constant.dart';
 import 'package:check_in/core/constant/temp_language.dart';
 import 'package:check_in/model/Message%20and%20Group%20Message%20Model/chat_model.dart';
 import 'package:check_in/ui/screens/%20Messages%20NavBar/edit_group_detail/edit_group_details.dart';
+import 'package:check_in/ui/screens/%20Messages%20NavBar/other_profile/other_profile_view.dart';
+import 'package:check_in/ui/screens/player.dart';
 import 'package:check_in/ui/widgets/custom_appbar.dart';
 import 'package:check_in/utils/Constants/images.dart';
 import 'package:check_in/utils/colors.dart';
@@ -24,6 +26,7 @@ import 'package:sizer/sizer.dart';
 import '../../../../model/Message and Group Message Model/message_model.dart';
 import '../../../../utils/Constants/enums.dart';
 import '../../../../utils/styles.dart';
+import '../../Players.dart';
 import 'Component/button.dart';
 import 'Component/image_date_container.dart';
 import 'Component/message_date_container.dart';
@@ -236,7 +239,8 @@ class _ChatScreenState extends State<ChatScreen> {
                         )).then((_) => null);
                   }
                 : () {
-                    // controller.updateLastSeenMethod();
+              User? user;
+                    pushNewScreen(context, screen: OtherProfileView(uid: controller.otherUserId.value));
                   },
             child: Row(
                 mainAxisSize: MainAxisSize.min,

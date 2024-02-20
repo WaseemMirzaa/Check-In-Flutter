@@ -333,7 +333,7 @@ class _PlayersViewState extends State<PlayersView> {
                                                   children: [
                                                     TextSpan(
                                                       text: '${TempLanguage.homeCourt} :',
-                                                      style: TextStyle(
+                                                      style: const TextStyle(
                                                         fontWeight:
                                                             FontWeight.w600,
                                                       ),

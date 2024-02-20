@@ -68,8 +68,7 @@ class AddGroupDetails extends GetView<GroupDetailController> {
                     .then((value) {
                   chatcontroller.docId.value = value[MessageField.ID] ?? '';
                   chatcontroller.name.value = controller.nameController.text;
-                  chatcontroller.image.value =
-                      value[MessageField.GROUP_IMG] ?? '';
+                  chatcontroller.image.value = value[MessageField.GROUP_IMG] ?? '';
                   controller.nameController.clear();
                   controller.aboutController.clear();
                   controller.fileImage.value = null;
@@ -101,12 +100,15 @@ class AddGroupDetails extends GetView<GroupDetailController> {
               Expanded(
                   child: SingleChildScrollView(
                 child: Column(
+
                   children: [
                     verticalGap(40),
-                    Obx(
-                      () => TextFormField(
-                        readOnly: !controller.nameTapped.value,
+                     TextFormField(
                         focusNode: controller.namefocusNode,
+                        onFieldSubmitted: (data){
+                          chatcontroller.name.value = controller.nameController.text;
+                          chatcontroller.senderName.value = controller.nameController.text;
+                        },
                         onTapOutside: (val) {
                           controller.namefocusNode.unfocus();
                         },
@@ -117,33 +119,8 @@ class AddGroupDetails extends GetView<GroupDetailController> {
                             focusedBorder: UnderlineInputBorder(
                                 borderSide: BorderSide(
                                     color: greyColor.withOpacity(0.6))),
-                            suffixIcon: GestureDetector(
-                                onTap: () {
-                                  chatcontroller.name.value =
-                                      controller.nameController.text;
-                                  chatcontroller.senderName.value =
-                                      controller.nameController.text;
-                                  controller.nameTapped.value =
-                                      !controller.nameTapped.value;
-                                },
-                                child: Padding(
-                                    padding: const EdgeInsets.only(
-                                        top: 20, bottom: 10, left: 30),
-                                    child: Obx(
-                                      () => SizedBox(
-                                          height: 2.h,
-                                          child: controller.nameTapped.value
-                                              ? poppinsText(TempLanguage.save,
-                                                  14, semiBold, appGreenColor)
-                                              : SizedBox(
-                                                  height: 2.h,
-                                                  child: Image.asset(
-                                                    AppAssets.EDIT_ICON,
-                                                  ),
-                                                )),
-                                    )))),
+                        ),
                       ),
-                    ),
                     verticalGap(26),
                     SizedBox(
                       width: 130,
@@ -189,33 +166,14 @@ class AddGroupDetails extends GetView<GroupDetailController> {
                       ),
                     ),
                     verticalGap(60),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        poppinsText(TempLanguage.aboutGroup, 14, semiBold,
-                            appBlackColor),
-                        Obx(() => GestureDetector(
-                              onTap: () {
-                                controller.aboutTapped.value =
-                                    !controller.aboutTapped.value;
-                              },
-                              child: controller.aboutTapped.value
-                                  ? poppinsText(TempLanguage.save, 14, semiBold,
-                                      appGreenColor)
-                                  : SizedBox(
-                                      height: 2.3.h,
-                                      child: Image.asset(
-                                        AppAssets.EDIT_ICON,
-                                      ),
-                                    ),
-                            ))
-                      ],
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: poppinsText(TempLanguage.aboutGroup, 14, semiBold,
+                          appBlackColor),
                     ),
                     verticalGap(5),
-                    Obx(() => TextFormField(
-                          readOnly: controller.aboutTapped.value == true
-                              ? false
-                              : true,
+                    TextFormField(
+
                           onTapOutside: (val) {
                             controller.aboutfocusNode.unfocus();
                           },
@@ -228,7 +186,7 @@ class AddGroupDetails extends GetView<GroupDetailController> {
                                 borderSide: BorderSide(
                                     color: greyColor.withOpacity(0.6))),
                           ),
-                        ))
+                        )
                   ],
                 ),
               )),

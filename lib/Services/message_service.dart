@@ -687,6 +687,7 @@ class MessageService {
 
   //........... Remove new member
   Future<void> removeMember(String id, docId) async {
+    print("doc id is: =========================> $docId");
     try {
       // Remove id from memberids array
       await _messagesCollection.doc(docId).update({
@@ -697,7 +698,6 @@ class MessageService {
           await _messagesCollection.doc(docId).get();
       List<Map<String, dynamic>> currentData = List<Map<String, dynamic>>.from(
           documentSnapshot[MessageField.MEMBERS] ?? []);
-      // Find the index of the map with the specified ID
       int indexToRemove =
           currentData.indexWhere((map) => map[MessageField.MEMBER_UID] == id);
       if (indexToRemove != -1) {
@@ -709,6 +709,7 @@ class MessageService {
         });
       }
     } catch (e) {
+      log("Error is --------------------------> $e");
       rethrow;
     }
   }
