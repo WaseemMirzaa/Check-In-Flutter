@@ -690,9 +690,7 @@ class MessageService {
     print("doc id is: =========================> $docId");
     try {
       // Remove id from memberids array
-      await _messagesCollection.doc(docId).update({
-        MessageField.MEMBER_IDS: FieldValue.arrayRemove([id]),
-      });
+      await _messagesCollection.doc(docId).update({MessageField.MEMBER_IDS: FieldValue.arrayRemove([id]),});
       // Get the current array of map data
       DocumentSnapshot documentSnapshot =
           await _messagesCollection.doc(docId).get();

@@ -105,7 +105,7 @@ class GroupMember extends GetView<GroupmemberController> {
                                   removeMemberOntap: () {
                                     if (snapshot.data![index].iAmAdmin!) {
                                       print('object');
-                                      controller.removeGroupMember(snapshot.data![index].memberId!);
+                                      controller.removeGroupMember(snapshot.data![index].memberId!,);
                                       Navigator.pop(context);
                                     }
                                   },

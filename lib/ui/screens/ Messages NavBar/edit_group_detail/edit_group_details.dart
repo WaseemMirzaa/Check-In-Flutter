@@ -26,7 +26,7 @@ import '../../../../utils/Constants/global_variable.dart';
 import 'Component/bottomsheet.dart';
 
 // ignore: must_be_immutable
-class EditGroupDetails extends GetView<GroupDetailController> {
+class EditGroupDetails extends StatefulWidget {
   bool? isGroup;
   String? image;
   // List? members;
@@ -43,41 +43,69 @@ class EditGroupDetails extends GetView<GroupDetailController> {
       this.docId,
       this.dataArray,
       this.showBtn = false});
+
+  @override
+  State<EditGroupDetails> createState() => _EditGroupDetailsState();
+}
+
+class _EditGroupDetailsState extends State<EditGroupDetails> {
+  var controller = Get.find<GroupDetailController>();
   var groupmemberController = Get.find<GroupmemberController>();
+
   var userController = Get.find<UserController>();
+
   var chatcontroller = Get.find<ChatController>();
+
   var messageController = Get.find<MessageController>();
+  @override
+  void initState() {
+    // TODO: implement initState
+    controller.getGroupDetail(widget.docId!, userController.userModel.value.uid!);
+    super.initState();
+
+  }
 
   @override
   Widget build(BuildContext context) {
     GlobalVariable.docId = '';
-    controller.getGroupDetail(docId!, userController.userModel.value.uid!);
     return Scaffold(
         floatingActionButton: FloatingActionButton(
             backgroundColor: appRedColor,
             child: const Icon(Icons.logout),
             onPressed: () {
-              showAdaptiveDialog(context: context, builder: (context)=>AlertDialog.adaptive(
-                title: Text('Group Left',style: TextStyle(fontWeight: FontWeight.w700,color: appBlackColor),),
-                content: Text('Do you really want to left the group?',style: TextStyle(fontSize: 14,color: appBlackColor),
-                ),
-                actions: [
-                  TextButton(onPressed: (){Navigator.pop(context);}, child: const Text('No')),
-                  TextButton(onPressed: () async{
-                   await groupmemberController
-                        .removeGroupMember(userController.userModel.value.uid!)
-                        .then((value) => pushNewScreen(context, screen: const Home()));
-                  }, child: const Text('Yes')),
-                ],
-              ));
-
+              showAdaptiveDialog(
+                  context: context,
+                  builder: (context) => AlertDialog.adaptive(
+                        title: Text(
+                          'Group Left',
+                          style: TextStyle(fontWeight: FontWeight.w700, color: appBlackColor),
+                        ),
+                        content: Text(
+                          'Do you really want to left the group?',
+                          style: TextStyle(fontSize: 14, color: appBlackColor),
+                        ),
+                        actions: [
+                          TextButton(
+                              onPressed: () {
+                                Navigator.pop(context);
+                              },
+                              child: const Text('No')),
+                          TextButton(
+                              onPressed: () async {
+                                await groupmemberController
+                                    .leftGroup(userController.userModel.value.uid!, widget.docId!)
+                                    .then((value) => pushNewScreen(context, screen: const Home()));
+                              },
+                              child: const Text('Yes')),
+                        ],
+                      ));
             }),
         appBar: CustomAppbar(
           title: poppinsText(TempLanguage.groupDetail, 15, bold, appBlackColor),
           actions: [
             GestureDetector(
                 onTap: () {
-                  groupmemberController.docid = docId!;
+                  groupmemberController.docid = widget.docId!;
                   pushNewScreen(context,
                       screen: GroupMember(
                         isAdmin: controller.groupDetailModel!.isAdmin!,
@@ -107,12 +135,14 @@ class EditGroupDetails extends GetView<GroupDetailController> {
                                   child: NameTextfield(
                                     readOnly: controller.nameTapped.value ? true : false,
                                     isAdmin: controller.groupDetailModel!.isAdmin,
-                                    iconOnTap: controller.groupDetailModel!.isAdmin! ? () {
-                                      controller.updateGroupName(docId!);
-                                      chatcontroller.name.value = controller.nameController.text;
+                                    iconOnTap: controller.groupDetailModel!.isAdmin!
+                                        ? () {
+                                            controller.updateGroupName(widget.docId!);
+                                            chatcontroller.name.value = controller.nameController.text;
 
-                                      controller.nameTapped.value = !controller.nameTapped.value;
-                                    } : null,
+                                            controller.nameTapped.value = !controller.nameTapped.value;
+                                          }
+                                        : null,
                                   ),
                                 ),
                               ],
@@ -138,7 +168,7 @@ class EditGroupDetails extends GetView<GroupDetailController> {
                                           bottom: 1,
                                           child: GestureDetector(
                                             onTap: () {
-                                              showbottomSheet(context, controller, docId!, chatcontroller);
+                                              showbottomSheet(context, controller, widget.docId!, chatcontroller);
                                             },
                                             child: Container(
                                               height: 40,
@@ -165,7 +195,7 @@ class EditGroupDetails extends GetView<GroupDetailController> {
                                         onTap: () {
                                           // controller.aboutfocusNode
                                           //     .requestFocus();
-                                          controller.updateGroupAbout(docId!);
+                                          controller.updateGroupAbout(widget.docId!);
                                           controller.aboutTapped.value = !controller.aboutTapped.value;
                                         },
                                         child: Obx(

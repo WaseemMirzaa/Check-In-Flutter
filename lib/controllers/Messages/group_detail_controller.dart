@@ -39,16 +39,22 @@ class GroupDetailController extends GetxController {
 //............ get detail
   Future<void> getGroupDetail(String docId, String userId) async {
     loading.value = true;
-    GroupDetailModel res = await messageService.getGroupDetails(docId, userId);
+    try {
+      GroupDetailModel res = await messageService.getGroupDetails(docId, userId);
 
-    /// store response in model
-    groupDetailModel = res;
+      /// store response in model
+      groupDetailModel = res;
+      print("------------------NO ERROR----------------${loading.value}");
 
-    /// store group name and about in textEditingController
-    nameController.text = res.groupName!;
-    aboutController.text = res.groupDesc!;
+      nameController.text = res.groupName!;
+      aboutController.text = res.groupDesc!;
 
-    loading.value = false;
+      loading.value = false;
+      print("------------------NO ERROR---------AFTER-------${loading.value}");
+    } catch (e) {
+      print("------------------EROR----------------$e");
+      loading.value = false;
+    }
   }
 
 //............ update group about

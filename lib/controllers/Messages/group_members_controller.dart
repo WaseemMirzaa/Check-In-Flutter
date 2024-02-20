@@ -38,4 +38,8 @@ class GroupmemberController extends GetxController {
   Future<void> removeGroupMember(String memberId) async {
     messageService.removeMember(memberId, docid);
   }
+
+   Future<void> leftGroup(String memberId, String docID) async {
+    messageService.removeMember(memberId, docID);
+  }
 }
