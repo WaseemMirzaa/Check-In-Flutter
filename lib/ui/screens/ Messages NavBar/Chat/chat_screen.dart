@@ -392,42 +392,11 @@ class _ChatScreenState extends State<ChatScreen> {
                                             // showLastSeen: showLastSeen,
 
                                             isGroup: controller.isgroup)
-                                        : GestureDetector(
-                                            onTap: () {
-                                              showGeneralDialog(
-                                                  barrierColor: greyColor,
-                                                  context: context,
-                                                  pageBuilder: (context, animation, secondaryAnimation) {
-                                                    return Padding(
-                                                      padding: const EdgeInsets.only(top: 40.0),
-                                                      child: Image.network(
-                                                        chat.message!,
-                                                        loadingBuilder: (BuildContext context, Widget child,
-                                                            ImageChunkEvent? loadingProgress) {
-                                                          if (loadingProgress == null) {
-                                                            return child;
-                                                          } else {
-                                                            return Center(
-                                                              child: CircularProgressIndicator(
-                                                                color: whiteColor,
-                                                                value: loadingProgress.expectedTotalBytes != null
-                                                                    ? loadingProgress.cumulativeBytesLoaded /
-                                                                        loadingProgress.expectedTotalBytes!
-                                                                    : null,
-                                                              ),
-                                                            );
-                                                          }
-                                                        },
-                                                      ),
-                                                    );
-                                                  });
-                                            },
-                                            child: ImageDateContainer(
-                                              chat: chat,
-                                              mymsg: mymsg,
+                                        : ImageDateContainer(
+                                            chat: chat,
+                                            mymsg: mymsg,
 
-                                              // showLastSeen: showLastSeen,
-                                            ),
+                                            // showLastSeen: showLastSeen,
                                           )
                                   ],
                                 ),
@@ -682,6 +651,7 @@ class _ChatScreenState extends State<ChatScreen> {
                     }
                   }
                 }),
+
             Obx(() => Offstage(
                   offstage: controller.issticker.value,
                   child: StickerKeyboard(

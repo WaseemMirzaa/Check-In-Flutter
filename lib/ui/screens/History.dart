@@ -18,21 +18,13 @@ class HistoryView extends StatefulWidget {
 }
 
 class _HistoryViewState extends State<HistoryView> {
-  List<String> courts = [
-    "Boston ",
-    "Philadelphia",
-    "Chicago",
-    "Manhattan",
-    "Los Angeles"
-  ];
+  List<String> courts = ["Boston ", "Philadelphia", "Chicago", "Manhattan", "Los Angeles"];
 
   Future<List<dynamic>> fetchData() async {
     List<dynamic> dataArray = [];
 
-    final documentSnapshot = await FirebaseFirestore.instance
-        .collection(Collections.USER)
-        .doc(FirebaseAuth.instance.currentUser!.uid)
-        .get();
+    final documentSnapshot =
+        await FirebaseFirestore.instance.collection(Collections.USER).doc(FirebaseAuth.instance.currentUser!.uid).get();
     final checkedCourtsData = documentSnapshot.data()?[CourtKey.CHECKED_COURTS];
 
     if (checkedCourtsData != null && checkedCourtsData is List<dynamic>) {
@@ -84,9 +76,7 @@ class _HistoryViewState extends State<HistoryView> {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 // return const Center(child: CircularProgressIndicator());
                 return const Center(child: CircularProgressIndicator());
-              } else if (snapshot.hasData &&
-                  snapshot.data != null &&
-                  snapshot.data!.isNotEmpty) {
+              } else if (snapshot.hasData && snapshot.data != null && snapshot.data!.isNotEmpty) {
                 return Padding(
                   padding: const EdgeInsets.only(top: 20),
                   child: ListView.builder(
@@ -96,9 +86,7 @@ class _HistoryViewState extends State<HistoryView> {
                         return Column(
                           children: [
                             Padding(
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: horizontalPadding,
-                                  vertical: 1.1.h),
+                              padding: EdgeInsets.symmetric(horizontal: horizontalPadding, vertical: 1.1.h),
                               child: Container(
                                 height: 14.h,
                                 decoration: BoxDecoration(
@@ -120,8 +108,7 @@ class _HistoryViewState extends State<HistoryView> {
                                         height: 10.2.h,
                                         width: 22.3.w,
                                         decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(15.0),
+                                          borderRadius: BorderRadius.circular(15.0),
                                         ),
                                         child: Image.asset(
                                           "assets/images/${courtsList[imageIndex]}.png",
@@ -131,8 +118,7 @@ class _HistoryViewState extends State<HistoryView> {
                                       ),
                                     ),
                                     Text.rich(TextSpan(
-                                        text:
-                                            '${snapshot.data![index]["courtName"]}\n',
+                                        text: '${snapshot.data![index]["courtName"]}\n',
                                         style: TextStyle(
                                           fontFamily: TempLanguage.poppins,
                                           fontSize: 1.6.h,
@@ -149,23 +135,20 @@ class _HistoryViewState extends State<HistoryView> {
                                             ),
                                             children: [
                                               TextSpan(
-                                                text:
-                                                    TempLanguage.courtLocation,
+                                                text: TempLanguage.courtLocation,
                                                 style: const TextStyle(
                                                   fontWeight: FontWeight.w600,
                                                 ),
                                               ),
                                               TextSpan(
-                                                text:
-                                                    ' ${snapshot.data![index]["courtName"]}\n',
+                                                text: ' ${snapshot.data![index]["courtName"]}\n',
                                                 style: TextStyle(
                                                   color: silverColor,
                                                   fontWeight: FontWeight.w500,
                                                 ),
                                               ),
                                               TextSpan(
-                                                text:
-                                                    TempLanguage.checkInHistory,
+                                                text: TempLanguage.checkInHistory,
                                                 style: const TextStyle(
                                                   fontWeight: FontWeight.w600,
                                                 ),
@@ -186,8 +169,7 @@ class _HistoryViewState extends State<HistoryView> {
                               ),
                             ),
                             Padding(
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: horizontalPadding + 15),
+                              padding: EdgeInsets.symmetric(horizontal: horizontalPadding + 15),
                               child: Container(
                                 height: 1,
                                 color: silverColor,

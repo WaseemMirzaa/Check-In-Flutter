@@ -1,6 +1,9 @@
+import 'package:check_in/controllers/Messages/chat_controller.dart';
 import 'package:check_in/utils/DateTimeUtils.dart';
 import 'package:check_in/utils/loader.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:nb_utils/nb_utils.dart';
 import 'package:sizer/sizer.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -30,6 +33,8 @@ class ImageDateContainer extends StatefulWidget {
 }
 
 class _ImageDateContainerState extends State<ImageDateContainer> {
+  final chatController = Get.find<ChatController>();
+
   // @override
   // void initState() {
   //   // TODO: implement initState
@@ -45,21 +50,128 @@ class _ImageDateContainerState extends State<ImageDateContainer> {
     return Column(
       crossAxisAlignment: widget.mymsg! ? CrossAxisAlignment.end : CrossAxisAlignment.start,
       children: [
-        Container(
-          height: 200,
-          width: 40.w,
-          decoration: BoxDecoration(
-              color: appGreenColor.withOpacity(0.3),
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: appGreenColor, width: 2)),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(8),
-            child: CachedNetworkImage(
-              imageUrl: widget.chat!.thumbnail!,
-              fit: BoxFit.cover,
-              placeholder: (context, url) => loaderView(loaderColor: whiteColor),
-            ),
-          ),
+        InkWell(
+          onTap: widget.chat!.isDelete == true
+              ? null
+              : () {
+                  showGeneralDialog(
+                      barrierColor: greyColor,
+                      context: context,
+                      pageBuilder: (context, animation, secondaryAnimation) {
+                        return Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 17.0, vertical: 50),
+                              child: GestureDetector(
+                                onTap: () {
+                                  Navigator.pop(context);
+                                },
+                                child: Icon(
+                                  Icons.arrow_back_ios,
+                                  color: appWhiteColor,
+                                ),
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(top: 40.0),
+                              child: Image.network(
+                                widget.chat!.message!,
+                                loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
+                                  if (loadingProgress == null) {
+                                    return child;
+                                  } else {
+                                    return Center(
+                                      child: CircularProgressIndicator(
+                                        color: whiteColor,
+                                        value: loadingProgress.expectedTotalBytes != null
+                                            ? loadingProgress.cumulativeBytesLoaded /
+                                                loadingProgress.expectedTotalBytes!
+                                            : null,
+                                      ),
+                                    );
+                                  }
+                                },
+                              ),
+                            ),
+                            const SizedBox(
+                              height: 80,
+                            ),
+                          ],
+                        );
+                      });
+                },
+          onLongPress: widget.mymsg! && widget.chat!.isDelete == null || widget.chat!.isDelete == false
+              ? () {
+                  showAdaptiveDialog(
+                      context: context,
+                      builder: (context) => AlertDialog.adaptive(
+                            title: Text(
+                              'Delete Message',
+                              style: TextStyle(fontWeight: FontWeight.w600, color: appBlackColor),
+                            ),
+                            content: Text('Do you want to delete this message?',
+                                style: TextStyle(fontWeight: FontWeight.w400, color: appBlackColor, fontSize: 14)),
+                            actions: [
+                              TextButton(
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                  },
+                                  child: const Text('No')),
+                              TextButton(
+                                  onPressed: () async {
+                                    await chatController
+                                        .deleteMessage(chatController.docId.value, widget.chat!.docID!)
+                                        .then((value) => Navigator.pop(context));
+                                  },
+                                  child: const Text('Yes'))
+                            ],
+                          ));
+                }
+              : null,
+          child: widget.chat!.isDelete == true
+              ? Container(
+                  constraints: BoxConstraints(maxWidth: 65.w),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(18),
+                    color: widget.chat!.isDelete == true
+                        ? greyColor.withOpacity(0.3)
+                        : widget.mymsg!
+                            ? appGreenColor
+                            : greyColor1.withOpacity(1),
+                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                  child: Text(
+                    widget.chat!.message!,
+                    style: GoogleFonts.poppins(
+                      textStyle: TextStyle(
+                          fontWeight: FontWeight.normal,
+                          fontSize: 12,
+                          color: widget.chat!.isDelete == true
+                              ? appWhiteColor
+                              : widget.mymsg!
+                                  ? appWhiteColor
+                                  : greyColor.withOpacity(1)),
+                    ),
+                  ),
+                )
+              : Container(
+                  height: 200,
+                  width: 40.w,
+                  decoration: BoxDecoration(
+                      color: appGreenColor.withOpacity(0.3),
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: appGreenColor, width: 2)),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: CachedNetworkImage(
+                      imageUrl: widget.chat!.message!,
+                      fit: BoxFit.cover,
+                      placeholder: (context, url) => loaderView(loaderColor: whiteColor),
+                    ),
+                  ),
+                ),
         ),
         verticalGap(8),
         Row(

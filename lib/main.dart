@@ -25,14 +25,11 @@ Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await init;
   // await Firebase.initializeApp();
   await initialize();
-  FlutterLocalNotificationsPlugin notification =
-      FlutterLocalNotificationsPlugin();
-  AndroidNotificationChannel androidNotificationChannel =
-      const AndroidNotificationChannel(
+  FlutterLocalNotificationsPlugin notification = FlutterLocalNotificationsPlugin();
+  AndroidNotificationChannel androidNotificationChannel = const AndroidNotificationChannel(
     'high_importance_channel', // id
     'High Importance Notifications', // title
-    description:
-        'This channel is used for important notifications.', // description
+    description: 'This channel is used for important notifications.', // description
     importance: Importance.high,
   );
 
@@ -89,8 +86,7 @@ void main() async {
   //   await Firebase.initializeApp();
   // }
 
-  final PushNotificationServices pushNotificationService =
-      PushNotificationServices();
+  final PushNotificationServices pushNotificationService = PushNotificationServices();
   FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
   pushNotificationService.init();
   FCMManager.getFCMToken();
@@ -119,6 +115,7 @@ class MyApp extends StatelessWidget {
           debugShowCheckedModeBanner: false,
           title: 'Check In',
           theme: ThemeData(
+            useMaterial3: true,
             scaffoldBackgroundColor: whiteColor,
           ),
           initialBinding: MyBinding(),

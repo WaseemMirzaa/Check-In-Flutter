@@ -9,6 +9,7 @@ Text poppinsText(
     textAlign: align,
     overflow: overflow,
     maxLines: maxlines,
+    
     style: GoogleFonts.poppins(
       fontWeight: fontWeight,
       fontSize: fontSize,

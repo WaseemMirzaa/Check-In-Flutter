@@ -1,5 +1,9 @@
+import 'package:check_in/controllers/Messages/chat_controller.dart';
 import 'package:check_in/utils/DateTimeUtils.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:nb_utils/nb_utils.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../../../../model/Message and Group Message Model/chat_model.dart';
@@ -14,7 +18,6 @@ class MessageDateContainer extends StatelessWidget {
   Chatmodel? chat;
   bool? mymsg;
   bool? showLastSeen;
-
   bool? isGroup;
   MessageDateContainer(
       {super.key,
@@ -23,6 +26,8 @@ class MessageDateContainer extends StatelessWidget {
       this.mymsg,
       this.showLastSeen,
       this.isGroup});
+
+  final chatController = Get.find<ChatController>();
 
   @override
   Widget build(BuildContext context) {
@@ -38,30 +43,102 @@ class MessageDateContainer extends StatelessWidget {
         Row(
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            mymsg!
+            chat!.isDelete == true
                 ? const SizedBox()
-                : CustomPaint(
-                    painter: CustomShape(bgcolor: greyColor1.withOpacity(1)),
-                  ),
-            Container(
-              constraints: BoxConstraints(maxWidth: 65.w),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.only(
-                    topLeft: const Radius.circular(15),
-                    topRight: const Radius.circular(15),
-                    bottomLeft: Radius.circular(mymsg! ? 15 : 0),
-                    bottomRight: Radius.circular(mymsg! ? 0 : 15)),
-                color: mymsg! ? appGreenColor : greyColor1.withOpacity(1),
-              ),
-              padding: const EdgeInsets.all(15),
-              child:
-                  poppinsText(chat!.message!, 12, FontWeight.normal, mymsg! ? appWhiteColor : greyColor.withOpacity(1)),
+                : mymsg!
+                    ? const SizedBox()
+                    : CustomPaint(
+                        painter: CustomShape(bgcolor: greyColor1.withOpacity(1)),
+                      ),
+            InkWell(
+              onLongPress: mymsg! && chat!.isDelete == null || chat!.isDelete == false
+                  ? () {
+                      showAdaptiveDialog(
+                          context: context,
+                          builder: (context) => AlertDialog.adaptive(
+                                title: Text(
+                                  'Delete Message',
+                                  style: TextStyle(fontWeight: FontWeight.w600, color: appBlackColor),
+                                ),
+                                content: Text('Do you want to delete this message?',
+                                    style: TextStyle(fontWeight: FontWeight.w400, color: appBlackColor, fontSize: 14)),
+                                actions: [
+                                  TextButton(
+                                      onPressed: () {
+                                        Navigator.pop(context);
+                                      },
+                                      child: const Text('No')),
+                                  TextButton(
+                                      onPressed: () async {
+                                        await chatController
+                                            .deleteMessage(chatController.docId.value, chat!.docID!)
+                                            .then((value) => Navigator.pop(context));
+                                      },
+                                      child: const Text('Yes'))
+                                ],
+                              ));
+                    }
+                  : null,
+              child: chat!.isDelete == true
+                  ? Container(
+                      constraints: BoxConstraints(maxWidth: 65.w),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(18),
+                        color: chat!.isDelete == true
+                            ? greyColor.withOpacity(0.3)
+                            : mymsg!
+                                ? appGreenColor
+                                : greyColor1.withOpacity(1),
+                      ),
+                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                      child: Text(
+                        chat!.message!,
+                        style: GoogleFonts.poppins(
+                          textStyle: TextStyle(
+                              fontWeight: FontWeight.normal,
+                              fontSize: 12,
+                              color: chat!.isDelete == true
+                                  ? appWhiteColor
+                                  : mymsg!
+                                      ? appWhiteColor
+                                      : greyColor.withOpacity(1)),
+                        ),
+                      ),
+                    )
+                  : Container(
+                      constraints: BoxConstraints(maxWidth: 65.w),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.only(
+                            topLeft: const Radius.circular(15),
+                            topRight: const Radius.circular(15),
+                            bottomLeft: Radius.circular(mymsg! ? 15 : 0),
+                            bottomRight: Radius.circular(mymsg! ? 0 : 15)),
+                        color: chat!.isDelete == true
+                            ? greyColor.withOpacity(0.2)
+                            : mymsg!
+                                ? appGreenColor
+                                : greyColor1.withOpacity(1),
+                      ),
+                      padding: const EdgeInsets.all(15),
+                      child: poppinsText(
+                          chat!.message!,
+                          chatController.chatfieldController.value.text.isEmptyOrNull ? 12 : 18,
+                          FontWeight.normal,
+                          chat!.isDelete == true
+                              ? appBlackColor.withOpacity(0.2)
+                              : mymsg!
+                                  ? appWhiteColor
+                                  : greyColor.withOpacity(1)),
+                    ),
             ),
-            mymsg!
-                ? CustomPaint(
-                    painter: CustomShape(bgcolor: appGreenColor),
-                  )
-                : const SizedBox()
+            chat!.isDelete == true
+                ? const SizedBox()
+                : mymsg!
+                    ? CustomPaint(
+                        painter:
+                            CustomShape(bgcolor: chat!.isDelete == true ? greyColor.withOpacity(0.2) : appGreenColor),
+                      )
+                    : const SizedBox()
           ],
         ),
         verticalGap(8),

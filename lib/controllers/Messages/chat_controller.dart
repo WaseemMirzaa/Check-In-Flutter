@@ -15,7 +15,7 @@ class ChatController extends GetxController {
   RxString name = ''.obs;
   RxList memberId = [].obs;
   RxList members = [].obs;
-  RxString otherUserId=''.obs;
+  RxString otherUserId = ''.obs;
   RxString image = ''.obs;
   RxString senderName = ''.obs;
   RxString sendMsgField = ''.obs;
@@ -44,25 +44,23 @@ class ChatController extends GetxController {
 
   //............. get message with docID
   Future<void> getSingleMessage() async {
-    var res = await chatService.getSingleMessage(
-        docId.value, userController.userModel.value.uid!);
+    var res = await chatService.getSingleMessage(docId.value, userController.userModel.value.uid!);
     Messagemodel model = res;
     if (isgroup) {
       members.value = model.members!;
+    } else {
+      userController.userModel.value.uid == model.senderId
+          ? otherUserId.value = model.recieverId!
+          : otherUserId.value = model.senderId!;
     }
-    else{
-      userController.userModel.value.uid==model.senderId?otherUserId.value=model.recieverId!:otherUserId.value=model.senderId!
-    ;}
     image.value = model.image!;
   }
 
   //............. get all conversation
   Stream<List<Chatmodel>> getConversation() {
-    chatService.updateUnreadCount(
-        docId.value, userController.userModel.value.uid!, 0, members);
+    chatService.updateUnreadCount(docId.value, userController.userModel.value.uid!, 0, members);
     // updateLastSeenMethod();
-    return chatService.getConversation(
-        docId.value, userController.userModel.value.uid!, members);
+    return chatService.getConversation(docId.value, userController.userModel.value.uid!, members);
   }
 
   //............. get message request status
@@ -72,8 +70,7 @@ class ChatController extends GetxController {
 
   //............. update request status
   void updateRequestStatus(String status, String msg, int unread) {
-    chatService.updateRequestStatus(
-        docId.value, status, msg, unread, userController.userModel.value.uid!);
+    chatService.updateRequestStatus(docId.value, status, msg, unread, userController.userModel.value.uid!);
   }
 
   String thumbnailPath = '';
@@ -97,16 +94,10 @@ class ChatController extends GetxController {
       type = 'image';
     }
 
-    Chatmodel? chatmodel = Chatmodel(
-        id: uid,
-        message: message,
-        time: time,
-        type: type,
-        thumbnail: thumbnailPath,
-        seenTimeStamp: "");
+    Chatmodel? chatmodel =
+        Chatmodel(id: uid, message: message, time: time, type: type, thumbnail: thumbnailPath, seenTimeStamp: "");
     // try {
-    DocumentSnapshot? newMessageDoc =
-        await chatService.sendMessage(docId.value, chatmodel, members);
+    DocumentSnapshot? newMessageDoc = await chatService.sendMessage(docId.value, chatmodel, members);
     sendMsgLoader.value = false;
     return newMessageDoc;
     // } catch (e) {
@@ -114,6 +105,11 @@ class ChatController extends GetxController {
     // }
 
     // return null;
+  }
+
+//........Delete Chat
+  Future<bool> deleteMessage(String messageDoc, String docID) async {
+    return await chatService.deleteChatAndUpdateModel(messageDoc, docID);
   }
 
 //........... Compress images
@@ -143,8 +139,7 @@ class ChatController extends GetxController {
   }
 
 //.............. get device token
-  Future<void> sendNotificationMethod(String notificationType, String msg,
-      {String? image}) async {
+  Future<void> sendNotificationMethod(String notificationType, String msg, {String? image}) async {
     // print(senderName);
     // print(memberId);
     for (var element in memberId) {
