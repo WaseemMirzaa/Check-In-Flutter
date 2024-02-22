@@ -6,7 +6,9 @@
     <string>This app will use your email to maintain your profile and location will be used to show relevant courts in your area.</string>
     <key>NSPhotoLibraryUsageDescription</key>
     <string>This app requires access to your photo library to upload images for user profile</string>
-    <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<key>NSCameraUsageDescription</key>
+	<string>To capture profile photo please grant camera access</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
     <string>This app needs access to your location to provide location-based services and find nearby basketball courts</string>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
