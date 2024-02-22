@@ -59,15 +59,16 @@ class _EditGroupDetailsState extends State<EditGroupDetails> {
   var messageController = Get.find<MessageController>();
   @override
   void initState() {
-    // TODO: implement initState
-    controller.getGroupDetail(widget.docId!, userController.userModel.value.uid!);
     super.initState();
-
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      controller.getGroupDetail(widget.docId!, userController.userModel.value.uid!);
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     GlobalVariable.docId = '';
+
     return Scaffold(
         floatingActionButton: FloatingActionButton(
             backgroundColor: appRedColor,

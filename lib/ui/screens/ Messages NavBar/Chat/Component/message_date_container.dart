@@ -1,4 +1,5 @@
 import 'package:check_in/controllers/Messages/chat_controller.dart';
+import 'package:check_in/core/constant/temp_language.dart';
 import 'package:check_in/utils/DateTimeUtils.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -33,10 +34,21 @@ class MessageDateContainer extends StatelessWidget {
   Widget build(BuildContext context) {
     String timeseperate = chat!.time!.split(' ')[1];
     String time = DateTimeUtils.time24to12(timeseperate);
+    List<InlineSpan> spans = [];
 
+    for (int runeValue in chat!.message!.runes) {
+      final character = String.fromCharCode(runeValue);
+      final isEmoji = isEmojiCharacter(runeValue);
+
+      spans.add(TextSpan(
+        text: character,
+        style: TextStyle(fontSize: isEmoji ? 16 : 12), // Set font size based on character type
+      ));
+    }
     //....
     // String dateseperate = chat!.time!.split(' ')[0];
     // String date = DateTimeUtils.formatTimestamp(c);
+
     return Column(
       crossAxisAlignment: mymsg! ? CrossAxisAlignment.end : CrossAxisAlignment.start,
       children: [
@@ -119,17 +131,32 @@ class MessageDateContainer extends StatelessWidget {
                                 ? appGreenColor
                                 : greyColor1.withOpacity(1),
                       ),
-                      padding: const EdgeInsets.all(15),
-                      child: poppinsText(
-                          chat!.message!,
-                          chatController.chatfieldController.value.text.isEmptyOrNull ? 12 : 18,
-                          FontWeight.normal,
-                          chat!.isDelete == true
-                              ? appBlackColor.withOpacity(0.2)
-                              : mymsg!
-                                  ? appWhiteColor
-                                  : greyColor.withOpacity(1)),
-                    ),
+                      padding: const EdgeInsets.all(12),
+                      child: RichText(
+                        text: TextSpan(
+                          children: spans,
+                          style: TextStyle(
+                            fontFamily: TempLanguage.poppins,
+                            fontWeight: FontWeight.normal,
+                            color: chat!.isDelete == true
+                                ? appBlackColor.withOpacity(0.2)
+                                : mymsg!
+                                    ? appWhiteColor
+                                    : greyColor.withOpacity(1),
+                          ),
+                        ),
+                      )
+
+                      // poppinsText(
+                      //     chat!.message!,
+                      //     12,
+                      //     FontWeight.normal,
+                      //     chat!.isDelete == true
+                      //         ? appBlackColor.withOpacity(0.2)
+                      //         : mymsg!
+                      //             ? appWhiteColor
+                      //             : greyColor.withOpacity(1)),
+                      ),
             ),
             chat!.isDelete == true
                 ? const SizedBox()
@@ -171,5 +198,32 @@ class MessageDateContainer extends StatelessWidget {
         //     : const SizedBox()
       ],
     );
+  }
+
+  bool containsSpecialCharacters(String message) {
+    RegExp specialChars = RegExp(r'[^\w\s]');
+    return specialChars.hasMatch(message);
+  }
+
+  bool containsAlphanumeric(String message) {
+    RegExp alphanumeric = RegExp(r'[a-zA-Z0-9]');
+    return alphanumeric.hasMatch(message);
+  }
+
+  int determineFontSize(String message) {
+    if (containsSpecialCharacters(message) || containsAlphanumeric(message)) {
+      return 14; // Set font size to 14 if message contains alphanumeric or special characters
+    } else {
+      return 20; // Set font size to 20 otherwise
+    }
+  }
+
+  bool isEmojiCharacter(int codePoint) {
+    // Check if the code point represents an emoji
+    return (codePoint >= 0x1F600 && codePoint <= 0x1F64F) ||
+        (codePoint >= 0x1F300 && codePoint <= 0x1F5FF) ||
+        (codePoint >= 0x1F680 && codePoint <= 0x1F6FF) ||
+        (codePoint >= 0x2600 && codePoint <= 0x26FF) ||
+        (codePoint >= 0x2700 && codePoint <= 0x27BF);
   }
 }
