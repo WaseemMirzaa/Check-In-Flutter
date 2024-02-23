@@ -36,9 +36,12 @@ final InitializationSettings initializationSettings = InitializationSettings(
 );
 
 class PushNotificationServices {
+
   final FirebaseMessaging _fcm = FirebaseMessaging.instance;
 
   Future<void> init() async {
+    print('🟢🟢🟢🟢🟢 init');
+
     await notificationsPlugin
         .resolvePlatformSpecificImplementation<
             IOSFlutterLocalNotificationsPlugin>()
@@ -47,6 +50,8 @@ class PushNotificationServices {
           badge: true,
           sound: true,
         );
+
+    print('🟢🟢🟢🟢🟢 plugin resolved');
 
     /// Update the iOS foreground notification presentation options to allow
     /// heads up ui.screens.Tabs.notifications.
@@ -57,6 +62,8 @@ class PushNotificationServices {
       sound: true,
     );
 
+    print('🟢🟢🟢🟢🟢 setForegroundNotificationPresentationOptions');
+
     channel = const AndroidNotificationChannel(
       'high_importance_channel', // id
       'High Importance Notifications', // title
@@ -64,11 +71,17 @@ class PushNotificationServices {
           'This channel is used for important notifications.', // description
       importance: Importance.high,
     );
+
+    print('🟢🟢🟢🟢🟢 AndroidNotificationChannel');
+
     // request permission to receive push notifications
     NotificationSettings settings = await _fcm.requestPermission();
+    print('🟢🟢🟢🟢🟢 NotificationSettings');
 
     // print('Step 1');
     if (settings.authorizationStatus == AuthorizationStatus.authorized) {
+      print('🟢🟢🟢🟢🟢 authorized');
+
       // print('Step 2');
       // handle received push notification messages
       // FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
@@ -137,7 +150,12 @@ class PushNotificationServices {
       //           )));
       // });
 
+      print('🟢🟢🟢🟢🟢 adding listener');
+
       FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
+
+        print('🟢🟢🟢🟢🟢 onMessageListened');
+
         // int notificationBadge = 0;
         if (message.data.isNotEmpty) {
           //RemoteNotification? notification = message.notification;
@@ -194,6 +212,8 @@ class PushNotificationServices {
       // handle notification messages when the app is in the background or terminated
       FirebaseMessaging.onMessageOpenedApp
           .listen((RemoteMessage message) async {
+        print('🟢🟢🟢🟢🟢 onMessageOpenedApp');
+
         //.............................
         chatcontroller.docId.value = NotificationModel.docId;
         chatcontroller.name.value = NotificationModel.name;
@@ -238,7 +258,9 @@ class PushNotificationServices {
       // print('Step 6');
       await notificationsPlugin.initialize(initializationSettings,
           onDidReceiveNotificationResponse: (payload) async {
-        // print("notification type is");
+            print('🟢🟢🟢🟢🟢 onDidReceiveNotificationResponse');
+
+            // print("notification type is");
         // print(NotificationModel.transactionId);
         //.............................
         chatcontroller.docId.value = NotificationModel.docId;
@@ -300,11 +322,11 @@ Future<void> sendNotification(
     final response =
         await http.post(Uri.parse(completeUrl), headers: headers, body: body);
     if (response.statusCode == 200) {
-      print('Notification sent');
+      print('🟡🟡🟡Notification sent');
     } else {
-      print('Error sending notification: ${response.statusCode}');
+      print('🔴🔴🔴Error sending notification: ${response.statusCode}');
     }
   } catch (e) {
-    print('Error sending notification: $e');
+    print('🔴🔴🔴Error sending notification: $e');
   }
 }

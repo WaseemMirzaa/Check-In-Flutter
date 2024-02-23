@@ -16,12 +16,14 @@ import 'package:sizer/sizer.dart';
 import 'firebase_options.dart';
 
 List<Map<String, dynamic>> courtlist = [];
+late final FirebaseMessaging _messaging;
 
 String? con;
 final init = Firebase.initializeApp(
   options: Platform.isIOS ? DefaultFirebaseOptions.currentPlatform : null,
 );
 Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  print('🔴🔴🔴🔴🔴firebaseMessagingBackgroundHandler');
   await init;
   // await Firebase.initializeApp();
   await initialize();
@@ -85,7 +87,11 @@ void main() async {
   // } else {
   //   await Firebase.initializeApp();
   // }
-
+  await Firebase.initializeApp();
+  _messaging = FirebaseMessaging.instance;
+  if(Platform.isIOS){
+    await _messaging.requestPermission();
+  }
   final PushNotificationServices pushNotificationService = PushNotificationServices();
   FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
   pushNotificationService.init();

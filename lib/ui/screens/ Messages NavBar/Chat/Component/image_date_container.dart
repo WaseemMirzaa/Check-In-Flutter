@@ -104,9 +104,9 @@ class _ImageDateContainerState extends State<ImageDateContainer> {
                 },
           onLongPress: widget.mymsg! && widget.chat!.isDelete == null || widget.chat!.isDelete == false
               ? () {
-                  showAdaptiveDialog(
+                  showDialog(
                       context: context,
-                      builder: (context) => AlertDialog.adaptive(
+                      builder: (context) => AlertDialog(
                             title: Text(
                               'Delete Message',
                               style: TextStyle(fontWeight: FontWeight.w600, color: appBlackColor),
