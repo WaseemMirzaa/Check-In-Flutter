@@ -220,6 +220,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
+        automaticallyImplyLeading: false,
         centerTitle: true,
         backgroundColor: appWhiteColor,
         title: poppinsText(TempLanguage.profile, 20, FontWeight.bold, appBlackColor),

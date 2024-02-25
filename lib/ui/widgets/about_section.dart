@@ -138,7 +138,7 @@ class _AboutSectionState extends State<AboutSection> {
                         child: Padding(
                             padding: const EdgeInsets.only(left: 8),
                             child: tapped
-                                ? Expanded(child: poppinsText(TempLanguage.save, 14, semiBold, appGreenColor))
+                                ? poppinsText(TempLanguage.save, 14, semiBold, appGreenColor)
                                 : const ImageIcon(
                                     AssetImage(
                                       AppAssets.EDIT_ICON,
@@ -148,33 +148,36 @@ class _AboutSectionState extends State<AboutSection> {
                       )
                     ],
                   ),
-                  TextField(
-                    controller: aboutMeController,
-                    textInputAction: TextInputAction.done,
-                    onSubmitted: (value) {
-                      // setState(() {
-                      //   // userController.userModel.value.
-                      //   //..........
-                      //   aboutMe = value;
-                      //   widget.userController.userModel.value.aboutMe = value;
-                      //   FirebaseFirestore.instance
-                      //       .collection(Collections.USER)
-                      //       .doc(FirebaseAuth.instance.currentUser!.uid)
-                      //       .update({UserKey.ABOUT_ME: aboutMe});
-                      // });
-                    },
-                    maxLines: widget.userController.userModel.value.isVerified == false ? 3 : 5,
-                    onChanged: (val) {},
-                    decoration: InputDecoration(
-                        border: InputBorder.none,
-                        enabled: tapped,
-                        enabledBorder: InputBorder.none,
-                        disabledBorder: InputBorder.none,
-                        errorBorder: InputBorder.none,
-                        focusedBorder: InputBorder.none,
-                        focusedErrorBorder: InputBorder.none,
-                        hintText: TempLanguage.tellUsAboutGame,
-                        helperStyle: GoogleFonts.poppins(fontSize: 14, fontWeight: regular, color: silverColor)),
+                  Container(
+                    height: 80,
+                    child: TextField(
+                      controller: aboutMeController,
+                      textInputAction: TextInputAction.done,
+                      onSubmitted: (value) {
+                        // setState(() {
+                        //   // userController.userModel.value.
+                        //   //..........
+                        //   aboutMe = value;
+                        //   widget.userController.userModel.value.aboutMe = value;
+                        //   FirebaseFirestore.instance
+                        //       .collection(Collections.USER)
+                        //       .doc(FirebaseAuth.instance.currentUser!.uid)
+                        //       .update({UserKey.ABOUT_ME: aboutMe});
+                        // });
+                      },
+                      maxLines: widget.userController.userModel.value.isVerified == false ? 3 : 5,
+                      onChanged: (val) {},
+                      decoration: InputDecoration(
+                          border: InputBorder.none,
+                          enabled: tapped,
+                          enabledBorder: InputBorder.none,
+                          disabledBorder: InputBorder.none,
+                          errorBorder: InputBorder.none,
+                          focusedBorder: InputBorder.none,
+                          focusedErrorBorder: InputBorder.none,
+                          hintText: TempLanguage.tellUsAboutGame,
+                          helperStyle: GoogleFonts.poppins(fontSize: 14, fontWeight: regular, color: silverColor)),
+                    ),
                   ),
                   // verticalGap(20),
                   Container(
