@@ -5,6 +5,7 @@ import 'package:check_in/core/constant/temp_language.dart';
 import 'package:check_in/ui/screens/login.dart';
 import 'package:check_in/ui/screens/signup.dart';
 import 'package:check_in/ui/widgets/common_button.dart';
+import 'package:check_in/utils/common.dart';
 import 'package:check_in/utils/gaps.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -116,15 +117,6 @@ class _StartViewState extends State<StartView> {
               ),
               Column(
                 children: [
-                  Padding(
-                    padding: EdgeInsets.only(top: 0.9.h, bottom: 0.9.h),
-                    child: fullWidthButton("Get user", () async{
-                      await getAllUsersWithoutParams();
-                     
-                    }),
-                  ),
-                  verticalGap(60)
-,
 
                   Padding(
                     padding: EdgeInsets.only(top: 0.9.h, bottom: 0.9.h),
@@ -283,22 +275,39 @@ class _StartViewState extends State<StartView> {
       ),
     );
   }
-  final FirebaseFirestore _db =  FirebaseFirestore.instance;
+  // final FirebaseFirestore _db =  FirebaseFirestore.instance;
 
-  Future<void> getAllUsersWithoutParams() async {
-    final collection = await FirebaseFirestore.instance.collection('USER').get();
-    for (final doc in collection.docs) {
-      final userData = doc.data();
-      if (userData.containsKey("params")) {
-
-      } else {
-       await _db.collection("OUT_PARAM").doc(doc.id).set(doc.data());
-       print("Created");
-      }
-    }
-
-  print("Nothings");
-  }
-
+  // Future<void> getAllUsersWithoutParams() async {
+  //   final collection = await FirebaseFirestore.instance.collection('USER').get();
+  //   for (final doc in collection.docs) {
+  //     final userData = doc.data();
+  //     if (userData.containsKey("params")) {
+  //
+  //     } else {
+  //      await _db.collection("OUT_PARAM").doc(doc.id).set(doc.data());
+  //      print("Created");
+  //     }
+  //   }
+  //
+  // print("Nothings");
+  // }
+  //
+  // Future<void> getOutUser() async {
+  //   // Get documents from the OUT_PARAM collection
+  //   final outParamSnapshot = await _db.collection('USER').get();
+  //
+  //   // Iterate through each document in the snapshot
+  //   for (final doc in outParamSnapshot.docs) {
+  //     final userName = doc['user name']; // Assuming 'user' is the field containing the user name
+  //     final searchParams = setSearchParam(userName);
+  //
+  //     // Update the document in the OUT_PARAM collection with the generated search parameters
+  //     await _db.collection('USER').doc(doc.id).update({
+  //       'params': searchParams,
+  //     });
+  //   }
+  //
+  //   print("User search parameters updated."); // Optional: Notify when complete
+  // }
 
 }

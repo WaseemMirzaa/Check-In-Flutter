@@ -126,7 +126,7 @@ class MyApp extends StatelessWidget {
             scaffoldBackgroundColor: whiteColor,
           ),
           initialBinding: MyBinding(),
-          home: StartView(isBack: true,),
+          home: Splash(),
         );
       },
     );
