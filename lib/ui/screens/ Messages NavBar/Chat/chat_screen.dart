@@ -469,12 +469,12 @@ class _ChatScreenState extends State<ChatScreen> {
                                     child: ChatButton(
                                   onTap: () {
                                     controller.updateRequestStatus(RequestStatusEnum.block.name, 'Blocked', 0);
-                                    controller.sendNotificationMethod(
-                                        '', '${userController.userModel.value.userName!} block you');
+                                    // controller.sendNotificationMethod(
+                                    //     '', '${userController.userModel.value.userName!} block you');
                                   },
                                   text: TempLanguage.block,
                                   textColor: appRedColor,
-                                  buttonColor: greyColor.withOpacity(0.7),
+                                  buttonColor: Colors.white.withOpacity(0.7),
                                 )),
                                 horizontalGap(2.w),
                                 Flexible(
@@ -487,7 +487,7 @@ class _ChatScreenState extends State<ChatScreen> {
                                   },
                                   text: TempLanguage.delete,
                                   textColor: appRedColor,
-                                  buttonColor: greyColor.withOpacity(0.7),
+                                      buttonColor: Colors.white.withOpacity(0.7),
                                 )),
                                 horizontalGap(2.w),
                                 Flexible(
@@ -499,8 +499,8 @@ class _ChatScreenState extends State<ChatScreen> {
                                         '', '${userController.userModel.value.userName!} accept request');
                                   },
                                   text: TempLanguage.accept,
-                                  textColor: appWhiteColor,
-                                  buttonColor: greyColor.withOpacity(0.7),
+                                  textColor: Colors.blue,
+                                      buttonColor: Colors.white.withOpacity(0.7),
                                 )),
                               ],
                             )
@@ -550,7 +550,7 @@ class _ChatScreenState extends State<ChatScreen> {
                                 controller.updateRequestStatus(
                                     RequestStatusEnum.pending.name, TempLanguage.messageRequest, 1);
                                 controller.sendNotificationMethod(
-                                    '', '${userController.userModel.value.userName!} send a request message');
+                                    '', '${userController.userModel.value.userName!} sent a message request');
                               },
                               text: "${TempLanguage.requestAgain} ",
                               buttonColor: appGreenColor,
@@ -611,8 +611,8 @@ class _ChatScreenState extends State<ChatScreen> {
                               width: 35.w,
                               onTap: () {
                                 controller.updateRequestStatus(RequestStatusEnum.accept.name, 'Unblocked', 0);
-                                controller.sendNotificationMethod(
-                                    '', "${userController.userModel.value.userName!} unblock you");
+                                // controller.sendNotificationMethod(
+                                //     '', "${userController.userModel.value.userName!} unblock you");
                               },
                               text: "${TempLanguage.unblock} ",
                               buttonColor: appGreenColor,

@@ -5,6 +5,7 @@ import 'package:check_in/Services/push_notification_service.dart';
 import 'package:check_in/binding.dart';
 import 'package:check_in/model/notification_model.dart';
 import 'package:check_in/ui/screens/splash.dart';
+import 'package:check_in/ui/screens/start.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -125,7 +126,7 @@ class MyApp extends StatelessWidget {
             scaffoldBackgroundColor: whiteColor,
           ),
           initialBinding: MyBinding(),
-          home: const Splash(),
+          home: StartView(isBack: true,),
         );
       },
     );

@@ -6,6 +6,7 @@ import 'package:check_in/ui/screens/login.dart';
 import 'package:check_in/ui/screens/signup.dart';
 import 'package:check_in/ui/widgets/common_button.dart';
 import 'package:check_in/utils/gaps.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
 import 'package:sizer/sizer.dart';
@@ -27,7 +28,6 @@ class _StartViewState extends State<StartView> {
   @override
   void initState() {
     super.initState();
-
     // It is safer to call native code using addPostFrameCallback after the widget has been fully built and initialized.
     // Directly calling native code from initState may result in errors due to the widget tree not being fully built at that point.
     WidgetsFlutterBinding.ensureInitialized()
@@ -118,11 +118,23 @@ class _StartViewState extends State<StartView> {
                 children: [
                   Padding(
                     padding: EdgeInsets.only(top: 0.9.h, bottom: 0.9.h),
+                    child: fullWidthButton("Get user", () async{
+                      await getAllUsersWithoutParams();
+                     
+                    }),
+                  ),
+                  verticalGap(60)
+,
+
+                  Padding(
+                    padding: EdgeInsets.only(top: 0.9.h, bottom: 0.9.h),
                     child: fullWidthButton(TempLanguage.logInSpaced, () {
                       pushNewScreen(context,
                           screen: const LoginView(), withNavBar: false);
                     }),
                   ),
+
+
                   Padding(
                     padding: EdgeInsets.only(top: 0.9.h, bottom: 0.9.h),
                     child: Container(
@@ -271,4 +283,22 @@ class _StartViewState extends State<StartView> {
       ),
     );
   }
+  final FirebaseFirestore _db =  FirebaseFirestore.instance;
+
+  Future<void> getAllUsersWithoutParams() async {
+    final collection = await FirebaseFirestore.instance.collection('USER').get();
+    for (final doc in collection.docs) {
+      final userData = doc.data();
+      if (userData.containsKey("params")) {
+
+      } else {
+       await _db.collection("OUT_PARAM").doc(doc.id).set(doc.data());
+       print("Created");
+      }
+    }
+
+  print("Nothings");
+  }
+
+
 }

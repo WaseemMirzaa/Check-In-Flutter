@@ -245,54 +245,55 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               SizedBox(
                                 width: 35.9.w,
                                 //   padding: EdgeInsets.all(10),
-                                child: Stack(
-                                  //  clipBehavior: Clip.antiAliasWithSaveLayer,
-                                  alignment: Alignment.bottomCenter,
-                                  children: [
-                                    GestureDetector(
-                                        onTap: _selectImage,
-                                        child: (_downloadUrl != null)
-                                            ? Container(
-                                                height: 20.h,
-                                                width: 35.h,
-                                                decoration: BoxDecoration(
-                                                    shape: BoxShape.circle,
-                                                    image: DecorationImage(
-                                                        image: NetworkImage(_downloadUrl as String), fit: BoxFit.fill)))
-                                            : (!userController.userModel.value.photoUrl.isEmptyOrNull)
-                                                ? Container(
-                                                    height: 20.h,
-                                                    width: 35.h,
-                                                    decoration: BoxDecoration(
-                                                        shape: BoxShape.circle,
-                                                        image: DecorationImage(
-                                                            image: NetworkImage(
-                                                                userController.userModel.value.photoUrl ?? ""),
-                                                            fit: BoxFit.fill)))
-                                                : Container(
-                                                    height: 20.h,
-                                                    width: 35.h,
-                                                    decoration: BoxDecoration(
-                                                        shape: BoxShape.circle,
-                                                        border: Border.all(width: 2, color: appGreenColor),
-                                                        image: const DecorationImage(
-                                                            image: AssetImage(AppAssets.LOGO_NEW), fit: BoxFit.fill)),
-                                                  )),
-                                    if (userController.userModel.value.isVerified == null ||
-                                        userController.userModel.value.isVerified == true)
-                                      Align(
-                                        alignment: Alignment.bottomRight,
-                                        child: Container(
-                                          height: 5.5.h,
-                                          width: 12.1.w,
-                                          decoration: const BoxDecoration(
-                                              shape: BoxShape.circle,
-                                              image: DecorationImage(image: AssetImage(AppAssets.INSTAGRAM_VERIFICATION))),
-                                        ),
-                                      )
-                                    else
-                                      const SizedBox(),
-                                  ],
+                                child: GestureDetector(
+                                  onTap: _selectImage,
+                                  child: Stack(
+                                    //  clipBehavior: Clip.antiAliasWithSaveLayer,
+                                    alignment: Alignment.bottomCenter,
+                                    children: [
+                                      (_downloadUrl != null)
+                                          ? Container(
+                                              height: 20.h,
+                                              width: 35.h,
+                                              decoration: BoxDecoration(
+                                                  shape: BoxShape.circle,
+                                                  image: DecorationImage(
+                                                      image: NetworkImage(_downloadUrl as String), fit: BoxFit.fill)))
+                                          : (!userController.userModel.value.photoUrl.isEmptyOrNull)
+                                              ? Container(
+                                                  height: 20.h,
+                                                  width: 35.h,
+                                                  decoration: BoxDecoration(
+                                                      shape: BoxShape.circle,
+                                                      image: DecorationImage(
+                                                          image: NetworkImage(
+                                                              userController.userModel.value.photoUrl ?? ""),
+                                                          fit: BoxFit.fill)))
+                                              : Container(
+                                                  height: 20.h,
+                                                  width: 35.h,
+                                                  decoration: BoxDecoration(
+                                                      shape: BoxShape.circle,
+                                                      border: Border.all(width: 2, color: appGreenColor),
+                                                      image: const DecorationImage(
+                                                          image: AssetImage(AppAssets.LOGO_NEW), fit: BoxFit.fill)),
+                                                ),
+                                      if (userController.userModel.value.isVerified == null ||
+                                          userController.userModel.value.isVerified == true)
+                                        Align(
+                                          alignment: Alignment.bottomRight,
+                                          child: Container(
+                                            height: 5.5.h,
+                                            width: 12.1.w,
+                                            decoration: const BoxDecoration(
+                                                shape: BoxShape.circle,
+                                                image: DecorationImage(image: AssetImage(AppAssets.INSTAGRAM_VERIFICATION))),
+                                          ),
+                                        )
+                                      else
+                                        const SizedBox(),
+                                    ],
+                                  ),
                                 ),
                               ),
                               verticalGap(0.5.h),
