@@ -89,7 +89,7 @@ class _AboutSectionState extends State<AboutSection> {
                 left: 30,
                 right: 30,
               ),
-              height: 20.h,
+              // height: 30.h,
               decoration: BoxDecoration(
                 color: appWhiteColor,
                 borderRadius: const BorderRadius.only(topLeft: Radius.circular(10), topRight: Radius.circular(10)),
@@ -109,8 +109,7 @@ class _AboutSectionState extends State<AboutSection> {
                     height: 0.5.h,
                     decoration: BoxDecoration(
                         color: appGreenColor,
-                        borderRadius:
-                            const BorderRadius.only(bottomLeft: Radius.circular(5), bottomRight: Radius.circular(5))),
+                        borderRadius: const BorderRadius.only(bottomLeft: Radius.circular(5), bottomRight: Radius.circular(5))),
                   ),
                   SizedBox(
                     height: 2.h,
@@ -127,8 +126,7 @@ class _AboutSectionState extends State<AboutSection> {
                               //..........
                               aboutMe = aboutMeController.text;
                               widget.userController.userModel.value.aboutMe = aboutMe;
-                              FirebaseFirestore.instance
-                                  .collection(Collections.USER)
+                              FirebaseFirestore.instance.collection(Collections.USER)
                                   .doc(FirebaseAuth.instance.currentUser!.uid)
                                   .update({UserKey.ABOUT_ME: aboutMe});
                             });
@@ -148,36 +146,33 @@ class _AboutSectionState extends State<AboutSection> {
                       )
                     ],
                   ),
-                  Container(
-                    height: 80,
-                    child: TextField(
-                      controller: aboutMeController,
-                      textInputAction: TextInputAction.done,
-                      onSubmitted: (value) {
-                        // setState(() {
-                        //   // userController.userModel.value.
-                        //   //..........
-                        //   aboutMe = value;
-                        //   widget.userController.userModel.value.aboutMe = value;
-                        //   FirebaseFirestore.instance
-                        //       .collection(Collections.USER)
-                        //       .doc(FirebaseAuth.instance.currentUser!.uid)
-                        //       .update({UserKey.ABOUT_ME: aboutMe});
-                        // });
-                      },
-                      maxLines: widget.userController.userModel.value.isVerified == false ? 3 : 5,
-                      onChanged: (val) {},
-                      decoration: InputDecoration(
-                          border: InputBorder.none,
-                          enabled: tapped,
-                          enabledBorder: InputBorder.none,
-                          disabledBorder: InputBorder.none,
-                          errorBorder: InputBorder.none,
-                          focusedBorder: InputBorder.none,
-                          focusedErrorBorder: InputBorder.none,
-                          hintText: TempLanguage.tellUsAboutGame,
-                          helperStyle: GoogleFonts.poppins(fontSize: 14, fontWeight: regular, color: silverColor)),
-                    ),
+                  TextField(
+                    controller: aboutMeController,
+                    textInputAction: TextInputAction.done,
+                    onSubmitted: (value) {
+                      // setState(() {
+                      //   // userController.userModel.value.
+                      //   //..........
+                      //   aboutMe = value;
+                      //   widget.userController.userModel.value.aboutMe = value;
+                      //   FirebaseFirestore.instance
+                      //       .collection(Collections.USER)
+                      //       .doc(FirebaseAuth.instance.currentUser!.uid)
+                      //       .update({UserKey.ABOUT_ME: aboutMe});
+                      // });
+                    },
+                    maxLines: widget.userController.userModel.value.isVerified == false ? 3 : 5,
+                    onChanged: (val) {},
+                    decoration: InputDecoration(
+                        border: InputBorder.none,
+                        enabled: tapped,
+                        enabledBorder: InputBorder.none,
+                        disabledBorder: InputBorder.none,
+                        errorBorder: InputBorder.none,
+                        focusedBorder: InputBorder.none,
+                        focusedErrorBorder: InputBorder.none,
+                        hintText: TempLanguage.tellUsAboutGame,
+                        helperStyle: GoogleFonts.poppins(fontSize: 14, fontWeight: regular, color: silverColor)),
                   ),
                   // verticalGap(20),
                   Container(

@@ -343,7 +343,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                               lineWidth: 8.0,
                                               animation: true,
                                               percent:
-                                                  ((snapshot.data?.length ?? 0) / (totalCount ?? 10)).clamp(0.0, 1.0),
+                                              ((snapshot.data?.length ?? 0) / (totalCount ?? 10)).clamp(0.0, 1.0),
                                               center: Text(
                                                 "${snapshot.data?.length ?? 0}\nCheck ins",
                                                 textAlign: TextAlign.center,
@@ -388,7 +388,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     ),
                                   ),
                                   const SizedBox(
-                                    width: 20,
+                                    width: 15,
                                   ),
                                   InkWell(
                                     onTap: () {
@@ -399,7 +399,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                       mainAxisAlignment: MainAxisAlignment.center,
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
-                                        poppinsText("Golden\nCourt", 22, FontWeight.bold, appBlackColor),
+                                        poppinsText("Golden", 22, FontWeight.bold, appBlackColor),
+                                        poppinsText("Court", 22, FontWeight.bold, appBlackColor),
                                         FutureBuilder<List<UserModel>?>(
                                           future: getUniqueCourtNameMaps(),
                                           builder: (context, snapshot) {
@@ -420,7 +421,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                         ),
                                       ],
                                     ),
-                                  )
+                                  ),
                                 ],
                               ),
                             ],
