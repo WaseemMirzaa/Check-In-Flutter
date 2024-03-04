@@ -400,7 +400,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
                                         poppinsText("Golden", 22, FontWeight.bold, appBlackColor),
-                                        poppinsText("Court", 22, FontWeight.bold, appBlackColor),
+                                        poppinsText("Courts", 22, FontWeight.bold, appBlackColor),
                                         FutureBuilder<List<UserModel>?>(
                                           future: getUniqueCourtNameMaps(),
                                           builder: (context, snapshot) {

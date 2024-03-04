@@ -127,7 +127,7 @@ class MessageService {
         .snapshots()
         .map((querySnapshot) => querySnapshot.docs.map<Chatmodel>((doc) {
               // updateLastSeen(docId, uId);
-
+      readReceipts(docId, uId);
               return Chatmodel.fromJson(doc.data(), docID: doc.id);
             }).toList());
   }
@@ -243,6 +243,32 @@ class MessageService {
       }
     } catch (error) {
       print("Error updating chat document model: $error");
+      return false;
+    }
+  }
+
+  // ................ READ RECEIPTS
+  Future<bool> readReceipts(String messageDoc, String uid) async {
+    try {
+      final querySnapshot = await _messagesCollection
+          .doc(messageDoc)
+          .collection(Collections.CHAT).where('id', isNotEqualTo:  uid)
+           .where('isRead', isEqualTo: null)
+          .get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        for (final doc in querySnapshot.docs) {
+          final chatModel = Chatmodel.fromJson(doc.data());
+          chatModel.isRead = true;
+          await doc.reference.update(chatModel.toJson());
+        }
+        return true;
+      } else {
+        log("🟢🟢🟢🟢🟢DOCS ARE NULL🟢🟢🟢🟢🟢");
+        return false; // No documents found where isRead is false
+      }
+    } catch (error) {
+      print("🟢🟢🟢🟢🟢🟢🟢🟢🟢🟢Error updating chat document models:🟢🟢🟢🟢🟢🟢🟢🟢🟢🟢 $error");
       return false;
     }
   }

@@ -1,4 +1,5 @@
 import 'package:check_in/controllers/Messages/chat_controller.dart';
+import 'package:check_in/core/constant/app_assets.dart';
 import 'package:check_in/utils/DateTimeUtils.dart';
 import 'package:check_in/utils/loader.dart';
 import 'package:flutter/material.dart';
@@ -22,7 +23,6 @@ class ImageDateContainer extends StatefulWidget {
   bool? isGroup;
   ImageDateContainer(
       {super.key,
-      // this.index,
       this.chat,
       this.mymsg,
       this.showLastSeen,
@@ -148,6 +148,7 @@ class _ImageDateContainerState extends State<ImageDateContainer> {
                       textStyle: TextStyle(
                           fontWeight: FontWeight.normal,
                           fontSize: 12,
+                          fontStyle: widget.chat!.isDelete == true ? FontStyle.italic : null,
                           color: widget.chat!.isDelete == true
                               ? appWhiteColor
                               : widget.mymsg!
@@ -178,6 +179,8 @@ class _ImageDateContainerState extends State<ImageDateContainer> {
           children: [
             poppinsText(time, 10, medium, greyColor.withOpacity(1)),
             horizontalGap(5),
+            widget.chat!.isDelete !=true && widget.isGroup != true && widget.mymsg! && widget.chat!.isRead != true  ? Icon(Icons.check,size: 15,color: greyColor,) : widget.chat!.isDelete !=true && widget.isGroup != true && widget.mymsg! && widget.chat!.isRead == true ? const ImageIcon(AssetImage(AppAssets.DOUBLE_TICK),size: 15,color: greenColor) : const SizedBox(),
+
             // mymsg!
             //     ? poppinsText('✓', 10, medium, greyColor.withOpacity(1))
             //     : const SizedBox(),
