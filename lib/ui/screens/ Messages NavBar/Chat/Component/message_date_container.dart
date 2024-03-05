@@ -176,7 +176,7 @@ class MessageDateContainer extends StatelessWidget {
           children: [
             poppinsText(time, 10, medium, greyColor.withOpacity(1)),
             horizontalGap(5),
-            chat!.isDelete !=true && mymsg! && chat!.isRead != true ? Icon(Icons.check,size: 15,color: greyColor,) : chat!.isDelete !=true && mymsg! && chat!.isRead == true ? const ImageIcon(AssetImage(AppAssets.DOUBLE_TICK),size: 15,color: greenColor) : const SizedBox(),
+            chat!.isDelete !=true && mymsg! && chat!.isRead != true && isGroup != true ? Icon(Icons.check,size: 15,color: greyColor,) : chat!.isDelete !=true && isGroup != true && mymsg! && chat!.isRead == true ? const ImageIcon(AssetImage(AppAssets.DOUBLE_TICK),size: 15,color: greenColor) : const SizedBox(),
 
             // mymsg!
             //     ? poppinsText('✓', 10, medium, greyColor.withOpacity(1))

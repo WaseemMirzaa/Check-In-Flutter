@@ -179,7 +179,7 @@ class _ImageDateContainerState extends State<ImageDateContainer> {
           children: [
             poppinsText(time, 10, medium, greyColor.withOpacity(1)),
             horizontalGap(5),
-            widget.chat!.isDelete !=true && widget.mymsg! && widget.chat!.isRead != true ? Icon(Icons.check,size: 15,color: greyColor,) : widget.chat!.isDelete !=true && widget.mymsg! && widget.chat!.isRead == true ? const ImageIcon(AssetImage(AppAssets.DOUBLE_TICK),size: 15,color: greenColor) : const SizedBox(),
+            widget.chat!.isDelete !=true && widget.isGroup != true && widget.mymsg! && widget.chat!.isRead != true  ? Icon(Icons.check,size: 15,color: greyColor,) : widget.chat!.isDelete !=true && widget.isGroup != true && widget.mymsg! && widget.chat!.isRead == true ? const ImageIcon(AssetImage(AppAssets.DOUBLE_TICK),size: 15,color: greenColor) : const SizedBox(),
 
             // mymsg!
             //     ? poppinsText('✓', 10, medium, greyColor.withOpacity(1))

@@ -400,7 +400,7 @@ class _ChatScreenState extends State<ChatScreen> {
                                         : ImageDateContainer(
                                             chat: chat,
                                             mymsg: mymsg,
-
+                                        isGroup: controller.isgroup
                                             // showLastSeen: showLastSeen,
                                           )
                                   ],
@@ -574,11 +574,13 @@ class _ChatScreenState extends State<ChatScreen> {
                           color: appWhiteColor,
                           borderRadius: BorderRadius.circular(10),
                           boxShadow: [
+
                             BoxShadow(
                               color: blackTranslucentColor,
                               offset: const Offset(0, 1),
                               blurRadius: 6,
                             ),
+
                           ],
                         ),
                         child: Row(
