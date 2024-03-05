@@ -78,7 +78,7 @@ class _EditGroupDetailsState extends State<EditGroupDetails> {
                   context: context,
                   builder: (context) => AlertDialog(
                         title: Text(
-                          'Group Left',
+                          'Left Group',
                           style: TextStyle(fontWeight: FontWeight.w700, color: appBlackColor),
                         ),
                         content: Text(

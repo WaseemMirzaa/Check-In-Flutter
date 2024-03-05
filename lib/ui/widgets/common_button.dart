@@ -1,17 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:sizer/sizer.dart';
 
 import '../../utils/colors.dart';
 
 Container fullWidthButton(String label, VoidCallback onTap) {
   return Container(
-    height: 50,
+    height: 6.h,
     decoration: BoxDecoration(
       color: appGreenColor,
       borderRadius: BorderRadius.circular(11.0),
       boxShadow: [
         BoxShadow(
           color: blackTranslucentColor,
-          offset: Offset(0, 3),
+          offset: const Offset(0, 3),
           blurRadius: 6,
         ),
       ],
@@ -26,7 +27,7 @@ Container fullWidthButton(String label, VoidCallback onTap) {
             label,
             style: TextStyle(
               fontFamily: 'Poppins',
-              fontSize: 14,
+              fontSize: 1.7.h,
               color: appWhiteColor,
               fontWeight: FontWeight.w500,
             ),

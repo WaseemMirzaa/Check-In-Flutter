@@ -6,8 +6,10 @@ import 'package:check_in/binding.dart';
 import 'package:check_in/model/notification_model.dart';
 import 'package:check_in/ui/screens/splash.dart';
 import 'package:check_in/ui/screens/start.dart';
+import 'package:device_preview/device_preview.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get_navigation/src/root/get_material_app.dart';
@@ -101,7 +103,9 @@ void main() async {
   // SharedPreferences prefs = await SharedPreferences.getInstance();
   // var email = prefs.getString('email');
 
-  runApp(const MyApp());
+  runApp( DevicePreview(
+      enabled: !kReleaseMode,
+      builder: (context) => MyApp()));
 }
 
 class MyApp extends StatelessWidget {
@@ -121,6 +125,7 @@ class MyApp extends StatelessWidget {
         return GetMaterialApp(
           debugShowCheckedModeBanner: false,
           title: 'Check In',
+          builder: DevicePreview.appBuilder,
           theme: ThemeData(
             useMaterial3: true,
             scaffoldBackgroundColor: whiteColor,

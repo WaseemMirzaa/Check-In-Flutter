@@ -49,8 +49,8 @@ class _LoginViewState extends State<LoginView> {
         backgroundColor: appWhiteColor,
         leading: Row(
           children: [
-            const SizedBox(
-              width: 30,
+             SizedBox(
+              width: 2.5.w,
             ),
             GestureDetector(
               onTap: () {
