@@ -69,9 +69,9 @@ class TempLanguage {
 
   static String get dearUser => "Dear User";
   static String get alertContentText =>
-      'We care about your privacy and data security. We use your email to maintain your own profile against it. '
-      'Also we use your location to show you the nearest basketball courts in your area. '
-      'Can we continue to use your data to give you best experience ?\n\nYou can change your choice anytime in the app settings. ';
+      'We care about your privacy and data security. We use your email to maintain your profile inside our catalog database. '
+      'Additionally, we use your location to provide you with the nearest basketball courts in your area. '
+      'Can we continue to use your data to provide you with the best user experience? \n\nYou can change this decision anytime in the apps settings. ';
   static String get newsFeed => "News Feed";
   static String get checkOutHot => "Check out what's Hot";
   static String get contentThatTrendingAndPopular => "Check out what's Hot";
@@ -97,7 +97,7 @@ class TempLanguage {
   static String get inviteSent => 'Invite Sent';
   static String get acceptMessageRequest => 'Accept message request from';
   static String get sendMessageRequestToCall =>
-      'Send a message request to this person to message and call them.';
+      'Sent a message request to this person to message and call them.';
   static String get sendRequest => 'Sent Request';
   static String get ignore => 'Ignore';
   static String get accept => 'Accept';

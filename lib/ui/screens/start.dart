@@ -5,7 +5,9 @@ import 'package:check_in/core/constant/temp_language.dart';
 import 'package:check_in/ui/screens/login.dart';
 import 'package:check_in/ui/screens/signup.dart';
 import 'package:check_in/ui/widgets/common_button.dart';
+import 'package:check_in/utils/common.dart';
 import 'package:check_in/utils/gaps.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
 import 'package:sizer/sizer.dart';
@@ -27,7 +29,6 @@ class _StartViewState extends State<StartView> {
   @override
   void initState() {
     super.initState();
-
     // It is safer to call native code using addPostFrameCallback after the widget has been fully built and initialized.
     // Directly calling native code from initState may result in errors due to the widget tree not being fully built at that point.
     WidgetsFlutterBinding.ensureInitialized()
@@ -81,8 +82,8 @@ class _StartViewState extends State<StartView> {
               backgroundColor: appWhiteColor,
               leading: Row(
                 children: [
-                  const SizedBox(
-                    width: 30,
+                    SizedBox(
+                    width: 2.5.w,
                   ),
                   GestureDetector(
                     onTap: () {
@@ -116,6 +117,8 @@ class _StartViewState extends State<StartView> {
               ),
               Column(
                 children: [
+
+
                   Padding(
                     padding: EdgeInsets.only(top: 0.9.h, bottom: 0.9.h),
                     child: fullWidthButton(TempLanguage.logInSpaced, () {
@@ -123,6 +126,9 @@ class _StartViewState extends State<StartView> {
                           screen: const LoginView(), withNavBar: false);
                     }),
                   ),
+
+
+
                   Padding(
                     padding: EdgeInsets.only(top: 0.9.h, bottom: 0.9.h),
                     child: Container(
@@ -135,7 +141,7 @@ class _StartViewState extends State<StartView> {
                         boxShadow: [
                           BoxShadow(
                             color: blackTranslucentColor,
-                            offset: Offset(0, 3),
+                            offset: const Offset(0, 3),
                             blurRadius: 6,
                           ),
                         ],
@@ -271,4 +277,39 @@ class _StartViewState extends State<StartView> {
       ),
     );
   }
+  // final FirebaseFirestore _db =  FirebaseFirestore.instance;
+
+  // Future<void> getAllUsersWithoutParams() async {
+  //   final collection = await FirebaseFirestore.instance.collection('USER').get();
+  //   for (final doc in collection.docs) {
+  //     final userData = doc.data();
+  //     if (userData.containsKey("params")) {
+  //
+  //     } else {
+  //      await _db.collection("OUT_PARAM").doc(doc.id).set(doc.data());
+  //      print("Created");
+  //     }
+  //   }
+  //
+  // print("Nothings");
+  // }
+  //
+  // Future<void> getOutUser() async {
+  //   // Get documents from the OUT_PARAM collection
+  //   final outParamSnapshot = await _db.collection('USER').get();
+  //
+  //   // Iterate through each document in the snapshot
+  //   for (final doc in outParamSnapshot.docs) {
+  //     final userName = doc['user name']; // Assuming 'user' is the field containing the user name
+  //     final searchParams = setSearchParam(userName);
+  //
+  //     // Update the document in the OUT_PARAM collection with the generated search parameters
+  //     await _db.collection('USER').doc(doc.id).update({
+  //       'params': searchParams,
+  //     });
+  //   }
+  //
+  //   print("User search parameters updated."); // Optional: Notify when complete
+  // }
+
 }

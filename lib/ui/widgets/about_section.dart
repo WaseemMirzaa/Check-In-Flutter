@@ -89,7 +89,7 @@ class _AboutSectionState extends State<AboutSection> {
                 left: 30,
                 right: 30,
               ),
-              height: 20.h,
+              // height: 30.h,
               decoration: BoxDecoration(
                 color: appWhiteColor,
                 borderRadius: const BorderRadius.only(topLeft: Radius.circular(10), topRight: Radius.circular(10)),
@@ -109,8 +109,7 @@ class _AboutSectionState extends State<AboutSection> {
                     height: 0.5.h,
                     decoration: BoxDecoration(
                         color: appGreenColor,
-                        borderRadius:
-                            const BorderRadius.only(bottomLeft: Radius.circular(5), bottomRight: Radius.circular(5))),
+                        borderRadius: const BorderRadius.only(bottomLeft: Radius.circular(5), bottomRight: Radius.circular(5))),
                   ),
                   SizedBox(
                     height: 2.h,
@@ -127,8 +126,7 @@ class _AboutSectionState extends State<AboutSection> {
                               //..........
                               aboutMe = aboutMeController.text;
                               widget.userController.userModel.value.aboutMe = aboutMe;
-                              FirebaseFirestore.instance
-                                  .collection(Collections.USER)
+                              FirebaseFirestore.instance.collection(Collections.USER)
                                   .doc(FirebaseAuth.instance.currentUser!.uid)
                                   .update({UserKey.ABOUT_ME: aboutMe});
                             });
@@ -138,7 +136,7 @@ class _AboutSectionState extends State<AboutSection> {
                         child: Padding(
                             padding: const EdgeInsets.only(left: 8),
                             child: tapped
-                                ? Expanded(child: poppinsText(TempLanguage.save, 14, semiBold, appGreenColor))
+                                ? poppinsText(TempLanguage.save, 14, semiBold, appGreenColor)
                                 : const ImageIcon(
                                     AssetImage(
                                       AppAssets.EDIT_ICON,

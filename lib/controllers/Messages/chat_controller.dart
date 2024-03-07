@@ -59,7 +59,7 @@ class ChatController extends GetxController {
   //............. get all conversation
   Stream<List<Chatmodel>> getConversation() {
     chatService.updateUnreadCount(docId.value, userController.userModel.value.uid!, 0, members);
-    // updateLastSeenMethod();
+    // chatService.readReceipts(docId.value, userController.userModel.value.uid!);
     return chatService.getConversation(docId.value, userController.userModel.value.uid!, members);
   }
 
@@ -99,6 +99,8 @@ class ChatController extends GetxController {
     // try {
     DocumentSnapshot? newMessageDoc = await chatService.sendMessage(docId.value, chatmodel, members);
     sendMsgLoader.value = false;
+    await chatService.readReceipts(chatcontroller.docId.value, userController.userModel.value.uid.toString());
+
     return newMessageDoc;
     // } catch (e) {
     //   print('--------- Err0rrrrrrrr');
@@ -110,6 +112,11 @@ class ChatController extends GetxController {
 //........Delete Chat
   Future<bool> deleteMessage(String messageDoc, String docID) async {
     return await chatService.deleteChatAndUpdateModel(messageDoc, docID);
+  }
+
+  //.........Receipts chat
+  Future<bool> readReceipts(String messageDoc,String uid) async{
+    return await chatService.readReceipts(messageDoc, uid);
   }
 
 //........... Compress images
@@ -140,6 +147,7 @@ class ChatController extends GetxController {
 
 //.............. get device token
   Future<void> sendNotificationMethod(String notificationType, String msg, {String? image}) async {
+
     // print(senderName);
     // print(memberId);
     for (var element in memberId) {

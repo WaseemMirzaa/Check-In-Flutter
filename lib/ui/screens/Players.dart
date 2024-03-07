@@ -239,13 +239,11 @@ class _PlayersViewState extends State<PlayersView> {
                                               children: [
                                                 Container(
                                                   height: 13.5.h,
-                                                  width: 24.w,
+                                                  width: 13.5.h,
                                                   decoration: BoxDecoration(
                                                     shape: BoxShape.circle,
                                                     border: user.photoUrl == ""
-                                                        ? Border.all(
-                                                            width: 2,
-                                                            color: appGreenColor)
+                                                        ? Border.all(width: 2, color: appGreenColor)
                                                         : null,
                                                   ),
                                                   child: ClipOval(

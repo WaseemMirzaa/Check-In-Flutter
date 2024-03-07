@@ -28,5 +28,6 @@ class AppAssets {
   static const PLAYER = 'assets/images/player.png';
   static const PLAYSTORE_ICON = 'assets/images/playstore-icon.png';
   static const USER_ICON = 'assets/images/user_icon.png';
+  static const DOUBLE_TICK = 'assets/images/double-tick.png';
   ////
 }

@@ -1,14 +1,15 @@
 import 'dart:async';
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:check_in/Services/push_notification_service.dart';
 import 'package:check_in/controllers/Messages/chat_controller.dart';
 import 'package:check_in/controllers/user_controller.dart';
 import 'package:check_in/core/constant/constant.dart';
 import 'package:check_in/core/constant/temp_language.dart';
 import 'package:check_in/model/Message%20and%20Group%20Message%20Model/chat_model.dart';
+import 'package:check_in/model/notification_model.dart';
 import 'package:check_in/ui/screens/%20Messages%20NavBar/edit_group_detail/edit_group_details.dart';
 import 'package:check_in/ui/screens/%20Messages%20NavBar/other_profile/other_profile_view.dart';
-import 'package:check_in/ui/screens/player.dart';
 import 'package:check_in/ui/widgets/custom_appbar.dart';
 import 'package:check_in/utils/Constants/images.dart';
 import 'package:check_in/utils/colors.dart';
@@ -118,10 +119,14 @@ class _ChatScreenState extends State<ChatScreen> {
   @override
   void initState() {
     super.initState();
+
     //   if (widget.isFirstTime) {
     //     null;
     //   } else {
 
+    // chatcontroller.docId.value == userController.userModel ? chatcontroller.readReceipts(chatcontroller.docId.value) : null;
+    // print("---------DOC ID IS: ${chatcontroller.docId.value}");
+    // print("---------NOTIFY ID IS: ${NotificationModel.docId}");
     controller.getSingleMessage();
     controller.issticker.value = true;
     controller.chatfieldController.addListener(() {
@@ -395,7 +400,7 @@ class _ChatScreenState extends State<ChatScreen> {
                                         : ImageDateContainer(
                                             chat: chat,
                                             mymsg: mymsg,
-
+                                        isGroup: controller.isgroup
                                             // showLastSeen: showLastSeen,
                                           )
                                   ],
@@ -469,12 +474,12 @@ class _ChatScreenState extends State<ChatScreen> {
                                     child: ChatButton(
                                   onTap: () {
                                     controller.updateRequestStatus(RequestStatusEnum.block.name, 'Blocked', 0);
-                                    controller.sendNotificationMethod(
-                                        '', '${userController.userModel.value.userName!} block you');
+                                    // controller.sendNotificationMethod(
+                                    //     '', '${userController.userModel.value.userName!} block you');
                                   },
                                   text: TempLanguage.block,
                                   textColor: appRedColor,
-                                  buttonColor: greyColor.withOpacity(0.7),
+                                  buttonColor: Colors.white.withOpacity(0.7),
                                 )),
                                 horizontalGap(2.w),
                                 Flexible(
@@ -483,11 +488,11 @@ class _ChatScreenState extends State<ChatScreen> {
                                     controller.updateRequestStatus(RequestStatusEnum.delete.name, 'Request Deleted', 0);
                                     Get.back();
                                     controller.sendNotificationMethod(
-                                        '', '${userController.userModel.value.userName!} delete message request');
+                                        '', '${userController.userModel.value.userName!} denied message request');
                                   },
                                   text: TempLanguage.delete,
                                   textColor: appRedColor,
-                                  buttonColor: greyColor.withOpacity(0.7),
+                                      buttonColor: Colors.white.withOpacity(0.7),
                                 )),
                                 horizontalGap(2.w),
                                 Flexible(
@@ -499,8 +504,8 @@ class _ChatScreenState extends State<ChatScreen> {
                                         '', '${userController.userModel.value.userName!} accept request');
                                   },
                                   text: TempLanguage.accept,
-                                  textColor: appWhiteColor,
-                                  buttonColor: greyColor.withOpacity(0.7),
+                                  textColor: Colors.blue,
+                                      buttonColor: Colors.white.withOpacity(0.7),
                                 )),
                               ],
                             )
@@ -550,7 +555,7 @@ class _ChatScreenState extends State<ChatScreen> {
                                 controller.updateRequestStatus(
                                     RequestStatusEnum.pending.name, TempLanguage.messageRequest, 1);
                                 controller.sendNotificationMethod(
-                                    '', '${userController.userModel.value.userName!} send a request message');
+                                    '', '${userController.userModel.value.userName!} sent a message request');
                               },
                               text: "${TempLanguage.requestAgain} ",
                               buttonColor: appGreenColor,
@@ -569,11 +574,13 @@ class _ChatScreenState extends State<ChatScreen> {
                           color: appWhiteColor,
                           borderRadius: BorderRadius.circular(10),
                           boxShadow: [
+
                             BoxShadow(
                               color: blackTranslucentColor,
                               offset: const Offset(0, 1),
                               blurRadius: 6,
                             ),
+
                           ],
                         ),
                         child: Row(
@@ -611,8 +618,8 @@ class _ChatScreenState extends State<ChatScreen> {
                               width: 35.w,
                               onTap: () {
                                 controller.updateRequestStatus(RequestStatusEnum.accept.name, 'Unblocked', 0);
-                                controller.sendNotificationMethod(
-                                    '', "${userController.userModel.value.userName!} unblock you");
+                                // controller.sendNotificationMethod(
+                                //     '', "${userController.userModel.value.userName!} unblock you");
                               },
                               text: "${TempLanguage.unblock} ",
                               buttonColor: appGreenColor,
@@ -753,6 +760,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
                 //.................Gallery
                 GestureDetector(
+
                   onTap: () async {
                     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
                     if (pickedFile != null) {

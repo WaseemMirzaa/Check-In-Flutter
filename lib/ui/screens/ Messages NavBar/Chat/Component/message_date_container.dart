@@ -1,4 +1,5 @@
 import 'package:check_in/controllers/Messages/chat_controller.dart';
+import 'package:check_in/core/constant/app_assets.dart';
 import 'package:check_in/core/constant/temp_language.dart';
 import 'package:check_in/utils/DateTimeUtils.dart';
 import 'package:flutter/material.dart';
@@ -29,6 +30,7 @@ class MessageDateContainer extends StatelessWidget {
       this.isGroup});
 
   final chatController = Get.find<ChatController>();
+
 
   @override
   Widget build(BuildContext context) {
@@ -65,9 +67,9 @@ class MessageDateContainer extends StatelessWidget {
             InkWell(
               onLongPress: mymsg! && chat!.isDelete == null || chat!.isDelete == false
                   ? () {
-                      showAdaptiveDialog(
+                      showDialog(
                           context: context,
-                          builder: (context) => AlertDialog.adaptive(
+                          builder: (context) => AlertDialog(
                                 title: Text(
                                   'Delete Message',
                                   style: TextStyle(fontWeight: FontWeight.w600, color: appBlackColor),
@@ -109,6 +111,7 @@ class MessageDateContainer extends StatelessWidget {
                           textStyle: TextStyle(
                               fontWeight: FontWeight.normal,
                               fontSize: 12,
+                              fontStyle: chat!.isDelete == true ? FontStyle.italic : null,
                               color: chat!.isDelete == true
                                   ? appWhiteColor
                                   : mymsg!
@@ -165,7 +168,7 @@ class MessageDateContainer extends StatelessWidget {
                         painter:
                             CustomShape(bgcolor: chat!.isDelete == true ? greyColor.withOpacity(0.2) : appGreenColor),
                       )
-                    : const SizedBox()
+                    : const SizedBox(),
           ],
         ),
         verticalGap(8),
@@ -173,6 +176,8 @@ class MessageDateContainer extends StatelessWidget {
           children: [
             poppinsText(time, 10, medium, greyColor.withOpacity(1)),
             horizontalGap(5),
+            chat!.isDelete !=true && mymsg! && chat!.isRead != true && isGroup != true ? Icon(Icons.check,size: 15,color: greyColor,) : chat!.isDelete !=true && isGroup != true && mymsg! && chat!.isRead == true ? const ImageIcon(AssetImage(AppAssets.DOUBLE_TICK),size: 15,color: greenColor) : const SizedBox(),
+
             // mymsg!
             //     ? poppinsText('✓', 10, medium, greyColor.withOpacity(1))
             //     : const SizedBox(),

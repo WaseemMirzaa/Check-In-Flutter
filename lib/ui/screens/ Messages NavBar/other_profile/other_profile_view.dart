@@ -151,7 +151,6 @@ class _OtherProfileViewState extends State<OtherProfileView> {
                   flex: 2,
                   child: Column(
                     children: [
-
                       Container(
                         padding:
                         const EdgeInsets.only(

@@ -56,6 +56,7 @@ class _HistoryViewState extends State<HistoryView> {
         appBar: AppBar(
           backgroundColor: appWhiteColor,
           centerTitle: true,
+          automaticallyImplyLeading: false,
           title: Text(
             TempLanguage.history,
             style: TextStyle(

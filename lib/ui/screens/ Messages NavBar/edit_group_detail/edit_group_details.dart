@@ -74,11 +74,11 @@ class _EditGroupDetailsState extends State<EditGroupDetails> {
             backgroundColor: appRedColor,
             child: const Icon(Icons.logout),
             onPressed: () {
-              showAdaptiveDialog(
+              showDialog(
                   context: context,
-                  builder: (context) => AlertDialog.adaptive(
+                  builder: (context) => AlertDialog(
                         title: Text(
-                          'Group Left',
+                          'Left Group',
                           style: TextStyle(fontWeight: FontWeight.w700, color: appBlackColor),
                         ),
                         content: Text(

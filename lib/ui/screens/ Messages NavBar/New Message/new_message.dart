@@ -111,7 +111,7 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
                         if (value['isNewChat'] == true) {
                           //....... send notification
                           chatcontroller.sendNotificationMethod('',
-                              '${userController.userModel.value.userName!} send a request message');
+                              '${userController.userModel.value.userName!} sent a message request');
                         } else {
                           successMessage('Chat already exist');
                         }
