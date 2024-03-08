@@ -698,12 +698,18 @@ class MessageService {
   }
 
 //............. get device token
-  Future<String> getDeviceToken(String id) async {
+  Future<List<dynamic>> getDeviceToken(String id) async {
     DocumentReference userRef = FirebaseFirestore.instance.collection('USER').doc(id);
 
     DocumentSnapshot userSnapshot = await userRef.get();
     Map<String, dynamic>? userData = userSnapshot.data() as Map<String, dynamic>;
-    List<dynamic>? deviceTokens = userData[UserKey.DEVICE_TOKEN];
-    return deviceTokens?.first ?? '';
+    // print(userData[UserKey.DEVICE_TOKEN]);
+    //
+    // print(userData[UserKey.DEVICE_TOKEN].runtimeType);
+    // print(userData[UserKey.DEVICE_TOKEN]);
+
+    List<dynamic>? deviceTokens = userData[UserKey.DEVICE_TOKEN] ;
+    return deviceTokens ?? [];
+
   }
 }

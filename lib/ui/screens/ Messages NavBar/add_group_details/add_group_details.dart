@@ -77,7 +77,7 @@ class AddGroupDetails extends GetView<GroupDetailController> {
                   newMessageController.searchQuery.value = '';
                   controller.loadNewGroup.value = false;
                   chatcontroller.sendNotificationMethod('',
-                      '${userController.userModel.value.userName!} created new group with you');
+                      '${userController.userModel.value.userName!} created a new group with you');
                   pushNewScreen(context, screen: ChatScreen()).then((_) {
                     Get.back();
                     Get.back();

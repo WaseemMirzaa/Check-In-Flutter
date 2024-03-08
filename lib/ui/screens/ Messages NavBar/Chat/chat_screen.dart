@@ -501,7 +501,7 @@ class _ChatScreenState extends State<ChatScreen> {
                                     controller.updateRequestStatus(
                                         RequestStatusEnum.accept.name, 'Request Accepted', 1);
                                     controller.sendNotificationMethod(
-                                        '', '${userController.userModel.value.userName!} accept request');
+                                        '', '${userController.userModel.value.userName!} accepted request');
                                   },
                                   text: TempLanguage.accept,
                                   textColor: Colors.blue,

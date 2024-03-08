@@ -69,7 +69,7 @@ class PushNotificationServices {
       'High Importance Notifications', // title
       description:
           'This channel is used for important notifications.', // description
-      importance: Importance.high,
+      importance: Importance.max,
     );
 
     print('🟢🟢🟢🟢🟢 AndroidNotificationChannel');
@@ -202,7 +202,7 @@ class PushNotificationServices {
                   )));
         }
         //....
-        
+
         // }
         // }
       });
@@ -294,7 +294,7 @@ class PushNotificationServices {
 }
 
 Future<void> sendNotification(
-    {required String token,
+    {required List<dynamic> token,
     required String notificationType,
     required String title,
     required String msg,
@@ -306,27 +306,29 @@ Future<void> sendNotification(
   var completeUrl =
       'https://us-central1-check-in-7ecd7.cloudfunctions.net/sendNotification';
   final headers = {'Content-Type': 'application/json'};
-  final body = jsonEncode({
-    'token': token,
-    'title': title,
-    'body': msg,
-    'notificationType': 'message',
-    "docId": docId,
-    "name": name,
-    "isGroup": isGroup,
-    "image": image,
-    "memberIds": memberIds
-  });
+  // Loop through each token and send individual notifications
+  for (final userToken in token) {
+    final body = jsonEncode({
+      'token': userToken, // Use each token in the loop
+      'title': title,
+      'body': msg,
+      'notificationType': notificationType,
+      'docId': docId,
+      'name': name,
+      'isGroup': isGroup,
+      'image': image,
+      'memberIds': memberIds,
+    });
 
-  try {
-    final response =
-        await http.post(Uri.parse(completeUrl), headers: headers, body: body);
-    if (response.statusCode == 200) {
-      print('🟡🟡🟡Notification sent');
-    } else {
-      print('🔴🔴🔴Error sending notification: ${response.statusCode}');
+    try {
+      final response =
+      await http.post(Uri.parse(completeUrl), headers: headers, body: body);
+      if (response.statusCode == 200) {
+        print('🟡🟡🟡Notification sent');
+      } else {
+        print('🔴🔴🔴Error sending notification: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('🔴🔴🔴Error sending notification: $e');
     }
-  } catch (e) {
-    print('🔴🔴🔴Error sending notification: $e');
-  }
-}
+  }}

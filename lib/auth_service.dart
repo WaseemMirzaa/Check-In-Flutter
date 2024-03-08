@@ -31,7 +31,7 @@ Future<bool> signUp(
         .then((value) async {
 
           List<String> nameSearchParams = setSearchParam(userName);
-         final token = await FCMManager.getFCMToken();
+         String token = await FCMManager.getFCMToken();
           snap
           .collection(Collections.USER)
           .doc(auth.currentUser!.uid)
@@ -44,7 +44,7 @@ Future<bool> signUp(
              UserKey.PARAMS: FieldValue.arrayUnion(nameSearchParams),
              //TODO: Change it to arrayUnion
              // UserKey.DEVICE_TOKEN:
-             //     FieldValue.arrayUnion([FCMManager.fcmToken!])
+                 // FieldValue.arrayUnion([token])
              UserKey.DEVICE_TOKEN: [token]
           }).then((value) => pushNewScreen(context, screen: const Home(), withNavBar: false));
       }
@@ -66,11 +66,15 @@ Future<void> login(email, password, context) async {
         .then((value) async {
       // print(FCMManager.fcmToken!);
       final token = await FCMManager.getFCMToken();
+      List<String> tokens =[];
+      tokens.add(token);
+      print(token);
+      print('========> toeken');
       if (token.isNotEmpty) {
         snap.collection(Collections.USER).doc(value.user!.uid).update(
           {
-            // UserKey.DEVICE_TOKEN: FieldValue.arrayUnion([FCMManager.fcmToken!])
-            UserKey.DEVICE_TOKEN: [token]
+            UserKey.DEVICE_TOKEN: FieldValue.arrayUnion(tokens)
+            // UserKey.DEVICE_TOKEN: [token]
           },
         );
       }
@@ -95,6 +99,7 @@ Future<void> logout(context) async {
   // userController.userModel.value = UserModel();
   SharedPreferences prefs = await SharedPreferences.getInstance();
   prefs.remove('email');
+  final token = await FCMManager.getFCMToken();
 
   //Checkout
 
@@ -102,7 +107,9 @@ Future<void> logout(context) async {
     UserKey.CHECKED_IN: false,
     CourtKey.COURT_LAT: FieldValue.delete(),
     CourtKey.COURT_LNG: FieldValue.delete(),
-    UserKey.DEVICE_TOKEN: []
+    // UserKey.DEVICE_TOKEN: []
+    UserKey.DEVICE_TOKEN: FieldValue.arrayRemove([token])
+
   });
   auth.signOut().then(
         (value) =>

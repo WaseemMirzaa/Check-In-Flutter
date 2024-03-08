@@ -152,7 +152,9 @@ class ChatController extends GetxController {
     // print(memberId);
     for (var element in memberId) {
       if (element != userController.userModel.value.uid) {
-        String deviceToken = await chatService.getDeviceToken(element);
+        List<dynamic> deviceToken = await chatService.getDeviceToken(element);
+        // print(deviceToken.first);
+        // print(deviceToken.first.runtimeType);
         sendNotification(
             token: deviceToken,
             notificationType: notificationType,
