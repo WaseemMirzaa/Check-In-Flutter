@@ -78,11 +78,11 @@ class _EditGroupDetailsState extends State<EditGroupDetails> {
                   context: context,
                   builder: (context) => AlertDialog(
                         title: Text(
-                          'Left Group',
+                          'Leave Group',
                           style: TextStyle(fontWeight: FontWeight.w700, color: appBlackColor),
                         ),
                         content: Text(
-                          'Do you really want to left the group?',
+                          'Do you really want to leave the group?',
                           style: TextStyle(fontSize: 14, color: appBlackColor),
                         ),
                         actions: [

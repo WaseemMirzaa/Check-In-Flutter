@@ -130,7 +130,7 @@ Future<void> delAcc(context) async {
     builder: (BuildContext context) => AlertDialog(
       title: const Text('Confirmation'),
       content: const Text(
-          'Are you sure you want to delete you account?\nThese changes are irreversible.'),
+          'Are you sure you want to delete your account?\nThese changes are irreversible.'),
       actions: <Widget>[
         OutlinedButton(
           child: const Text('Cancel'),
