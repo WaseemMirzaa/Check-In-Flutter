@@ -73,8 +73,9 @@ dependencies:
   flutter_image_compress: ^2.1.0
   dartz: ^0.10.1
   wakelock_plus: ^1.1.4
+  swipe_to: ^1.0.6
   google_maps_flutter:
-      path: /Users/developlogix.dev1/Documents/DevelopLogix/Check-In-Flutter/google_maps_flutter/google_maps_flutter
+      path: /Users/user/Documents/OwnProjects/Check-In-Flutter/google_maps_flutter/google_maps_flutter
   device_preview: ^1.1.0
   permission_handler: ^11.0.1
 #

@@ -10,6 +10,7 @@ import 'package:check_in/utils/gaps.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
+import 'package:swipe_to/swipe_to.dart';
 import '../../../../utils/Constants/global_variable.dart';
 import '../../../../utils/loader.dart';
 import '../../../../controllers/Messages/messages_controller.dart';
@@ -60,31 +61,39 @@ class MessageScreen extends GetView<MessageController> {
                                     .toLowerCase()
                                     .contains(controller.searchQuery.toLowerCase())) {
                                   return Padding(
-                                    padding: const EdgeInsets.symmetric(vertical: 6),
-                                    child: MessageListTile(
-                                      message: snapshot.data![index],
-                                      ontap: () {
-                                        GlobalVariable.docId = chatcontroller.docId.value = message.id!;
-                                        //.........................
-                                        chatcontroller.name.value = message.name!;
-                                        chatcontroller.isgroup = message.isgroup!;
-                                        chatcontroller.image.value = message.image!;
-                                        chatcontroller.memberId.value = message.memberIds!;
-                                        chatcontroller.senderName.value = message.yourname!;
-                                        chatcontroller.members.value = message.members ?? [];
-                                        //...............
-                                        // chatcontroller.updateLastSeenMethod();
-                                        pushNewScreen(
-                                          context,
-                                          screen: ChatScreen(
-                                        
-                                            //   name: message.name!.obs,isGroup: message.isgroup,
-                                            // image:message.image!.obs,memberId: message.memberIds!.obs,senderName: message.senderName!.obs,
-                                          ),
-                                        );
-                                      },
-                                    ),
-                                  );
+                                      padding: const EdgeInsets.symmetric(vertical: 6),
+                                      child: SwipeTo(
+                                        swipeSensitivity: 5,
+                                        iconOnLeftSwipe: Icons.delete,
+                                        onLeftSwipe: (_) {
+                                          //------- delete message
+                                          controller.deleteMessage(
+                                              snapshot.data![index].id!, userController.userModel.value.uid!);
+                                        },
+                                        child: MessageListTile(
+                                          message: snapshot.data![index],
+                                          ontap: () {
+                                            GlobalVariable.docId = chatcontroller.docId.value = message.id!;
+                                            //.........................
+                                            chatcontroller.name.value = message.name!;
+                                            chatcontroller.isgroup = message.isgroup!;
+                                            chatcontroller.image.value = message.image!;
+                                            chatcontroller.memberId.value = message.memberIds!;
+                                            chatcontroller.senderName.value = message.yourname!;
+                                            chatcontroller.members.value = message.members ?? [];
+                                            //...............
+                                            // chatcontroller.updateLastSeenMethod();
+                                            pushNewScreen(
+                                              context,
+                                              screen: const ChatScreen(
+
+                                                  //   name: message.name!.obs,isGroup: message.isgroup,
+                                                  // image:message.image!.obs,memberId: message.memberIds!.obs,senderName: message.senderName!.obs,
+                                                  ),
+                                            );
+                                          },
+                                        ),
+                                      ));
                                 } else {
                                   return Container();
                                 }

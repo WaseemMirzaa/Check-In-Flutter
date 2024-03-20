@@ -72,7 +72,10 @@ class _EditGroupDetailsState extends State<EditGroupDetails> {
     return Scaffold(
         floatingActionButton: FloatingActionButton(
             backgroundColor: appRedColor,
-            child: const Icon(Icons.logout),
+            child: Icon(
+              Icons.logout,
+              color: appWhiteColor,
+            ),
             onPressed: () {
               showDialog(
                   context: context,

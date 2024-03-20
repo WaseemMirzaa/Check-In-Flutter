@@ -15,6 +15,7 @@ class Messagemodel {
   String? recieverName;
   String? recieverId;
   List? memberIds;
+  List? deleteIds;
   List? members;
   bool? showMessageTile;
   Messagemodel({
@@ -32,11 +33,13 @@ class Messagemodel {
     this.senderName,
     this.recieverName,
     this.memberIds,
+    this.deleteIds,
     this.showMessageTile,
     this.members,
   });
 
-  factory Messagemodel.fromJson(Map<String, dynamic> json, {name, image, unread, showMessageTile, yourName}) {
+  factory Messagemodel.fromJson(Map<String, dynamic> json,
+      {name, image, unread, showMessageTile, yourName, deleteIds}) {
     return Messagemodel(
         id: json[MessageField.ID],
         name: name ?? '',
@@ -51,6 +54,7 @@ class Messagemodel {
         recieverName: json[MessageField.RECIEVER_NAME],
         recieverId: json[MessageField.RECIEVER_ID],
         memberIds: json[MessageField.MEMBER_IDS],
+        deleteIds: deleteIds,
         members: json[MessageField.MEMBERS],
         showMessageTile: showMessageTile,
         yourname: yourName);

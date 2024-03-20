@@ -60,7 +60,7 @@ class ChatController extends GetxController {
   Stream<List<Chatmodel>> getConversation() {
     chatService.updateUnreadCount(docId.value, userController.userModel.value.uid!, 0, members);
     // chatService.readReceipts(docId.value, userController.userModel.value.uid!);
-    return chatService.getConversation(docId.value, userController.userModel.value.uid!, members);
+    return chatService.getNewConversation(docId.value, userController.userModel.value.uid!, members);
   }
 
   //............. get message request status
@@ -88,7 +88,6 @@ class ChatController extends GetxController {
       message = chatfieldController.text;
       type = 'message';
     } else {
-      print(fileImage.value!.path);
       await compressImage();
       message = originalPath;
       type = 'image';
@@ -99,6 +98,9 @@ class ChatController extends GetxController {
     // try {
     DocumentSnapshot? newMessageDoc = await chatService.sendMessage(docId.value, chatmodel, members);
     sendMsgLoader.value = false;
+    if (newMessageDoc != null) {
+      await chatService.updateDelete(docId.value, uid);
+    }
     await chatService.readReceipts(chatcontroller.docId.value, userController.userModel.value.uid.toString());
 
     return newMessageDoc;
@@ -115,7 +117,7 @@ class ChatController extends GetxController {
   }
 
   //.........Receipts chat
-  Future<bool> readReceipts(String messageDoc,String uid) async{
+  Future<bool> readReceipts(String messageDoc, String uid) async {
     return await chatService.readReceipts(messageDoc, uid);
   }
 
@@ -147,7 +149,6 @@ class ChatController extends GetxController {
 
 //.............. get device token
   Future<void> sendNotificationMethod(String notificationType, String msg, {String? image}) async {
-
     // print(senderName);
     // print(memberId);
     for (var element in memberId) {

@@ -61,13 +61,15 @@ class MessageService {
               Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
               bool showMessagetile = false;
               String name, imagepath, yourname = '';
-
+              List delete = [];
               if (data[MessageField.IS_GROUP] == true) {
                 name = data[MessageField.GROUP_NAME];
                 imagepath = data[MessageField.GROUP_IMG];
                 mem = data[MessageField.MEMBERS];
                 yourname = data[MessageField.GROUP_NAME];
-
+                if (data.containsKey(MessageField.DELETE_IDS)) {
+                  delete = data[MessageField.DELETE_IDS];
+                }
                 for (var val in mem) {
                   if (val[MessageField.MEMBER_UID] == myId) {
                     unread = val[MessageField.MEMBER_UNREAD_COUNT];
@@ -92,9 +94,24 @@ class MessageService {
                         data[MessageField.REQUEST_STATUS] == RequestStatusEnum.delete.name
                     ? false
                     : true;
+                if (data.containsKey(MessageField.DELETE_IDS)) {
+                  delete = data[MessageField.DELETE_IDS];
+                }
+              }
+              if (delete.isNotEmpty) {
+                for (var del in delete) {
+                  if (del[MessageField.MEMBER_UID] == myId && del[MessageField.IS_DELETED] == true) {
+                    showMessagetile = false;
+                  }
+                }
               }
               return Messagemodel.fromJson(doc.data() as Map<String, dynamic>,
-                  name: name, image: imagepath, unread: unread, showMessageTile: showMessagetile, yourName: yourname);
+                  name: name,
+                  deleteIds: delete,
+                  image: imagepath,
+                  unread: unread,
+                  showMessageTile: showMessagetile,
+                  yourName: yourname);
             }).toList());
   }
 
@@ -119,17 +136,58 @@ class MessageService {
   }
 
 //............ Get conversations
-  Stream<List<Chatmodel>> getConversation(String docId, String uId, List mem) {
+  // Stream<List<Chatmodel>> getConversation(String docId, String uId, List mem) {
+  //   return _messagesCollection
+  //       .doc(docId)
+  //       .collection(Collections.CHAT)
+  //       .orderBy(ChatField.TIME_STAMP, descending: true)
+  //       .snapshots()
+  //       .map((querySnapshot) => querySnapshot.docs.map<Chatmodel>((doc) {
+  //             // updateLastSeen(docId, uId);
+  //             readReceipts(docId, uId);
+  //             return Chatmodel.fromJson(doc.data(), docID: doc.id);
+  //           }).toList());
+  // }
+
+  Stream<List<Chatmodel>> getNewConversation(String docId, String uId, List mem) {
     return _messagesCollection
         .doc(docId)
         .collection(Collections.CHAT)
         .orderBy(ChatField.TIME_STAMP, descending: true)
         .snapshots()
-        .map((querySnapshot) => querySnapshot.docs.map<Chatmodel>((doc) {
-              // updateLastSeen(docId, uId);
+        .asyncMap((querySnapshot) async {
+      List<Chatmodel> chatModels = [];
+      DocumentSnapshot messageSnapshot = await _messagesCollection.doc(docId).get();
+      Map<String, dynamic> data = messageSnapshot.data() as Map<String, dynamic>;
+      if (messageSnapshot.exists && data.containsKey(MessageField.DELETE_IDS)) {
+        List<dynamic> deleteIds = data[MessageField.DELETE_IDS];
+        for (var doc in querySnapshot.docs) {
+          bool excludeMessage = false;
+          for (var deleteId in deleteIds) {
+            if (deleteId.containsKey(MessageField.MEMBER_UID) &&
+                deleteId[MessageField.MEMBER_UID] == uId &&
+                deleteId.containsKey(MessageField.DELETE_TIMESTAMP)) {
+              String deleteTimestamp = deleteId[MessageField.DELETE_TIMESTAMP];
+              String chatTimestamp = doc.data()[ChatField.TIME_STAMP];
+              if (chatTimestamp.compareTo(deleteTimestamp) > 0) {
+                excludeMessage = true;
+                break;
+              }
+            }
+          }
+          if (excludeMessage) {
+            chatModels.add(Chatmodel.fromJson(doc.data(), docID: doc.id));
+          }
+        }
+      } else {
+        chatModels.addAll(querySnapshot.docs.map((doc) => Chatmodel.fromJson(doc.data(), docID: doc.id)));
+      }
+
+      // updateLastSeen(docId, uId);
       readReceipts(docId, uId);
-              return Chatmodel.fromJson(doc.data(), docID: doc.id);
-            }).toList());
+
+      return chatModels;
+    });
   }
 
   // Function to fetch the online status of a user
@@ -154,6 +212,62 @@ class MessageService {
     } catch (e) {
       print('Error fetching online status: $e');
       return '';
+    }
+  }
+
+//.............. Delete message
+  void deleteMessage(String docID, String userID) async {
+    DocumentReference docRef = _messagesCollection.doc(docID);
+    DocumentSnapshot snapshot = await docRef.get();
+    Map<String, dynamic> data = snapshot.data() as Map<String, dynamic>;
+
+    if (snapshot.exists) {
+      List<dynamic> deleteIds = data[MessageField.DELETE_IDS] ?? [];
+
+      bool found = false;
+
+      for (int i = 0; i < deleteIds.length; i++) {
+        if (deleteIds[i][MessageField.MEMBER_UID] == userID) {
+          deleteIds[i][MessageField.IS_DELETED] = true;
+          deleteIds[i][MessageField.DELETE_TIMESTAMP] = DateTime.now().toString();
+          found = true;
+          break;
+        }
+      }
+
+      if (!found) {
+        Map<String, dynamic> userData = {
+          MessageField.MEMBER_UID: userID,
+          MessageField.IS_DELETED: true,
+          MessageField.DELETE_TIMESTAMP: DateTime.now().toString()
+        };
+        deleteIds.add(userData);
+      }
+
+      await _messagesCollection.doc(docID).set({MessageField.DELETE_IDS: deleteIds}, SetOptions(merge: true));
+    }
+  }
+
+//............ Update delete data array
+  Future<void> updateDelete(String docId, String userId) async {
+    try {
+      DocumentReference docRef = _messagesCollection.doc(docId);
+      DocumentSnapshot snapshot = await docRef.get();
+      Map<String, dynamic> data = snapshot.data() as Map<String, dynamic>;
+
+      if (snapshot.exists) {
+        List<dynamic> deleteIds = data[MessageField.DELETE_IDS] ?? [];
+
+        for (int i = 0; i < deleteIds.length; i++) {
+          if (deleteIds[i][MessageField.MEMBER_UID] != userId && deleteIds[i][MessageField.IS_DELETED] == true) {
+            deleteIds[i][MessageField.IS_DELETED] = false;
+          }
+        }
+
+        await _messagesCollection.doc(docId).set({MessageField.DELETE_IDS: deleteIds}, SetOptions(merge: true));
+      }
+    } catch (error) {
+      print("Error updating deleteIds: $error");
     }
   }
 
@@ -252,8 +366,9 @@ class MessageService {
     try {
       final querySnapshot = await _messagesCollection
           .doc(messageDoc)
-          .collection(Collections.CHAT).where('id', isNotEqualTo:  uid)
-           .where('isRead', isEqualTo: null)
+          .collection(Collections.CHAT)
+          .where('id', isNotEqualTo: uid)
+          .where('isRead', isEqualTo: null)
           .get();
 
       if (querySnapshot.docs.isNotEmpty) {
@@ -708,8 +823,7 @@ class MessageService {
     // print(userData[UserKey.DEVICE_TOKEN].runtimeType);
     // print(userData[UserKey.DEVICE_TOKEN]);
 
-    List<dynamic>? deviceTokens = userData[UserKey.DEVICE_TOKEN] ;
+    List<dynamic>? deviceTokens = userData[UserKey.DEVICE_TOKEN];
     return deviceTokens ?? [];
-
   }
 }
