@@ -5,11 +5,9 @@ import 'package:check_in/Services/push_notification_service.dart';
 import 'package:check_in/binding.dart';
 import 'package:check_in/model/notification_model.dart';
 import 'package:check_in/ui/screens/splash.dart';
-import 'package:check_in/ui/screens/start.dart';
 import 'package:device_preview/device_preview.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get_navigation/src/root/get_material_app.dart';
@@ -30,13 +28,13 @@ Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await init;
   // await Firebase.initializeApp();
   await initialize();
-  FlutterLocalNotificationsPlugin notification = FlutterLocalNotificationsPlugin();
-  AndroidNotificationChannel androidNotificationChannel = const AndroidNotificationChannel(
-    'high_importance_channel', // id
-    'High Importance Notifications', // title
-    description: 'This channel is used for important notifications.', // description
-    importance: Importance.high,
-  );
+  // FlutterLocalNotificationsPlugin notification = FlutterLocalNotificationsPlugin();
+  // AndroidNotificationChannel androidNotificationChannel = const AndroidNotificationChannel(
+  //   'high_importance_channel', // id
+  //   'High Importance Notifications', // title
+  //   description: 'This channel is used for important notifications.', // description
+  //   importance: Importance.high,
+  // );
 
   print("notification received in BACKGROUND");
   print(message.data);
@@ -92,7 +90,7 @@ void main() async {
   // }
   await Firebase.initializeApp();
   _messaging = FirebaseMessaging.instance;
-  if(Platform.isIOS){
+  if (Platform.isIOS) {
     await _messaging.requestPermission();
   }
   final PushNotificationServices pushNotificationService = PushNotificationServices();
@@ -107,9 +105,9 @@ void main() async {
       // DevicePreview(
       // enabled: !kReleaseMode,
       // builder: (context) =>
-          MyApp()
-  // )
-  );
+      const MyApp()
+      // )
+      );
 }
 
 class MyApp extends StatelessWidget {
@@ -135,7 +133,7 @@ class MyApp extends StatelessWidget {
             scaffoldBackgroundColor: whiteColor,
           ),
           initialBinding: MyBinding(),
-          home: Splash(),
+          home: const Splash(),
         );
       },
     );

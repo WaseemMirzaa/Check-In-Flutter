@@ -19,12 +19,12 @@ class MessageController extends GetxController {
     return update;
   }
 
-  Future<bool> leftGroup(String docID) async {
-    final left = await chatService.removeCurrentUserFromMemberIds(docID);
-    return left;
-  }
+  // Future<bool> leftGroup(String docID) async {
+  //   final left = await chatService.removeGroupUser(docID,uid);
+  //   return left;
+  // }
 
-  void deleteMessage(String docID, String userID) async {
-    chatService.deleteMessage(docID, userID);
+  Future deleteMessage(String docID, String userID) async {
+    await chatService.deleteMessage(docID, userID);
   }
 }

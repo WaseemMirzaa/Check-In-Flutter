@@ -1,4 +1,3 @@
-import 'package:check_in/core/constant/constant.dart';
 import 'package:check_in/model/Message%20and%20Group%20Message%20Model/group_member_model.dart';
 import 'package:get/get.dart';
 
@@ -36,10 +35,10 @@ class GroupmemberController extends GetxController {
 
 //............ remove group members
   Future<void> removeGroupMember(String memberId) async {
-    messageService.removeMember(memberId, docid);
+    messageService.removeGroupUser(docid, memberId);
   }
 
-   Future<void> leftGroup(String memberId, String docID) async {
-    messageService.removeMember(memberId, docID);
+  Future<void> leftGroup(String memberId, String docID) async {
+    messageService.removeGroupUser(docID, memberId);
   }
 }

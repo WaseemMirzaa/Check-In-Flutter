@@ -29,26 +29,21 @@ Future<bool> signUp(
         //     await addUserData(email: email, fullName: userName))
         .then((value) => auth.currentUser?.updateDisplayName(userName))
         .then((value) async {
-
-          List<String> nameSearchParams = setSearchParam(userName);
-         String token = await FCMManager.getFCMToken();
-          snap
-          .collection(Collections.USER)
-          .doc(auth.currentUser!.uid)
-          .set({
-             UserKey.USER_NAME: auth.currentUser!.displayName,
-             UserKey.EMAIL: auth.currentUser!.email,
-             UserKey.UID: auth.currentUser!.uid,
-             UserKey.CHECKED_IN: false,
-             UserKey.IS_VERIFIED: false,
-             UserKey.PARAMS: FieldValue.arrayUnion(nameSearchParams),
-             //TODO: Change it to arrayUnion
-             // UserKey.DEVICE_TOKEN:
-                 // FieldValue.arrayUnion([token])
-             UserKey.DEVICE_TOKEN: [token]
-          }).then((value) => pushNewScreen(context, screen: const Home(), withNavBar: false));
-      }
-    );
+      List<String> nameSearchParams = setSearchParam(userName);
+      String token = await FCMManager.getFCMToken();
+      snap.collection(Collections.USER).doc(auth.currentUser!.uid).set({
+        UserKey.USER_NAME: auth.currentUser!.displayName,
+        UserKey.EMAIL: auth.currentUser!.email,
+        UserKey.UID: auth.currentUser!.uid,
+        UserKey.CHECKED_IN: false,
+        UserKey.IS_VERIFIED: false,
+        UserKey.PARAMS: FieldValue.arrayUnion(nameSearchParams),
+        //TODO: Change it to arrayUnion
+        // UserKey.DEVICE_TOKEN:
+        // FieldValue.arrayUnion([token])
+        UserKey.DEVICE_TOKEN: [token]
+      }).then((value) => pushNewScreen(context, screen: const Home(), withNavBar: false));
+    });
   } on FirebaseAuthException catch (e) {
     print('error message ${e.message}');
     Get.snackbar('Error', e.message ?? '', snackPosition: SnackPosition.TOP);
@@ -61,12 +56,10 @@ Future<bool> signUp(
 
 Future<void> login(email, password, context) async {
   try {
-    await auth
-        .signInWithEmailAndPassword(email: email, password: password)
-        .then((value) async {
+    await auth.signInWithEmailAndPassword(email: email, password: password).then((value) async {
       // print(FCMManager.fcmToken!);
       final token = await FCMManager.getFCMToken();
-      List<String> tokens =[];
+      List<String> tokens = [];
       tokens.add(token);
       print(token);
       print('========> toeken');
@@ -88,8 +81,7 @@ Future<void> login(email, password, context) async {
   } on FirebaseAuthException catch (e) {
     print('error message ${e.message}');
     // Get.snackbar('Error', e.message ?? '', snackPosition: SnackPosition.BOTTOM);
-    Get.snackbar('Error', "Invalid username or password",
-        snackPosition: SnackPosition.TOP);
+    Get.snackbar('Error', "Invalid username or password", snackPosition: SnackPosition.TOP);
     print('Failed with error code: ${e.code}');
     print(e.message);
   }
@@ -102,14 +94,13 @@ Future<void> logout(context) async {
   final token = await FCMManager.getFCMToken();
 
   //Checkout
-
+  print('-----------token-----------$token');
   snap.collection(Collections.USER).doc(auth.currentUser!.uid).update({
     UserKey.CHECKED_IN: false,
+    UserKey.DEVICE_TOKEN: FieldValue.arrayRemove([token]),
     CourtKey.COURT_LAT: FieldValue.delete(),
     CourtKey.COURT_LNG: FieldValue.delete(),
     // UserKey.DEVICE_TOKEN: []
-    UserKey.DEVICE_TOKEN: FieldValue.arrayRemove([token])
-
   });
   auth.signOut().then(
         (value) =>
@@ -129,8 +120,7 @@ Future<void> delAcc(context) async {
     context: context,
     builder: (BuildContext context) => AlertDialog(
       title: const Text('Confirmation'),
-      content: const Text(
-          'Are you sure you want to delete you account?\nThese changes are irreversible.'),
+      content: const Text('Are you sure you want to delete you account?\nThese changes are irreversible.'),
       actions: <Widget>[
         OutlinedButton(
           child: const Text('Cancel'),
@@ -163,20 +153,15 @@ Future<void> delAcc(context) async {
                             User? user = FirebaseAuth.instance.currentUser;
 
                             // Prompt the user to reauthenticate
-                            AuthCredential credential =
-                                EmailAuthProvider.credential(
+                            AuthCredential credential = EmailAuthProvider.credential(
                               email: user!.email ?? "",
                               password: pass.text,
                             );
 
                             try {
-                              await user
-                                  .reauthenticateWithCredential(credential);
+                              await user.reauthenticateWithCredential(credential);
 
-                              snap
-                                  .collection(Collections.USER)
-                                  .doc(auth.currentUser!.uid)
-                                  .delete();
+                              snap.collection(Collections.USER).doc(auth.currentUser!.uid).delete();
 
                               await user.delete().then((value) {
                                 Get.offAll(StartView(isBack: false));
@@ -225,10 +210,8 @@ Future<void> delAcc(context) async {
 }
 
 toModal(BuildContext context) async {
-  DocumentSnapshot snap = await FirebaseFirestore.instance
-      .collection(Collections.USER)
-      .doc(auth.currentUser?.uid ?? "")
-      .get();
+  DocumentSnapshot snap =
+      await FirebaseFirestore.instance.collection(Collections.USER).doc(auth.currentUser?.uid ?? "").get();
   UserModel userModel = UserModel.fromMap(snap.data() as Map<String, dynamic>);
   print("user model:.. ${userModel.uid}");
 }
@@ -241,8 +224,7 @@ Future<void> resetPassword({required String emailText}) async {
     await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
 
     // Display a success message and navigate back
-    Fluttertoast.showToast(msg: "Password reset link sent via Email")
-        .then((value) {
+    Fluttertoast.showToast(msg: "Password reset link sent via Email").then((value) {
       Get.back(); // Navigate back to the previous screen
     });
   } on FirebaseAuthException catch (e) {

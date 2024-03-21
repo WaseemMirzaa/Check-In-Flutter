@@ -57,10 +57,13 @@ class ChatController extends GetxController {
   }
 
   //............. get all conversation
-  Stream<List<Chatmodel>> getConversation() {
-    chatService.updateUnreadCount(docId.value, userController.userModel.value.uid!, 0, members);
+  Stream<List<Chatmodel>> getConversation() async* {
+    print('././././././../. $members');
+    String timeStamp = await chatService.getDeleteTimeStamp(docId.value, userController.userModel.value.uid!);
+    // chatService.updateUnreadCount(docId.value, userController.userModel.value.uid!, 0, members);
     // chatService.readReceipts(docId.value, userController.userModel.value.uid!);
-    return chatService.getNewConversation(docId.value, userController.userModel.value.uid!, members);
+
+    yield* chatService.getConversation(docId.value, userController.userModel.value.uid!, members, timeStamp);
   }
 
   //............. get message request status
