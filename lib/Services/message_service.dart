@@ -259,7 +259,7 @@ class MessageService {
         List<dynamic> deleteIds = data[MessageField.DELETE_IDS] ?? [];
 
         for (int i = 0; i < deleteIds.length; i++) {
-          if (deleteIds[i][MessageField.MEMBER_UID] != userId && deleteIds[i][MessageField.IS_DELETED] == true) {
+          if (deleteIds[i][MessageField.IS_DELETED] == true) {
             deleteIds[i][MessageField.IS_DELETED] = false;
           }
         }
