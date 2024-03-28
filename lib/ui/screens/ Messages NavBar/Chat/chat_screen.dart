@@ -1,13 +1,11 @@
 import 'dart:async';
 
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:check_in/Services/push_notification_service.dart';
 import 'package:check_in/controllers/Messages/chat_controller.dart';
 import 'package:check_in/controllers/user_controller.dart';
 import 'package:check_in/core/constant/constant.dart';
 import 'package:check_in/core/constant/temp_language.dart';
 import 'package:check_in/model/Message%20and%20Group%20Message%20Model/chat_model.dart';
-import 'package:check_in/model/notification_model.dart';
 import 'package:check_in/ui/screens/%20Messages%20NavBar/edit_group_detail/edit_group_details.dart';
 import 'package:check_in/ui/screens/%20Messages%20NavBar/other_profile/other_profile_view.dart';
 import 'package:check_in/ui/widgets/custom_appbar.dart';
@@ -27,7 +25,6 @@ import 'package:sizer/sizer.dart';
 import '../../../../model/Message and Group Message Model/message_model.dart';
 import '../../../../utils/Constants/enums.dart';
 import '../../../../utils/styles.dart';
-import '../../Players.dart';
 import 'Component/button.dart';
 import 'Component/image_date_container.dart';
 import 'Component/message_date_container.dart';
@@ -62,7 +59,6 @@ class _ChatScreenState extends State<ChatScreen> {
   String onlineStatus = '';
   // bool _isRequesting = false;
   // bool _isFinish = false;
-
   // void onChangeData(List<DocumentChange> documentChanges) {
   //   try {
   //     controller.chatService
@@ -123,7 +119,6 @@ class _ChatScreenState extends State<ChatScreen> {
     //   if (widget.isFirstTime) {
     //     null;
     //   } else {
-
     // chatcontroller.docId.value == userController.userModel ? chatcontroller.readReceipts(chatcontroller.docId.value) : null;
     // print("---------DOC ID IS: ${chatcontroller.docId.value}");
     // print("---------NOTIFY ID IS: ${NotificationModel.docId}");
@@ -397,12 +392,9 @@ class _ChatScreenState extends State<ChatScreen> {
                                             // showLastSeen: showLastSeen,
 
                                             isGroup: controller.isgroup)
-                                        : ImageDateContainer(
-                                            chat: chat,
-                                            mymsg: mymsg,
-                                        isGroup: controller.isgroup
+                                        : ImageDateContainer(chat: chat, mymsg: mymsg, isGroup: controller.isgroup
                                             // showLastSeen: showLastSeen,
-                                          )
+                                            )
                                   ],
                                 ),
                               );
@@ -492,7 +484,7 @@ class _ChatScreenState extends State<ChatScreen> {
                                   },
                                   text: TempLanguage.delete,
                                   textColor: appRedColor,
-                                      buttonColor: Colors.white.withOpacity(0.7),
+                                  buttonColor: Colors.white.withOpacity(0.7),
                                 )),
                                 horizontalGap(2.w),
                                 Flexible(
@@ -501,11 +493,11 @@ class _ChatScreenState extends State<ChatScreen> {
                                     controller.updateRequestStatus(
                                         RequestStatusEnum.accept.name, 'Request Accepted', 1);
                                     controller.sendNotificationMethod(
-                                        '', '${userController.userModel.value.userName!} accept request');
+                                        '', '${userController.userModel.value.userName!} accepted request');
                                   },
                                   text: TempLanguage.accept,
                                   textColor: Colors.blue,
-                                      buttonColor: Colors.white.withOpacity(0.7),
+                                  buttonColor: Colors.white.withOpacity(0.7),
                                 )),
                               ],
                             )
@@ -574,13 +566,11 @@ class _ChatScreenState extends State<ChatScreen> {
                           color: appWhiteColor,
                           borderRadius: BorderRadius.circular(10),
                           boxShadow: [
-
                             BoxShadow(
                               color: blackTranslucentColor,
                               offset: const Offset(0, 1),
                               blurRadius: 6,
                             ),
-
                           ],
                         ),
                         child: Row(
@@ -760,7 +750,6 @@ class _ChatScreenState extends State<ChatScreen> {
 
                 //.................Gallery
                 GestureDetector(
-
                   onTap: () async {
                     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
                     if (pickedFile != null) {

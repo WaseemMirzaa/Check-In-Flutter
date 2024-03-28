@@ -35,15 +35,13 @@ import '../../utils/CourtsParser.dart';
 class AddHomeCourt extends StatefulWidget {
   final isMyProfile;
 
-  const AddHomeCourt({Key? key, bool this.isMyProfile = true})
-      : super(key: key);
+  const AddHomeCourt({Key? key, bool this.isMyProfile = true}) : super(key: key);
 
   @override
   State<AddHomeCourt> createState() => _AddHomeCourtState();
 }
 
-class _AddHomeCourtState extends State<AddHomeCourt>
-    with SingleTickerProviderStateMixin {
+class _AddHomeCourtState extends State<AddHomeCourt> with SingleTickerProviderStateMixin {
   int? index;
   bool withinRadius = false;
   double ZOOM_LEVEL_INITIAL = 12;
@@ -63,9 +61,8 @@ class _AddHomeCourtState extends State<AddHomeCourt>
   final auth = FirebaseAuth.instance;
   final snap = FirebaseFirestore.instance;
 
-  DocumentReference docRef = FirebaseFirestore.instance
-      .collection(Collections.USER)
-      .doc(FirebaseAuth.instance.currentUser!.uid);
+  DocumentReference docRef =
+      FirebaseFirestore.instance.collection(Collections.USER).doc(FirebaseAuth.instance.currentUser!.uid);
 
   LatLng? loc;
 
@@ -88,15 +85,13 @@ class _AddHomeCourtState extends State<AddHomeCourt>
   LatLng? _selectedLocation;
 
   Future<Position> getCurrentLocation() async {
-    Position position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high);
+    Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
     // courtNames();
     print(currentLocation?.longitude);
     if (mounted) {
       setState(() {
         currentLocation = position;
-        _selectedLocation =
-            LatLng(currentLocation!.latitude, currentLocation!.latitude);
+        _selectedLocation = LatLng(currentLocation!.latitude, currentLocation!.latitude);
         courtNames();
       });
     }
@@ -105,10 +100,7 @@ class _AddHomeCourtState extends State<AddHomeCourt>
   }
 
   Future courtNames() async {
-    await snap
-        .collection(Collections.GOLDEN_LOCATIONS)
-        .get()
-        .then((querySnapshot) {
+    await snap.collection(Collections.GOLDEN_LOCATIONS).get().then((querySnapshot) {
       for (var doc in querySnapshot.docs) {
         double latitude = doc.data()[CourtKey.LAT];
         double longitude = doc.data()[CourtKey.LNG];
@@ -119,8 +111,7 @@ class _AddHomeCourtState extends State<AddHomeCourt>
           markerId: MarkerId(doc.id),
           position: location,
           infoWindow: InfoWindow(title: name),
-          icon:
-              BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueYellow),
+          icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueYellow),
           onTap: () {
             _selectedPlace = name;
             // pushNewScreen(
@@ -208,8 +199,8 @@ class _AddHomeCourtState extends State<AddHomeCourt>
   }
 
   bool _checkIfWithinRadius(Position userPos, LatLng court) {
-    double distanceInMeters = Geolocator.distanceBetween(
-        userPos.latitude, userPos.longitude, court.latitude, court.longitude);
+    double distanceInMeters =
+        Geolocator.distanceBetween(userPos.latitude, userPos.longitude, court.latitude, court.longitude);
     if (distanceInMeters <= 100) {
       print("user in radius");
       return true;
@@ -263,8 +254,7 @@ class _AddHomeCourtState extends State<AddHomeCourt>
                 ),
                 title: Text(TempLanguage.contactUs),
                 onTap: () {
-                  pushNewScreen(context,
-                      screen: const ContactUs(), withNavBar: false);
+                  pushNewScreen(context, screen: const ContactUs(), withNavBar: false);
                 },
               ),
               ListTile(
@@ -273,8 +263,7 @@ class _AddHomeCourtState extends State<AddHomeCourt>
                 ),
                 title: Text(TempLanguage.privacyPolicy),
                 onTap: () {
-                  pushNewScreen(context,
-                      screen: const PrivacyPolicy(), withNavBar: false);
+                  pushNewScreen(context, screen: const PrivacyPolicy(), withNavBar: false);
                 },
               ),
               ListTile(
@@ -283,8 +272,7 @@ class _AddHomeCourtState extends State<AddHomeCourt>
                 ),
                 title: Text(TempLanguage.termsAndConditions),
                 onTap: () {
-                  pushNewScreen(context,
-                      screen: const TermsAndConditions(), withNavBar: false);
+                  pushNewScreen(context, screen: const TermsAndConditions(), withNavBar: false);
                 },
               ),
               ListTile(
@@ -339,8 +327,7 @@ class _AddHomeCourtState extends State<AddHomeCourt>
                           // },
                           // tileOverlays: ,
                           initialCameraPosition: CameraPosition(
-                            target: LatLng(currentLocation!.latitude,
-                                currentLocation!.longitude),
+                            target: LatLng(currentLocation!.latitude, currentLocation!.longitude),
                             zoom: ZOOM_LEVEL_INITIAL,
                           ),
                           markers: markers,
@@ -409,10 +396,7 @@ class _AddHomeCourtState extends State<AddHomeCourt>
                                     focusedErrorBorder: InputBorder.none,
                                     fillColor: appWhiteColor,
                                     hintText: TempLanguage.findCourts,
-                                    hintStyle: GoogleFonts.poppins(
-                                        fontSize: 12,
-                                        fontWeight: medium,
-                                        color: greyColor),
+                                    hintStyle: GoogleFonts.poppins(fontSize: 12, fontWeight: medium, color: greyColor),
                                     suffixIcon: Row(
                                       mainAxisAlignment: MainAxisAlignment.end,
                                       mainAxisSize: MainAxisSize.min,
@@ -448,9 +432,7 @@ class _AddHomeCourtState extends State<AddHomeCourt>
                                   if (currentLocation == null) {
                                     return [];
                                   }
-                                  final courts = await CourtsParser()
-                                      .getCourtsByNameOrAddressFromCSVFile(
-                                          pattern);
+                                  final courts = await CourtsParser().getCourtsByNameOrAddressFromCSVFile(pattern);
 
                                   // final placesResponse =
                                   //     await _places.searchNearbyWithRadius(
@@ -475,8 +457,7 @@ class _AddHomeCourtState extends State<AddHomeCourt>
                                 onSuggestionSelected: (prediction) async {
                                   if (mounted) {
                                     setState(() {
-                                      _selectedPlace =
-                                          prediction.title as String;
+                                      _selectedPlace = prediction.title as String;
                                     });
                                   }
                                   typeAheadController.text = _selectedPlace;
@@ -489,8 +470,7 @@ class _AddHomeCourtState extends State<AddHomeCourt>
                                   var lat = prediction.latitude;
                                   var lng = prediction.longitude;
 
-                                  final GoogleMapController controller =
-                                      await _googleMapController.future;
+                                  final GoogleMapController controller = await _googleMapController.future;
                                   controller.animateCamera(
                                     CameraUpdate.newCameraPosition(
                                       CameraPosition(
@@ -529,8 +509,7 @@ class _AddHomeCourtState extends State<AddHomeCourt>
                                     if (mounted) setState(() {});
                                   }
                                 },
-                                transitionBuilder:
-                                    (context, suggestionsBox, controller) {
+                                transitionBuilder: (context, suggestionsBox, controller) {
                                   return suggestionsBox;
                                 },
                               ),
@@ -578,15 +557,12 @@ class _AddHomeCourtState extends State<AddHomeCourt>
                           //     });
                           //   }
                           // }
-                          userController.userModel.value.homeCourt =
-                              selectedLocationName;
+                          userController.userModel.value.homeCourt = selectedLocationName;
                           FirebaseFirestore.instance
                               .collection(Collections.USER)
                               .doc(FirebaseAuth.instance.currentUser!.uid)
-                              .update(
-                                  {UserKey.HOME_COURT: selectedLocationName});
-                          pushNewScreen(context,
-                              screen: const Home(), withNavBar: false);
+                              .update({UserKey.HOME_COURT: selectedLocationName});
+                          pushNewScreen(context, screen: const Home(), withNavBar: false);
                         }),
                       ),
                     )

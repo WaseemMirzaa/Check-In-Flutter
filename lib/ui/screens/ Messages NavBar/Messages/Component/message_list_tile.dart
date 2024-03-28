@@ -18,10 +18,8 @@ class MessageListTile extends StatelessWidget {
   MessageListTile({super.key, this.message, this.ontap});
   @override
   Widget build(BuildContext context) {
-    String dateseperate =
-        message!.timeStamp == '' ? '' : message!.timeStamp!.split(' ')[1];
-    String time =
-        message!.timeStamp == '' ? '' : DateTimeUtils.time24to12(dateseperate);
+    String dateseperate = message!.timeStamp == '' ? '' : message!.timeStamp!.split(' ')[1];
+    String time = message!.timeStamp == '' ? '' : DateTimeUtils.time24to12(dateseperate);
 
     String unReadCount = message!.unreadmsg! < 10 ? '0${message!.unreadmsg.toString()}' : message!.unreadmsg.toString();
 
@@ -35,7 +33,7 @@ class MessageListTile extends StatelessWidget {
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 15),
             height: 78,
-            width: 50,
+            // width: 50,
             decoration: BoxDecoration(borderRadius: BorderRadius.circular(10)),
             child: Row(
               children: [
@@ -62,9 +60,8 @@ class MessageListTile extends StatelessWidget {
                           ],
                           SizedBox(
                             width: 45.w,
-                            child: poppinsText(
-                                message!.name!, 15, medium, appBlackColor,
-                                overflow: TextOverflow.ellipsis),
+                            child:
+                                poppinsText(message!.name!, 15, medium, appBlackColor, overflow: TextOverflow.ellipsis),
                           ),
                         ],
                       ),
@@ -91,8 +88,7 @@ class MessageListTile extends StatelessWidget {
                           )
                         : Container(
                             padding: const EdgeInsets.all(4),
-                            decoration: BoxDecoration(
-                                color: appGreenColor, shape: BoxShape.circle),
+                            decoration: BoxDecoration(color: appGreenColor, shape: BoxShape.circle),
                             child: poppinsText(
                               unReadCount,
                               9,
@@ -100,8 +96,7 @@ class MessageListTile extends StatelessWidget {
                               appWhiteColor,
                             ),
                           ),
-                    poppinsText(time, 10, FontWeight.normal,
-                        const Color(0xFF161F3D).withOpacity(0.4))
+                    poppinsText(time, 10, FontWeight.normal, const Color(0xFF161F3D).withOpacity(0.4))
                   ],
                 )
               ],

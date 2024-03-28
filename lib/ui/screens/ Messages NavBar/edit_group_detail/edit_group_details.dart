@@ -72,13 +72,16 @@ class _EditGroupDetailsState extends State<EditGroupDetails> {
     return Scaffold(
         floatingActionButton: FloatingActionButton(
             backgroundColor: appRedColor,
-            child: const Icon(Icons.logout),
+            child: Icon(
+              Icons.logout,
+              color: appWhiteColor,
+            ),
             onPressed: () {
               showDialog(
                   context: context,
                   builder: (context) => AlertDialog(
                         title: Text(
-                          'Group Left',
+                          'Left Group',
                           style: TextStyle(fontWeight: FontWeight.w700, color: appBlackColor),
                         ),
                         content: Text(

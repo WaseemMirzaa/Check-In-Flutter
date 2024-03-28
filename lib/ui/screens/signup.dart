@@ -55,8 +55,8 @@ class _SignupViewState extends State<SignupView> {
         backgroundColor: appWhiteColor,
         leading: Row(
           children: [
-            const SizedBox(
-              width: 30,
+            SizedBox(
+              width: 2.5.w,
             ),
             GestureDetector(
               onTap: () {

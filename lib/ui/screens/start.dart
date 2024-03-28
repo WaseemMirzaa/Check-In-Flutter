@@ -82,8 +82,8 @@ class _StartViewState extends State<StartView> {
               backgroundColor: appWhiteColor,
               leading: Row(
                 children: [
-                  const SizedBox(
-                    width: 30,
+                    SizedBox(
+                    width: 2.5.w,
                   ),
                   GestureDetector(
                     onTap: () {
@@ -118,6 +118,7 @@ class _StartViewState extends State<StartView> {
               Column(
                 children: [
 
+
                   Padding(
                     padding: EdgeInsets.only(top: 0.9.h, bottom: 0.9.h),
                     child: fullWidthButton(TempLanguage.logInSpaced, () {
@@ -125,6 +126,7 @@ class _StartViewState extends State<StartView> {
                           screen: const LoginView(), withNavBar: false);
                     }),
                   ),
+
 
 
                   Padding(
@@ -139,7 +141,7 @@ class _StartViewState extends State<StartView> {
                         boxShadow: [
                           BoxShadow(
                             color: blackTranslucentColor,
-                            offset: Offset(0, 3),
+                            offset: const Offset(0, 3),
                             blurRadius: 6,
                           ),
                         ],
