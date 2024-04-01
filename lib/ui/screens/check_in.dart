@@ -68,9 +68,8 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
   final auth = FirebaseAuth.instance;
   final snap = FirebaseFirestore.instance;
 
-  DocumentReference docRef = FirebaseFirestore.instance
-      .collection(Collections.USER)
-      .doc(FirebaseAuth.instance.currentUser?.uid);
+  DocumentReference docRef =
+      FirebaseFirestore.instance.collection(Collections.USER).doc(FirebaseAuth.instance.currentUser?.uid);
 
   LatLng? loc;
 
@@ -109,9 +108,8 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
 
   Future indexValue() async {
     if (FirebaseAuth.instance.currentUser != null) {
-      final document = FirebaseFirestore.instance
-          .collection(Collections.USER)
-          .doc(FirebaseAuth.instance.currentUser!.uid);
+      final document =
+          FirebaseFirestore.instance.collection(Collections.USER).doc(FirebaseAuth.instance.currentUser!.uid);
       document.get().then((DocumentSnapshot snapshot) {
         if (snapshot.exists) {
           dynamic data = snapshot.data();
@@ -145,8 +143,7 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
 
   Future<Position?> getCurrentLocation() async {
     try {
-      Position position = await Geolocator.getCurrentPosition(
-          desiredAccuracy: LocationAccuracy.high);
+      Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
       // courtNames();
       // print(currentLocation?.longitude);
       if (mounted) {
@@ -167,10 +164,7 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
     // Golden Location
     try {
       if (courtlist.isEmpty) {
-        await snap
-            .collection(Collections.GOLDEN_LOCATIONS)
-            .get()
-            .then((querySnapshot) {
+        await snap.collection(Collections.GOLDEN_LOCATIONS).get().then((querySnapshot) {
           for (var doc in querySnapshot.docs) {
             courtlist.add(doc.data());
             double latitude = doc.data()[CourtKey.LAT];
@@ -182,8 +176,7 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
               markerId: MarkerId(doc.id),
               position: location,
               infoWindow: InfoWindow(title: name, snippet: CourtKey.GOLDEN),
-              icon: BitmapDescriptor.defaultMarkerWithHue(
-                  BitmapDescriptor.hueYellow),
+              icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueYellow),
               onTap: () {
                 pushNewScreen(context,
                     screen: PlayersView(
@@ -210,8 +203,7 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
             markerId: MarkerId(doc[CourtKey.ID].toString()),
             position: location,
             infoWindow: InfoWindow(title: name, snippet: CourtKey.GOLDEN),
-            icon: BitmapDescriptor.defaultMarkerWithHue(
-                BitmapDescriptor.hueYellow),
+            icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueYellow),
             onTap: () {
               pushNewScreen(context,
                   screen: PlayersView(
@@ -294,8 +286,8 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
 
   Future<PlacesSearchResponse?> getBasketballCourts() async {
     final apiKey = Constants.API_KEY;
-    final url = Uri.parse(
-        'https://maps.googleapis.com/maps/api/place/textsearch/json?query=basketball+courts&key=$apiKey');
+    final url =
+        Uri.parse('https://maps.googleapis.com/maps/api/place/textsearch/json?query=basketball+courts&key=$apiKey');
     final response = await http.get(url);
 
     if (response.statusCode == 200) {
@@ -406,15 +398,13 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
     // Configure the location callback
     var locationOptions = const LocationOptions(
       accuracy: LocationAccuracy.best,
-      distanceFilter:
-          10, // Minimum distance (in meters) for location change updates
+      distanceFilter: 10, // Minimum distance (in meters) for location change updates
     );
 
     // Listen for location changes
     _positionStreamSubscription = Geolocator.getPositionStream(
       desiredAccuracy: LocationAccuracy.best,
-      distanceFilter:
-          10, // Minimum distance (in meters) for location change updates
+      distanceFilter: 10, // Minimum distance (in meters) for location change updates
     ).listen((Position position) {
       if (mounted) {
         setState(() {
@@ -426,8 +416,8 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
   }
 
   bool _checkIfWithinRadius(Position userPos, LatLng court) {
-    double distanceInMeters = Geolocator.distanceBetween(
-        userPos.latitude, userPos.longitude, court.latitude, court.longitude);
+    double distanceInMeters =
+        Geolocator.distanceBetween(userPos.latitude, userPos.longitude, court.latitude, court.longitude);
     if (distanceInMeters <= 100) {
       // print("user in radius");
       return true;
@@ -516,19 +506,12 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
     // return Future.value(withinRadius);
   }
 
-  Future<bool> isCourtAlreadyStored(
-      double currentCourtLat, double currentCourtLng) async {
-    DocumentSnapshot userDoc = await snap
-        .collection(Collections.USER)
-        .doc(auth.currentUser!.uid)
-        .get();
-    List<dynamic> checkedCourts =
-        (userDoc.data() as Map<String, dynamic>?)?[CourtKey.CHECKED_COURTS] ??
-            [];
+  Future<bool> isCourtAlreadyStored(double currentCourtLat, double currentCourtLng) async {
+    DocumentSnapshot userDoc = await snap.collection(Collections.USER).doc(auth.currentUser!.uid).get();
+    List<dynamic> checkedCourts = (userDoc.data() as Map<String, dynamic>?)?[CourtKey.CHECKED_COURTS] ?? [];
     // Check if the coordinates are already present in the array
-    if (checkedCourts.any((court) =>
-        court[CourtKey.COURT_LAT] == currentCourtLat &&
-        court[CourtKey.COURT_LNG] == currentCourtLng)) {
+    if (checkedCourts
+        .any((court) => court[CourtKey.COURT_LAT] == currentCourtLat && court[CourtKey.COURT_LNG] == currentCourtLng)) {
       return false;
     } else {
       return true;
@@ -542,8 +525,7 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
     if (index == 1) {
       if (mounted) {
         setState(() {
-          courtInfo['checkInTime'] =
-              DateFormat('HH:mm:ss').format(DateTime.now());
+          courtInfo['checkInTime'] = DateFormat('HH:mm:ss').format(DateTime.now());
           courtInfo[CheckedCourts.checkInTimeStamp] = Timestamp.now();
 
           checkedInCourtName = courtInfo['courtName'];
@@ -572,10 +554,7 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
       }
 
       Get.snackbar("Checked In", "You have checked into this court.",
-          backgroundColor: appWhiteColor,
-          borderWidth: 4,
-          borderColor: appBlackColor,
-          colorText: appBlackColor);
+          backgroundColor: appWhiteColor, borderWidth: 4, borderColor: appBlackColor, colorText: appBlackColor);
       // print(index);
       // print(withinRadius);
     }
@@ -591,12 +570,8 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
 
       checkedInCourtName = '';
 
-      Get.snackbar(
-          TempLanguage.checkOutToastTitle, TempLanguage.checkOutToastMessage,
-          backgroundColor: appWhiteColor,
-          borderWidth: 4,
-          borderColor: appBlackColor,
-          colorText: appBlackColor);
+      Get.snackbar(TempLanguage.checkOutToastTitle, TempLanguage.checkOutToastMessage,
+          backgroundColor: appWhiteColor, borderWidth: 4, borderColor: appBlackColor, colorText: appBlackColor);
     }
   }
 
@@ -615,8 +590,7 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
           .collection(Collections.USER)
           .doc(FirebaseAuth.instance.currentUser?.uid ?? "")
           .get();
-      userController.userModel.value =
-          UserModel.fromMap(snapshot.data() as Map<String, dynamic>);
+      userController.userModel.value = UserModel.fromMap(snapshot.data() as Map<String, dynamic>);
       print(userController.userModel.value);
     }
     // UserModel currentUser = UserModel.fromMap(snapshot.data() as Map<String, dynamic>);
@@ -662,8 +636,7 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
                 ),
                 title: Text(TempLanguage.contactUs),
                 onTap: () {
-                  pushNewScreen(context,
-                      screen: const ContactUs(), withNavBar: false);
+                  pushNewScreen(context, screen: const ContactUs(), withNavBar: false);
                 },
               ),
               ListTile(
@@ -672,8 +645,7 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
                 ),
                 title: Text(TempLanguage.privacyPolicy),
                 onTap: () {
-                  pushNewScreen(context,
-                      screen: const PrivacyPolicy(), withNavBar: false);
+                  pushNewScreen(context, screen: const PrivacyPolicy(), withNavBar: false);
                 },
               ),
               ListTile(
@@ -682,8 +654,7 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
                 ),
                 title: Text(TempLanguage.termsAndConditions),
                 onTap: () {
-                  pushNewScreen(context,
-                      screen: const TermsAndConditions(), withNavBar: false);
+                  pushNewScreen(context, screen: const TermsAndConditions(), withNavBar: false);
                 },
               ),
               FirebaseAuth.instance.currentUser == null
@@ -697,13 +668,11 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
                           ),
                           title: Text(TempLanguage.verifyProfile),
                           onTap: () {
-                            if (userController.userModel.value.isVerified ==
-                                false) {
+                            if (userController.userModel.value.isVerified == false) {
                               sendEmail(
                                   userController.userModel.value.userName ?? "",
                                   userController.userModel.value.email ?? "",
-                                  userController.userModel.value.homeCourt ??
-                                      "");
+                                  userController.userModel.value.homeCourt ?? "");
                             }
                           },
                         ),
@@ -752,8 +721,7 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
 
                         // tileOverlays: ,
                         initialCameraPosition: CameraPosition(
-                          target: LatLng(currentLocation!.latitude,
-                              currentLocation!.longitude
+                          target: LatLng(currentLocation!.latitude, currentLocation!.longitude
                               // 42.3878,
                               // -71.1105
                               ),
@@ -813,8 +781,7 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
                               // For Android: According to documentation, radius should be between 10 to 50
                               radius: kIsWeb
                                   ? 10
-                                  : defaultTargetPlatform ==
-                                          TargetPlatform.android
+                                  : defaultTargetPlatform == TargetPlatform.android
                                       ? heatMapRadius.value
                                       : heatMapRadius.value,
                             )
@@ -860,10 +827,7 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
                                 // Get.offAll(CheckIn());
                                 //....................
                                 Navigator.pushAndRemoveUntil(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => const Home()),
-                                    (route) => false);
+                                    context, MaterialPageRoute(builder: (context) => const Home()), (route) => false);
                                 //...................
                                 // setState(() {});
                                 // Navigator.pushReplacement(
@@ -902,7 +866,7 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
                                   decoration: InputDecoration(
                                     contentPadding: const EdgeInsets.only(
                                       left: 20,
-                                      top: 15,
+                                      top: 10,
                                     ),
                                     filled: true,
                                     border: InputBorder.none,
@@ -913,10 +877,7 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
                                     focusedErrorBorder: InputBorder.none,
                                     fillColor: appWhiteColor,
                                     hintText: TempLanguage.findCourts,
-                                    hintStyle: GoogleFonts.poppins(
-                                        fontSize: 12,
-                                        fontWeight: medium,
-                                        color: greyColor),
+                                    hintStyle: GoogleFonts.poppins(fontSize: 12, fontWeight: medium, color: greyColor),
                                     suffixIcon: Row(
                                       mainAxisAlignment: MainAxisAlignment.end,
                                       mainAxisSize: MainAxisSize.min,
@@ -940,9 +901,7 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
                                   if (currentLocation == null) {
                                     return [];
                                   }
-                                  final courts = await CourtsParser()
-                                      .getCourtsByNameOrAddressFromCSVFile(
-                                          pattern);
+                                  final courts = await CourtsParser().getCourtsByNameOrAddressFromCSVFile(pattern);
 
                                   // final placesResponse =
                                   //     await _places.searchNearbyWithRadius(
@@ -967,8 +926,7 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
                                 onSuggestionSelected: (prediction) async {
                                   mounted
                                       ? setState(() {
-                                          _selectedPlace =
-                                              prediction.title as String;
+                                          _selectedPlace = prediction.title as String;
                                         })
                                       : null;
                                   typeAheadController.text = _selectedPlace;
@@ -981,8 +939,7 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
                                   var lat = prediction.latitude;
                                   var lng = prediction.longitude;
 
-                                  final GoogleMapController controller =
-                                      await _googleMapController.future;
+                                  final GoogleMapController controller = await _googleMapController.future;
                                   controller.animateCamera(
                                     CameraUpdate.newCameraPosition(
                                       CameraPosition(
@@ -1010,8 +967,7 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
                                         screen: PlayersView(
                                           courtLatLng: location,
                                           courtName: prediction.title,
-                                          isCheckedIn: checkedInCourtName ==
-                                              prediction.title,
+                                          isCheckedIn: checkedInCourtName == prediction.title,
                                         ),
                                         withNavBar: false,
                                       );
@@ -1032,8 +988,7 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
                                     mounted ? setState(() {}) : null;
                                   }
                                 },
-                                transitionBuilder:
-                                    (context, suggestionsBox, controller) {
+                                transitionBuilder: (context, suggestionsBox, controller) {
                                   return suggestionsBox;
                                 },
                               ),
@@ -1043,26 +998,18 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
                       ],
                     ),
                     Padding(
-                      padding: const EdgeInsets.only(
-                          left: 40, right: 40, bottom: 10),
-                      child: fullWidthButton(
-                          index == 0
-                              ? TempLanguage.checkIn
-                              : TempLanguage.checkOut, () {
+                      padding: const EdgeInsets.only(left: 40, right: 40, bottom: 10),
+                      child: fullWidthButton(index == 0 ? TempLanguage.checkIn : TempLanguage.checkOut, () {
                         if (FirebaseAuth.instance.currentUser == null) {
                           showDialog(
                               context: context,
                               builder: (context) => AlertDialog(
-                                    title: poppinsText(
-                                        TempLanguage.logInForFeatures,
-                                        16,
-                                        FontWeight.w500,
-                                        appBlackColor),
+                                    title:
+                                        poppinsText(TempLanguage.logInForFeatures, 16, FontWeight.w500, appBlackColor),
                                     actions: [
                                       TextButton(
                                         onPressed: () {
-                                          Get.off(
-                                              () => StartView(isBack: true));
+                                          Get.off(() => StartView(isBack: true));
                                         },
                                         child: Text(TempLanguage.logIn),
                                       ),
@@ -1077,8 +1024,7 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
                         } else {
                           withinRadius == true || index == 1
                               ? _buttonPress()
-                              : Get.snackbar(TempLanguage.notAtCourtToastTitle,
-                                  TempLanguage.notAtCourtToastMessage,
+                              : Get.snackbar(TempLanguage.notAtCourtToastTitle, TempLanguage.notAtCourtToastMessage,
                                   backgroundColor: appWhiteColor,
                                   borderWidth: 4,
                                   borderColor: appBlackColor,

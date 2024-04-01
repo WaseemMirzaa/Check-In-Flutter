@@ -14,13 +14,17 @@ class MessageController extends GetxController {
     return chatService.getChatMessage(userId);
   }
 
-  Future<bool> updateCollection(String collectionName, String docID, Map<String, dynamic> list )async{
-   final update = await chatService.updateCollection(collectionName, docID, list);
-   return update;
+  Future<bool> updateCollection(String collectionName, String docID, Map<String, dynamic> list) async {
+    final update = await chatService.updateCollection(collectionName, docID, list);
+    return update;
   }
 
-  Future<bool> leftGroup(String docID) async{
-    final left = await chatService.removeCurrentUserFromMemberIds(docID);
-    return left;
+  // Future<bool> leftGroup(String docID) async {
+  //   final left = await chatService.removeGroupUser(docID,uid);
+  //   return left;
+  // }
+
+  Future deleteMessage(String docID, String userID) async {
+    await chatService.deleteMessage(docID, userID);
   }
 }

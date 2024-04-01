@@ -64,6 +64,9 @@ class MessageField {
   static const String IS_OWNER = 'isOwner';
   static const String ABOUT_USER = 'about';
   static const String REQUEST_STATUS = 'requestStatus';
+  static const String DELETE_IDS = 'deleteIds';
+  static const String DELETE_TIMESTAMP = 'deleteTimeStamp';
+  static const String IS_DELETED = 'isDeleted';
 }
 
 class ChatField {

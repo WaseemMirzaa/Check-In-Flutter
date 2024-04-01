@@ -4,11 +4,15 @@ import 'package:check_in/core/constant/temp_language.dart';
 import 'package:check_in/model/Message%20and%20Group%20Message%20Model/message_model.dart';
 import 'package:check_in/ui/screens/%20Messages%20NavBar/Chat/chat_screen.dart';
 import 'package:check_in/ui/screens/%20Messages%20NavBar/Messages/Component/appbar.dart';
+import 'package:check_in/ui/screens/%20Messages%20NavBar/Messages/Component/delete_chat_dialog.dart';
 import 'package:check_in/ui/screens/%20Messages%20NavBar/Messages/Component/message_list_tile.dart';
 import 'package:check_in/ui/screens/%20Messages%20NavBar/Messages/Component/search_field.dart';
+import 'package:check_in/utils/colors.dart';
 import 'package:check_in/utils/gaps.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:get/get.dart';
+import 'package:nb_utils/nb_utils.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
 import '../../../../utils/Constants/global_variable.dart';
 import '../../../../utils/loader.dart';
@@ -60,31 +64,53 @@ class MessageScreen extends GetView<MessageController> {
                                     .toLowerCase()
                                     .contains(controller.searchQuery.toLowerCase())) {
                                   return Padding(
-                                    padding: const EdgeInsets.symmetric(vertical: 6),
-                                    child: MessageListTile(
-                                      message: snapshot.data![index],
-                                      ontap: () {
-                                        GlobalVariable.docId = chatcontroller.docId.value = message.id!;
-                                        //.........................
-                                        chatcontroller.name.value = message.name!;
-                                        chatcontroller.isgroup = message.isgroup!;
-                                        chatcontroller.image.value = message.image!;
-                                        chatcontroller.memberId.value = message.memberIds!;
-                                        chatcontroller.senderName.value = message.yourname!;
-                                        chatcontroller.members.value = message.members ?? [];
-                                        //...............
-                                        // chatcontroller.updateLastSeenMethod();
-                                        pushNewScreen(
-                                          context,
-                                          screen: ChatScreen(
-                                        
-                                            //   name: message.name!.obs,isGroup: message.isgroup,
-                                            // image:message.image!.obs,memberId: message.memberIds!.obs,senderName: message.senderName!.obs,
-                                          ),
-                                        );
-                                      },
-                                    ),
-                                  );
+                                      padding: const EdgeInsets.symmetric(vertical: 6),
+                                      child: Slidable(
+                                        endActionPane: ActionPane(
+                                          extentRatio: 0.27,
+                                          motion: const ScrollMotion(),
+                                          children: [
+                                            SlidableAction(
+                                              onPressed: (_) {
+                                                messageDeleteDialog(onTap: () {
+                                                  controller
+                                                      .deleteMessage(message.id!, userController.userModel.value.uid!)
+                                                      .then((_) => Get.back());
+                                                });
+                                              },
+                                              backgroundColor: appRedColor,
+                                              foregroundColor: appWhiteColor,
+                                              borderRadius: BorderRadius.only(
+                                                  topLeft: const Radius.circular(5), bottomLeft: radiusCircular(5)),
+                                              icon: Icons.delete,
+                                              label: 'Delete',
+                                            ),
+                                          ],
+                                        ),
+                                        child: MessageListTile(
+                                          message: snapshot.data![index],
+                                          ontap: () {
+                                            GlobalVariable.docId = chatcontroller.docId.value = message.id!;
+                                            //.........................
+                                            chatcontroller.name.value = message.name!;
+                                            chatcontroller.isgroup = message.isgroup!;
+                                            chatcontroller.image.value = message.image!;
+                                            chatcontroller.memberId.value = message.memberIds!;
+                                            chatcontroller.senderName.value = message.yourname!;
+                                            chatcontroller.members.value = message.members ?? [];
+                                            //...............
+                                            // chatcontroller.updateLastSeenMethod();
+                                            pushNewScreen(
+                                              context,
+                                              screen: const ChatScreen(
+
+                                                  //   name: message.name!.obs,isGroup: message.isgroup,
+                                                  // image:message.image!.obs,memberId: message.memberIds!.obs,senderName: message.senderName!.obs,
+                                                  ),
+                                            );
+                                          },
+                                        ),
+                                      ));
                                 } else {
                                   return Container();
                                 }

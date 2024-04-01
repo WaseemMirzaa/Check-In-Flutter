@@ -15,7 +15,7 @@ class StickerKeyboard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-        height: 25.h,
+        height: 28.h,
         child: EmojiPicker(
           onBackspacePressed: () {},
           textEditingController: controller,
