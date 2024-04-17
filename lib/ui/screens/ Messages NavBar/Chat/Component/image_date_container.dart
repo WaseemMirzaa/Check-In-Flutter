@@ -45,7 +45,7 @@ class _ImageDateContainerState extends State<ImageDateContainer> {
   // }
   @override
   Widget build(BuildContext context) {
-    String timeseperate = widget.chat!.time!.split(' ')[1];
+    String timeseperate = widget.chat!.time!.toString().split(' ')[1];
     String time = DateTimeUtils.time24to12(timeseperate);
     return Column(
       crossAxisAlignment: widget.mymsg! ? CrossAxisAlignment.end : CrossAxisAlignment.start,

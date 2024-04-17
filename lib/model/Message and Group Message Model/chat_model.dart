@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class Chatmodel {
   String? id;
   String? docID;
@@ -5,9 +7,11 @@ class Chatmodel {
   bool? isRead;
   String? message;
   String? type;
-  String? time;
+  //String? time;
+  Timestamp? time;
   String? thumbnail;
-  String? seenTimeStamp;
+  //String? seenTimeStamp;
+  Timestamp? seenTimeStamp;
   Chatmodel({this.message, this.id, this.docID,this.isDelete,this.isRead, this.time, this.type, this.thumbnail, this.seenTimeStamp});
 
   factory Chatmodel.fromJson(Map<String, dynamic> json, {String? docID}) {

@@ -1,4 +1,5 @@
 import 'package:check_in/core/constant/constant.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Messagemodel {
   String? id;
@@ -8,7 +9,8 @@ class Messagemodel {
   String? lastmessage;
   num? unreadmsg;
   bool? isgroup;
-  String? timeStamp;
+  //String? timeStamp;
+  Timestamp? timeStamp;
   String? senderId;
   String? requestStatus;
   String? senderName;

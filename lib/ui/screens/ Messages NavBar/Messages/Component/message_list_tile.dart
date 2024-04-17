@@ -18,8 +18,8 @@ class MessageListTile extends StatelessWidget {
   MessageListTile({super.key, this.message, this.ontap});
   @override
   Widget build(BuildContext context) {
-    String dateseperate = message!.timeStamp == '' ? '' : message!.timeStamp!.split(' ')[1];
-    String time = message!.timeStamp == '' ? '' : DateTimeUtils.time24to12(dateseperate);
+   // String dateseperate = message!.timeStamp == null ? '' : message!.timeStamp!.toString().split(' ')[1];
+    String time = message!.timeStamp == null ? '' : DateTimeUtils.timeStamp24to12(message!.timeStamp!);
 
     String unReadCount = message!.unreadmsg! < 10 ? '0${message!.unreadmsg.toString()}' : message!.unreadmsg.toString();
 
