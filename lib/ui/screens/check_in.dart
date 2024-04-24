@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:flutter/material.dart';
 import 'dart:developer';
+import 'package:check_in/Services/payment_service.dart';
 import 'package:check_in/auth_service.dart';
 import 'package:check_in/core/constant/app_assets.dart';
 import 'package:check_in/core/constant/constant.dart';
@@ -37,6 +39,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../constants.dart';
 import '../../controllers/user_controller.dart';
 import '../../main.dart';
+import '../../utils/common.dart';
 import 'Players.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/foundation.dart';
@@ -667,13 +670,32 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
                             Icons.verified,
                           ),
                           title: Text(TempLanguage.verifyProfile),
-                          onTap: () {
-                            if (userController.userModel.value.isVerified == false) {
-                              sendEmail(
-                                  userController.userModel.value.userName ?? "",
-                                  userController.userModel.value.email ?? "",
-                                  userController.userModel.value.homeCourt ?? "");
-                            }
+                          onTap: () async {
+                            //showLoadingIndicator(context);
+                            // if (userController.userModel.value.isVerified == false) {
+                            //   if (userController.userModel.value.customerId.isEmptyOrNull) {
+                            //     try {
+                            //       String customerId = await PaymentService.createStripeCustomer(email: userController.userModel.value.email ?? '');
+                            //       await FirebaseFirestore.instance.collection(Collections.USER).doc(FirebaseAuth.instance.currentUser!.uid).update({
+                            //         UserKey.CUSTOMER_ID: customerId
+                            //       });
+                            //       await PaymentService.initPaymentSheet(amount: 1000, customerId: customerId, callback: (bool result) {
+                            //         //Navigator.pop(context);
+                            //       });
+                            //     } catch (e) {
+                            //       log(e.toString());
+                            //       //Navigator.pop(context);
+                            //     }
+                            //   } else {
+                            //     await PaymentService.initPaymentSheet(amount: 1000, customerId: userController.userModel.value.customerId ?? '', callback: (bool result) {
+                            //       //Navigator.pop(context);
+                            //     });
+                            //   }
+                            // }
+                            sendEmail(
+                                userController.userModel.value.userName ?? "",
+                                userController.userModel.value.email ?? "",
+                                userController.userModel.value.homeCourt ?? "");
                           },
                         ),
               FirebaseAuth.instance.currentUser == null

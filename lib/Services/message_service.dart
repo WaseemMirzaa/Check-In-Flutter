@@ -71,7 +71,7 @@ class MessageService {
                 if (data.containsKey(MessageField.DELETE_IDS)) {
                   delete = data[MessageField.DELETE_IDS];
                 }
-                for (var val in mem) {
+                for (var val in data[MessageField.MEMBERS]) {
                   if (val[MessageField.MEMBER_UID] == myId) {
                     unread = val[MessageField.MEMBER_UNREAD_COUNT];
                     checkMyId = true;

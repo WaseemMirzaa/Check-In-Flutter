@@ -11,6 +11,7 @@ class Collections {
 class UserKey {
   static const EMAIL = 'email';
   static const UID = 'uid';
+  static const CUSTOMER_ID = 'customerId';
   static const USER_NAME = 'user name';
   static const IS_VERIFIED = 'isVerified';
   static const PHOTO_URL = 'photoUrl';

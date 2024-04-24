@@ -58,3 +58,47 @@ List<String> setSearchParam(String caseNumber) {
   }
   return caseSearchList;
 }
+
+Widget progressDialog() {
+  return Container(
+    padding: const EdgeInsets.all(16),
+    color: Colors.white.withOpacity(0.8),
+    child: Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        _getLoadingIndicator(),
+      ],
+    ),
+  );
+}
+
+void showLoadingIndicator(BuildContext context) {
+  showDialog(
+    context: context,
+    barrierDismissible: false,
+    builder: (BuildContext context) {
+      return WillPopScope(
+          onWillPop: () {
+            return Future.value(false);
+          },
+          child: AlertDialog(
+            shape: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(8.0))),
+            backgroundColor: Colors.white,
+            content: progressDialog(),
+          ));
+    },
+  );
+}
+
+Widget _getLoadingIndicator() {
+  return const Padding(
+    padding: EdgeInsets.only(bottom: 16),
+    child: SizedBox(
+      width: 32,
+      height: 32,
+      child: CircularProgressIndicator(strokeWidth: 3),
+    ),
+  );
+}
