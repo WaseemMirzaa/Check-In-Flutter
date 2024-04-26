@@ -78,6 +78,8 @@ dependencies:
   device_preview: ^1.1.0
   flutter_slidable: ^3.0.0
   permission_handler: ^11.0.1
+  flutter_stripe: ^8.0.0+1
+  dio: ^5.3.2
 #
 #  google_maps_flutter_platform_interface:
 #      path: /Users/apple/StudioProjects/Check-In-Flutter/google_maps_flutter/google_maps_flutter_platform_interface
