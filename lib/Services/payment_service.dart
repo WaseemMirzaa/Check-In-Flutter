@@ -4,7 +4,7 @@ import 'dart:developer';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_stripe/flutter_stripe.dart';
+// import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:nb_utils/nb_utils.dart';
 
 import 'dio_config.dart';
@@ -59,23 +59,23 @@ class PaymentService {
 
 
       if (clientSecret.isNotEmpty) {
-        await Stripe.instance.initPaymentSheet(
-          paymentSheetParameters: SetupPaymentSheetParameters(
-            paymentIntentClientSecret: clientSecret,
-            merchantDisplayName: 'Check In',
-            customerId: customer,
-            applePay: const PaymentSheetApplePay(
-              merchantCountryCode: 'US',
-            ),
-            googlePay: const PaymentSheetGooglePay(
-              currencyCode: 'USD',
-              merchantCountryCode: 'US',
-            ),
-            customerEphemeralKeySecret: ephemeralKey,
-            style: ThemeMode.dark,
-          ),
-        );
-        await Stripe.instance.presentPaymentSheet();
+        // await Stripe.instance.initPaymentSheet(
+        //   paymentSheetParameters: SetupPaymentSheetParameters(
+        //     paymentIntentClientSecret: clientSecret,
+        //     merchantDisplayName: 'Check In',
+        //     customerId: customer,
+        //     applePay: const PaymentSheetApplePay(
+        //       merchantCountryCode: 'US',
+        //     ),
+        //     googlePay: const PaymentSheetGooglePay(
+        //       currencyCode: 'USD',
+        //       merchantCountryCode: 'US',
+        //     ),
+        //     customerEphemeralKeySecret: ephemeralKey,
+        //     style: ThemeMode.dark,
+        //   ),
+        // );
+        // await Stripe.instance.presentPaymentSheet();
         callback(true);
       }
     } catch (e) {

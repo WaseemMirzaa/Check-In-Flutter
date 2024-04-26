@@ -10,7 +10,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:flutter_stripe/flutter_stripe.dart';
+// import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:get/get_navigation/src/root/get_material_app.dart';
 import 'package:nb_utils/nb_utils.dart';
 import 'package:sizer/sizer.dart';
@@ -99,10 +99,10 @@ void main() async {
   pushNotificationService.init();
   FCMManager.getFCMToken();
 
-  Stripe.publishableKey = 'pk_test_51OVAkvSH2cKtemlY7VjJfdlvi74I4aC3cb623k6O6ZpIw3tgwp6zglGNfNG6jaTfYeXVvSjbT6DyHGKGLEIeju6E002hajlL3c';
-  Stripe.merchantIdentifier = 'merchant.flutter.stripe.test';
-  Stripe.urlScheme = 'flutterstripe';
-  await Stripe.instance.applySettings();
+  // Stripe.publishableKey = 'pk_test_51OVAkvSH2cKtemlY7VjJfdlvi74I4aC3cb623k6O6ZpIw3tgwp6zglGNfNG6jaTfYeXVvSjbT6DyHGKGLEIeju6E002hajlL3c';
+  // Stripe.merchantIdentifier = 'merchant.flutter.stripe.test';
+  // Stripe.urlScheme = 'flutterstripe';
+  // await Stripe.instance.applySettings();
 
   // SharedPreferences prefs = await SharedPreferences.getInstance();
   // var email = prefs.getString('email');
