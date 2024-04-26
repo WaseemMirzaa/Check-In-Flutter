@@ -2,6 +2,10 @@
 import 'dart:convert';
 import 'dart:developer';
 
+import 'package:check_in/auth_service.dart';
+import 'package:check_in/core/constant/constant.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
@@ -31,24 +35,18 @@ class PaymentService {
     });
 
     var completeUrl = '${DioHelper.baseURL}initPaymentSheet';
-    if (kDebugMode) {
-      print('URL: $completeUrl');
-    }
+
     ApiResponse response = await DioHelper.postRawData(completeUrl, params);
     if (response.body != null) {
-      if (kDebugMode) {
-        print(response.body);
-      }
       Map<String, dynamic> mapData = json.decode(response.body);
-
       return mapData;
     } else {
       log('Stripe Response: ${response.body}--');
-      return null;
+      throw Exception();
     }
   }
 
-  static Future<void> initPaymentSheet({required int amount, required String customerId, required void Function(bool result) callback}) async {
+  static Future<void> initPaymentSheet({required int amount, required String customerId}) async {
     try {
       final data = await createPaymentSheet(amount: amount, customerId: customerId);
 
@@ -76,12 +74,12 @@ class PaymentService {
           ),
         );
         await Stripe.instance.presentPaymentSheet();
-        callback(true);
+
+        await FirebaseFirestore.instance.collection(Collections.USER).doc(FirebaseAuth.instance.currentUser?.uid ?? '')
+        .update({'isVerified': true,});
+        userController.userModel.value.copyWith(isVerified: true);
       }
     } catch (e) {
-      if (kDebugMode) {
-        print('Exception $e');
-      }
       toast('Something went wrong. Try again later');
     }
   }

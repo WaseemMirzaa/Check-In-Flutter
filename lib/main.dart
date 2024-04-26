@@ -99,7 +99,7 @@ void main() async {
   pushNotificationService.init();
   FCMManager.getFCMToken();
 
-  Stripe.publishableKey = 'pk_test_51OVAkvSH2cKtemlY7VjJfdlvi74I4aC3cb623k6O6ZpIw3tgwp6zglGNfNG6jaTfYeXVvSjbT6DyHGKGLEIeju6E002hajlL3c';
+  Stripe.publishableKey = 'pk_test_51P9IBQRwQJgokiPYdbWlcZnEpVC6ZDb0B7ZMVPFSJzi0LzPWCSG1kzwnrSscPCH1ZZBzWKoLeapYlZX5QLHBBNKR00HKEkqjkJ';
   Stripe.merchantIdentifier = 'merchant.flutter.stripe.test';
   Stripe.urlScheme = 'flutterstripe';
   await Stripe.instance.applySettings();

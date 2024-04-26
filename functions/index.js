@@ -4,7 +4,7 @@ admin.initializeApp();
 
 const firestore = admin.firestore();
 
-const stripe = require("stripe")("sk_test_51OVAkvSH2cKtemlYccYyFoRZxJaiTt5ybBwAwKI7wzaN2dzhXKoM19mfej22pgS0JLqYNn3b9oFzsRjVpm7u2bRB004er4R15V");
+const stripe = require("stripe")("sk_test_51P9IBQRwQJgokiPYPegZMeUdmsZdKCddCKLK4ftzP37H4Nqxhh2Cga365PIORCdc6Vo7645ICqbNC5oqOvfeRbnD00rj91dn4A");
 
 
 exports.deleteLastCheckedIn = functions.pubsub.schedule("every 60 minutes")

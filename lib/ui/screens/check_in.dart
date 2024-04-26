@@ -671,31 +671,29 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
                           ),
                           title: Text(TempLanguage.verifyProfile),
                           onTap: () async {
-                            //showLoadingIndicator(context);
-                            // if (userController.userModel.value.isVerified == false) {
-                            //   if (userController.userModel.value.customerId.isEmptyOrNull) {
-                            //     try {
-                            //       String customerId = await PaymentService.createStripeCustomer(email: userController.userModel.value.email ?? '');
-                            //       await FirebaseFirestore.instance.collection(Collections.USER).doc(FirebaseAuth.instance.currentUser!.uid).update({
-                            //         UserKey.CUSTOMER_ID: customerId
-                            //       });
-                            //       await PaymentService.initPaymentSheet(amount: 1000, customerId: customerId, callback: (bool result) {
-                            //         //Navigator.pop(context);
-                            //       });
-                            //     } catch (e) {
-                            //       log(e.toString());
-                            //       //Navigator.pop(context);
-                            //     }
-                            //   } else {
-                            //     await PaymentService.initPaymentSheet(amount: 1000, customerId: userController.userModel.value.customerId ?? '', callback: (bool result) {
-                            //       //Navigator.pop(context);
-                            //     });
-                            //   }
-                            // }
-                            sendEmail(
-                                userController.userModel.value.userName ?? "",
-                                userController.userModel.value.email ?? "",
-                                userController.userModel.value.homeCourt ?? "");
+                            showLoadingIndicator(context);
+                            if (userController.userModel.value.isVerified == false) {
+                              if (userController.userModel.value.customerId.isEmptyOrNull) {
+                                try {
+                                  String customerId = await PaymentService.createStripeCustomer(email: userController.userModel.value.email ?? '');
+                                  // await FirebaseFirestore.instance.collection(Collections.USER).doc(FirebaseAuth.instance.currentUser!.uid).update({
+                                  //   UserKey.CUSTOMER_ID: customerId
+                                  // });
+                                  await PaymentService.initPaymentSheet(amount: 1000, customerId: customerId);
+                                } catch (e) {
+                                  log(e.toString());
+                                }
+                              } else {
+                                await PaymentService.initPaymentSheet(amount: 1000, customerId: userController.userModel.value.customerId ?? '');
+                              }
+                            }
+                            Navigator.pop(context);
+                            Navigator.pop(context);
+
+                            // sendEmail(
+                            //     userController.userModel.value.userName ?? "",
+                            //     userController.userModel.value.email ?? "",
+                            //     userController.userModel.value.homeCourt ?? "");
                           },
                         ),
               FirebaseAuth.instance.currentUser == null
