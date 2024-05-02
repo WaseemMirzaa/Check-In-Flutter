@@ -96,7 +96,7 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
                         userController.userModel.value.userName!,
                         userController.userModel.value.photoUrl!,
                       )
-                          .then((value) {
+                          .then((value) async {
                         log('doc id $value');
                         UserModel model = controller.mydata.values.first;
                         chatcontroller.docId.value = value['docId'];
@@ -113,7 +113,8 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
                           chatcontroller.sendNotificationMethod('',
                               '${userController.userModel.value.userName!} sent a message request');
                         } else {
-                          successMessage('Chat already exist');
+                         await controller.updateDeleteChatStatus(value['docId'], userController.userModel.value.uid ?? '');
+                          //successMessage('Chat already exist');
                         }
 
                         // clear map mydata

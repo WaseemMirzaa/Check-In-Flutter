@@ -159,6 +159,28 @@ class MessageService {
             }).toList());
   }
 
+  Future<String?> getLastMessage(String docId, String uId, Timestamp? messageTimeStamp) async {
+
+    final result = await _messagesCollection
+        .doc(docId)
+        .collection(Collections.CHAT)
+        .orderBy(ChatField.TIME_STAMP, descending: true)
+        .limit(1)
+        .get();
+
+    if (result.docs.isNotEmpty) {
+      final doc = result.docs.first;
+      if (messageTimeStamp == null || doc.data()[ChatField.TIME_STAMP].compareTo(messageTimeStamp) > 0) {
+        final chat = Chatmodel.fromJson(doc.data(), docID: doc.id);
+        return chat.message;
+      } else {
+        return null;
+      }
+    } else {
+      return null;
+    }
+  }
+
   // Stream<List<Chatmodel>> getNewConversation(String docId, String uId, List mem) {
   //   return _messagesCollection
   //       .doc(docId)
@@ -273,6 +295,31 @@ class MessageService {
       }
     } catch (error) {
       print("Error updating deleteIds: $error");
+    }
+  }
+
+  Future<void> updateUserDelete(String docId, String userId) async {
+    try {
+      DocumentReference docRef = _messagesCollection.doc(docId);
+      DocumentSnapshot snapshot = await docRef.get();
+      Map<String, dynamic> data = snapshot.data() as Map<String, dynamic>;
+
+      if (snapshot.exists) {
+        List<dynamic> deleteIds = data[MessageField.DELETE_IDS] ?? [];
+
+        for (int i = 0; i < deleteIds.length; i++) {
+          if (deleteIds[i][MessageField.IS_DELETED] == true && deleteIds[i][MessageField.MEMBER_UID] == userId) {
+            deleteIds[i][MessageField.IS_DELETED] = false;
+            break;
+          }
+        }
+        if (data.containsKey(MessageField.DELETE_IDS)) {
+          await _messagesCollection.doc(docId).set({MessageField.DELETE_IDS: deleteIds}, SetOptions(merge: true));
+        }
+        // await _messagesCollection.doc(docId).set({MessageField.DELETE_IDS: deleteIds}, SetOptions(merge: true));
+      }
+    } catch (error) {
+      print(" Error updating deleteIds: ${error.toString()}");
     }
   }
 

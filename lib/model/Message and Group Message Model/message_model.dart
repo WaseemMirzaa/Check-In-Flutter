@@ -9,6 +9,7 @@ class Messagemodel {
   String? lastmessage;
   num? unreadmsg;
   bool? isgroup;
+
   //String? timeStamp;
   Timestamp? timeStamp;
   String? senderId;
@@ -20,6 +21,7 @@ class Messagemodel {
   List? deleteIds;
   List? members;
   bool? showMessageTile;
+
   Messagemodel({
     this.name,
     this.yourname,
@@ -61,6 +63,7 @@ class Messagemodel {
         showMessageTile: showMessageTile,
         yourname: yourName);
   }
+
   Map<String, dynamic> toJson() {
     final data = <String, dynamic>{};
     data[MessageField.ID] = id;
@@ -71,5 +74,44 @@ class Messagemodel {
     data[MessageField.TIME_STAMP] = timeStamp;
 
     return data;
+  }
+
+  Messagemodel copyWith(
+      {String? id,
+      String? name,
+      String? yourname,
+      String? image,
+      String? lastmessage,
+      num? unreadmsg,
+      bool? isgroup,
+      Timestamp? timeStamp,
+      String? senderId,
+      String? requestStatus,
+      String? senderName,
+      String? recieverName,
+      String? recieverId,
+      List? memberIds,
+      List? deleteIds,
+      List? members,
+      bool? showMessageTile}) {
+    return Messagemodel(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      yourname: yourname ?? this.yourname,
+      image: image ?? this.image,
+      lastmessage: lastmessage ?? this.lastmessage,
+      unreadmsg: unreadmsg ?? this.unreadmsg,
+      isgroup: isgroup ?? this.isgroup,
+      timeStamp: timeStamp ?? this.timeStamp,
+      senderId: senderId ?? this.senderId,
+      requestStatus: requestStatus ?? this.requestStatus,
+      senderName: senderName ?? this.senderName,
+      recieverName: recieverName ?? this.recieverName,
+      recieverId: recieverId ?? this.recieverId,
+      memberIds: memberIds ?? this.memberIds,
+      deleteIds: deleteIds ?? this.deleteIds,
+      members: members ?? this.members,
+      showMessageTile: showMessageTile ?? this.showMessageTile
+    );
   }
 }
