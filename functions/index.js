@@ -5,7 +5,7 @@ admin.initializeApp();
 const firestore = admin.firestore();
 
 // sk_test_51P9IBQRwQJgokiPYPegZMeUdmsZdKCddCKLK4ftzP37H4Nqxhh2Cga365PIORCdc6Vo7645ICqbNC5oqOvfeRbnD00rj91dn4A
-const stripe = require("stripe")("sk_test_51P9IBQRwQJgokiPYPegZMeUdmsZdKCddCKLK4ftzP37H4Nqxhh2Cga365PIORCdc6Vo7645ICqbNC5oqOvfeRbnD00rj91dn4A");
+const stripe = require("stripe")("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");
 // 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
 
 
