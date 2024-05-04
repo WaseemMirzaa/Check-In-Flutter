@@ -51,8 +51,7 @@ class UserModel {
         userName: map[UserKey.USER_NAME] ?? "",
         email: map[UserKey.EMAIL] ?? "",
         uid: map[UserKey.UID] ?? "",
-        isVerified: map[UserKey.IS_VERIFIED] ??
-            true, //because all previous users are verified
+        isVerified: map[UserKey.IS_VERIFIED] ?? false, //because all previous users are verified
         photoUrl: map[UserKey.PHOTO_URL] ?? "",
         checkedIn: map[UserKey.CHECKED_IN] ?? false,
         checkedInCourtName: map[UserKey.CHECKED_IN_COURT_NAME] ?? "",

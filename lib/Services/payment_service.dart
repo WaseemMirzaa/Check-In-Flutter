@@ -46,7 +46,7 @@ class PaymentService {
     }
   }
 
-  static Future<void> initPaymentSheet({required int amount, required String customerId}) async {
+  static Future<void> initPaymentSheet({required BuildContext context, required int amount, required String customerId}) async {
     try {
       final data = await createPaymentSheet(amount: amount, customerId: customerId);
 
@@ -75,12 +75,44 @@ class PaymentService {
         );
         await Stripe.instance.presentPaymentSheet();
 
+        showConfirmDialogCustom(
+          context,
+          barrierDismissible: false,
+          cancelable: false,
+          title: 'You are now officially verified, enjoy the blue check!',
+          dialogType: DialogType.ACCEPT,
+          positiveText: 'Ok',
+          onAccept: (ctx){
+            Navigator.pop(ctx);
+            Navigator.pop(context);
+          },
+          onCancel: (ctx){
+            Navigator.pop(ctx);
+            Navigator.pop(context);
+          }
+        );
+
         await FirebaseFirestore.instance.collection(Collections.USER).doc(FirebaseAuth.instance.currentUser?.uid ?? '')
         .update({'isVerified': true,});
         userController.userModel.value.copyWith(isVerified: true);
       }
     } catch (e) {
-      toast('Something went wrong. Try again later');
+      showConfirmDialogCustom(
+        context,
+        barrierDismissible: false,
+        cancelable: false,
+        title: 'Something went wrong. Try again later',
+        dialogType: DialogType.RETRY,
+        positiveText: 'Ok',
+        onAccept: (ctx){
+          Navigator.pop(ctx);
+          Navigator.pop(context);
+        },
+        onCancel: (ctx){
+          Navigator.pop(ctx);
+          Navigator.pop(context);
+        }
+      );
     }
   }
 }

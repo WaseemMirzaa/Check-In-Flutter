@@ -671,25 +671,35 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
                           ),
                           title: Text(TempLanguage.verifyProfile),
                           onTap: () async {
-                            showLoadingIndicator(context);
-                            if (userController.userModel.value.isVerified == false) {
-                              if (userController.userModel.value.customerId.isEmptyOrNull) {
-                                try {
-                                  String customerId = await PaymentService.createStripeCustomer(email: userController.userModel.value.email ?? '');
-                                  // await FirebaseFirestore.instance.collection(Collections.USER).doc(FirebaseAuth.instance.currentUser!.uid).update({
-                                  //   UserKey.CUSTOMER_ID: customerId
-                                  // });
-                                  await PaymentService.initPaymentSheet(amount: 1000, customerId: customerId);
-                                } catch (e) {
-                                  log(e.toString());
+                            nbutils.showConfirmDialogCustom(
+                              context,
+                              title: 'Get verified today!',
+                              subTitle: '',
+                              dialogType: nbutils.DialogType.CONFIRMATION,
+                              cancelable: false,
+                              onAccept: (ctx) async {
+                                Navigator.pop(ctx);
+                                showLoadingIndicator(context);
+                                if (userController.userModel.value.isVerified == false) {
+                                  if (userController.userModel.value.customerId.isEmptyOrNull) {
+                                    try {
+                                      String customerId = await PaymentService.createStripeCustomer(email: userController.userModel.value.email ?? '');
+                                      // await FirebaseFirestore.instance.collection(Collections.USER).doc(FirebaseAuth.instance.currentUser!.uid).update({
+                                      //   UserKey.CUSTOMER_ID: customerId
+                                      // });
+                                      await PaymentService.initPaymentSheet(context: context, amount: 1000, customerId: customerId);
+                                    } catch (e) {
+                                      log(e.toString());
+                                    }
+                                  } else {
+                                    await PaymentService.initPaymentSheet(context: context, amount: 1000, customerId: userController.userModel.value.customerId ?? '');
+                                  }
                                 }
-                              } else {
-                                await PaymentService.initPaymentSheet(amount: 1000, customerId: userController.userModel.value.customerId ?? '');
+                              },
+                              onCancel: (ctx){
+                                Navigator.pop(ctx);
                               }
-                            }
-                            Navigator.pop(context);
-                            Navigator.pop(context);
-
+                            );
                             // sendEmail(
                             //     userController.userModel.value.userName ?? "",
                             //     userController.userModel.value.email ?? "",

@@ -1,4 +1,6 @@
+import 'package:check_in/auth_service.dart';
 import 'package:check_in/model/Message%20and%20Group%20Message%20Model/message_model.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
 
 import '../../Services/message_service.dart';
@@ -17,6 +19,11 @@ class MessageController extends GetxController {
   Future<bool> updateCollection(String collectionName, String docID, Map<String, dynamic> list) async {
     final update = await chatService.updateCollection(collectionName, docID, list);
     return update;
+  }
+
+  Future<String?> getLastMessage(String docId) async {
+    Timestamp? timeStamp = await chatService.getDeleteTimeStamp(docId, userController.userModel.value.uid!);
+    return await chatService.getLastMessage(docId, userController.userModel.value.uid!, timeStamp);
   }
 
   // Future<bool> leftGroup(String docID) async {
