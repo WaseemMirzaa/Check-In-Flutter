@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:check_in/controllers/Messages/chat_controller.dart';
 import 'package:check_in/controllers/user_controller.dart';
+import 'package:check_in/core/constant/app_assets.dart';
 import 'package:check_in/core/constant/constant.dart';
 import 'package:check_in/core/constant/temp_language.dart';
 import 'package:check_in/model/Message%20and%20Group%20Message%20Model/chat_model.dart';
@@ -375,10 +376,10 @@ class _ChatScreenState extends State<ChatScreen> {
                                             padding: const EdgeInsets.only(bottom: 22.0),
                                             child: CircleAvatar(
                                               backgroundColor: appGreenColor.withOpacity(0.6),
-                                              backgroundImage: controller.image.value != '' && !controller.isgroup
-                                                  ? NetworkImage(
-                                                      controller.image.value,
-                                                    )
+                                              backgroundImage: !controller.isgroup
+                                                  ? controller.image.value.isEmptyOrNull
+                                                    ? const NetworkImage(AppAssets.defaulImg)
+                                                    : NetworkImage(controller.image.value)
                                                   : _showGroupImage(chat.id!),
                                               radius: 17,
                                             ),
@@ -702,7 +703,7 @@ class _ChatScreenState extends State<ChatScreen> {
       print("group member image --->  ${member['image']}");
       if (member['uid'] == chatId) {
         // Return the user image URL if found
-        return member['image'] == null ? AssetImage(AppImage.user) as NetworkImage : NetworkImage(member['image']);
+        return (member['image'] == null || member['image'] == '') ? NetworkImage(AppAssets.defaulImg) : NetworkImage(member['image']);
       }
     }
     // Return null if no user with matching ID is found
