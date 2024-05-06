@@ -45,6 +45,7 @@ dependencies:
   geolocator: ^7.1.0
   geocoding: ^2.0.0
   flutter_svg:
+#  flutter_stripe: ^9.1.1
   email_validator: ^2.1.17
   firebase_core: ^2.24.2
   cloud_firestore: ^4.14.0
