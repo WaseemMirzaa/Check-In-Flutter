@@ -58,6 +58,13 @@ class MessageService {
         .map((querySnapshot) => querySnapshot.docs.map<Messagemodel>((doc) {
               num unread = 0;
               Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+
+              if(data[MessageField.TIME_STAMP] is !Timestamp) {
+                return Messagemodel(
+                  showMessageTile: false
+                );
+              }
+
               bool checkMyId = false;
               bool checkDeleteStatus = true;
               bool showMessagetile = false;
