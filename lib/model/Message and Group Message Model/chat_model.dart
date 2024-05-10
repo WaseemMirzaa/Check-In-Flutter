@@ -25,7 +25,7 @@ class Chatmodel {
         message: json['message'],
         time: json['timeStamp'] is !Timestamp ? convertDateToTimeStamp(json['timeStamp']) : json['timeStamp'],
         type: json['type'],
-        seenTimeStamp: json['seenTimeStamp'],
+        seenTimeStamp: json['seenTimeStamp'] == null ? null : json['seenTimeStamp'] is !Timestamp ? convertDateToTimeStamp(json['seenTimeStamp']) : json['seenTimeStamp'],
         thumbnail: json['thumbnail']);
   }
   Map<String, dynamic> toJson() {

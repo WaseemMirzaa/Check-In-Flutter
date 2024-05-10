@@ -157,9 +157,7 @@ class MessageService {
                 .where((doc) {
                   return messageTimeStamp == null
                       ? true
-                      : (doc.data()[ChatField.TIME_STAMP] is !Timestamp
-                         ? convertDateToTimeStamp(doc.data()[ChatField.TIME_STAMP]).compareTo(messageTimeStamp) > 0
-                         : doc.data()[ChatField.TIME_STAMP].compareTo(messageTimeStamp) > 0);
+                      : doc.data()[ChatField.TIME_STAMP].compareTo(messageTimeStamp) > 0;
                }) // Filter messages by timestamp
                 .map<Chatmodel>((doc) {
               // updateLastSeen(docId, uId);
@@ -728,7 +726,7 @@ class MessageService {
     String documentId = documentReference.id;
 
     // Update the 'id' field in the model with the document ID
-    _messagesCollection.doc(documentId).update({MessageField.ID: documentId});
+    await _messagesCollection.doc(documentId).update({MessageField.ID: documentId});
     return documentId;
   }
 
@@ -779,7 +777,7 @@ class MessageService {
     groupImage != '' ? image = await uploadImageToFirebase(documentId, groupImage) : image = '';
 
     // Update the 'id' field in the model with the document ID
-    _messagesCollection.doc(documentId).update({MessageField.ID: documentId, MessageField.GROUP_IMG: image});
+    await _messagesCollection.doc(documentId).update({MessageField.ID: documentId, MessageField.GROUP_IMG: image});
     return {MessageField.ID: documentId, MessageField.GROUP_IMG: image ?? ''};
   }
 

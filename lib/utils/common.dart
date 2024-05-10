@@ -104,8 +104,11 @@ Widget _getLoadingIndicator() {
   );
 }
 
-Timestamp convertDateToTimeStamp(String date) {
-  DateTime dateTime = DateTime.parse(date);
+Timestamp? convertDateToTimeStamp(String date) {
+   if (date.isEmpty) {
+     return null;
+   }
+   DateTime dateTime = DateTime.parse(date);
   Timestamp firebaseTimestamp = Timestamp.fromDate(dateTime);
   return firebaseTimestamp;
 }
