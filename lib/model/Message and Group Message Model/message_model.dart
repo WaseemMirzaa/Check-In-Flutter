@@ -1,4 +1,5 @@
 import 'package:check_in/core/constant/constant.dart';
+import 'package:check_in/utils/common.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Messagemodel {
@@ -51,7 +52,7 @@ class Messagemodel {
         lastmessage: json[MessageField.LAST_MESSAGE],
         unreadmsg: unread ?? 0,
         isgroup: json[MessageField.IS_GROUP],
-        timeStamp: json[MessageField.TIME_STAMP],
+        timeStamp: json[MessageField.TIME_STAMP] is !Timestamp ? convertDateToTimeStamp(json[MessageField.TIME_STAMP]) : json[MessageField.TIME_STAMP],
         senderId: json[MessageField.SENDER_ID],
         requestStatus: json[MessageField.REQUEST_STATUS],
         senderName: json[MessageField.SENDER_NAME],

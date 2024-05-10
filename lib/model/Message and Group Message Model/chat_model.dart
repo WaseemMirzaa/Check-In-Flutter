@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+import '../../utils/common.dart';
+
 class Chatmodel {
   String? id;
   String? docID;
@@ -21,7 +23,7 @@ class Chatmodel {
         isDelete: json['isDelete'],
         isRead: json['isRead'],
         message: json['message'],
-        time: json['timeStamp'],
+        time: json['timeStamp'] is !Timestamp ? convertDateToTimeStamp(json['timeStamp']) : json['timeStamp'],
         type: json['type'],
         seenTimeStamp: json['seenTimeStamp'],
         thumbnail: json['thumbnail']);

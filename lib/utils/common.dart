@@ -1,5 +1,6 @@
 
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -101,4 +102,10 @@ Widget _getLoadingIndicator() {
       child: CircularProgressIndicator(strokeWidth: 3),
     ),
   );
+}
+
+Timestamp convertDateToTimeStamp(String date) {
+  DateTime dateTime = DateTime.parse(date);
+  Timestamp firebaseTimestamp = Timestamp.fromDate(dateTime);
+  return firebaseTimestamp;
 }

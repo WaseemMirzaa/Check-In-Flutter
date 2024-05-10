@@ -11,6 +11,7 @@ import 'package:check_in/model/Message%20and%20Group%20Message%20Model/group_det
 import 'package:check_in/model/Message%20and%20Group%20Message%20Model/group_member_model.dart';
 import 'package:check_in/model/user_modal.dart';
 import 'package:check_in/utils/Constants/enums.dart';
+import 'package:check_in/utils/common.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:intl/intl.dart';
@@ -59,11 +60,11 @@ class MessageService {
               num unread = 0;
               Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
 
-              if(data[MessageField.TIME_STAMP] is !Timestamp) {
-                return Messagemodel(
-                  showMessageTile: false
-                );
-              }
+              // if(data[MessageField.TIME_STAMP] is !Timestamp) {
+              //   return Messagemodel(
+              //     showMessageTile: false
+              //   );
+              // }
 
               bool checkMyId = false;
               bool checkDeleteStatus = true;
@@ -156,7 +157,9 @@ class MessageService {
                 .where((doc) {
                   return messageTimeStamp == null
                       ? true
-                      : doc.data()[ChatField.TIME_STAMP].compareTo(messageTimeStamp) > 0;
+                      : (doc.data()[ChatField.TIME_STAMP] is !Timestamp
+                         ? convertDateToTimeStamp(doc.data()[ChatField.TIME_STAMP]).compareTo(messageTimeStamp) > 0
+                         : doc.data()[ChatField.TIME_STAMP].compareTo(messageTimeStamp) > 0);
                }) // Filter messages by timestamp
                 .map<Chatmodel>((doc) {
               // updateLastSeen(docId, uId);
