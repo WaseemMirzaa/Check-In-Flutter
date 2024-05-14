@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
 
 class DateTimeUtils {
@@ -6,6 +7,15 @@ class DateTimeUtils {
     final DateFormat outputFormat = DateFormat('h:mm a');
     final DateTime dateTime = inputFormat.parse(time);
     final String formattedTime = outputFormat.format(dateTime);
+    return formattedTime;
+  }
+
+  static String timeStamp24to12(Timestamp time) {
+    final DateFormat inputFormat = DateFormat('HH:mm');
+    final DateFormat outputFormat = DateFormat('h:mm a');
+    DateTime date = time.toDate();
+    //final DateTime dateTime = inputFormat.parse(date.toString());
+    final String formattedTime = outputFormat.format(date);
     return formattedTime;
   }
 

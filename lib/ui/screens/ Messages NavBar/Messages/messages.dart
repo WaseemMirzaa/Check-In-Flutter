@@ -58,6 +58,7 @@ class MessageScreen extends GetView<MessageController> {
                           itemCount: snapshot.data!.length,
                           itemBuilder: (context, index) {
                             var message = snapshot.data![index];
+
                             if (message.showMessageTile!) {
                               return Obx(() {
                                 if (snapshot.data![index].name!

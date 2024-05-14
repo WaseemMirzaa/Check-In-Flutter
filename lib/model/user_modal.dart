@@ -11,6 +11,7 @@ class UserModel {
   // String? checkedCourts;
   String? aboutMe;
   String? homeCourt;
+  String? customerId;
   int? goldenCheckin;
   List? deviceTokes;
 
@@ -23,6 +24,7 @@ class UserModel {
       this.checkedIn,
       this.checkedInCourtName,
       this.aboutMe,
+      this.customerId,
       this.homeCourt,
       this.goldenCheckin,
       this.deviceTokes});
@@ -31,6 +33,7 @@ class UserModel {
     return <String, dynamic>{
       UserKey.EMAIL: email,
       UserKey.UID: uid,
+      UserKey.CUSTOMER_ID: customerId,
       UserKey.USER_NAME: userName,
       UserKey.IS_VERIFIED: isVerified,
       UserKey.PHOTO_URL: photoUrl,
@@ -48,13 +51,13 @@ class UserModel {
         userName: map[UserKey.USER_NAME] ?? "",
         email: map[UserKey.EMAIL] ?? "",
         uid: map[UserKey.UID] ?? "",
-        isVerified: map[UserKey.IS_VERIFIED] ??
-            true, //because all previous users are verified
+        isVerified: map[UserKey.IS_VERIFIED] ?? false, //because all previous users are verified
         photoUrl: map[UserKey.PHOTO_URL] ?? "",
         checkedIn: map[UserKey.CHECKED_IN] ?? false,
         checkedInCourtName: map[UserKey.CHECKED_IN_COURT_NAME] ?? "",
         aboutMe: map[UserKey.ABOUT_ME] ?? "",
         homeCourt: map[UserKey.HOME_COURT] ?? "",
+        customerId: map[UserKey.CUSTOMER_ID] ?? '',
         goldenCheckin: map[UserKey.GOLDEN_CHECK_IN] ?? 0,
         deviceTokes: map[UserKey.DEVICE_TOKEN]);
   }
@@ -71,6 +74,7 @@ class UserModel {
     String? aboutMe,
     String? homeCourt,
     int? goldenCheckin,
+    String? customerId
   }) {
     return UserModel(
       userName: userName ?? this.userName,
@@ -83,6 +87,7 @@ class UserModel {
       aboutMe: aboutMe ?? this.aboutMe,
       homeCourt: homeCourt ?? this.homeCourt,
       goldenCheckin: goldenCheckin ?? this.goldenCheckin,
+      customerId: customerId ?? this.customerId
     );
   }
 }

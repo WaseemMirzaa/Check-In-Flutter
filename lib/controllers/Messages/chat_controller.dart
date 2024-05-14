@@ -59,7 +59,7 @@ class ChatController extends GetxController {
   //............. get all conversation
   Stream<List<Chatmodel>> getConversation() async* {
     print('././././././../. $members');
-    String timeStamp = await chatService.getDeleteTimeStamp(docId.value, userController.userModel.value.uid!);
+    Timestamp? timeStamp = await chatService.getDeleteTimeStamp(docId.value, userController.userModel.value.uid!);
     // chatService.updateUnreadCount(docId.value, userController.userModel.value.uid!, 0, members);
     // chatService.readReceipts(docId.value, userController.userModel.value.uid!);
 
@@ -82,7 +82,7 @@ class ChatController extends GetxController {
   Future<DocumentSnapshot?> sendMessage() async {
     sendMsgLoader.value = true;
 
-    String time = DateTime.now().toString();
+    //String time = DateTime.now().toString();
     String uid = userController.userModel.value.uid!;
     String message = '';
     String type = '';
@@ -97,7 +97,7 @@ class ChatController extends GetxController {
     }
 
     Chatmodel? chatmodel =
-        Chatmodel(id: uid, message: message, time: time, type: type, thumbnail: thumbnailPath, seenTimeStamp: "");
+        Chatmodel(id: uid, message: message, time: Timestamp.now(), type: type, thumbnail: thumbnailPath, seenTimeStamp: null);
     // try {
     DocumentSnapshot? newMessageDoc = await chatService.sendMessage(docId.value, chatmodel, members);
     sendMsgLoader.value = false;

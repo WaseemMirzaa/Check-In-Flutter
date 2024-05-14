@@ -34,8 +34,8 @@ class MessageDateContainer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    String timeseperate = chat!.time!.split(' ')[1];
-    String time = DateTimeUtils.time24to12(timeseperate);
+    //String timeseperate = chat!.time!.toString().split(' ')[1];
+    String time = DateTimeUtils.timeStamp24to12(chat!.time!);
     List<InlineSpan> spans = [];
 
     for (int runeValue in chat!.message!.runes) {

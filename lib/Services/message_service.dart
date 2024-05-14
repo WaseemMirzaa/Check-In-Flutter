@@ -11,6 +11,7 @@ import 'package:check_in/model/Message%20and%20Group%20Message%20Model/group_det
 import 'package:check_in/model/Message%20and%20Group%20Message%20Model/group_member_model.dart';
 import 'package:check_in/model/user_modal.dart';
 import 'package:check_in/utils/Constants/enums.dart';
+import 'package:check_in/utils/common.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:intl/intl.dart';
@@ -58,6 +59,13 @@ class MessageService {
         .map((querySnapshot) => querySnapshot.docs.map<Messagemodel>((doc) {
               num unread = 0;
               Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+
+              // if(data[MessageField.TIME_STAMP] is !Timestamp) {
+              //   return Messagemodel(
+              //     showMessageTile: false
+              //   );
+              // }
+
               bool checkMyId = false;
               bool checkDeleteStatus = true;
               bool showMessagetile = false;
@@ -71,7 +79,7 @@ class MessageService {
                 if (data.containsKey(MessageField.DELETE_IDS)) {
                   delete = data[MessageField.DELETE_IDS];
                 }
-                for (var val in mem) {
+                for (var val in data[MessageField.MEMBERS]) {
                   if (val[MessageField.MEMBER_UID] == myId) {
                     unread = val[MessageField.MEMBER_UNREAD_COUNT];
                     checkMyId = true;
@@ -139,21 +147,46 @@ class MessageService {
   }
 
 //............ Get conversations
-  Stream<List<Chatmodel>> getConversation(String docId, String uId, List mem, String messageTimeStamp) {
+  Stream<List<Chatmodel>> getConversation(String docId, String uId, List mem, Timestamp? messageTimeStamp) {
     return _messagesCollection
         .doc(docId)
         .collection(Collections.CHAT)
         .orderBy(ChatField.TIME_STAMP, descending: true)
         .snapshots()
         .map((querySnapshot) => querySnapshot.docs
-                .where((doc) =>
-                    doc.data()[ChatField.TIME_STAMP].compareTo(messageTimeStamp) > 0) // Filter messages by timestamp
+                .where((doc) {
+                  return messageTimeStamp == null
+                      ? true
+                      : doc.data()[ChatField.TIME_STAMP].compareTo(messageTimeStamp) > 0;
+               }) // Filter messages by timestamp
                 .map<Chatmodel>((doc) {
               // updateLastSeen(docId, uId);
               updateUnreadCount(docId, uId, mem);
               readReceipts(docId, uId);
               return Chatmodel.fromJson(doc.data(), docID: doc.id);
             }).toList());
+  }
+
+  Future<String?> getLastMessage(String docId, String uId, Timestamp? messageTimeStamp) async {
+
+    final result = await _messagesCollection
+        .doc(docId)
+        .collection(Collections.CHAT)
+        .orderBy(ChatField.TIME_STAMP, descending: true)
+        .limit(1)
+        .get();
+
+    if (result.docs.isNotEmpty) {
+      final doc = result.docs.first;
+      if (messageTimeStamp == null || doc.data()[ChatField.TIME_STAMP].compareTo(messageTimeStamp) > 0) {
+        final chat = Chatmodel.fromJson(doc.data(), docID: doc.id);
+        return chat.message;
+      } else {
+        return null;
+      }
+    } else {
+      return null;
+    }
   }
 
   // Stream<List<Chatmodel>> getNewConversation(String docId, String uId, List mem) {
@@ -172,10 +205,10 @@ class MessageService {
   //   });
   // }
 
-  Future<String> getDeleteTimeStamp(String docId, String uId) async {
+  Future<Timestamp?> getDeleteTimeStamp(String docId, String uId) async {
     DocumentSnapshot messageSnapshot = await _messagesCollection.doc(docId).get();
     Map<String, dynamic> data = messageSnapshot.data() as Map<String, dynamic>;
-    String deleteTimestamp = '';
+    Timestamp? deleteTimestamp;
 
     if (messageSnapshot.exists && data.containsKey(MessageField.DELETE_IDS)) {
       List<dynamic> deleteIds = data[MessageField.DELETE_IDS];
@@ -229,7 +262,7 @@ class MessageService {
       for (int i = 0; i < deleteIds.length; i++) {
         if (deleteIds[i][MessageField.MEMBER_UID] == userID) {
           deleteIds[i][MessageField.IS_DELETED] = true;
-          deleteIds[i][MessageField.DELETE_TIMESTAMP] = DateTime.now().toString();
+          deleteIds[i][MessageField.DELETE_TIMESTAMP] = Timestamp.now();
           found = true;
           break;
         }
@@ -239,7 +272,7 @@ class MessageService {
         Map<String, dynamic> userData = {
           MessageField.MEMBER_UID: userID,
           MessageField.IS_DELETED: true,
-          MessageField.DELETE_TIMESTAMP: DateTime.now().toString()
+          MessageField.DELETE_TIMESTAMP: Timestamp.now()
         };
         deleteIds.add(userData);
       }
@@ -270,6 +303,31 @@ class MessageService {
       }
     } catch (error) {
       print("Error updating deleteIds: $error");
+    }
+  }
+
+  Future<void> updateUserDelete(String docId, String userId) async {
+    try {
+      DocumentReference docRef = _messagesCollection.doc(docId);
+      DocumentSnapshot snapshot = await docRef.get();
+      Map<String, dynamic> data = snapshot.data() as Map<String, dynamic>;
+
+      if (snapshot.exists) {
+        List<dynamic> deleteIds = data[MessageField.DELETE_IDS] ?? [];
+
+        for (int i = 0; i < deleteIds.length; i++) {
+          if (deleteIds[i][MessageField.IS_DELETED] == true && deleteIds[i][MessageField.MEMBER_UID] == userId) {
+            deleteIds[i][MessageField.IS_DELETED] = false;
+            break;
+          }
+        }
+        if (data.containsKey(MessageField.DELETE_IDS)) {
+          await _messagesCollection.doc(docId).set({MessageField.DELETE_IDS: deleteIds}, SetOptions(merge: true));
+        }
+        // await _messagesCollection.doc(docId).set({MessageField.DELETE_IDS: deleteIds}, SetOptions(merge: true));
+      }
+    } catch (error) {
+      print(" Error updating deleteIds: ${error.toString()}");
     }
   }
 
@@ -403,7 +461,7 @@ class MessageService {
     DocumentSnapshot messageSnapshot = await docRef.get();
     if (chatmodel.type == 'image') {
       var image = await uploadChatImageToFirebase(
-          docId, chatmodel.message!, chatmodel.id!, chatmodel.time!, messageSnapshot, chatmodel.thumbnail!);
+          docId, chatmodel.message!, chatmodel.id!, chatmodel.time!.microsecondsSinceEpoch.toString(), messageSnapshot, chatmodel.thumbnail!);
       chatmodel.message = image['original'];
       chatmodel.thumbnail = image['thumbnail'];
     }
@@ -659,7 +717,8 @@ class MessageService {
       MessageField.SENDER_IMG: UIimage,
       MessageField.SENDER_NAME: senderName,
       MessageField.SENDER_UNREAD: 0,
-      MessageField.TIME_STAMP: DateTime.now().toString(),
+      //MessageField.TIME_STAMP: DateTime.now().toString(),
+      MessageField.TIME_STAMP: Timestamp.now(),
       MessageField.REQUEST_STATUS: RequestStatusEnum.pending.name
     };
 
@@ -667,7 +726,7 @@ class MessageService {
     String documentId = documentReference.id;
 
     // Update the 'id' field in the model with the document ID
-    _messagesCollection.doc(documentId).update({MessageField.ID: documentId});
+    await _messagesCollection.doc(documentId).update({MessageField.ID: documentId});
     return documentId;
   }
 
@@ -707,7 +766,8 @@ class MessageService {
       MessageField.LAST_MESSAGE: '',
       MessageField.MEMBER_IDS: ids,
       MessageField.MEMBERS: members,
-      MessageField.TIME_STAMP: DateTime.now().toString(),
+      //MessageField.TIME_STAMP: DateTime.now().toString(),
+      MessageField.TIME_STAMP: Timestamp.now(),
     };
 
     DocumentReference documentReference = await _messagesCollection.add(data);
@@ -717,7 +777,7 @@ class MessageService {
     groupImage != '' ? image = await uploadImageToFirebase(documentId, groupImage) : image = '';
 
     // Update the 'id' field in the model with the document ID
-    _messagesCollection.doc(documentId).update({MessageField.ID: documentId, MessageField.GROUP_IMG: image});
+    await _messagesCollection.doc(documentId).update({MessageField.ID: documentId, MessageField.GROUP_IMG: image});
     return {MessageField.ID: documentId, MessageField.GROUP_IMG: image ?? ''};
   }
 

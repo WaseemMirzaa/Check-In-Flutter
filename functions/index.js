@@ -1,28 +1,13 @@
-/* eslint-disable require-jsdoc */
-/**
- * Import function triggers from their respective submodules:
- *
- * const {onCall} = require("firebase-functions/v2/https");
- * const {onDocumentWritten} = require("firebase-functions/v2/firestore");
- *
- * See a full list of supported triggers at https://firebase.google.com/docs/functions
- */
-
-// const {onRequest} = require("firebase-functions/v2/https");
-// const logger = require("firebase-functions/logger");
 const functions = require("firebase-functions");
 const admin = require("firebase-admin");
 admin.initializeApp();
 
 const firestore = admin.firestore();
 
-// Create and deploy your first functions
-// https://firebase.google.com/docs/functions/get-started
+// sk_test_51P9IBQRwQJgokiPYPegZMeUdmsZdKCddCKLK4ftzP37H4Nqxhh2Cga365PIORCdc6Vo7645ICqbNC5oqOvfeRbnD00rj91dn4A
+const stripe = require("stripe")("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");
+// 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
 
-// exports.helloWorld = onRequest((request, response) => {
-//   logger.info("Hello logs!", {structuredData: true});
-//   response.send("Hello from Firebase!");
-// });
 
 exports.deleteLastCheckedIn = functions.pubsub.schedule("every 60 minutes")
     .onRun((context) => {
@@ -44,7 +29,7 @@ exports.deleteLastCheckedIn = functions.pubsub.schedule("every 60 minutes")
                 const hoursSinceLastCheckedIn = Math.abs(currentTime -
               lastCheckedInTime) / (1000 * 60 * 60);
 
-                // eslint-disable-next-line max-len
+
                 // console.log("hoursSinceLastCheckedIn:" + hoursSinceLastCheckedIn);
 
                 if (hoursSinceLastCheckedIn >= 3) {
@@ -151,3 +136,50 @@ exports.sendNotification = functions.https.onRequest(async (req, res) => {
     res.status(500).send("Error sending notification");
   }
 });
+
+exports.initPaymentSheet = functions.https.onRequest(async (data, res) => {
+  try {
+    const {amount, customerId} = data.body;
+    const ephemeralKey = await stripe.ephemeralKeys.create({
+      customer: customerId,
+    }, {
+      apiVersion: "2024-04-10",
+    });
+
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount: amount,
+      currency: "usd",
+      customer: customerId,
+      automatic_payment_methods: {
+        enabled: true,
+      },
+    });
+
+    res.status(200).json({
+      paymentIntent: paymentIntent,
+      ephemeralKey: ephemeralKey.secret,
+      customer: customerId,
+      clientSecret: paymentIntent.client_secret,
+    });
+  } catch (error) {
+    console.error("Error:", error.message);
+    res.status(500).json({error: error.message});
+  }
+});
+
+exports.createStripeCustomer = functions.https.onRequest(async (data, res) => {
+  try {
+    const email = data.body.email;
+    const customer = await stripe.customers.create({
+      email: email,
+    });
+
+    res.json({customerId: customer.id});
+  } catch (err) {
+    console.log(err);
+    res.json({error: err});
+
+    res.status(500).json({error: err.message});
+  }
+});
+

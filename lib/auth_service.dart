@@ -1,3 +1,5 @@
+import 'package:check_in/Services/dio_config.dart';
+import 'package:check_in/Services/payment_service.dart';
 import 'package:check_in/Services/push_notification_service.dart';
 import 'package:check_in/controllers/user_controller.dart';
 import 'package:check_in/core/constant/constant.dart';
@@ -31,12 +33,14 @@ Future<bool> signUp(
         .then((value) async {
       List<String> nameSearchParams = setSearchParam(userName);
       String token = await FCMManager.getFCMToken();
+      String customerId = await PaymentService.createStripeCustomer(email: email);
       snap.collection(Collections.USER).doc(auth.currentUser!.uid).set({
         UserKey.USER_NAME: auth.currentUser!.displayName,
         UserKey.EMAIL: auth.currentUser!.email,
         UserKey.UID: auth.currentUser!.uid,
         UserKey.CHECKED_IN: false,
         UserKey.IS_VERIFIED: false,
+        UserKey.CUSTOMER_ID: customerId,
         UserKey.PARAMS: FieldValue.arrayUnion(nameSearchParams),
         //TODO: Change it to arrayUnion
         // UserKey.DEVICE_TOKEN:

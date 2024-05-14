@@ -93,6 +93,13 @@ class NewMessageController extends GetxController {
     }
   }
 
+  Future<void> updateDeleteChatStatus(String docId, String userId) async {
+    try {
+      final response = await chatService.updateUserDelete(docId, userId);
+    } catch(e) {
+    }
+  }
+
 //........... start new group chat
   Future<String> startNewGroupChat(
       String myUid, String uNAme, String memberImage, String about) async {

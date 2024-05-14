@@ -58,7 +58,7 @@ class AddGroupDetails extends GetView<GroupDetailController> {
                 Fluttertoast.showToast(msg: 'Group title is empty');
                 controller.loadNewGroup.value = false;
               } else if (controller.aboutController.text.isEmpty) {
-                Fluttertoast.showToast(msg: 'Fill about group info');
+                Fluttertoast.showToast(msg: 'Fill in group info');
                 controller.loadNewGroup.value = false;
               } else {
                 final chatGood = await chatcontroller.chatService
