@@ -18,6 +18,7 @@ import 'package:check_in/utils/styles.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
+import 'package:nb_utils/nb_utils.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
 import 'package:sizer/sizer.dart';
 
@@ -112,7 +113,7 @@ class _EditGroupDetailsState extends State<EditGroupDetails> {
                   groupmemberController.docid = widget.docId!;
                   pushNewScreen(context,
                       screen: GroupMember(
-                        isAdmin: controller.groupDetailModel!.isAdmin!,
+                        isAdmin: controller.groupDetailModel!.isAdmin ?? false,
                       ));
                 },
                 child: Padding(
@@ -138,8 +139,8 @@ class _EditGroupDetailsState extends State<EditGroupDetails> {
                                 Expanded(
                                   child: NameTextfield(
                                     readOnly: controller.nameTapped.value ? true : false,
-                                    isAdmin: controller.groupDetailModel!.isAdmin,
-                                    iconOnTap: controller.groupDetailModel!.isAdmin!
+                                    isAdmin: controller.groupDetailModel!.isAdmin ?? false,
+                                    iconOnTap: controller.groupDetailModel!.isAdmin ?? false
                                         ? () {
                                             controller.updateGroupName(widget.docId!);
                                             chatcontroller.name.value = controller.nameController.text;
@@ -161,12 +162,12 @@ class _EditGroupDetailsState extends State<EditGroupDetails> {
                                     backgroundColor: appGreenColor.withOpacity(0.6),
                                     backgroundImage: controller.fileImage.value != null
                                         ? FileImage(File(controller.fileImage.value!.path))
-                                        : controller.groupDetailModel!.groupImg! == ''
+                                        : controller.groupDetailModel!.groupImg.isEmptyOrNull
                                             ? AssetImage(AppImage.user) as ImageProvider
                                             : CachedNetworkImageProvider(controller.groupDetailModel!.groupImg!),
                                     radius: 65,
                                   ),
-                                  controller.groupDetailModel!.isAdmin!
+                                  controller.groupDetailModel!.isAdmin ?? false
                                       ? Positioned(
                                           right: 10,
                                           bottom: 1,
@@ -194,7 +195,7 @@ class _EditGroupDetailsState extends State<EditGroupDetails> {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 poppinsText(TempLanguage.aboutGroup, 14, semiBold, appBlackColor),
-                                controller.groupDetailModel!.isAdmin!
+                                controller.groupDetailModel!.isAdmin ?? false
                                     ? GestureDetector(
                                         onTap: () {
                                           // controller.aboutfocusNode
@@ -218,7 +219,7 @@ class _EditGroupDetailsState extends State<EditGroupDetails> {
                             verticalGap(5),
                             AboutTextfield(
                               readOnly: controller.aboutTapped.value,
-                              isAdmin: controller.groupDetailModel!.isAdmin,
+                              isAdmin: controller.groupDetailModel!.isAdmin ?? false,
                             ),
                             Divider(
                               // thickness: 1,
