@@ -140,7 +140,7 @@ class MyApp extends StatelessWidget {
             scaffoldBackgroundColor: whiteColor,
           ),
           initialBinding: MyBinding(),
-          home: const Splash(),
+          home: Splash(),
         );
       },
     );
