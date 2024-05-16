@@ -81,14 +81,14 @@ void main() async {
 
   await init;
 
-  // if (Platform.isIOS) {
-  //   await Firebase.initializeApp(
-  //     // name: "check_in",// Removing this name causes exception and show white screen on ios
-  //     options: DefaultFirebaseOptions.currentPlatform,
-  //   );
-  // } else {
-  //   await Firebase.initializeApp();
-  // }
+  if (Platform.isIOS) {
+    await Firebase.initializeApp(
+      // name: "check_in",// Removing this name causes exception and show white screen on ios
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+  } else {
+    await Firebase.initializeApp();
+  }
   await Firebase.initializeApp();
   _messaging = FirebaseMessaging.instance;
   if (Platform.isIOS) {

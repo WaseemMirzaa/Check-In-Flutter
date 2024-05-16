@@ -2,6 +2,8 @@
 
 import 'package:check_in/controllers/News%20Feed/create_post_controller.dart';
 import 'package:check_in/controllers/News%20Feed/news_feed_controller.dart';
+import 'package:check_in/controllers/user_controller.dart';
+import 'package:check_in/core/constant/app_assets.dart';
 import 'package:check_in/ui/screens/News%20Feed%20NavBar/Create%20Post/create_post_screen.dart';
 import 'package:check_in/ui/widgets/custom_container.dart';
 import 'package:check_in/ui/widgets/text_field.dart';
@@ -11,6 +13,7 @@ import 'package:check_in/utils/styles.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
+import 'package:nb_utils/nb_utils.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
 import 'package:sizer/sizer.dart';
 
@@ -20,6 +23,8 @@ class TopContainer extends GetView<NewsFeedController> {
   Function()? ontap;
   TopContainer({super.key, this.ontap});
   var createPostController = Get.find<CreatePostController>();
+  UserController userController = Get.put(UserController());
+
   @override
   Widget build(BuildContext context) {
     return CustomContainer1(
@@ -28,15 +33,62 @@ class TopContainer extends GetView<NewsFeedController> {
         child: Column(
           children: [
             Row(children: [
-              const CircleAvatar(
-                backgroundImage: NetworkImage(
-                  'https://wac-cdn.atlassian.com/dam/jcr:ba03a215-2f45-40f5-8540-b2015223c918/Max-R_Headshot%20(1).jpg?cdnVersion=1365',
-                ),
+              Stack(
+                clipBehavior: Clip.none,
+                alignment: Alignment.bottomRight,
+                children: [
+                  (userController.userModel.value.photoUrl != null)
+                      ? Container(
+                      height: 5.8.h,
+                      width: 5.8.h,
+                      decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          image: DecorationImage(
+                              image: NetworkImage(userController.userModel.value.photoUrl as String), fit: BoxFit.fill)))
+                      : (!userController.userModel.value.photoUrl.isEmptyOrNull)
+                      ? Container(
+                      height: 5.8.h,
+                      width: 5.8.h,
+                      decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          image: DecorationImage(
+                              image: NetworkImage(
+                                  userController.userModel.value.photoUrl ?? ""),
+                              fit: BoxFit.fill)))
+                      : Container(
+                    height: 5.8.h,
+                    width: 5.8.h,
+                    decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(width: 2, color: appGreenColor),
+                        image: const DecorationImage(
+                            image: AssetImage(AppAssets.LOGO_NEW), fit: BoxFit.fill)),
+                  ),
+                  if (userController.userModel.value.isVerified == null ||
+                      userController.userModel.value.isVerified == true)
+                    Positioned(
+                      right: -6,
+                      bottom: -2,
+                      child: Align(
+                        alignment: Alignment.bottomRight,
+                        child: Container(
+                          height: 2.4.h,
+                          width: 2.4.h,
+                          decoration: const BoxDecoration(
+                              shape: BoxShape.circle,
+                              image: DecorationImage(image: AssetImage(AppAssets.INSTAGRAM_VERIFICATION))),
+                        ),
+                      ),
+                    )
+                  else
+                    const SizedBox(),
+                ],
               ),
               horizontalGap(10),
               Expanded(
                 child: Container(
                   width: 50.w,
+
                   decoration: BoxDecoration(
                       color: greyColor.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(25)),
@@ -47,7 +99,7 @@ class TopContainer extends GetView<NewsFeedController> {
                     hintText: 'Write something...',
                     onTap: () {
                       createPostController.type.value = 'text';
-                      pushNewScreen(context, screen: const CreatePost());
+                      pushNewScreen(context, screen:  CreatePost());
                     },
                     onTapOutside: (_) {
                       controller.postFocusNode.unfocus();
@@ -68,7 +120,7 @@ class TopContainer extends GetView<NewsFeedController> {
                         bool checkNavigate =
                             await createPostController.filePicker('image');
                         checkNavigate
-                            ? pushNewScreen(context, screen: const CreatePost())
+                            ? pushNewScreen(context, screen: CreatePost())
                             : null;
                       },
                       child: poppinsText('Photo', 12, regular, greyColor)),
@@ -80,7 +132,7 @@ class TopContainer extends GetView<NewsFeedController> {
                         bool checkNavigate =
                             await createPostController.filePicker('video');
                         checkNavigate
-                            ? pushNewScreen(context, screen: const CreatePost())
+                            ? pushNewScreen(context, screen: CreatePost())
                             : null;
                       },
                       child: poppinsText('Video', 12, regular, greyColor))
