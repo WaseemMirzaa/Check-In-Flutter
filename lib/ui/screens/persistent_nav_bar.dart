@@ -10,12 +10,14 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
+import 'package:nb_utils/nb_utils.dart';
 
 import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
 
 import ' Messages NavBar/Messages/messages.dart';
 import 'History.dart';
 import '../../controllers/nav_bar_controller.dart';
+import 'News Feed NavBar/News Feed/news_feed_screen.dart';
 
 class BottomNav {
   String icon;
@@ -152,7 +154,7 @@ class _HomeState extends State<Home> with AutomaticKeepAliveClientMixin {
     const CheckIn(),
     MessageScreen(),
     //................ News Feed
-    // const NewsFeedScreen(),
+     const NewsFeedScreen(),
     const HistoryView(),
     const ProfileScreen()
     //KeyedSubtree(key: UniqueKey(), child: const ProfileScreen()),
@@ -178,29 +180,29 @@ class _HomeState extends State<Home> with AutomaticKeepAliveClientMixin {
       ).getBottomNavItem(),
 
       //.......................... News Feed
-      // BottomNav(
-      //   label: 'NewsFeed',
-      //   boxColor:
-      //       navBarController.controller.index == 2 ? greenColor : whiteColor,
-      //   icon: "calendar",
-      //   iconColor:
-      //       navBarController.controller.index == 2 ? whiteColor : blackColor,
-      // ).getBottomNavItem(),
+      BottomNav(
+        label: 'NewsFeed',
+        boxColor:
+            navBarController.controller.index == 2 ? greenColor : whiteColor,
+        icon: "calendar",
+        iconColor:
+            navBarController.controller.index == 2 ? whiteColor : blackColor,
+      ).getBottomNavItem(),
       BottomNav(
         label: 'History',
         boxColor:
-            navBarController.controller.index == 2 ? appGreenColor : appWhiteColor,
+            navBarController.controller.index == 3 ? appGreenColor : appWhiteColor,
         icon: "Icon awesome-history",
         iconColor:
-            navBarController.controller.index == 2 ? appWhiteColor : appBlackColor,
+            navBarController.controller.index == 3 ? appWhiteColor : appBlackColor,
       ).getBottomNavItem(),
       BottomNav(
         label: 'Profile',
         boxColor:
-            navBarController.controller.index == 3 ? appGreenColor : appWhiteColor,
+            navBarController.controller.index == 4 ? appGreenColor : appWhiteColor,
         icon: "Icon material-person",
         iconColor:
-            navBarController.controller.index == 3 ? appWhiteColor : appBlackColor,
+            navBarController.controller.index == 4 ? appWhiteColor : appBlackColor,
       ).getBottomNavItem(),
     ];
   }
