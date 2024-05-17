@@ -15,4 +15,17 @@ class NewsFeedService {
               return NewsFeedModel.fromJson(doc.data() as Map<String, dynamic>);
             }).toList());
   }
+
+  /// Create news feed post
+  Future<bool> createPost(NewsFeedModel newsFeedModel) async{
+    try{
+      DocumentReference docReff = FirebaseFirestore.instance.collection(Collections.NEWSFEED).doc();
+      newsFeedModel.id = docReff.id;
+      await docReff.set(newsFeedModel.toJson());
+      return true;
+    }catch (e){
+      print(e.toString());
+      return false;
+    }
+  }
 }

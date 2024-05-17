@@ -80,6 +80,7 @@ class NewsFeed {
   static const String DESCRIPTION = 'description';
   static const String NAME = 'userName';
   static const String USER_ID = 'userId';
+  static const String FEED_ID = 'feedId';
   static const String USER_IMAGE = 'userImage';
   static const String POST_URL = 'postUrl';
   static const String IS_TYPE = 'isType';
