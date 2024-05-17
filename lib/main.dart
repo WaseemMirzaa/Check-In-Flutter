@@ -14,7 +14,7 @@ import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:get/get_navigation/src/root/get_material_app.dart';
 import 'package:nb_utils/nb_utils.dart';
 import 'package:sizer/sizer.dart';
-
+import 'package:firebase_app_check/firebase_app_check.dart';
 import 'firebase_options.dart';
 
 List<Map<String, dynamic>> courtlist = [];
@@ -81,14 +81,14 @@ void main() async {
 
   await init;
 
-  if (Platform.isIOS) {
-    await Firebase.initializeApp(
-      // name: "check_in",// Removing this name causes exception and show white screen on ios
-      options: DefaultFirebaseOptions.currentPlatform,
-    );
-  } else {
-    await Firebase.initializeApp();
-  }
+  // if (Platform.isIOS) {
+  //   await Firebase.initializeApp(
+  //     // name: "check_in",// Removing this name causes exception and show white screen on ios
+  //     options: DefaultFirebaseOptions.currentPlatform,
+  //   );
+  // } else {
+  //   await Firebase.initializeApp();
+  // }
   await Firebase.initializeApp();
   _messaging = FirebaseMessaging.instance;
   if (Platform.isIOS) {
@@ -99,11 +99,11 @@ void main() async {
   pushNotificationService.init();
   FCMManager.getFCMToken();
 
-  //Stripe.publishableKey = 'pk_test_51P9IBQRwQJgokiPYdbWlcZnEpVC6ZDb0B7ZMVPFSJzi0LzPWCSG1kzwnrSscPCH1ZZBzWKoLeapYlZX5QLHBBNKR00HKEkqjkJ';
   Stripe.publishableKey = 'pk_live_51P9IBQRwQJgokiPYvyLG23TCbtFARynKi5dFHmmxmx69GkHZxQm15cmLz8EkHaCAhIpzK9ma2Prr0yQbyF1l6ZpW006am35MWF';
   Stripe.merchantIdentifier = 'merchant.flutter.stripe.test';
   Stripe.urlScheme = 'flutterstripe';
   await Stripe.instance.applySettings();
+  await FirebaseAppCheck.instance.activate();
 
   // SharedPreferences prefs = await SharedPreferences.getInstance();
   // var email = prefs.getString('email');
@@ -140,7 +140,7 @@ class MyApp extends StatelessWidget {
             scaffoldBackgroundColor: whiteColor,
           ),
           initialBinding: MyBinding(),
-          home: Splash(),
+          home: const Splash(),
         );
       },
     );

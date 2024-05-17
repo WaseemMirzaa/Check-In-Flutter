@@ -37,13 +37,13 @@ class EditGroupDetails extends StatefulWidget {
   List<Map<String, dynamic>>? dataArray;
   EditGroupDetails(
       {super.key,
-      this.isGroup,
-      this.image,
-      // this.members,
-      this.senderName,
-      this.docId,
-      this.dataArray,
-      this.showBtn = false});
+        this.isGroup,
+        this.image,
+        // this.members,
+        this.senderName,
+        this.docId,
+        this.dataArray,
+        this.showBtn = false});
 
   @override
   State<EditGroupDetails> createState() => _EditGroupDetailsState();
@@ -81,29 +81,29 @@ class _EditGroupDetailsState extends State<EditGroupDetails> {
               showDialog(
                   context: context,
                   builder: (context) => AlertDialog(
-                        title: Text(
-                          'Left Group',
-                          style: TextStyle(fontWeight: FontWeight.w700, color: appBlackColor),
-                        ),
-                        content: Text(
-                          'Do you really want to left the group?',
-                          style: TextStyle(fontSize: 14, color: appBlackColor),
-                        ),
-                        actions: [
-                          TextButton(
-                              onPressed: () {
-                                Navigator.pop(context);
-                              },
-                              child: const Text('No')),
-                          TextButton(
-                              onPressed: () async {
-                                await groupmemberController
-                                    .leftGroup(userController.userModel.value.uid!, widget.docId!)
-                                    .then((value) => pushNewScreen(context, screen: const Home()));
-                              },
-                              child: const Text('Yes')),
-                        ],
-                      ));
+                    title: Text(
+                      'Left Group',
+                      style: TextStyle(fontWeight: FontWeight.w700, color: appBlackColor),
+                    ),
+                    content: Text(
+                      'Do you really want to left the group?',
+                      style: TextStyle(fontSize: 14, color: appBlackColor),
+                    ),
+                    actions: [
+                      TextButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                          child: const Text('No')),
+                      TextButton(
+                          onPressed: () async {
+                            await groupmemberController
+                                .leftGroup(userController.userModel.value.uid!, widget.docId!)
+                                .then((value) => pushNewScreen(context, screen: const Home()));
+                          },
+                          child: const Text('Yes')),
+                    ],
+                  ));
             }),
         appBar: CustomAppbar(
           title: poppinsText(TempLanguage.groupDetail, 15, bold, appBlackColor),
@@ -123,126 +123,126 @@ class _EditGroupDetailsState extends State<EditGroupDetails> {
           ],
         ),
         body: Obx(
-          () => controller.loading.value
+              () => controller.loading.value
               ? loaderView()
               : Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                  child: Column(
-                    children: [
-                      Expanded(
-                          child: SingleChildScrollView(
-                        child: Column(
-                          children: [
-                            verticalGap(40),
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: NameTextfield(
-                                    readOnly: controller.nameTapped.value ? true : false,
-                                    isAdmin: controller.groupDetailModel!.isAdmin ?? false,
-                                    iconOnTap: controller.groupDetailModel!.isAdmin ?? false
-                                        ? () {
-                                            controller.updateGroupName(widget.docId!);
-                                            chatcontroller.name.value = controller.nameController.text;
+            padding: const EdgeInsets.symmetric(horizontal: 20.0),
+            child: Column(
+              children: [
+                Expanded(
+                    child: SingleChildScrollView(
+                      child: Column(
+                        children: [
+                          verticalGap(40),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: NameTextfield(
+                                  readOnly: controller.nameTapped.value ? true : false,
+                                  isAdmin: controller.groupDetailModel!.isAdmin ?? false,
+                                  iconOnTap: controller.groupDetailModel!.isAdmin ?? false
+                                      ? () {
+                                    controller.updateGroupName(widget.docId!);
+                                    chatcontroller.name.value = controller.nameController.text;
 
-                                            controller.nameTapped.value = !controller.nameTapped.value;
-                                          }
-                                        : null,
-                                  ),
+                                    controller.nameTapped.value = !controller.nameTapped.value;
+                                  }
+                                      : null,
                                 ),
-                              ],
-                            ),
-                            verticalGap(26),
-                            SizedBox(
-                              width: 130,
-                              height: 135,
-                              child: Stack(
-                                children: [
-                                  CircleAvatar(
-                                    backgroundColor: appGreenColor.withOpacity(0.6),
-                                    backgroundImage: controller.fileImage.value != null
-                                        ? FileImage(File(controller.fileImage.value!.path))
-                                        : controller.groupDetailModel!.groupImg.isEmptyOrNull
-                                            ? AssetImage(AppImage.user) as ImageProvider
-                                            : CachedNetworkImageProvider(controller.groupDetailModel!.groupImg!),
-                                    radius: 65,
-                                  ),
-                                  controller.groupDetailModel!.isAdmin ?? false
-                                      ? Positioned(
-                                          right: 10,
-                                          bottom: 1,
-                                          child: GestureDetector(
-                                            onTap: () {
-                                              showbottomSheet(context, controller, widget.docId!, chatcontroller);
-                                            },
-                                            child: Container(
-                                              height: 40,
-                                              width: 40,
-                                              decoration: BoxDecoration(color: appGreenColor, shape: BoxShape.circle),
-                                              child: Icon(
-                                                Icons.camera_alt,
-                                                color: appWhiteColor,
-                                              ),
-                                            ),
-                                          ),
-                                        )
-                                      : const SizedBox()
-                                ],
                               ),
-                            ),
-                            verticalGap(60),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            ],
+                          ),
+                          verticalGap(26),
+                          SizedBox(
+                            width: 130,
+                            height: 135,
+                            child: Stack(
                               children: [
-                                poppinsText(TempLanguage.aboutGroup, 14, semiBold, appBlackColor),
+                                CircleAvatar(
+                                  backgroundColor: appGreenColor.withOpacity(0.6),
+                                  backgroundImage: controller.fileImage.value != null
+                                      ? FileImage(File(controller.fileImage.value!.path))
+                                      : controller.groupDetailModel!.groupImg.isEmptyOrNull
+                                      ? AssetImage(AppImage.user) as ImageProvider
+                                      : CachedNetworkImageProvider(controller.groupDetailModel!.groupImg!),
+                                  radius: 65,
+                                ),
                                 controller.groupDetailModel!.isAdmin ?? false
-                                    ? GestureDetector(
-                                        onTap: () {
-                                          // controller.aboutfocusNode
-                                          //     .requestFocus();
-                                          controller.updateGroupAbout(widget.docId!);
-                                          controller.aboutTapped.value = !controller.aboutTapped.value;
-                                        },
-                                        child: Obx(
-                                          () => controller.aboutTapped.value
-                                              ? poppinsText(TempLanguage.save, 14, semiBold, appGreenColor)
-                                              : SizedBox(
-                                                  height: 2.4.h,
-                                                  child: Image.asset(
-                                                    AppAssets.EDIT_ICON,
-                                                  ),
-                                                ),
-                                        ))
+                                    ? Positioned(
+                                  right: 10,
+                                  bottom: 1,
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      showbottomSheet(context, controller, widget.docId!, chatcontroller);
+                                    },
+                                    child: Container(
+                                      height: 40,
+                                      width: 40,
+                                      decoration: BoxDecoration(color: appGreenColor, shape: BoxShape.circle),
+                                      child: Icon(
+                                        Icons.camera_alt,
+                                        color: appWhiteColor,
+                                      ),
+                                    ),
+                                  ),
+                                )
                                     : const SizedBox()
                               ],
                             ),
-                            verticalGap(5),
-                            AboutTextfield(
-                              readOnly: controller.aboutTapped.value,
-                              isAdmin: controller.groupDetailModel!.isAdmin ?? false,
-                            ),
-                            Divider(
-                              // thickness: 1,
-                              color: appBlackColor,
-                            ),
-                          ],
-                        ),
-                      )),
-                      // controller.groupDetailModel!.isAdmin!
-                      //     ? Padding(
-                      //         padding:
-                      //             const EdgeInsets.symmetric(vertical: 10.0),
-                      //         child:
-                      //             Obx(() => controller.uploadDataLoading.value
-                      //                 ? loaderView()
-                      //                 : fullWidthButton('Save', () {
-                      //                     controller.updateGroupDetail(docId!);
-                      //                   })),
-                      //       )
-                      //     : const SizedBox()
-                    ],
-                  ),
-                ),
+                          ),
+                          verticalGap(60),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              poppinsText(TempLanguage.aboutGroup, 14, semiBold, appBlackColor),
+                              controller.groupDetailModel!.isAdmin ?? false
+                                  ? GestureDetector(
+                                  onTap: () {
+                                    // controller.aboutfocusNode
+                                    //     .requestFocus();
+                                    controller.updateGroupAbout(widget.docId!);
+                                    controller.aboutTapped.value = !controller.aboutTapped.value;
+                                  },
+                                  child: Obx(
+                                        () => controller.aboutTapped.value
+                                        ? poppinsText(TempLanguage.save, 14, semiBold, appGreenColor)
+                                        : SizedBox(
+                                      height: 2.4.h,
+                                      child: Image.asset(
+                                        AppAssets.EDIT_ICON,
+                                      ),
+                                    ),
+                                  ))
+                                  : const SizedBox()
+                            ],
+                          ),
+                          verticalGap(5),
+                          AboutTextfield(
+                            readOnly: controller.aboutTapped.value,
+                            isAdmin: controller.groupDetailModel!.isAdmin ?? false,
+                          ),
+                          Divider(
+                            // thickness: 1,
+                            color: appBlackColor,
+                          ),
+                        ],
+                      ),
+                    )),
+                // controller.groupDetailModel!.isAdmin!
+                //     ? Padding(
+                //         padding:
+                //             const EdgeInsets.symmetric(vertical: 10.0),
+                //         child:
+                //             Obx(() => controller.uploadDataLoading.value
+                //                 ? loaderView()
+                //                 : fullWidthButton('Save', () {
+                //                     controller.updateGroupDetail(docId!);
+                //                   })),
+                //       )
+                //     : const SizedBox()
+              ],
+            ),
+          ),
         ));
   }
 }

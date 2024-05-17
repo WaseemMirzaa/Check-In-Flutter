@@ -1,11 +1,6 @@
 import 'dart:io';
 
-import 'package:check_in/Services/newfeed_service.dart';
 import 'package:check_in/controllers/News%20Feed/create_post_controller.dart';
-import 'package:check_in/controllers/News%20Feed/news_feed_controller.dart';
-import 'package:check_in/controllers/user_controller.dart';
-import 'package:check_in/core/constant/app_assets.dart';
-import 'package:check_in/model/NewsFeed%20Model/news_feed_model.dart';
 import 'package:check_in/ui/widgets/custom_appbar.dart';
 import 'package:check_in/utils/Constants/images.dart';
 import 'package:check_in/utils/colors.dart';
@@ -15,31 +10,18 @@ import 'package:check_in/utils/styles.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
-import 'package:nb_utils/nb_utils.dart';
 import 'package:sizer/sizer.dart';
 import 'package:chewie/chewie.dart';
 
 class CreatePost extends GetView<CreatePostController> {
-   CreatePost({super.key});
-   UserController userController = Get.put(UserController());
-   NewsFeedController newsFeedController = Get.put(NewsFeedController(NewsFeedService()));
-   NewsFeedModel? newsFeedModel;
-
+  const CreatePost({super.key});
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       floatingActionButton: Padding(
         padding: const EdgeInsets.only(bottom: 40.0),
         child: FloatingActionButton.extended(
-          onPressed: () async{
-
-            if(newsFeedModel!.description.isEmptyOrNull){
-              toast('Post description is empty');
-            }else {
-              print(newsFeedModel.toString());
-              await newsFeedController.createPost(newsFeedModel!);
-            }
-          },
+          onPressed: () {},
           backgroundColor: appGreenColor,
           label: Row(
             children: [
@@ -67,59 +49,14 @@ class CreatePost extends GetView<CreatePostController> {
                     padding: const EdgeInsets.symmetric(horizontal: 15.0),
                     child: Row(
                       children: [
-                        Stack(
-                          clipBehavior: Clip.none,
-                          alignment: Alignment.bottomRight,
-                          children: [
-                            (userController.userModel.value.photoUrl != null)
-                                ? Container(
-                                height: 7.8.h,
-                                width: 7.8.h,
-                                decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    image: DecorationImage(
-                                        image: NetworkImage(userController.userModel.value.photoUrl as String), fit: BoxFit.fill)))
-                                : (!userController.userModel.value.photoUrl.isEmptyOrNull)
-                                ? Container(
-                                height: 7.8.h,
-                                width: 7.8.h,
-                                decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    image: DecorationImage(
-                                        image: NetworkImage(
-                                            userController.userModel.value.photoUrl ?? ""),
-                                        fit: BoxFit.fill)))
-                                : Container(
-                              height: 7.8.h,
-                              width: 7.8.h,
-                              decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  border: Border.all(width: 2, color: appGreenColor),
-                                  image: const DecorationImage(
-                                      image: AssetImage(AppAssets.LOGO_NEW), fit: BoxFit.fill)),
-                            ),
-                            if (userController.userModel.value.isVerified == null ||
-                                userController.userModel.value.isVerified == true)
-                              Positioned(
-                                right: -6,
-                                bottom: -2,
-                                child: Align(
-                                  alignment: Alignment.bottomRight,
-                                  child: Container(
-                                    height: 3.4.h,
-                                    width: 3.4.h,
-                                    decoration: const BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        image: DecorationImage(image: AssetImage(AppAssets.INSTAGRAM_VERIFICATION))),
-                                  ),
-                                ),
-                              )
-                            else
-                              const SizedBox(),
-                          ],
+                        const CircleAvatar(
+                          backgroundImage: NetworkImage(
+                            'https://wac-cdn.atlassian.com/dam/jcr:ba03a215-2f45-40f5-8540-b2015223c918/Max-R_Headshot%20(1).jpg?cdnVersion=1365',
+                          ),
+                          radius: 30,
                         ),
                         horizontalGap(20),
-                        Expanded(child: poppinsText(userController.userModel.value.userName!, 18, bold, appBlackColor,maxlines: 1))
+                        poppinsText('Julian Dasilva', 18, bold, appBlackColor)
                       ],
                     ),
                   ),
@@ -127,12 +64,9 @@ class CreatePost extends GetView<CreatePostController> {
                   Divider(
                     color: greyColor,
                   ),
-    TextField(
+                  const TextField(
                     maxLines: 6,
-                    onChanged: (value){
-                      newsFeedModel?.description = value;
-                    },
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                         hintText: "What's on your mind?",
                         contentPadding:
                             EdgeInsets.symmetric(horizontal: 15, vertical: 10),

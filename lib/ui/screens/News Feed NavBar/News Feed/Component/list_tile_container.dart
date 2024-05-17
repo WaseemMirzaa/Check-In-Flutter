@@ -37,29 +37,13 @@ class ListTileContainer extends GetView<NewsFeedController> {
               child: Row(
                 children: [
                   data!.userImage == ''
-                      ? Stack(
-                children: [
-                SizedBox(
-                height: 44,
-                width: 43,
-                child: CustomPaint(
-                  painter: MyPainter(),
-                  size: const Size(200, 200),
-                ),
-              ),
-              Positioned(
-                top: 1.5,
-                left: 1,
-                child:
-                          Container(
-                              height: 40,
-                              width: 40,
-                              decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  image: DecorationImage(
-                                      image: NetworkImage(AppImage.userImagePath))))),
-                        ],
-                      )
+                      ? Container(
+                          height: 40,
+                          width: 40,
+                          decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              image: DecorationImage(
+                                  image: NetworkImage(AppImage.userImagePath))))
                       : Stack(
                           children: [
                             SizedBox(

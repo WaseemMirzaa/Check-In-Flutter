@@ -31,7 +31,7 @@ class NewsFeedScreen extends GetView<NewsFeedController> {
               TopContainer(
                 ontap: () {
                   pushNewScreen(context,
-                      screen: CreatePost(), withNavBar: true);
+                      screen: const CreatePost(), withNavBar: true);
                 },
               ),
               CustomContainer1(
@@ -42,15 +42,11 @@ class NewsFeedScreen extends GetView<NewsFeedController> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         poppinsText(
                             TempLanguage.checkOutHot, 20, bold, appBlackColor),
-                        Padding(
-                          padding: const EdgeInsets.only(left: 10),
-                          child: poppinsText(TempLanguage.contentThatTrendingAndPopular,
-                              9, medium, greyColor),
-                        ),
+                        poppinsText(TempLanguage.contentThatTrendingAndPopular,
+                            9, medium, greyColor),
                       ],
                     ),
                     Image.asset(AppImage.fire)

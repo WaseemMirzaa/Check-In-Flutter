@@ -948,6 +948,10 @@ PODS:
   - abseil/xcprivacy (1.20240116.2)
   - app_tracking_transparency (0.0.1):
     - Flutter
+  - AppCheckCore (10.19.0):
+    - GoogleUtilities/Environment (~> 7.13)
+    - GoogleUtilities/UserDefaults (~> 7.13)
+    - PromisesObjC (~> 2.3)
   - BoringSSL-GRPC (0.0.32):
     - BoringSSL-GRPC/Implementation (= 0.0.32)
     - BoringSSL-GRPC/Interface (= 0.0.32)
@@ -981,6 +985,11 @@ PODS:
   - Firebase/Storage (10.18.0):
     - Firebase/CoreOnly
     - FirebaseStorage (~> 10.18.0)
+  - firebase_app_check (0.2.1-8):
+    - Firebase/CoreOnly (~> 10.18.0)
+    - firebase_core
+    - FirebaseAppCheck (~> 10.18.0-beta)
+    - Flutter
   - firebase_auth (4.16.0):
     - Firebase/Auth (= 10.18.0)
     - firebase_core
@@ -1000,6 +1009,12 @@ PODS:
     - Firebase/Storage (= 10.18.0)
     - firebase_core
     - Flutter
+  - FirebaseAppCheck (10.18.0):
+    - AppCheckCore (~> 10.18)
+    - FirebaseAppCheckInterop (~> 10.17)
+    - FirebaseCore (~> 10.0)
+    - GoogleUtilities/Environment (~> 7.8)
+    - PromisesObjC (~> 2.1)
   - FirebaseAppCheckInterop (10.25.0)
   - FirebaseAuth (10.18.0):
     - FirebaseAppCheckInterop (~> 10.17)
@@ -1332,6 +1347,7 @@ DEPENDENCIES:
   - cloud_firestore (from `.symlinks/plugins/cloud_firestore/ios`)
   - connectivity_plus (from `.symlinks/plugins/connectivity_plus/ios`)
   - emoji_picker_flutter (from `.symlinks/plugins/emoji_picker_flutter/ios`)
+  - firebase_app_check (from `.symlinks/plugins/firebase_app_check/ios`)
   - firebase_auth (from `.symlinks/plugins/firebase_auth/ios`)
   - firebase_core (from `.symlinks/plugins/firebase_core/ios`)
   - firebase_crashlytics (from `.symlinks/plugins/firebase_crashlytics/ios`)
@@ -1363,8 +1379,10 @@ DEPENDENCIES:
 SPEC REPOS:
   trunk:
     - abseil
+    - AppCheckCore
     - BoringSSL-GRPC
     - Firebase
+    - FirebaseAppCheck
     - FirebaseAppCheckInterop
     - FirebaseAuth
     - FirebaseAuthInterop
@@ -1415,6 +1433,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/connectivity_plus/ios"
   emoji_picker_flutter:
     :path: ".symlinks/plugins/emoji_picker_flutter/ios"
+  firebase_app_check:
+    :path: ".symlinks/plugins/firebase_app_check/ios"
   firebase_auth:
     :path: ".symlinks/plugins/firebase_auth/ios"
   firebase_core:
@@ -1472,17 +1492,20 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   abseil: d121da9ef7e2ff4cab7666e76c5a3e0915ae08c3
-  app_tracking_transparency: 5b1745ef9ade815f7455cb6a0848349589afb7c5
+  app_tracking_transparency: e169b653478da7bb15a6c61209015378ca73e375
+  AppCheckCore: 58dbd968d93b7c56650c28a1ac404d7a54307c0e
   BoringSSL-GRPC: 1e2348957acdbcad360b80a264a90799984b2ba6
   cloud_firestore: 73eece22ce25a0565238c283ee9990f1618d8063
   connectivity_plus: bf0076dd84a130856aa636df1c71ccaff908fa1d
   emoji_picker_flutter: fe2e6151c5b548e975d546e6eeb567daf0962a58
   Firebase: 414ad272f8d02dfbf12662a9d43f4bba9bec2a06
+  firebase_app_check: 375d2482bc2219ef06df67f2ad659c377b2c1075
   firebase_auth: 8e9ec02991ca4659111cc671c84d0c010b6bfb26
   firebase_core: 0af4a2b24f62071f9bf283691c0ee41556dcb3f5
   firebase_crashlytics: 4b91b8ad60ee7c168fe88979f84c9573a729de7a
   firebase_messaging: 90e8a6db84b6e1e876cebce4f30f01dc495e7014
   firebase_storage: 2b932fa5461f4efac36a2dcfbe240898b190b5b1
+  FirebaseAppCheck: f34226df40cf6057dc54916ab5a5d461bb51ee68
   FirebaseAppCheckInterop: 5da5ce93e8797a215e3f677fb0654b74e736c8b8
   FirebaseAuth: 12314b438fa76048540c8fb86d6cfc9e08595176
   FirebaseAuthInterop: 2753ef68cb3cd5aefebe0f58082671cede78350f
@@ -1502,7 +1525,7 @@ SPEC CHECKSUMS:
   flutter_image_compress_common: ec1d45c362c9d30a3f6a0426c297f47c52007e3e
   flutter_keyboard_visibility: 0339d06371254c3eb25eeb90ba8d17dca8f9c069
   flutter_local_notifications: 4cde75091f6327eb8517fa068a0a5950212d2086
-  fluttertoast: 31b00dabfa7fb7bacd9e7dbee580d7a2ff4bf265
+  fluttertoast: 9f2f8e81bb5ce18facb9748d7855bf5a756fe3db
   geocoding_ios: a389ea40f6f548de6e63006a2e31bf66ff80769a
   geolocator_apple: b741765c55dc21950e3e106e8b3584e55cf81ce5
   Google-Maps-iOS-Utils: f77eab4c4326d7e6a277f8e23a0232402731913a
