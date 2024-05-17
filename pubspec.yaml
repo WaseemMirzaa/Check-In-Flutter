@@ -17,7 +17,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
 # In Windows, build-name is used as the major, minor, and patch parts
 # of the product and file versions while build-number is used as the build suffix.
-version: 1.0.20+20
+version: 2.2.1+31
 
 environment:
   sdk: '>=2.19.0 <3.0.0'
@@ -45,7 +45,6 @@ dependencies:
   geolocator: ^7.1.0
   geocoding: ^2.0.0
   flutter_svg:
-#  flutter_stripe: ^9.1.1
   email_validator: ^2.1.17
   firebase_core: ^2.24.2
   cloud_firestore: ^4.14.0
@@ -75,10 +74,10 @@ dependencies:
   dartz: ^0.10.1
   wakelock_plus: ^1.1.4
   google_maps_flutter:
-      path: C:/Users/Lenovo/StudioProjects/Check-In-Flutter/google_maps_flutter/google_maps_flutter
+      path: /Users/apple/StudioProjects/Check-In-Flutter/google_maps_flutter/google_maps_flutter
   device_preview: ^1.1.0
-  flutter_slidable: ^3.0.0
   permission_handler: ^11.0.1
+  flutter_slidable: ^3.1.0
   flutter_stripe: ^8.0.0+1
   dio: ^5.3.2
 #
