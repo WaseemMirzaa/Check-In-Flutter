@@ -15,6 +15,7 @@ import 'package:check_in/utils/common.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:intl/intl.dart';
+import 'package:uuid/uuid.dart';
 
 import '../controllers/Messages/firestore_pagination.dart';
 import '../model/Message and Group Message Model/message_model.dart';
@@ -702,8 +703,15 @@ class MessageService {
     //   // Do not add data and return an indication that no data waSs added
     //   return {'NewChat': 'No', 'docId': areIdsMatching(ids)};
     // }
+
+    // const uuid = Uuid();
+    // final documentId = uuid.v4();
+    String documentId = _messagesCollection.doc().id;
+
+
+
     Map<String, dynamic> data = {
-      MessageField.ID: '',
+      MessageField.ID: documentId,
       MessageField.IS_GROUP: false,
       MessageField.LAST_MESSAGE: TempLanguage.messageRequest,
       MessageField.MEMBER_IDS: ids,
@@ -722,11 +730,11 @@ class MessageService {
       MessageField.REQUEST_STATUS: RequestStatusEnum.pending.name
     };
 
-    DocumentReference documentReference = await _messagesCollection.add(data);
-    String documentId = documentReference.id;
+    await _messagesCollection.doc(documentId).set(data);
+    //String documentId = documentReference.id;
 
     // Update the 'id' field in the model with the document ID
-    await _messagesCollection.doc(documentId).update({MessageField.ID: documentId});
+    //await _messagesCollection.doc(documentId).update({MessageField.ID: documentId});
     return documentId;
   }
 
@@ -757,11 +765,18 @@ class MessageService {
   Future<Map<String, String>> startNewGroupChat(
       List ids, List members, String groupName, groupInfo, String groupImage) async {
     print('members $members');
+
+    // const uuid = Uuid();
+    // final documentId = uuid.v4();
+
+    String documentId = _messagesCollection.doc().id;
+
+
     Map<String, dynamic> data = {
       MessageField.ABOUT_GROUP: groupInfo,
       MessageField.GROUP_IMG: '',
       MessageField.GROUP_NAME: groupName,
-      MessageField.ID: '',
+      MessageField.ID: documentId,
       MessageField.IS_GROUP: true,
       MessageField.LAST_MESSAGE: '',
       MessageField.MEMBER_IDS: ids,
@@ -770,14 +785,15 @@ class MessageService {
       MessageField.TIME_STAMP: Timestamp.now(),
     };
 
-    DocumentReference documentReference = await _messagesCollection.add(data);
-    String documentId = documentReference.id;
+
+    await _messagesCollection.doc(documentId).set(data);
+    //String documentId = documentReference.id;
 
     String? image = '';
     groupImage != '' ? image = await uploadImageToFirebase(documentId, groupImage) : image = '';
 
     // Update the 'id' field in the model with the document ID
-    await _messagesCollection.doc(documentId).update({MessageField.ID: documentId, MessageField.GROUP_IMG: image});
+    await _messagesCollection.doc(documentId).update({MessageField.GROUP_IMG: image});
     return {MessageField.ID: documentId, MessageField.GROUP_IMG: image ?? ''};
   }
 
