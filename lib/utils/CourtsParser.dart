@@ -9,6 +9,7 @@ import '../model/CourtModel.dart';
 
 class CourtsParser {
   static final List<CourtModel> additionalLocations = [];
+  static final List<CourtModel> csvCourtModel = [];
 
   Future<String> loadAsset() async {
     return await rootBundle.loadString('assets/check-in-data.txt');
@@ -100,35 +101,42 @@ class CourtsParser {
 
       var csvString = await loadAsset();
 
-      var csvData = const CsvToListConverter().convert(csvString,eol: "\n");
+      if (csvCourtModel.isEmpty) {
+        var csvData = const CsvToListConverter().convert(csvString,eol: "\n");
+        for (var i = 1; i < csvData.length; i++) {
+          final location = CourtModel(
+            city: csvData[i][0].toString(),
+            street: csvData[i][1].toString(),
+            placeId: csvData[i][2].toString(),
+            latitude: double.parse(csvData[i][3].toString()),
+            longitude: double.parse(csvData[i][4].toString()),
+            url: csvData[i][5].toString(),
+            state: csvData[i][6].toString(),
+            address: csvData[i][7].toString(),
+            title: csvData[i][8].toString(),
+          );
+          csvCourtModel.add(location);
+        }
+      }
 
-      for (var i = 1; i < csvData.length; i++) {
-        final location = CourtModel(
-          city: csvData[i][0].toString(),
-          street: csvData[i][1].toString(),
-          placeId: csvData[i][2].toString(),
-          latitude: double.parse(csvData[i][3].toString()),
-          longitude: double.parse(csvData[i][4].toString()),
-          url: csvData[i][5].toString(),
-          state: csvData[i][6].toString(),
-          address: csvData[i][7].toString(),
-          title: csvData[i][8].toString(),
-        );
+      for (var i = 1; i < csvCourtModel.length; i++) {
+
 
         // Filter courts based on address
-        if (location.title.toLowerCase().contains(search.toLowerCase()) ||
-            location.address.toLowerCase().contains(search.toLowerCase())) {
+        if (csvCourtModel[i].title.toLowerCase().contains(search.toLowerCase()) ||
+            csvCourtModel[i].address.toLowerCase().contains(search.toLowerCase())) {
 
-          final court = LatLng(location.latitude, location.longitude);
+          final court = LatLng(csvCourtModel[i].latitude, csvCourtModel[i].longitude);
           var isInRadius = checkIfWithinRadius(currentLocation, court);
           if (isInRadius) {
             // Distance in meters (50km = 50000m)
-            filteredLocations.add(location);
+            filteredLocations.add(csvCourtModel[i]);
           }
         }
       }
 
 
+      print('iii ${additionalLocations.length}');
       for (var location in additionalLocations) {
         // Filter courts based on address
         if (location.title.toLowerCase().contains(search.toLowerCase()) ||
@@ -142,81 +150,6 @@ class CourtsParser {
           }
         }
       }
-    } catch (e) {
-      print(e);
-    }
-
-    return filteredLocations;
-  }
-
-  Future<List<CourtModel>> getCourtsFromCSVFileAndFirestoreSearch(String search) async {
-    final List<CourtModel> filteredLocations = [];
-    final currentLocation = await getCurrentLocation();
-
-    try {
-      var csvString = await loadAsset();
-
-      var csvData = const CsvToListConverter().convert(csvString, eol: "\n");
-
-      for (var i = 1; i < csvData.length; i++) {
-        final location = CourtModel(
-          city: csvData[i][0].toString(),
-          street: csvData[i][1].toString(),
-          placeId: csvData[i][2].toString(),
-          latitude: double.parse(csvData[i][3].toString()),
-          longitude: double.parse(csvData[i][4].toString()),
-          url: csvData[i][5].toString(),
-          state: csvData[i][6].toString(),
-          address: csvData[i][7].toString(),
-          title: csvData[i][8].toString(),
-        );
-
-        // Filter courts based on address
-        if (location.title.toLowerCase().contains(search.toLowerCase()) ||
-            location.address.toLowerCase().contains(search.toLowerCase())) {
-
-          final court = LatLng(location.latitude, location.longitude);
-          var isInRadius = checkIfWithinRadius(currentLocation, court);
-          if (isInRadius) {
-            // Distance in meters (50km = 50000m)
-            filteredLocations.add(location);
-          }
-        }
-      }
-    } catch (e) {
-      print(e);
-    }
-
-    final snap = FirebaseFirestore.instance;
-
-    try {
-      await snap.collection('AdditionalLocations').get().then((querySnapshot) {
-        for (var doc in querySnapshot.docs) {
-          final location = CourtModel(
-            city: doc.data()['city'],
-            street: doc.data()['street'],
-            placeId: doc.data()['placeId']??'',
-            latitude: doc.data()['latitude'],
-            longitude: doc.data()['longitude'],
-            url: doc.data()['url'],
-            state: doc.data()['state'],
-            address: doc.data()['address'],
-            title: doc.data()['title'],
-          );
-
-          additionalLocations.add(location);
-
-          if (location.title.toLowerCase().contains(search.toLowerCase()) ||
-              location.address.toLowerCase().contains(search.toLowerCase())) {
-
-            final court = LatLng(location.latitude, location.longitude);
-            var isInRadius = checkIfWithinRadius(currentLocation, court);
-            if (isInRadius) {
-              filteredLocations.add(location);
-            }
-          }
-        }
-      });
     } catch (e) {
       print(e);
     }
