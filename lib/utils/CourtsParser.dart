@@ -149,6 +149,81 @@ class CourtsParser {
     return filteredLocations;
   }
 
+  Future<List<CourtModel>> getCourtsFromCSVFileAndFirestoreSearch(String search) async {
+    final List<CourtModel> filteredLocations = [];
+    final currentLocation = await getCurrentLocation();
+
+    try {
+      var csvString = await loadAsset();
+
+      var csvData = const CsvToListConverter().convert(csvString, eol: "\n");
+
+      for (var i = 1; i < csvData.length; i++) {
+        final location = CourtModel(
+          city: csvData[i][0].toString(),
+          street: csvData[i][1].toString(),
+          placeId: csvData[i][2].toString(),
+          latitude: double.parse(csvData[i][3].toString()),
+          longitude: double.parse(csvData[i][4].toString()),
+          url: csvData[i][5].toString(),
+          state: csvData[i][6].toString(),
+          address: csvData[i][7].toString(),
+          title: csvData[i][8].toString(),
+        );
+
+        // Filter courts based on address
+        if (location.title.toLowerCase().contains(search.toLowerCase()) ||
+            location.address.toLowerCase().contains(search.toLowerCase())) {
+
+          final court = LatLng(location.latitude, location.longitude);
+          var isInRadius = checkIfWithinRadius(currentLocation, court);
+          if (isInRadius) {
+            // Distance in meters (50km = 50000m)
+            filteredLocations.add(location);
+          }
+        }
+      }
+    } catch (e) {
+      print(e);
+    }
+
+    final snap = FirebaseFirestore.instance;
+
+    try {
+      await snap.collection('AdditionalLocations').get().then((querySnapshot) {
+        for (var doc in querySnapshot.docs) {
+          final location = CourtModel(
+            city: doc.data()['city'],
+            street: doc.data()['street'],
+            placeId: doc.data()['placeId']??'',
+            latitude: doc.data()['latitude'],
+            longitude: doc.data()['longitude'],
+            url: doc.data()['url'],
+            state: doc.data()['state'],
+            address: doc.data()['address'],
+            title: doc.data()['title'],
+          );
+
+          additionalLocations.add(location);
+
+          if (location.title.toLowerCase().contains(search.toLowerCase()) ||
+              location.address.toLowerCase().contains(search.toLowerCase())) {
+
+            final court = LatLng(location.latitude, location.longitude);
+            var isInRadius = checkIfWithinRadius(currentLocation, court);
+            if (isInRadius) {
+              filteredLocations.add(location);
+            }
+          }
+        }
+      });
+    } catch (e) {
+      print(e);
+    }
+
+    return filteredLocations;
+  }
+
   bool checkIfWithinRadius(Position userPos, LatLng court) {
     double distanceInMeters = Geolocator.distanceBetween(
         userPos.latitude, userPos.longitude, court.latitude, court.longitude);

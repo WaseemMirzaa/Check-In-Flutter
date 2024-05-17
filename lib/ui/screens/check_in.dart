@@ -927,11 +927,12 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
                                     ),
                                   ),
                                 ),
+                                hideSuggestionsOnKeyboardHide: false,
                                 suggestionsCallback: (pattern) async {
                                   if (currentLocation == null) {
                                     return [];
                                   }
-                                  final courts = await CourtsParser().getCourtsByNameOrAddressFromCSVFile(pattern);
+                                  final courts = await CourtsParser().getCourtsFromCSVFileAndFirestoreSearch(pattern);
 
                                   // final placesResponse =
                                   //     await _places.searchNearbyWithRadius(

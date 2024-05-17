@@ -1,6 +1,7 @@
 // ignore_for_file: prefer_typing_uninitialized_variables
 
 import 'dart:async';
+import 'dart:isolate';
 import 'package:check_in/auth_service.dart';
 import 'package:check_in/core/constant/app_assets.dart';
 import 'package:check_in/core/constant/temp_language.dart';
@@ -428,11 +429,12 @@ class _AddHomeCourtState extends State<AddHomeCourt> with SingleTickerProviderSt
                                 //     title: Text(prediction.description as String),
                                 //   );
                                 // },
+                                hideSuggestionsOnKeyboardHide: false,
                                 suggestionsCallback: (pattern) async {
                                   if (currentLocation == null) {
                                     return [];
                                   }
-                                  final courts = await CourtsParser().getCourtsByNameOrAddressFromCSVFile(pattern);
+                                  final courts = await CourtsParser().getCourtsFromCSVFileAndFirestoreSearch(pattern);
 
                                   // final placesResponse =
                                   //     await _places.searchNearbyWithRadius(
