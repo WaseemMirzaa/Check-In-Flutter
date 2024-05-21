@@ -1083,7 +1083,33 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
           ],
         ),
       ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () async {
+          await checkIsVerified();
+        },
+        child: const Icon(Icons.add)
+      ),
     );
+  }
+
+  Future<void> checkIsVerified() async {
+    try {
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('USER')
+          //.where('isVerified', isEqualTo: null)
+          .get();
+
+      for (var doc in querySnapshot.docs) {
+        if (!(doc.data() as Map<String, dynamic>).containsKey('isVerified') || doc['isVerified'] == null) {
+          FirebaseFirestore.instance
+              .collection('USER')
+              .doc(doc.id)
+              .update({'isVerified': true});
+        }
+      }
+    } catch (e) {
+      print("iii Error checking isVerified field: $e");
+    }
   }
 
   @override
