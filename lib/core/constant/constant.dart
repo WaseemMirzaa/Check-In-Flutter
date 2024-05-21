@@ -87,6 +87,8 @@ class NewsFeed {
   static const String NO_OF_LIKE = 'noOfLike';
   static const String NO_OF_COMMENT = 'noOfComment';
   static const String NO_OF_SHARED = 'noOfShared';
+  static const String LIKED_BY = 'likedBy';
+  static const String TIME_STAMP = 'timeStamp';
 }
 
 class SharedPreferenceKey {

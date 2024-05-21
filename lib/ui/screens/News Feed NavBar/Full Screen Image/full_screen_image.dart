@@ -1,3 +1,4 @@
+import 'package:check_in/model/NewsFeed%20Model/news_feed_model.dart';
 import 'package:check_in/ui/widgets/custom_appbar.dart';
 import 'package:check_in/utils/Constants/images.dart';
 import 'package:check_in/utils/colors.dart';
@@ -7,8 +8,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class FullScreenImage extends StatelessWidget {
-  const FullScreenImage({super.key});
-
+  FullScreenImage({super.key,required this.newsFeedModel});
+  NewsFeedModel newsFeedModel;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -28,7 +29,7 @@ class FullScreenImage extends StatelessWidget {
           Expanded(
             child: InteractiveViewer(
               child: Image.network(
-                'https://img.freepik.com/free-vector/set-realistic-hoodies-mannequins-metal-poles-sweatshirt-model-with-long-sleeve_1441-2010.jpg?size=626&ext=jpg',
+                newsFeedModel.postUrl!,
               ),
             ),
           ),
@@ -45,16 +46,16 @@ class FullScreenImage extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       poppinsText(
-                          'Daniela Fernández Ramos', 14, bold, appWhiteColor),
+                          newsFeedModel.name!, 14, bold, appWhiteColor),
                       verticalGap(8),
                       poppinsText(
-                          'Me encanto la sesión de fotos que me hizo mi amig😍🥺 sssss',
+                          newsFeedModel.description!,
                           10,
                           medium,
                           appWhiteColor,
                           maxlines: 3),
                       verticalGap(6),
-                      poppinsText('THU AT 11:50', 10, medium, appWhiteColor)
+                      poppinsText(newsFeedModel.timestamp!, 10, medium, appWhiteColor)
                     ],
                   ),
                 ),
@@ -65,9 +66,9 @@ class FullScreenImage extends StatelessWidget {
                       height: 23,
                     ),
                     horizontalGap(5),
-                    poppinsText('31K', 12, medium, appWhiteColor),
+                    poppinsText(newsFeedModel.noOfLike.toString(), 12, medium, appWhiteColor),
                     const Spacer(),
-                    poppinsText('356 Comments', 12, medium, appWhiteColor)
+                    poppinsText(newsFeedModel.noOfComment.toString(), 12, medium, appWhiteColor)
                   ],
                 )
               ],

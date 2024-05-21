@@ -1,11 +1,9 @@
 import 'dart:io';
-
 import 'package:check_in/Services/newfeed_service.dart';
 import 'package:check_in/controllers/News%20Feed/create_post_controller.dart';
 import 'package:check_in/controllers/News%20Feed/news_feed_controller.dart';
 import 'package:check_in/controllers/user_controller.dart';
 import 'package:check_in/core/constant/app_assets.dart';
-import 'package:check_in/model/NewsFeed%20Model/news_feed_model.dart';
 import 'package:check_in/ui/widgets/custom_appbar.dart';
 import 'package:check_in/utils/Constants/images.dart';
 import 'package:check_in/utils/colors.dart';
@@ -19,7 +17,7 @@ import 'package:nb_utils/nb_utils.dart';
 import 'package:sizer/sizer.dart';
 import 'package:chewie/chewie.dart';
 
-class CreatePost extends GetView<CreatePostController> {
+class CreatePost extends StatelessWidget {
   CreatePost({super.key});
   UserController userController = Get.put(UserController());
   NewsFeedController newsFeedController = Get.put(NewsFeedController(NewsFeedService()));
@@ -29,25 +27,36 @@ class CreatePost extends GetView<CreatePostController> {
     return Scaffold(
       floatingActionButton: Padding(
         padding: const EdgeInsets.only(bottom: 40.0),
-        child: FloatingActionButton.extended(
-          onPressed: () async{
-            if(newsFeedController.newsFeedModel.value.description.isEmptyOrNull){
-              toast('Post description is empty');
-            }else {
-              print(newsFeedController.newsFeedModel.value.description.toString());
-              await newsFeedController.createPost(newsFeedController.newsFeedModel.value);
-            }
-          },
-          backgroundColor: appGreenColor,
-          label: Row(
-            children: [
-              poppinsText('Send', 12, FontWeight.normal, appWhiteColor),
-              horizontalGap(20),
-              SvgPicture.asset(
-                AppImage.messageappbaricon,
-                color: appWhiteColor,
-              ),
-            ],
+        child: SizedBox(
+          height: 4.5.h,
+          child: FloatingActionButton.extended(
+            onPressed: () async{
+              if(newsFeedController.newsFeedModel.value.description.isEmptyOrNull){
+                toast('Post description is empty');
+              }else {
+                print(newsFeedController.newsFeedModel.value.description.toString());
+                await newsFeedController.createPost(newsFeedController.newsFeedModel.value).then((value) {
+                  newsFeedController.newsFeedModel.value.postUrl = null;
+                  Navigator.pop(context);
+                } );
+              }
+            },
+
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)),
+            backgroundColor: appGreenColor,
+            extendedIconLabelSpacing: 5,
+            label: Row(
+              children: [
+                poppinsText('Send', 12, FontWeight.normal, appWhiteColor),
+                horizontalGap(20),
+                SvgPicture.asset(
+                  AppImage.messageappbaricon,
+                  color: appWhiteColor,
+                  height: 20,
+                ),
+              ],
+            ),
+            isExtended: true,
           ),
         ),
       ),
@@ -121,12 +130,10 @@ class CreatePost extends GetView<CreatePostController> {
                       ],
                     ),
                   ),
-                  verticalGap(8),
-                  Divider(
-                    color: greyColor,
-                  ),
+                  verticalGap(12),
                   TextField(
                     maxLines: 6,
+                    autofocus: true,
                     onChanged: (value)async{
                       newsFeedController.newsFeedModel.value.description = value;
                        print("The desData is: ${newsFeedController.newsFeedModel.value.description  ?? '0'}");
@@ -139,15 +146,15 @@ class CreatePost extends GetView<CreatePostController> {
                   ),
                   SizedBox(
                       height: 40.h,
-                      child: Obx(() => controller.type.value == 'video'
-                          ? controller.videoLoad.value
+                      child: Obx(() => newsFeedController.type.value == 'video'
+                          ? newsFeedController.videoLoad.value
                           ? loaderView()
                           : Chewie(
-                        controller: controller.chewieController!,
+                        controller: newsFeedController.chewieController!,
                       )
-                          : controller.type.value == 'image'
+                          : newsFeedController.type.value == 'image'
                           ? Image.file(
-                          File(controller.fileImage.value!.path))
+                          File(newsFeedController.fileImage.value!.path))
                           : const SizedBox()))
                 ],
               ),
@@ -157,7 +164,7 @@ class CreatePost extends GetView<CreatePostController> {
             padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 15),
             decoration: BoxDecoration(
                 color: appWhiteColor,
-                border: Border(top: BorderSide(color: greyColor))),
+                border: Border(top: BorderSide(color: greyColor.withOpacity(0.3)))),
             child: Row(
               children: [
                 SvgPicture.asset(
@@ -167,7 +174,7 @@ class CreatePost extends GetView<CreatePostController> {
                 horizontalGap(5),
                 GestureDetector(
                     onTap: () async {
-                      controller.filePicker('image');
+                      newsFeedController.filePicker('image');
                     },
                     child: poppinsText('Photo', 14, medium, greyColor)),
                 horizontalGap(10.w),
@@ -178,7 +185,7 @@ class CreatePost extends GetView<CreatePostController> {
                 horizontalGap(5),
                 GestureDetector(
                     onTap: () async {
-                      controller.filePicker('video');
+                      newsFeedController.filePicker('video');
                     },
                     child: poppinsText('Video', 14, medium, greyColor))
               ],

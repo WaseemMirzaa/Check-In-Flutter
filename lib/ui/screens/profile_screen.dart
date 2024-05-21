@@ -118,8 +118,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       });
 
       final storage = FirebaseStorage.instance;
-      final ref = storage
-          .ref()
+      final ref = storage.ref()
           // .child('profile/${DateTime.now().millisecondsSinceEpoch}');
           .child('profile/${FirebaseAuth.instance.currentUser?.uid ?? ""}');
       final uploadTask = ref.putFile(_imageFile!);

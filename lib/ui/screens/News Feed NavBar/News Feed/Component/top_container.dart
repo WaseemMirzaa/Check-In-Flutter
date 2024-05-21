@@ -1,3 +1,5 @@
+
+import 'package:check_in/Services/newfeed_service.dart';
 import 'package:check_in/controllers/News%20Feed/create_post_controller.dart';
 import 'package:check_in/controllers/News%20Feed/news_feed_controller.dart';
 import 'package:check_in/controllers/user_controller.dart';
@@ -20,7 +22,9 @@ class TopContainer extends GetView<NewsFeedController> {
   Function()? ontap;
   TopContainer({super.key, this.ontap});
   UserController userController = Get.put(UserController());
-  var createPostController = Get.find<CreatePostController>();
+  NewsFeedController newsFeedController = Get.put(NewsFeedController(NewsFeedService()));
+
+
   @override
   Widget build(BuildContext context) {
     return CustomContainer1(
@@ -93,7 +97,7 @@ class TopContainer extends GetView<NewsFeedController> {
                     readOnly: true,
                     hintText: 'Write something...',
                     onTap: () {
-                      createPostController.type.value = 'text';
+                      newsFeedController.type.value = 'text';
                       pushNewScreen(context, screen: CreatePost());
                     },
                     onTapOutside: (_) {
@@ -112,9 +116,9 @@ class TopContainer extends GetView<NewsFeedController> {
                   horizontalGap(5),
                   GestureDetector(
                       onTap: () async {
-                        bool checkNavigate =
-                            await createPostController.filePicker('image');
-                        checkNavigate
+                        String? checkNavigate = await newsFeedController.filePicker('image');
+                        // newsFeedController.newsFeedModel.value.postUrl = checkNavigate;
+                        checkNavigate!.isNotEmpty
                             ? pushNewScreen(context, screen:  CreatePost())
                             : null;
                       },
@@ -124,9 +128,10 @@ class TopContainer extends GetView<NewsFeedController> {
                   horizontalGap(5),
                   GestureDetector(
                       onTap: () async {
-                        bool checkNavigate =
-                            await createPostController.filePicker('video');
-                        checkNavigate
+                        String? checkNavigate =
+                            await newsFeedController.filePicker('video');
+                        // newsFeedController.newsFeedModel.value.postUrl = checkNavigate;
+                        checkNavigate!.isNotEmpty
                             ? pushNewScreen(context, screen:  CreatePost())
                             : null;
                       },

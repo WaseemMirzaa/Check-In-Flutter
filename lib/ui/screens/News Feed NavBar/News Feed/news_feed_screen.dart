@@ -64,6 +64,10 @@ class NewsFeedScreen extends GetView<NewsFeedController> {
                       return loaderView();
                     } else if (!snapshot.hasData) {
                       return Center(child: Text(TempLanguage.noMessageFound));
+                    }else if (snapshot.data!.isEmpty) {
+                      return Center(child: Text(TempLanguage.noMessageFound));
+                    } else if(snapshot.hasError){
+                      return Center(child: Text(snapshot.error.toString()),);
                     } else {
                       return ListView.builder(
                           physics: const NeverScrollableScrollPhysics(),
