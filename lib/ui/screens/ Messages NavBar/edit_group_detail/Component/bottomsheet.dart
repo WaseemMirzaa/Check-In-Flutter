@@ -1,5 +1,7 @@
 // ignore_for_file: use_build_context_synchronously
 
+import 'dart:io';
+
 import 'package:check_in/controllers/Messages/chat_controller.dart';
 import 'package:check_in/controllers/Messages/group_detail_controller.dart';
 import 'package:check_in/utils/gaps.dart';
@@ -7,6 +9,8 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:nb_utils/nb_utils.dart';
 import 'package:sizer/sizer.dart';
+
+import '../../../../../utils/common.dart';
 
 Future<void> showbottomSheet(
     BuildContext context,
@@ -30,9 +34,14 @@ Future<void> showbottomSheet(
               //.................Camera
               GestureDetector(
                 onTap: () async {
-                  final pickedFile =
-                      await picker.pickImage(source: ImageSource.camera);
+                  XFile? pickedFile =
+                      await picker.pickImage(source: ImageSource.camera,);
+
+
                   if (pickedFile != null) {
+                    File _imageFile = await compressImage(pickedFile, quality: 20, height: 200, width: 200);
+                    pickedFile = XFile(_imageFile.path);
+
                     controller.fileImage.value = pickedFile;
                     Navigator.pop(context);
                     String image = await controller.updateGroupImage(docId);
@@ -55,9 +64,12 @@ Future<void> showbottomSheet(
               //.................Gallery
               GestureDetector(
                 onTap: () async {
-                  final pickedFile =
-                      await picker.pickImage(source: ImageSource.gallery);
+                  XFile? pickedFile =
+                      await picker.pickImage(source: ImageSource.gallery,);
                   if (pickedFile != null) {
+                    File _imageFile = await compressImage(pickedFile, quality: 20, height: 200, width: 200);
+                    pickedFile = XFile(_imageFile.path);
+
                     controller.fileImage.value = pickedFile;
                     Navigator.pop(context);
                     String image = await controller.updateGroupImage(docId);

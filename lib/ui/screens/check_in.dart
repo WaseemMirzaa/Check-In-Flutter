@@ -23,8 +23,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
-// import 'package:flutter_heat_map/flutter_heat_map.dart';
-import 'package:flutter_typeahead/flutter_typeahead.dart';
+//import 'package:flutter_typeahead/flutter_typeahead.dart';
+import '../../utils/custom/custom_type_ahead.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -927,6 +927,7 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
                                     ),
                                   ),
                                 ),
+                                hideSuggestionsOnKeyboardHide: false,
                                 suggestionsCallback: (pattern) async {
                                   if (currentLocation == null) {
                                     return [];

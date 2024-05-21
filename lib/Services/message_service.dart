@@ -15,7 +15,6 @@ import 'package:check_in/utils/common.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:intl/intl.dart';
-import 'package:uuid/uuid.dart';
 
 import '../controllers/Messages/firestore_pagination.dart';
 import '../model/Message and Group Message Model/message_model.dart';

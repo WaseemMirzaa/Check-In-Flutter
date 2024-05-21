@@ -118,53 +118,71 @@ class _HistoryViewState extends State<HistoryView> {
                                         ),
                                       ),
                                     ),
-                                    Text.rich(TextSpan(
-                                        text: '${snapshot.data![index]["courtName"]}\n',
-                                        style: TextStyle(
-                                          fontFamily: TempLanguage.poppins,
-                                          fontSize: 1.6.h,
-                                          color: appBlackColor,
-                                          fontWeight: FontWeight.w600,
-                                        ),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        mainAxisAlignment: MainAxisAlignment.center,
                                         children: [
-                                          TextSpan(
+                                          Text(
+                                            '${snapshot.data![index]["courtName"]}',
                                             style: TextStyle(
                                               fontFamily: TempLanguage.poppins,
-                                              fontSize: 1.1.h,
-                                              color: appGreenColor,
-                                              height: 1.7,
+                                              fontSize: 1.6.h,
+                                              color: appBlackColor,
+                                              fontWeight: FontWeight.w600,
                                             ),
-                                            children: [
-                                              TextSpan(
-                                                text: TempLanguage.courtLocation,
-                                                style: const TextStyle(
-                                                  fontWeight: FontWeight.w600,
-                                                ),
-                                              ),
-                                              TextSpan(
-                                                text: ' ${snapshot.data![index]["courtName"]}\n',
-                                                style: TextStyle(
-                                                  color: silverColor,
-                                                  fontWeight: FontWeight.w500,
-                                                ),
-                                              ),
-                                              TextSpan(
-                                                text: TempLanguage.checkInHistory,
-                                                style: const TextStyle(
-                                                  fontWeight: FontWeight.w600,
-                                                ),
-                                              ),
-                                              TextSpan(
-                                                text:
-                                                    ' ${DateTimeUtils.time24to12(snapshot.data![index]["checkInTime"])} ',
-                                                style: TextStyle(
-                                                  color: silverColor,
-                                                  fontWeight: FontWeight.w500,
-                                                ),
-                                              ),
-                                            ],
+                                            maxLines: 2,
+                                            overflow: TextOverflow.ellipsis,
                                           ),
-                                        ]))
+                                          Container(height: 10,),
+                                          RichText(
+                                            overflow: TextOverflow.ellipsis,
+                                            maxLines: 2,
+                                            text: TextSpan(
+                                              text: TempLanguage.courtLocation,
+                                              style: TextStyle(
+                                                fontFamily: TempLanguage.poppins,
+                                                fontSize: 1.1.h,
+                                                color: appGreenColor,
+                                                fontWeight: FontWeight.w600,
+                                              ),
+                                              children: [
+                                                TextSpan(
+                                                  text: ' ${snapshot.data![index]["courtName"]}',
+                                                  style: TextStyle(
+                                                    color: silverColor,
+                                                    fontWeight: FontWeight.w500,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                          Container(height: 5,),
+
+                                          RichText(
+                                            maxLines: 1,
+                                            text: TextSpan(
+                                              text: TempLanguage.checkInHistory,
+                                              style: TextStyle(
+                                                fontFamily: TempLanguage.poppins,
+                                                fontSize: 1.1.h,
+                                                color: appGreenColor,
+                                                fontWeight: FontWeight.w600,
+                                              ),
+                                              children: [
+                                                TextSpan(
+                                                  text: ' ${DateTimeUtils.time24to12(snapshot.data![index]["checkInTime"])} ',
+                                                  style: TextStyle(
+                                                    color: silverColor,
+                                                    fontWeight: FontWeight.w500,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    )
                                   ],
                                 ),
                               ),
