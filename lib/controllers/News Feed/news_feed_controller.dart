@@ -1,11 +1,15 @@
 import 'dart:io';
 
+import 'package:check_in/Services/message_service.dart';
 import 'package:check_in/Services/newfeed_service.dart';
+import 'package:check_in/controllers/Messages/chat_controller.dart';
 import 'package:check_in/controllers/user_controller.dart';
+import 'package:check_in/model/NewsFeed%20Model/comment_model.dart';
 import 'package:check_in/model/NewsFeed%20Model/news_feed_model.dart';
 import 'package:check_in/model/user_modal.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:chewie/chewie.dart';
@@ -14,6 +18,7 @@ import 'package:video_player/video_player.dart';
 class NewsFeedController extends GetxController {
 
   Rx<NewsFeedModel> newsFeedModel = NewsFeedModel().obs;
+  Rx<CommentModel> commentModel = CommentModel().obs;
 
   NewsFeedService newsFeedService;
 
@@ -32,6 +37,9 @@ class NewsFeedController extends GetxController {
   RxString type = ''.obs;
   RxBool videoLoad = false.obs;
 
+  String thumbnailPath = '';
+  String originalPath = '';
+
   @override
   void onInit() {
     super.onInit();
@@ -39,10 +47,13 @@ class NewsFeedController extends GetxController {
     postFocusNode = FocusNode();
   }
 
+/// get news feed (posts) controller
   Stream<List<NewsFeedModel>> getNewsFeed() {
     return newsFeedService.getNewsFeed();
   }
-  Future<bool> createPost(NewsFeedModel feedsModel) async{
+
+/// Create post controller
+  Future<bool> createPost(NewsFeedModel feedsModel,String compressImage) async{
     print("The post url ${newsFeedModel.value.postUrl}");
     feedsModel.name = userController.userModel.value.userName;
     feedsModel.userImage = userController.userModel.value.photoUrl;
@@ -51,35 +62,75 @@ class NewsFeedController extends GetxController {
     feedsModel.noOfComment = 0;
     feedsModel.noOfLike = 0;
     feedsModel.noOfShared = 0;
-    feedsModel.timestamp = Timestamp.now().millisecondsSinceEpoch.toString();
+    feedsModel.timestamp = Timestamp.now();
     feedsModel.isType = type.value;
     print("Created-------${feedsModel.timestamp}");
-
-    return await newsFeedService.createPost(feedsModel);
+    return await newsFeedService.createPost(feedsModel,compressImage);
   }
 
+/// Like post controller
   Future<bool> likePost(String postId, String userId)async{
     return newsFeedService.toggleLikePost(postId, userId);
   }
 
+/// fetch all likers on posts controller
   Future<List<UserModel>> fetchLikerUsers(String postId) async {
     return await newsFeedService.fetchLikerUsers(postId);
   }
 
+/// Add comment on post controller
+  Future<bool> addCommentOnPost(String postId, CommentModel commentModel) async{
+    commentModel.parentId = postId;
+    commentModel.postId = postId;
+    commentModel.timestamp = Timestamp.now();
+    commentModel.likedBy = [];
+    commentModel.likes = 0;
+    return await newsFeedService.addCommentOnPost(postId, commentModel);
+  }
 
+/// Add comment on comment controller
+  Future<bool> addCommentOnComment(String postId, String commentId ,CommentModel commentModel) async{
+    commentModel.parentId = commentId;
+    commentModel.timestamp = Timestamp.now();
+    commentModel.postId = postId;
+    commentModel.likedBy = [];
+    commentModel.likes = 0;
+    return await newsFeedService.addCommentOnComment(postId, commentId ,commentModel);
+  }
 
+/// get post comments controller
+  Stream<List<CommentModel>> getPostComments(String postId){
+    return newsFeedService.getPostComments(postId);
+  }
 
+/// get comments on comments
+  Stream<List<CommentModel>> getCommentsOnComment(String postId, String commentId){
+    return newsFeedService.getCommentsOnComment(postId, commentId);
+  }
 
+/// like on comments controller
+  Future<bool> toggleLikeComment(String postId, String commentId ,String userId) async {
+    return await newsFeedService.toggleLikeComment(postId, commentId, userId);
+  }
+
+/// like on subComment controller
+  Future<bool> toggleLikeSubComment(String postId, String commentId ,String userId,String subCommentId) async {
+    return await newsFeedService.toggleLikeSubComment(postId, commentId ,subCommentId, userId,);
+  }
+
+/// file picker
   Future<String?> filePicker(String fileType) async {
     if (fileType == 'image') {
       final pickedFile =
       await ImagePicker().pickImage(source: ImageSource.gallery);
       if (pickedFile != null) {
         fileImage.value = pickedFile;
+        await compressImage();
         type.value = 'image';
-        final url = await newsFeedService.uploadChatImageToFirebase(pickedFile.path, userController.userModel.value.uid!, DateTime.now().toString(),'jpg');
-        newsFeedModel.value.postUrl =  url;
-        return url;
+        String compress = originalPath;
+         // final url = await newsFeedService.uploadChatImageToFirebase(compress, userController.userModel.value.uid!, DateTime.now().toString(),'jpg');
+         // newsFeedModel.value.postUrl = url;
+        return compress;
       } else {
         return null;
       }
@@ -109,5 +160,41 @@ class NewsFeedController extends GetxController {
         return null;
       }
     }
+  }
+
+/// fetch all likes on comments
+  Future<List<UserModel>> fetchLikesOnComment(String postId, String commentId) async {
+    return await newsFeedService.fetchAllLikesComment(postId,commentId);
+  }
+
+  /// fetch all likes on sub comments
+  Future<List<UserModel>> fetchAllLikesOnSubComment(String postId,String parentId, String commentId) async {
+    return await newsFeedService.fetchAllLikesOnSubComment(postId, parentId,commentId);
+  }
+
+/// image compresser
+  Future<void> compressImage() async {
+    // final lastIndex = fileImage.value!.path.lastIndexOf(RegExp(r'.'));
+    // final splitted = fileImage.value!.path.substring(0, (lastIndex));
+    thumbnailPath = "${fileImage.value!.path}_thumbnail";
+    originalPath = "${fileImage.value!.path}_original";
+    FlutterImageCompress.validator.ignoreCheckExtName = true;
+    print('thumbnailpath =$thumbnailPath');
+//............. for thumbnail
+    await FlutterImageCompress.compressAndGetFile(
+      fileImage.value!.path,
+      thumbnailPath,
+      quality: 20,
+      minHeight: 300,
+      minWidth: 300,
+    );
+//............. for original image
+    await FlutterImageCompress.compressAndGetFile(
+      fileImage.value!.path,
+      originalPath,
+      quality: 60,
+      minHeight: 600,
+      minWidth: 600,
+    );
   }
 }

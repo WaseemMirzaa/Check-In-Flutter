@@ -5,12 +5,13 @@ import 'package:check_in/auth_service.dart';
 import 'package:check_in/controllers/News%20Feed/news_feed_controller.dart';
 import 'package:check_in/model/NewsFeed%20Model/news_feed_model.dart';
 import 'package:check_in/ui/screens/News%20Feed%20NavBar/All%20Comments/all_comments.dart';
-import 'package:check_in/ui/screens/News%20Feed%20NavBar/All%20Likes/all_likes_screen.dart';
+import 'package:check_in/ui/screens/News%20Feed%20NavBar/All%20Likes/post_all_likes_view.dart';
 import 'package:check_in/ui/screens/News%20Feed%20NavBar/Full%20Screen%20Image/full_screen_image.dart';
 import 'package:check_in/ui/screens/News%20Feed%20NavBar/News%20Feed/Component/comment_container.dart';
 import 'package:check_in/ui/screens/News%20Feed%20NavBar/News%20Feed/Component/custom_paint.dart';
 import 'package:check_in/ui/widgets/text_field.dart';
 import 'package:chewie/chewie.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:check_in/ui/widgets/custom_container.dart';
 import 'package:check_in/utils/Constants/images.dart';
@@ -19,6 +20,7 @@ import 'package:check_in/utils/gaps.dart';
 import 'package:check_in/utils/styles.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
+import 'package:nb_utils/nb_utils.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
 import 'package:sizer/sizer.dart';
 import 'package:video_player/video_player.dart';
@@ -28,11 +30,13 @@ class ListTileContainer extends GetView<NewsFeedController> {
   ListTileContainer({super.key, this.data});
 
   NewsFeedController newsFeedController = Get.put(NewsFeedController(NewsFeedService()));
+  final addCommentController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
+    newsFeedController.commentModel.value.userId = data!.userId;
+    newsFeedController.commentModel.value.userImage = data!.userImage;
     RxBool isVisible = false.obs;
-    RxBool isLike = false.obs;
     return CustomContainer1(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 15),
@@ -44,11 +48,11 @@ class ListTileContainer extends GetView<NewsFeedController> {
               child: Row(
                 children: [
                   Stack(
-                          children: [
-                            SizedBox(
-                              height: 44,
-                              width: 43,
-                              child: CustomPaint(
+                    children: [
+                      SizedBox(
+                        height: 44,
+                        width: 43,
+                        child: CustomPaint(
                                 painter: MyPainter(),
                                 size: const Size(200, 200),
                               ),
@@ -68,14 +72,14 @@ class ListTileContainer extends GetView<NewsFeedController> {
                         ),
                   horizontalGap(10),
                   Expanded(
-                    child: poppinsText(data!.name ?? '', 14, bold, darkBlue,
+                    child: poppinsText(data!.name ?? '', 14, bold, appDarkBlue,
                         overflow: TextOverflow.ellipsis),
                   ),
                   horizontalGap(5),
                   Container(
                     padding: const EdgeInsets.all(4),
                     decoration: BoxDecoration(
-                        shape: BoxShape.circle, color: greyColor1),
+                        shape: BoxShape.circle, color: appGreyColor1),
                     child: Icon(
                       Icons.more_horiz,
                       color: greyColor,
@@ -88,7 +92,7 @@ class ListTileContainer extends GetView<NewsFeedController> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 10.0),
               child: poppinsText(data!.description ?? "", 12, medium,
-                  darkBlue.withOpacity(0.8),
+                  appDarkBlue.withOpacity(0.8),
                   maxlines: 3),
             ),
             verticalGap(8),
@@ -117,10 +121,10 @@ class ListTileContainer extends GetView<NewsFeedController> {
               padding: const EdgeInsets.symmetric(horizontal: 10),
               child: Row(
                 children: [
-                  poppinsText("${data!.noOfComment}", 11, medium, darkBlue),
-                  poppinsText(' comments . ', 11, medium, darkBlue),
-                  poppinsText("${data!.noOfShared} ", 11, medium, darkBlue),
-                  poppinsText('shared', 11, medium, darkBlue),
+                  poppinsText("${data!.noOfComment}", 11, medium, appDarkBlue),
+                  poppinsText(' comments . ', 11, medium, appDarkBlue),
+                  poppinsText("${data!.noOfShared} ", 11, medium, appDarkBlue),
+                  poppinsText('shared', 11, medium, appDarkBlue),
                 ],
               ),
             ),
@@ -132,8 +136,6 @@ class ListTileContainer extends GetView<NewsFeedController> {
                   GestureDetector(
                       onTap: () async{
                         await newsFeedController.likePost(data!.id!, userController.userModel.value!.uid!);
-                        isLike.value = !data!.likedBy!.contains(userController.userModel.value.uid);
-                        print("The collection responce value is ${isLike.value}");
                         },
                       child: data!.likedBy!.contains(userController.userModel.value.uid)
                           ? Container(
@@ -200,7 +202,7 @@ class ListTileContainer extends GetView<NewsFeedController> {
                   const Spacer(),
                   GestureDetector(
                       onTap: () {
-                        pushNewScreen(context, screen: AllLikesScreen(postId: data!.id!,));
+                        pushNewScreen(context, screen: PostAllLikesView(postId: data!.id!,));
                       },
                       child: poppinsText('Liked by ${data!.noOfLike} People',
                       
@@ -226,34 +228,89 @@ class ListTileContainer extends GetView<NewsFeedController> {
                             borderRadius: BorderRadius.circular(25)),
                         padding: const EdgeInsets.symmetric(horizontal: 15),
                         child: CustomTextfield1(
-                          suffixIcon: Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 12.0),
-                            child: SvgPicture.asset(
-                              AppImage.messageappbaricon,
-                              color: appGreenColor,
+                          controller: addCommentController,
+                          onChanged: (value){
+                            newsFeedController.commentModel.value.content = value;
+                          },
+                          onEditingCompleted: () async{
+                            if(addCommentController.text.isEmptyOrNull){
+                              toast('The field is empty');
+                            }else {
+                              final comment = await newsFeedController
+                                  .addCommentOnPost(data!.id!,
+                                  newsFeedController.commentModel.value);
+                              (comment) ? addCommentController.clear() : null;
+                              print("The comment has added $comment");
+                            }
+
+                          },
+                          suffixIcon: GestureDetector(
+                            onTap: () async{
+                              if(addCommentController.text.isEmptyOrNull){
+                                toast('The field is empty');
+
+                              }else {
+                                final comment = await newsFeedController
+                                    .addCommentOnPost(data!.id!,
+                                    newsFeedController.commentModel.value);
+                                (comment) ? addCommentController.clear() : null;
+                                print("The comment has added $comment");
+                              }
+                            },
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 12.0),
+                              child: SvgPicture.asset(
+                                AppImage.messageappbaricon,
+                                color: appGreenColor,
+                              ),
                             ),
                           ),
                           hintText: 'Write a comment',
                         )),
-                    const Padding(
-                        padding: EdgeInsets.all(10.0),
-                        child: CommentContainer()),
-                    const Padding(
-                        padding: EdgeInsets.all(10.0),
-                        child: CommentContainer()),
-                    verticalGap(10),
-                    Divider(
-                      color: greyColor,
-                      indent: 20.w,
-                      endIndent: 20.w,
+                    StreamBuilder(
+                      stream: newsFeedController.getPostComments(data!.id!),
+                      builder: (context, snapshot) {
+                        if(snapshot.connectionState == ConnectionState.waiting){
+                          return const Center(child: CircularProgressIndicator(),);
+                        }else if(snapshot.hasError){
+                          return Center(child: Text(snapshot.error.toString()),);
+                        }else if(!snapshot.hasData){
+                          return const Center(child: Text('No data found'),);
+                        }else{
+                          return Column(
+                            children: [
+                              ListView.separated(
+                                shrinkWrap: true,
+                                physics: const NeverScrollableScrollPhysics(),
+                                itemCount: snapshot.data!.length,
+                              padding: const EdgeInsets.all(8),
+                              scrollDirection: Axis.vertical,
+                              separatorBuilder: (context, index) =>
+                              const SizedBox(height: 20,),
+                              itemBuilder: (context,
+                                  index) => CommentContainer(commentModel: snapshot.data![index],),),
+
+                              verticalGap(10),
+                              Divider(
+                                color: greyColor,
+                                indent: 20.w,
+                                endIndent: 20.w,
+                              ),
+                              verticalGap(10),
+                              GestureDetector(
+                                  onTap: () {
+                                    pushNewScreen(context,
+                                        screen: AllCommentsScreen(commentModel:snapshot.data!));
+                                  },
+                                  child: poppinsText('Show more', 15, bold, appGreenColor))
+                            ],
+                          );
+
+    }
+                      }
                     ),
-                    verticalGap(10),
-                    GestureDetector(
-                        onTap: () {
-                          pushNewScreen(context,
-                              screen: const AllCommentsScreen());
-                        },
-                        child: poppinsText('Show more', 15, bold, appGreenColor))
+
+
                   ],
                 )))
           ],

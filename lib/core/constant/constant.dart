@@ -4,6 +4,7 @@ class Collections {
   static const String MESSAGES = 'messages';
   static const String CHAT = 'chat';
   static const String NEWSFEED = 'newsFeed';
+  static const String COMMENTS = 'comments';
 
   ///
 }

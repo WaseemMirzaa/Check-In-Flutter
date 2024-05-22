@@ -35,8 +35,9 @@ class CreatePost extends StatelessWidget {
                 toast('Post description is empty');
               }else {
                 print(newsFeedController.newsFeedModel.value.description.toString());
-                await newsFeedController.createPost(newsFeedController.newsFeedModel.value).then((value) {
+                await newsFeedController.createPost(newsFeedController.newsFeedModel.value,newsFeedController.originalPath ).then((value) {
                   newsFeedController.newsFeedModel.value.postUrl = null;
+                  newsFeedController.originalPath = '';
                   Navigator.pop(context);
                 } );
               }

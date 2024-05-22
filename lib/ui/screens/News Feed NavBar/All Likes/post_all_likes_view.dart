@@ -9,8 +9,8 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:nb_utils/nb_utils.dart';
 
-class AllLikesScreen extends StatelessWidget {
-  AllLikesScreen({super.key, required this.postId});
+class PostAllLikesView extends StatelessWidget {
+  PostAllLikesView({super.key, required this.postId});
   String postId;
   final newsFeedController = Get.put(NewsFeedController(NewsFeedService()));
 

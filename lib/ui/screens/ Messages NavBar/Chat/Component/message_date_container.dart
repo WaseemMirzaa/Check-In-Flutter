@@ -62,7 +62,7 @@ class MessageDateContainer extends StatelessWidget {
                 : mymsg!
                     ? const SizedBox()
                     : CustomPaint(
-                        painter: CustomShape(bgcolor: greyColor1.withOpacity(1)),
+                        painter: CustomShape(bgcolor: appGreyColor1.withOpacity(1)),
                       ),
             InkWell(
               onLongPress: mymsg! && chat!.isDelete == null || chat!.isDelete == false
@@ -102,7 +102,7 @@ class MessageDateContainer extends StatelessWidget {
                             ? greyColor.withOpacity(0.3)
                             : mymsg!
                                 ? appGreenColor
-                                : greyColor1.withOpacity(1),
+                                : appGreyColor1.withOpacity(1),
                       ),
                       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
                       child: Text(
@@ -132,7 +132,7 @@ class MessageDateContainer extends StatelessWidget {
                             ? greyColor.withOpacity(0.2)
                             : mymsg!
                                 ? appGreenColor
-                                : greyColor1.withOpacity(1),
+                                : appGreyColor1.withOpacity(1),
                       ),
                       padding: const EdgeInsets.all(12),
                       child: RichText(

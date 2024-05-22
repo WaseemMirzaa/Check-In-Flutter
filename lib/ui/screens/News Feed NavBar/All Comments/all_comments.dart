@@ -1,3 +1,4 @@
+import 'package:check_in/model/NewsFeed%20Model/comment_model.dart';
 import 'package:check_in/ui/screens/News%20Feed%20NavBar/News%20Feed/Component/comment_container.dart';
 import 'package:check_in/ui/widgets/custom_appbar.dart';
 import 'package:check_in/ui/widgets/text_field.dart';
@@ -8,7 +9,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class AllCommentsScreen extends StatelessWidget {
-  const AllCommentsScreen({super.key});
+  AllCommentsScreen({super.key,required this.commentModel});
+  List<CommentModel> commentModel;
 
   @override
   Widget build(BuildContext context) {
@@ -32,13 +34,13 @@ class AllCommentsScreen extends StatelessWidget {
         children: [
           Expanded(
             child: ListView.builder(
-                itemCount: 12,
+                itemCount: commentModel.length,
                 shrinkWrap: true,
                 itemBuilder: (context, index) {
-                  return const Padding(
+                  return Padding(
                     padding:
                         EdgeInsets.symmetric(vertical: 7.0, horizontal: 10),
-                    child: CommentContainer(),
+                    child: CommentContainer(commentModel: commentModel[index],),
                   );
                 }),
           ),

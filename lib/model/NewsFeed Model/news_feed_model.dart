@@ -13,7 +13,7 @@ class NewsFeedModel {
   int noOfLike;
   int? noOfComment;
   int? noOfShared;
-  String? timestamp;
+  Timestamp? timestamp;
   NewsFeedModel(
       {this.id,
       this.userId,
