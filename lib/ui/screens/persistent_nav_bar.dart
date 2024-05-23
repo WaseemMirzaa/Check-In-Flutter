@@ -7,6 +7,8 @@ import 'package:check_in/utils/colors.dart';
 import 'package:check_in/utils/common.dart';
 import 'package:check_in/utils/styles.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
@@ -17,7 +19,7 @@ import ' Messages NavBar/Messages/messages.dart';
 import 'History.dart';
 import '../../controllers/nav_bar_controller.dart';
 import 'News Feed NavBar/News Feed/news_feed_screen.dart';
-
+import 'dart:developer' as developer;
 class BottomNav {
   String icon;
   Color iconColor;
@@ -148,7 +150,13 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> with AutomaticKeepAliveClientMixin {
   final NavBarController navBarController = Get.put(NavBarController());
+@override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    initDynamicLinks(context);
 
+}
   final List<Widget> _buildScreens = [
     const CheckIn(),
     MessageScreen(),
@@ -158,6 +166,42 @@ class _HomeState extends State<Home> with AutomaticKeepAliveClientMixin {
     const ProfileScreen()
     //KeyedSubtree(key: UniqueKey(), child: const ProfileScreen()),
   ];
+  /// The deep link
+  Future<void> initDynamicLinks(BuildContext context) async {
+    await Firebase.initializeApp();
+    // Handle initial link when the app is first opened
+    final PendingDynamicLinkData? initialLinkData = await FirebaseDynamicLinks.instance.getInitialLink();
+    _handleDeepLink(context, initialLinkData?.link);
+
+    // Set up the listener for any dynamic links clicked while the app is in the background or foreground
+    FirebaseDynamicLinks.instance.onLink.listen(
+          (PendingDynamicLinkData dynamicLinkData) {
+        _handleDeepLink(context, dynamicLinkData?.link);
+      },
+      onError: (error) async {
+        developer.log('Dynamic Link Failed: ${error.toString()}');
+      },
+    );
+  }
+
+  void _handleDeepLink(BuildContext context, Uri? deepLink) {
+    if (deepLink != null) {
+      var isPost = deepLink.pathSegments.contains('post');
+      print("THe collection contains---> $isPost");
+      if (isPost) {
+        var postId = deepLink.queryParameters['postId=12'];
+        if (postId != null) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => NewsFeedScreen(postId: postId,),
+            ),
+          );
+        }
+      }
+    }
+  }
+
 
   List<BottomNavigationBarItem> _navBarsItems() {
     return [

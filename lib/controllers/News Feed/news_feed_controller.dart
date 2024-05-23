@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:check_in/Services/message_service.dart';
@@ -74,7 +75,7 @@ class NewsFeedController extends GetxController {
   }
 
 /// fetch all likers on posts controller
-  Future<List<UserModel>> fetchLikerUsers(String postId) async {
+  Future<List<UserModel>> fetchLikerUsers(String postId) async{
     return await newsFeedService.fetchLikerUsers(postId);
   }
 
@@ -84,6 +85,7 @@ class NewsFeedController extends GetxController {
     commentModel.postId = postId;
     commentModel.timestamp = Timestamp.now();
     commentModel.likedBy = [];
+    commentModel.userImage = userController.userModel.value.photoUrl;
     commentModel.likes = 0;
     return await newsFeedService.addCommentOnPost(postId, commentModel);
   }
@@ -94,6 +96,7 @@ class NewsFeedController extends GetxController {
     commentModel.timestamp = Timestamp.now();
     commentModel.postId = postId;
     commentModel.likedBy = [];
+    commentModel.userImage = userController.userModel.value.photoUrl;
     commentModel.likes = 0;
     return await newsFeedService.addCommentOnComment(postId, commentId ,commentModel);
   }
@@ -151,11 +154,13 @@ class NewsFeedController extends GetxController {
           allowFullScreen: false,
           showOptions: false,
         );
+        originalPath = pickedFile.path;
         type.value = 'video';
-        final url = await newsFeedService.uploadChatImageToFirebase(pickedFile.path, userController.userModel.value.uid!, DateTime.now().toString(),'mp4');
-        print("The Video path is: $url");
-        newsFeedModel.value.postUrl = url;
-        return url;
+        // final url = await newsFeedService.uploadChatImageToFirebase(pickedFile.path, userController.userModel.value.uid!, DateTime.now().toString(),'mp4');
+        // print("The Video path is: $url");
+        // newsFeedModel.value.postUrl = url;
+        log("_______\n\n\n\n--------------Video is: ${pickedFile.path}");
+        return pickedFile.path;
       } else {
         return null;
       }

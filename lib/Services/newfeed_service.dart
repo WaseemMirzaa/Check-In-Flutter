@@ -32,7 +32,7 @@ class NewsFeedService {
   Future<bool> createPost(NewsFeedModel newsFeedModel,String compress) async{
     try{
       if(compress.isNotEmpty){
-        final url = await uploadChatImageToFirebase(compress, userController.userModel.value.uid!, DateTime.now().toString(), 'jpg');
+        final url = await uploadChatImageToFirebase(compress, userController.userModel.value.uid!, DateTime.now().toString(),newsFeedModel.isType == 'image' ? 'jpg' : 'mp4');
         newsFeedModel.postUrl = url;
         if(newsFeedModel.postUrl!.isNotEmpty) {
           DocumentReference docReff = FirebaseFirestore.instance.collection(
@@ -54,7 +54,6 @@ class NewsFeedService {
       return false;
     }
   }
-
 
   /// Like and unlike post
   Future<bool> toggleLikePost(String postId, String userId) async {
@@ -198,7 +197,7 @@ class NewsFeedService {
   Future<bool> toggleLikeSubComment(String postId, String commentId, String subCommentId ,String userId) async {
     try{
       final docRef = FirebaseFirestore.instance.collection(Collections.NEWSFEED).doc(postId).collection(Collections.COMMENTS).doc(commentId).collection(Collections.COMMENTS).doc(subCommentId);
-      log("The doc is:" + docRef.id.toString());
+      log("The doc is:${docRef.id}");
       await FirebaseFirestore.instance.runTransaction((transaction) async {
         final snapshot = await transaction.get(docRef);
         if (!snapshot.exists) {

@@ -1,8 +1,12 @@
 import 'package:check_in/core/constant/app_assets.dart';
 import 'package:check_in/core/constant/temp_language.dart';
+import 'package:check_in/ui/screens/News%20Feed%20NavBar/News%20Feed/news_feed_screen.dart';
 import 'package:check_in/ui/screens/persistent_nav_bar.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/material.dart';
 import '../../utils/colors.dart';
+import 'dart:developer' as developer;
 
 class Splash extends StatefulWidget {
   const Splash({super.key});
@@ -12,11 +16,13 @@ class Splash extends StatefulWidget {
 }
 
 class _SplashState extends State<Splash> {
+
   @override
   void initState() {
     super.initState();
-    _navigatetohome();
+     _navigatetohome();
   }
+
 
   _navigatetohome() async {
     await Future.delayed(const Duration(milliseconds: 1500), () {

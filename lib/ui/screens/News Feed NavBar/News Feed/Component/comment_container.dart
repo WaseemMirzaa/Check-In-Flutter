@@ -21,7 +21,7 @@ import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
 import 'package:sizer/sizer.dart';
 
 class CommentContainer extends StatelessWidget {
-  CommentContainer({super.key, required this.commentModel});
+  CommentContainer({super.key, required this.commentModel,});
   CommentModel commentModel;
   final newsFeedController = Get.put(NewsFeedController(NewsFeedService()));
   final userController = Get.put(UserController());
@@ -37,11 +37,12 @@ class CommentContainer extends StatelessWidget {
     }
     return parts.join(' ');
   }
+  Rx<bool> isLiked = false.obs;
+
   @override
   Widget build(BuildContext context) {
     Rx isReply = false.obs;
-
-    // commentModel.userImage = userController.userModel.value.photoUrl!;
+    isLiked.value = commentModel.likedBy!.contains(userController.userModel.value.uid);
     return SizedBox(
       width: MediaQuery.sizeOf(context).width,
       child: Column(
@@ -74,11 +75,15 @@ class CommentContainer extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 poppinsText(formatTimestamp(commentModel.timestamp!), 12, regular, greyColor),
-                GestureDetector(
-                    onTap: ()async{
-                      await newsFeedController.toggleLikeComment(commentModel.parentId! ,commentModel.commentId!, userController.userModel.value.uid!,);
-                    },
-                    child: commentModel.likedBy!.contains(userController.userModel.value.uid) ? poppinsText('Liked', 12, bold, appGreenColor) : poppinsText('Like', 12, regular, greyColor)),
+                Obx(() => GestureDetector(
+                          onTap: ()async{
+                            await newsFeedController.toggleLikeComment(commentModel.parentId! ,commentModel.commentId!, userController.userModel.value.uid!,);
+                            isLiked = commentModel.likedBy!.contains(userController.userModel.value.uid).obs;
+                            print("The liked obx is: $isLiked");
+                          },
+                          child: commentModel.likedBy!.contains(userController.userModel.value.uid) || isLiked.value ? poppinsText('Liked', 12, bold, appGreenColor) : poppinsText('Like', 12, regular, greyColor)),
+                    ),
+
                 GestureDetector(
                     onTap: (){
                       isReply.value =! isReply.value;

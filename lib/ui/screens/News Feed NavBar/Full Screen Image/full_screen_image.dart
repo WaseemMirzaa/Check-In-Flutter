@@ -12,7 +12,7 @@ import 'package:intl/intl.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
 
 class FullScreenImage extends StatelessWidget {
-  FullScreenImage({super.key,required this.newsFeedModel});
+  FullScreenImage({super.key,required this.newsFeedModel, this.postId = ''});
   NewsFeedModel newsFeedModel;
   String formatTimestamp(Timestamp timestamp) {
     final DateTime dateTime = timestamp.toDate();
@@ -24,6 +24,7 @@ class FullScreenImage extends StatelessWidget {
     }
     return parts.join(' ');
   }
+  String postId;
 
   @override
   Widget build(BuildContext context) {

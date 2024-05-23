@@ -1,5 +1,5 @@
 import 'dart:io';
-
+import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:check_in/Services/newfeed_service.dart';
 import 'package:check_in/auth_service.dart';
 import 'package:check_in/controllers/News%20Feed/news_feed_controller.dart';
@@ -9,7 +9,9 @@ import 'package:check_in/ui/screens/News%20Feed%20NavBar/All%20Likes/post_all_li
 import 'package:check_in/ui/screens/News%20Feed%20NavBar/Full%20Screen%20Image/full_screen_image.dart';
 import 'package:check_in/ui/screens/News%20Feed%20NavBar/News%20Feed/Component/comment_container.dart';
 import 'package:check_in/ui/screens/News%20Feed%20NavBar/News%20Feed/Component/custom_paint.dart';
+import 'package:check_in/ui/screens/News%20Feed%20NavBar/News%20Feed/Component/video_from_db.dart';
 import 'package:check_in/ui/widgets/text_field.dart';
+import 'package:check_in/utils/loader.dart';
 import 'package:chewie/chewie.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -22,6 +24,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:nb_utils/nb_utils.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:sizer/sizer.dart';
 import 'package:video_player/video_player.dart';
 
@@ -35,7 +38,6 @@ class ListTileContainer extends GetView<NewsFeedController> {
   @override
   Widget build(BuildContext context) {
     newsFeedController.commentModel.value.userId = data!.userId;
-    newsFeedController.commentModel.value.userImage = data!.userImage;
     RxBool isVisible = false.obs;
     return CustomContainer1(
       child: Padding(
@@ -113,9 +115,9 @@ class ListTileContainer extends GetView<NewsFeedController> {
                       ),
                     ),
                   )
-                : data!.isType == 'video'
-                    ? const SizedBox()
-                    : const SizedBox(),
+                : data!.isType == 'video' ? newsFeedController.videoLoad.value
+                ? loaderView()
+                : VideoPlayerFromFirebase(videoUrl: data!.postUrl!,) : SizedBox(),
             verticalGap(10),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 10),
@@ -183,8 +185,12 @@ class ListTileContainer extends GetView<NewsFeedController> {
                   ),
                   horizontalGap(3.w),
                   GestureDetector(
-                    onTap: () {
-                      // Share.share('news feed post');
+                    onTap: () async{
+                      String link = await createDynamicLink(data!.id!);
+                      print("The link is: $link");
+                      if(link.isNotEmpty){
+                        Share.share('Check out this post: $link');
+                      }
                     },
                     child: Container(
                       padding: const EdgeInsets.all(8),
@@ -300,7 +306,7 @@ class ListTileContainer extends GetView<NewsFeedController> {
                               GestureDetector(
                                   onTap: () {
                                     pushNewScreen(context,
-                                        screen: AllCommentsScreen(commentModel:snapshot.data!));
+                                        screen: AllCommentsScreen(docId:snapshot.data!.first.postId!));
                                   },
                                   child: poppinsText('Show more', 15, bold, appGreenColor))
                             ],
@@ -318,6 +324,31 @@ class ListTileContainer extends GetView<NewsFeedController> {
       ),
     );
   }
+
+  Future<String> createDynamicLink(String postId) async {
+    try{
+      final DynamicLinkParameters parameters = DynamicLinkParameters(
+        uriPrefix: 'https://developlogix.page.link', // Your Firebase Dynamic Links URL prefix
+        link: Uri.parse('https://yourapp.com/post?postId=12'), // Deep link URL
+        androidParameters: const AndroidParameters(
+          packageName: 'com.developlogix.checkinapp', // Your package name
+          minimumVersion: 0,
+        ),
+        iosParameters: const IOSParameters(
+          bundleId: 'com.developlogix.checkin', // Your bundle ID
+          minimumVersion: '0',
+        ),
+      );
+
+      final ShortDynamicLink shortDynamicLink = await FirebaseDynamicLinks.instance.buildShortLink(parameters);
+      return shortDynamicLink.shortUrl.toString();
+    }catch (e){
+      log("The error is----------\n\n\n\n\n\n\ $e\n\n\n");
+      return '';
+    }
+    }
+
+
 }
 
 class ChewieDemo extends StatefulWidget {
