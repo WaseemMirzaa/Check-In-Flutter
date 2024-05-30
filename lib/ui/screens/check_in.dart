@@ -673,7 +673,7 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
                           onTap: () async {
                             nbutils.showConfirmDialogCustom(
                               context,
-                              title: 'Get verified today!',
+                              title: 'Get Verified on Check In Hoops Today! \n- 1 Time Purchase',
                               subTitle: '',
                               dialogType: nbutils.DialogType.CONFIRMATION,
                               cancelable: false,

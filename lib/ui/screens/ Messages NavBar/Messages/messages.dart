@@ -9,6 +9,7 @@ import 'package:check_in/ui/screens/%20Messages%20NavBar/Messages/Component/mess
 import 'package:check_in/ui/screens/%20Messages%20NavBar/Messages/Component/search_field.dart';
 import 'package:check_in/utils/colors.dart';
 import 'package:check_in/utils/gaps.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:get/get.dart';
@@ -46,20 +47,21 @@ class MessageScreen extends GetView<MessageController> {
           verticalGap(20),
           Expanded(
               child: StreamBuilder<List<Messagemodel>>(
-                  stream: controller.getChatMessage(userController.userModel.value.uid!),
+                  stream: controller.getChatMessage(FirebaseAuth.instance.currentUser?.uid??''),
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return loaderView();
                     } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
                       return Center(child: Text(TempLanguage.noMessageFound));
+                    }else if(snapshot.hasError){
+                      return Center(child: Text(snapshot.error.toString()),);
                     } else {
                       return ListView.builder(
                           // padding: const EdgeInsets.only(top: 14),
                           itemCount: snapshot.data!.length,
                           itemBuilder: (context, index) {
-                            var message = snapshot.data![index];
-
-                            if (message.showMessageTile!) {
+                            var message = snapshot.data?[index];
+                            if (message!.showMessageTile!) {
                               return Obx(() {
                                 if (snapshot.data![index].name!
                                     .toLowerCase()
@@ -74,8 +76,7 @@ class MessageScreen extends GetView<MessageController> {
                                             SlidableAction(
                                               onPressed: (_) {
                                                 messageDeleteDialog(onTap: () {
-                                                  controller
-                                                      .deleteMessage(message.id!, userController.userModel.value.uid!)
+                                                  controller.deleteMessage(message.id!, userController.userModel.value.uid!)
                                                       .then((_) => Get.back());
                                                 });
                                               },
@@ -93,11 +94,11 @@ class MessageScreen extends GetView<MessageController> {
                                           ontap: () {
                                             GlobalVariable.docId = chatcontroller.docId.value = message.id!;
                                             //.........................
-                                            chatcontroller.name.value = message.name!;
-                                            chatcontroller.isgroup = message.isgroup!;
-                                            chatcontroller.image.value = message.image!;
-                                            chatcontroller.memberId.value = message.memberIds!;
-                                            chatcontroller.senderName.value = message.yourname!;
+                                            chatcontroller.name.value = message.name ?? '';
+                                            chatcontroller.isgroup = message.isgroup ?? false;
+                                            chatcontroller.image.value = message.image ?? '';
+                                            chatcontroller.memberId.value = message.memberIds ?? [];
+                                            chatcontroller.senderName.value = message.yourname ?? '';
                                             chatcontroller.members.value = message.members ?? [];
                                             //...............
                                             // chatcontroller.updateLastSeenMethod();

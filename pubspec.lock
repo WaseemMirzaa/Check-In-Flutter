@@ -792,28 +792,28 @@ packages:
   google_maps_flutter:
     dependency: "direct main"
     description:
-      path: "/Users/apple/StudioProjects/Check-In-Flutter/google_maps_flutter/google_maps_flutter"
+      path: "/Users/developlogix.dev1/SABIR/check_in/google_maps_flutter/google_maps_flutter"
       relative: false
     source: path
     version: "2.3.0"
   google_maps_flutter_android:
     dependency: transitive
     description:
-      path: "/Users/apple/StudioProjects/Check-In-Flutter/google_maps_flutter/google_maps_flutter_android"
+      path: "/Users/developlogix.dev1/SABIR/check_in/google_maps_flutter/google_maps_flutter_android"
       relative: false
     source: path
     version: "2.5.0"
   google_maps_flutter_ios:
     dependency: transitive
     description:
-      path: "/Users/apple/StudioProjects/Check-In-Flutter/google_maps_flutter/google_maps_flutter_ios"
+      path: "/Users/developlogix.dev1/SABIR/check_in/google_maps_flutter/google_maps_flutter_ios"
       relative: false
     source: path
     version: "2.3.0"
   google_maps_flutter_platform_interface:
     dependency: transitive
     description:
-      path: "/Users/apple/StudioProjects/Check-In-Flutter/google_maps_flutter/google_maps_flutter_platform_interface"
+      path: "/Users/developlogix.dev1/SABIR/check_in/google_maps_flutter/google_maps_flutter_platform_interface"
       relative: false
     source: path
     version: "2.3.0"
@@ -1582,6 +1582,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.1.0"
+  web:
+    dependency: transitive
+    description:
+      name: web
+      sha256: dc8ccd225a2005c1be616fe02951e2e342092edf968cf0844220383757ef8f10
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.1.4-beta"
   webview_flutter:
     dependency: "direct main"
     description:
@@ -1647,5 +1655,5 @@ packages:
     source: hosted
     version: "3.1.2"
 sdks:
-  dart: ">=3.0.0 <4.0.0"
+  dart: ">=3.1.0-185.0.dev <4.0.0"
   flutter: ">=3.10.0"

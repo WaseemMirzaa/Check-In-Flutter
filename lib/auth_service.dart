@@ -80,7 +80,7 @@ Future<void> login(email, password, context) async {
       await toModal(context);
       SharedPreferences prefs = await SharedPreferences.getInstance();
       prefs.setString('email', 'useremail@gmail.com');
-      pushNewScreen(context, screen: const Home());
+      userController.userModel.value.uid.isEmptyOrNull ? null : pushNewScreen(context, screen: const Home());
     });
   } on FirebaseAuthException catch (e) {
     print('error message ${e.message}');
@@ -218,7 +218,8 @@ toModal(BuildContext context) async {
   DocumentSnapshot snap =
       await FirebaseFirestore.instance.collection(Collections.USER).doc(auth.currentUser?.uid ?? "").get();
   UserModel userModel = UserModel.fromMap(snap.data() as Map<String, dynamic>);
-  print("user model:.. ${userModel.uid}");
+  userController.userModel.value =userModel;
+  print("user model:.. ${userController.userModel.value.uid}");
 }
 
 Future<void> resetPassword({required String emailText}) async {

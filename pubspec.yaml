@@ -74,7 +74,7 @@ dependencies:
   dartz: ^0.10.1
   wakelock_plus: ^1.1.4
   google_maps_flutter:
-      path: /Users/apple/StudioProjects/Check-In-Flutter/google_maps_flutter/google_maps_flutter
+      path: /Users/developlogix.dev1/SABIR/check_in/google_maps_flutter/google_maps_flutter
   device_preview: ^1.1.0
   permission_handler: ^11.0.1
   flutter_slidable: ^3.1.0
