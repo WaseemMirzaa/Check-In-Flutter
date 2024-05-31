@@ -63,10 +63,33 @@ class NewsFeedController extends GetxController {
     feedsModel.noOfComment = 0;
     feedsModel.noOfLike = 0;
     feedsModel.noOfShared = 0;
+    feedsModel.isOriginal = true;
     feedsModel.timestamp = Timestamp.now();
     feedsModel.isType = type.value;
     print("Created-------${feedsModel.timestamp}");
     return await newsFeedService.createPost(feedsModel,compressImage);
+  }
+
+  /// share post
+  Future<bool> sharePost(NewsFeedModel feedsModel) async{
+    print("The post url ${newsFeedModel.value.postUrl}");
+    // feedsModel.name = feedsModel.name;
+    // feedsModel.userImage = feedsModel.userImage;
+    // feedsModel.postUrl = feedsModel.postUrl;
+    // feedsModel.userId = feedsModel.userId;
+    // feedsModel.noOfComment = feedsModel.noOfComment;
+    // feedsModel.noOfLike = feedsModel.noOfLike;
+    // feedsModel.noOfShared = feedsModel.noOfShared;
+    // feedsModel.timestamp = feedsModel.timestamp;
+    // feedsModel.isType = feedsModel.isType;
+    feedsModel.isOriginal = false;
+    feedsModel.shareUID = userController.userModel.value.uid;
+    feedsModel.shareName = userController.userModel.value.userName;
+    feedsModel.shareImage = userController.userModel.value.photoUrl;
+    feedsModel.sharePostID = feedsModel.id;
+    feedsModel.shareTimestamp = Timestamp.now();
+    print("Shared-------${feedsModel.shareTimestamp}");
+    return await newsFeedService.sharePost(feedsModel);
   }
 
 /// Like post controller
@@ -175,6 +198,16 @@ class NewsFeedController extends GetxController {
   /// fetch all likes on sub comments
   Future<List<UserModel>> fetchAllLikesOnSubComment(String postId,String parentId, String commentId) async {
     return await newsFeedService.fetchAllLikesOnSubComment(postId, parentId,commentId);
+  }
+
+  /// create deep link
+  Future<String> createDynamicLink(String postId) async {
+    return await newsFeedService.createDynamicLink(postId);
+  }
+
+  /// hide post for me
+  Future<bool> hidePost(String docId)async{
+    return await newsFeedService.hidePost(docId);
   }
 
 /// image compresser

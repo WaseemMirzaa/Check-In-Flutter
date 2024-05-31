@@ -2,16 +2,16 @@ import 'package:chewie/chewie.dart';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 
-class VideoPlayerFromFirebase extends StatefulWidget {
+class VideoPlayerWidget extends StatefulWidget {
   final String videoUrl;
 
-  VideoPlayerFromFirebase({required this.videoUrl});
+  VideoPlayerWidget({required this.videoUrl});
 
   @override
-  _VideoPlayerFromFirebaseState createState() => _VideoPlayerFromFirebaseState();
+  _VideoPlayerWidgetState createState() => _VideoPlayerWidgetState();
 }
 
-class _VideoPlayerFromFirebaseState extends State<VideoPlayerFromFirebase> {
+class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
   VideoPlayerController? _videoPlayerController;
   ChewieController? _chewieController;
 
@@ -26,7 +26,7 @@ class _VideoPlayerFromFirebaseState extends State<VideoPlayerFromFirebase> {
     await _videoPlayerController!.initialize();
     _chewieController = ChewieController(
       videoPlayerController: _videoPlayerController!,
-      autoPlay: true,
+      autoPlay: false,  // Set this to false to prevent auto play
       looping: false,
       // Add these options for a more modern look (optional)
       placeholder: Container(
@@ -62,7 +62,7 @@ class _VideoPlayerFromFirebaseState extends State<VideoPlayerFromFirebase> {
         controller: _chewieController!,
       ),
     )
-        : Center(
+        : const Center(
       child: CircularProgressIndicator(),
     );
   }

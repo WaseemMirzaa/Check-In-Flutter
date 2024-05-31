@@ -14,6 +14,7 @@ Text poppinsText(
       fontWeight: fontWeight,
       fontSize: fontSize,
       color: color,
+    
     ),
   );
 }

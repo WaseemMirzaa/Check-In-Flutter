@@ -7,6 +7,7 @@ import 'package:check_in/model/NewsFeed%20Model/comment_model.dart';
 import 'package:check_in/model/NewsFeed%20Model/news_feed_model.dart';
 import 'package:check_in/model/user_modal.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:get/get.dart';
 import 'package:nb_utils/nb_utils.dart';
@@ -19,14 +20,20 @@ class NewsFeedService {
   final FirebaseStorage _storage = FirebaseStorage.instance;
   final userController = Get.put(UserController());
 
-  //............ Get newsfeed post
-  Stream<List<NewsFeedModel>> getNewsFeed() {
-    return _newsFeedCollection.orderBy(NewsFeed.TIME_STAMP, descending: true).snapshots()
-        .map((querySnapshot) => querySnapshot.docs.map<NewsFeedModel>((doc) {
-              return NewsFeedModel.fromJson(doc.data() as Map<String, dynamic>);
-            }).toList());
-  }
-
+ Stream<List<NewsFeedModel>> getNewsFeed() {
+  return _newsFeedCollection
+      .orderBy(NewsFeed.TIME_STAMP, descending: true)
+      .snapshots()
+      .map((querySnapshot) => querySnapshot.docs
+          .where((doc) =>
+              doc.data() != null &&
+              (doc.data() as Map<String, dynamic>?)![NewsFeed.HIDE_USER] is List &&
+              !(doc.data() as Map<String, dynamic>)[NewsFeed.HIDE_USER].contains(userController.userModel.value.uid))
+          .map<NewsFeedModel>((doc) {
+            return NewsFeedModel.fromJson(doc.data() as Map<String, dynamic>);
+          })
+          .toList());
+}
 
   /// Create news feed post
   Future<bool> createPost(NewsFeedModel newsFeedModel,String compress) async{
@@ -54,6 +61,22 @@ class NewsFeedService {
       return false;
     }
   }
+
+   /// Create news feed post
+  Future<bool> sharePost(NewsFeedModel newsFeedModel) async{
+    try{
+        DocumentReference docReff = FirebaseFirestore.instance.collection(
+            Collections.NEWSFEED).doc();
+        newsFeedModel.shareID = docReff.id;
+        await docReff.set(newsFeedModel.toJson());
+        return true;
+      
+    }catch (e){
+      print(e.toString());
+      return false;
+    }
+  }
+
 
   /// Like and unlike post
   Future<bool> toggleLikePost(String postId, String userId) async {
@@ -261,6 +284,43 @@ class NewsFeedService {
 
     return likers;
   }
+
+  /// Hide post for me
+  Future<bool> hidePost(String docId)async{
+    try{
+       _newsFeedCollection.doc(docId).update({
+      NewsFeed.HIDE_USER: FieldValue.arrayUnion([userController.userModel.value.uid])
+    });
+      return true;
+    }catch (e){
+      return false;
+    }
+   
+  }
+
+  /// share through deep linking
+  Future<String> createDynamicLink(String postId) async {
+    try{
+      final DynamicLinkParameters parameters = DynamicLinkParameters(
+        uriPrefix: 'https://developlogix.page.link', // Your Firebase Dynamic Links URL prefix
+        link: Uri.parse('https://yourapp.com/post?postId=12'), // Deep link URL
+        androidParameters: const AndroidParameters(
+          packageName: 'com.developlogix.checkinapp', // Your package name
+          minimumVersion: 0,
+        ),
+        iosParameters: const IOSParameters(
+          bundleId: 'com.developlogix.checkin', // Your bundle ID
+          minimumVersion: '0',
+        ),
+      );
+
+      final ShortDynamicLink shortDynamicLink = await FirebaseDynamicLinks.instance.buildShortLink(parameters);
+      return shortDynamicLink.shortUrl.toString();
+    }catch (e){
+      log("The error is----------\n\n\n\n\n\n\ $e\n\n\n");
+      return '';
+    }
+    }
 
 /// Upload image to firebase for news feed
   Future<String> uploadChatImageToFirebase( String imagePath, String uId, String time, String extension) async {

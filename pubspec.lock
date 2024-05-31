@@ -791,21 +791,21 @@ packages:
   google_maps_flutter_android:
     dependency: transitive
     description:
-      path: "/Users/developlogix.dev1/SABIR/check_in/google_maps_flutter/google_maps_flutter_android"
+      path: "D:/developloix/check_in_flutter/google_maps_flutter/google_maps_flutter_android"
       relative: false
     source: path
     version: "2.5.0"
   google_maps_flutter_ios:
     dependency: transitive
     description:
-      path: "/Users/developlogix.dev1/SABIR/check_in/google_maps_flutter/google_maps_flutter_ios"
+      path: "D:/developloix/check_in_flutter/google_maps_flutter/google_maps_flutter_ios"
       relative: false
     source: path
     version: "2.3.0"
   google_maps_flutter_platform_interface:
     dependency: transitive
     description:
-      path: "/Users/developlogix.dev1/SABIR/check_in/google_maps_flutter/google_maps_flutter_platform_interface"
+      path: "D:/developloix/check_in_flutter/google_maps_flutter/google_maps_flutter_platform_interface"
       relative: false
     source: path
     version: "2.3.0"

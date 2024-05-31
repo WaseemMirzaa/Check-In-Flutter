@@ -25,8 +25,8 @@ import '../../auth_service.dart';
 import '../../utils/gaps.dart';
 
 class ProfileScreen extends StatefulWidget {
-  const ProfileScreen({Key? key}) : super(key: key);
-
+  ProfileScreen({Key? key,this.isNavBar = true}) : super(key: key);
+  bool isNavBar;
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();
 }
@@ -222,6 +222,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
         automaticallyImplyLeading: false,
         centerTitle: true,
         backgroundColor: appWhiteColor,
+        leading: widget.isNavBar ? SizedBox() : IconButton(onPressed: (){
+          Navigator.pop(context);
+        }, icon: Icon(Icons.arrow_back_ios)),
         title: poppinsText(TempLanguage.profile, 20, FontWeight.bold, appBlackColor),
       ),
       body: SingleChildScrollView(

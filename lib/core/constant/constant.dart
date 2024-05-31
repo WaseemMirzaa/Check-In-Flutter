@@ -89,7 +89,16 @@ class NewsFeed {
   static const String NO_OF_COMMENT = 'noOfComment';
   static const String NO_OF_SHARED = 'noOfShared';
   static const String LIKED_BY = 'likedBy';
+  static const String HIDE_USER = 'hideUsers';
+  static const String IS_ORIGINAL = 'isOriginal';
   static const String TIME_STAMP = 'timeStamp';
+  static const String SHARE_NAME = 'shareName';
+  static const String SHARE_IMAGE = 'shareImage';
+  static const String SHARE_UID = 'shareUID';
+  static const String SHARE_ID = 'shareID';
+  static const String SHARE_POSTID = 'sharePostID';
+  static const String SHARE_TIMESTAMP = 'shareTimestamp';
+  static const String SHARE_TEXT = 'shareText';
 }
 
 class SharedPreferenceKey {

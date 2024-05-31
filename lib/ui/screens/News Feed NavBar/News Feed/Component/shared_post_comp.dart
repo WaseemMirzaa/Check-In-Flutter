@@ -30,9 +30,10 @@ import 'package:share_plus/share_plus.dart';
 import 'package:sizer/sizer.dart';
 import 'package:video_player/video_player.dart';
 
-class ListTileContainer extends GetView<NewsFeedController> {
+
+class SharedPostComp extends GetView<NewsFeedController> {
   NewsFeedModel? data;
-  ListTileContainer({super.key, this.data});
+  SharedPostComp({super.key, this.data});
 
   NewsFeedController newsFeedController = Get.put(NewsFeedController(NewsFeedService()));
   final addCommentController = TextEditingController();
@@ -47,6 +48,116 @@ class ListTileContainer extends GetView<NewsFeedController> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+             Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8),
+              child: Row(
+                children: [
+                  GestureDetector(
+                    onTap: (){
+                      if(userController.userModel.value.uid == data!.shareUID){
+                        pushNewScreen(context, screen: ProfileScreen(isNavBar: false,));
+                      }else{
+                        pushNewScreen(context,
+                                        screen: OtherProfileView(uid: data!.shareUID!));
+                      }
+                      
+                    },
+                    child: Stack(
+                      children: [
+                        SizedBox(
+                          height: 44,
+                          width: 43,
+                          child: CustomPaint(
+                                  painter: MyPainter(),
+                                  size: const Size(200, 200),
+                                ),
+                              ),
+                              Positioned(
+                                top: 1.5,
+                                left: 1,
+                                child: Container(
+                                    height: 40,
+                                    width: 40,
+                                    decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        image: DecorationImage(
+                                            image: data!.shareImage == '' ? NetworkImage(AppImage.userImagePath) : NetworkImage(data!.shareImage!),fit: BoxFit.cover))),
+                              )
+                            ],
+                          ),
+                  ),
+                  
+                  horizontalGap(10),
+                  Expanded(
+                    child:  GestureDetector(
+                    onTap: (){
+                      if(userController.userModel.value.uid == data!.shareUID){
+                        pushNewScreen(context, screen: ProfileScreen(isNavBar: false,));
+                      }else{
+                        pushNewScreen(context,
+                                        screen: OtherProfileView(uid: data!.shareUID!));
+                      }
+                      
+                    },
+                    child: poppinsText(data!.shareName ?? '', 14, bold, appDarkBlue,
+                          overflow: TextOverflow.ellipsis),
+                    ),
+                  ),
+                  horizontalGap(5),
+                   PopupMenuButton<String>(
+          icon: Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: BoxDecoration(
+                          shape: BoxShape.circle, color: appGreyColor1),
+                      child: Icon(
+                        Icons.more_horiz,
+                        color: greyColor,
+                      ),
+                    ),
+          onSelected: (String result) async{
+            switch (result) {
+              case 'Delete':
+                newsFeedController.hidePost(data!.shareID!);
+                break;
+              case 'Share':
+                 String link = await newsFeedController.createDynamicLink(data!.shareID!);
+                      print("The link is: $link");
+                      if(link.isNotEmpty){
+                        Share.share('Check out this post: $link');
+                      }
+                break;
+            }
+          },
+          itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+            const PopupMenuItem<String>(
+              value: 'Delete',
+              child: ListTile(
+                leading: Icon(Icons.delete),
+                title: Text('Delete'),
+              ),
+            ),
+            const PopupMenuItem<String>(
+              value: 'Share',
+              child: ListTile(
+                leading: Icon(Icons.share),
+                title: Text('Share'),
+              ),
+            ),
+          ]),
+                
+                ],
+              ),
+            ),
+            
+             verticalGap(8),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10.0),
+              child: poppinsText(data!.shareText ?? "", 12, medium,
+                  appDarkBlue.withOpacity(0.8),
+                  maxlines: 3),
+            ),
+            verticalGap(8),
+            SizedBox(height: 2.h),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 8),
               child: Row(
@@ -103,46 +214,6 @@ class ListTileContainer extends GetView<NewsFeedController> {
                     ),
                   ),
                   horizontalGap(5),
-                   PopupMenuButton<String>(
-          icon: Container(
-                      padding: const EdgeInsets.all(4),
-                      decoration: BoxDecoration(
-                          shape: BoxShape.circle, color: appGreyColor1),
-                      child: Icon(
-                        Icons.more_horiz,
-                        color: greyColor,
-                      ),
-                    ),
-          onSelected: (String result) async{
-            switch (result) {
-              case 'Delete':
-                newsFeedController.hidePost(data!.id!);
-                break;
-              case 'Share':
-                 String link = await newsFeedController.createDynamicLink(data!.id!);
-                      print("The link is: $link");
-                      if(link.isNotEmpty){
-                        Share.share('Check out this post: $link');
-                      }
-                break;
-            }
-          },
-          itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-            const PopupMenuItem<String>(
-              value: 'Delete',
-              child: ListTile(
-                leading: Icon(Icons.delete),
-                title: Text('Delete'),
-              ),
-            ),
-            const PopupMenuItem<String>(
-              value: 'Share',
-              child: ListTile(
-                leading: Icon(Icons.share),
-                title: Text('Share'),
-              ),
-            ),
-          ]),
                 
                 ],
               ),

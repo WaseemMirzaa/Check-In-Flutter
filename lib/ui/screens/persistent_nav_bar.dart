@@ -163,7 +163,7 @@ class _HomeState extends State<Home> with AutomaticKeepAliveClientMixin {
     //................ News Feed
     NewsFeedScreen(),
     const HistoryView(),
-    const ProfileScreen()
+    ProfileScreen()
     //KeyedSubtree(key: UniqueKey(), child: const ProfileScreen()),
   ];
   /// The deep link

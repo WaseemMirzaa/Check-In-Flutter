@@ -4,6 +4,8 @@ import 'package:check_in/core/constant/temp_language.dart';
 import 'package:check_in/model/NewsFeed%20Model/news_feed_model.dart';
 import 'package:check_in/ui/screens/News%20Feed%20NavBar/Create%20Post/create_post_screen.dart';
 import 'package:check_in/ui/screens/News%20Feed%20NavBar/News%20Feed/Component/list_tile_container.dart';
+import 'package:check_in/ui/screens/News%20Feed%20NavBar/News%20Feed/Component/share_post_comp.dart';
+import 'package:check_in/ui/screens/News%20Feed%20NavBar/News%20Feed/Component/shared_post_comp.dart';
 import 'package:check_in/ui/screens/News%20Feed%20NavBar/News%20Feed/Component/top_container.dart';
 import 'package:check_in/ui/screens/profile_screen.dart';
 import 'package:check_in/ui/widgets/custom_container.dart';
@@ -131,9 +133,9 @@ class _NewsFeedScreenState extends State<NewsFeedScreen> {
                           itemCount: snapshot.data!.length,
                           itemBuilder: (context, index) {
                             var data = snapshot.data![index];
-                            return ListTileContainer(
+                            return data.isOriginal! ? ListTileContainer(
                               data: data,
-                            );
+                            ) : SharedPostComp(data:data);
                           });
                     }
                   })
