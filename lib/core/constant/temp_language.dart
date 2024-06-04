@@ -76,6 +76,7 @@ class TempLanguage {
   static String get checkOutHot => "Check out what's Hot";
   static String get contentThatTrendingAndPopular => "Check out what's Hot";
   static String get noMessageFound => "No messages found.";
+  static String get noPostFound => "No posts found.";
   static String get typeSomething => "Type something";
   static String get noRecent => "No Recents";
   static String get noConversation => "No Conversation.";

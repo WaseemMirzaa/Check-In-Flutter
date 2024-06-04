@@ -83,7 +83,6 @@ class NewsFeedService {
     try{
       final docRef = FirebaseFirestore.instance.collection(Collections.NEWSFEED).doc(postId);
       log(docRef.id.toString());
-
       await FirebaseFirestore.instance.runTransaction((transaction) async {
         final snapshot = await transaction.get(docRef);
         if (!snapshot.exists) {

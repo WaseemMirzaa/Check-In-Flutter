@@ -73,20 +73,12 @@ class NewsFeedController extends GetxController {
   /// share post
   Future<bool> sharePost(NewsFeedModel feedsModel) async{
     print("The post url ${newsFeedModel.value.postUrl}");
-    // feedsModel.name = feedsModel.name;
-    // feedsModel.userImage = feedsModel.userImage;
-    // feedsModel.postUrl = feedsModel.postUrl;
-    // feedsModel.userId = feedsModel.userId;
-    // feedsModel.noOfComment = feedsModel.noOfComment;
-    // feedsModel.noOfLike = feedsModel.noOfLike;
-    // feedsModel.noOfShared = feedsModel.noOfShared;
-    // feedsModel.timestamp = feedsModel.timestamp;
-    // feedsModel.isType = feedsModel.isType;
     feedsModel.isOriginal = false;
     feedsModel.shareUID = userController.userModel.value.uid;
     feedsModel.shareName = userController.userModel.value.userName;
     feedsModel.shareImage = userController.userModel.value.photoUrl;
     feedsModel.sharePostID = feedsModel.id;
+    feedsModel.timestamp = Timestamp.now();
     feedsModel.shareTimestamp = Timestamp.now();
     print("Shared-------${feedsModel.shareTimestamp}");
     return await newsFeedService.sharePost(feedsModel);

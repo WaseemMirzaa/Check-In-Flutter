@@ -13,6 +13,7 @@ import 'package:check_in/utils/styles.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -44,7 +45,7 @@ class CommentContainer extends StatelessWidget {
     Rx isReply = false.obs;
     isLiked.value = commentModel.likedBy!.contains(userController.userModel.value.uid);
     return SizedBox(
-      width: MediaQuery.sizeOf(context).width,
+      width: 100.w,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -57,15 +58,18 @@ class CommentContainer extends StatelessWidget {
                 radius: 17,
               ),
               horizontalGap(10),
-              Container(
-                  width: MediaQuery.sizeOf(context).width * 0.65,
-                  padding: const EdgeInsets.all(15),
-                  decoration: BoxDecoration(
-                      color: appDarkBlue.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(10)),
-                  child: poppinsText(commentModel.content!, 12,
-                      medium, appBlackColor,
-                      maxlines: 5))
+              Expanded(
+                child: Container(
+                    width: MediaQuery.sizeOf(context).width * 0.65,
+                    padding: const EdgeInsets.all(15),
+                    decoration: BoxDecoration(
+                        color: appDarkBlue.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(10)),
+                    child: poppinsText(commentModel.content!, 12,
+                        medium, appBlackColor,
+                        overflow: TextOverflow.ellipsis,
+                        maxlines: 5)),
+              )
             ],
           ),
           Container(

@@ -4,17 +4,13 @@ import 'package:check_in/core/constant/temp_language.dart';
 import 'package:check_in/model/NewsFeed%20Model/news_feed_model.dart';
 import 'package:check_in/ui/screens/News%20Feed%20NavBar/Create%20Post/create_post_screen.dart';
 import 'package:check_in/ui/screens/News%20Feed%20NavBar/News%20Feed/Component/list_tile_container.dart';
-import 'package:check_in/ui/screens/News%20Feed%20NavBar/News%20Feed/Component/share_post_comp.dart';
 import 'package:check_in/ui/screens/News%20Feed%20NavBar/News%20Feed/Component/shared_post_comp.dart';
 import 'package:check_in/ui/screens/News%20Feed%20NavBar/News%20Feed/Component/top_container.dart';
-import 'package:check_in/ui/screens/profile_screen.dart';
 import 'package:check_in/ui/widgets/custom_container.dart';
 import 'package:check_in/utils/Constants/images.dart';
 import 'package:check_in/utils/colors.dart';
 import 'package:check_in/utils/loader.dart';
 import 'package:check_in/utils/styles.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
@@ -121,9 +117,9 @@ class _NewsFeedScreenState extends State<NewsFeedScreen> {
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return loaderView();
                     } else if (!snapshot.hasData) {
-                      return Center(child: Text(TempLanguage.noMessageFound));
+                      return Center(child: Text(TempLanguage.noPostFound));
                     }else if (snapshot.data!.isEmpty) {
-                      return Center(child: Text(TempLanguage.noMessageFound));
+                      return Center(child: Text(TempLanguage.noPostFound));
                     } else if(snapshot.hasError){
                       return Center(child: Text(snapshot.error.toString()),);
                     } else {

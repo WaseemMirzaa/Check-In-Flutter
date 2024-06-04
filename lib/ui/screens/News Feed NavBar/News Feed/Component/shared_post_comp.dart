@@ -99,8 +99,7 @@ class SharedPostComp extends GetView<NewsFeedController> {
                       }
                       
                     },
-                    child: poppinsText(data!.shareName ?? '', 14, bold, appDarkBlue,
-                          overflow: TextOverflow.ellipsis),
+                    child:richText(data!.shareName??'', 'shared a post'),
                     ),
                   ),
                   horizontalGap(5),
@@ -156,7 +155,9 @@ class SharedPostComp extends GetView<NewsFeedController> {
                   appDarkBlue.withOpacity(0.8),
                   maxlines: 3),
             ),
-            verticalGap(8),
+            Padding(padding: EdgeInsets.only(left: 20),child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
             SizedBox(height: 2.h),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 8),
@@ -265,7 +266,7 @@ class SharedPostComp extends GetView<NewsFeedController> {
                 children: [
                   GestureDetector(
                       onTap: () async{
-                        await newsFeedController.likePost(data!.id!, userController.userModel.value!.uid!);
+                        await newsFeedController.likePost(data!.shareID!, userController.userModel.value!.uid!);
                         },
                       child: data!.likedBy!.contains(userController.userModel.value.uid)
                           ? Container(
@@ -370,7 +371,7 @@ class SharedPostComp extends GetView<NewsFeedController> {
                               toast('The field is empty');
                             }else {
                               final comment = await newsFeedController
-                                  .addCommentOnPost(data!.id!,
+                                  .addCommentOnPost(data!.shareID!,
                                   newsFeedController.commentModel.value);
                               (comment) ? addCommentController.clear() : null;
                               print("The comment has added $comment");
@@ -384,7 +385,7 @@ class SharedPostComp extends GetView<NewsFeedController> {
 
                               }else {
                                 final comment = await newsFeedController
-                                    .addCommentOnPost(data!.id!,
+                                    .addCommentOnPost(data!.shareID!,
                                     newsFeedController.commentModel.value);
                                 (comment) ? addCommentController.clear() : null;
                                 print("The comment has added $comment");
@@ -401,7 +402,7 @@ class SharedPostComp extends GetView<NewsFeedController> {
                           hintText: 'Write a comment',
                         )),
                     StreamBuilder(
-                      stream: newsFeedController.getPostComments(data!.id!),
+                      stream: newsFeedController.getPostComments(data!.shareID!),
                       builder: (context, snapshot) {
                         if(snapshot.connectionState == ConnectionState.waiting){
                           return const Center(child: CircularProgressIndicator(),);
@@ -446,6 +447,7 @@ class SharedPostComp extends GetView<NewsFeedController> {
 
                   ],
                 )))
+            ],),)
           ],
         ),
       ),

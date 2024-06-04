@@ -39,7 +39,7 @@ class SharePostScreen extends StatelessWidget {
            Padding(padding: const EdgeInsets.all(16),child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-             const Text('Add your point of view'),
+             const Text('Add your thoughts'),
              SizedBox(height: 1.h,),
             TextField(
               controller: commentController,
@@ -59,11 +59,5 @@ class SharePostScreen extends StatelessWidget {
       ),
     );
   }
-
- Future<void> sharePost(String postId, String comment) async {
-  // feedController.sharePost(feedsModel);
-  
-
-}
 
 }
