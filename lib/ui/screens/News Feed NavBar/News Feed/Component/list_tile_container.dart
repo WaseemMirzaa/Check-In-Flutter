@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:check_in/core/constant/constant.dart';
 import 'package:check_in/ui/screens/%20Messages%20NavBar/other_profile/other_profile_view.dart';
 import 'package:check_in/ui/screens/News%20Feed%20NavBar/share_screen/share_screen.dart';
 import 'package:check_in/ui/screens/profile_screen.dart';
@@ -16,6 +17,7 @@ import 'package:check_in/ui/screens/News%20Feed%20NavBar/News%20Feed/Component/v
 import 'package:check_in/ui/widgets/text_field.dart';
 import 'package:check_in/utils/loader.dart';
 import 'package:chewie/chewie.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:check_in/ui/widgets/custom_container.dart';
 import 'package:check_in/utils/Constants/images.dart';
@@ -24,6 +26,7 @@ import 'package:check_in/utils/gaps.dart';
 import 'package:check_in/utils/styles.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:nb_utils/nb_utils.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
 import 'package:share_plus/share_plus.dart';
@@ -115,8 +118,11 @@ class ListTileContainer extends GetView<NewsFeedController> {
                     ),
           onSelected: (String result) async{
             switch (result) {
-              case 'Delete':
+              case 'Hide':
                 newsFeedController.hidePost(data!.id!);
+                break;
+              case 'Delete':
+                 newsFeedController.deletePost(data!.id!);
                 break;
               case 'Share':
                  String link = await newsFeedController.createDynamicLink(data!.id!);
@@ -128,11 +134,11 @@ class ListTileContainer extends GetView<NewsFeedController> {
             }
           },
           itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-            const PopupMenuItem<String>(
-              value: 'Delete',
+             PopupMenuItem<String>(
+              value: data!.userId == userController.userModel.value.uid ? 'Delete' : 'Hide',
               child: ListTile(
-                leading: Icon(Icons.delete),
-                title: Text('Delete'),
+                leading: const Icon(Icons.delete),
+                title: Text(data!.userId == userController.userModel.value.uid ? 'Delete' : 'Hide'),
               ),
             ),
             const PopupMenuItem<String>(
@@ -148,11 +154,20 @@ class ListTileContainer extends GetView<NewsFeedController> {
               ),
             ),
             verticalGap(8),
-            Padding(
+             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 10.0),
-              child: poppinsText(data!.description ?? "", 12, medium,
-                  appDarkBlue.withOpacity(0.8),
-                  maxlines: 3),
+              child: ReadMoreText(
+                data!.description ?? "",
+                trimMode: TrimMode.Line,
+                trimLines: 6,
+                colorClickableText: Colors.blue,
+                trimCollapsedText: ' Show more',
+                style: GoogleFonts.poppins(fontSize: 12, fontWeight: medium, color: appDarkBlue.withOpacity(0.8)),
+                trimExpandedText: ' Show less',
+              )
+              // poppinsText(data!.description ?? "", 12, medium,
+              //     appDarkBlue.withOpacity(0.8),
+              //     maxlines: 10),
             ),
             verticalGap(8),
             data!.isType == 'image' && data!.postUrl!.isNotEmpty
@@ -174,13 +189,13 @@ class ListTileContainer extends GetView<NewsFeedController> {
                   )
                 : data!.isType == 'video' ? newsFeedController.videoLoad.value
                 ? loaderView()
-                : VideoPlayerWidget(videoUrl: data!.postUrl!,) : SizedBox(),
+                : VideoPlayerWidget(videoUrl: data!.postUrl!,) : const SizedBox(),
             verticalGap(10),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 10),
               child: Row(
                 children: [
-                  poppinsText("${data!.noOfComment}", 11, medium, appDarkBlue),
+                  poppinsText("${data!.noOfComment} ", 11, medium, appDarkBlue),
                   poppinsText(' comments . ', 11, medium, appDarkBlue),
                   poppinsText("${data!.noOfShared} ", 11, medium, appDarkBlue),
                   poppinsText('shared', 11, medium, appDarkBlue),
@@ -298,9 +313,14 @@ class ListTileContainer extends GetView<NewsFeedController> {
                             if(addCommentController.text.isEmptyOrNull){
                               toast('The field is empty');
                             }else {
-                              final comment = await newsFeedController
-                                  .addCommentOnPost(data!.id!,
+                              final comment = await newsFeedController.addCommentOnPost(data!.id!,
                                   newsFeedController.commentModel.value);
+                              if(comment){
+                                await newsFeedController.updateCollection(Collections.NEWSFEED, data!.id!,
+                                    {
+                                      NewsFeed.NO_OF_COMMENT : data!.noOfComment! + 1,
+                                    });
+                              }
                               (comment) ? addCommentController.clear() : null;
                               print("The comment has added $comment");
                             }
@@ -312,9 +332,13 @@ class ListTileContainer extends GetView<NewsFeedController> {
                                 toast('The field is empty');
 
                               }else {
-                                final comment = await newsFeedController
-                                    .addCommentOnPost(data!.id!,
-                                    newsFeedController.commentModel.value);
+                                final comment = await newsFeedController.addCommentOnPost(data!.id!, newsFeedController.commentModel.value);
+                                if(comment){
+                                  await newsFeedController.updateCollection(Collections.NEWSFEED, data!.id!,
+                                      {
+                                        NewsFeed.NO_OF_COMMENT : data!.noOfComment! + 1,
+                                      });
+                                }
                                 (comment) ? addCommentController.clear() : null;
                                 print("The comment has added $comment");
                               }
@@ -380,9 +404,6 @@ class ListTileContainer extends GetView<NewsFeedController> {
       ),
     );
   }
-
-  
-
 
 }
 

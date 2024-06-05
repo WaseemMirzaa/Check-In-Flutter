@@ -81,7 +81,8 @@ class CommentContainer extends StatelessWidget {
                 poppinsText(formatTimestamp(commentModel.timestamp!), 12, regular, greyColor),
                 Obx(() => GestureDetector(
                           onTap: ()async{
-                            await newsFeedController.toggleLikeComment(commentModel.parentId! ,commentModel.commentId!, userController.userModel.value.uid!,);
+                            await newsFeedController.toggleLikeComment(commentModel.parentId! ,commentModel.commentId!, userController.userModel.value.uid!,).then((value) {
+                            });
                             isLiked = commentModel.likedBy!.contains(userController.userModel.value.uid).obs;
                             print("The liked obx is: $isLiked");
                           },

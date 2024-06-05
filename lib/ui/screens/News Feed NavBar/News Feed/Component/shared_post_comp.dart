@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:check_in/core/constant/constant.dart';
 import 'package:check_in/ui/screens/%20Messages%20NavBar/other_profile/other_profile_view.dart';
 import 'package:check_in/ui/screens/News%20Feed%20NavBar/share_screen/share_screen.dart';
 import 'package:check_in/ui/screens/profile_screen.dart';
@@ -115,8 +116,11 @@ class SharedPostComp extends GetView<NewsFeedController> {
                     ),
           onSelected: (String result) async{
             switch (result) {
-              case 'Delete':
+              case 'Hide':
                 newsFeedController.hidePost(data!.shareID!);
+                break;
+              case 'Delete':
+                newsFeedController.deletePost(data!.shareID!);
                 break;
               case 'Share':
                  String link = await newsFeedController.createDynamicLink(data!.shareID!);
@@ -128,11 +132,11 @@ class SharedPostComp extends GetView<NewsFeedController> {
             }
           },
           itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-            const PopupMenuItem<String>(
-              value: 'Delete',
+             PopupMenuItem<String>(
+              value: data!.shareUID == userController.userModel.value.uid ? 'Delete' : 'Hide',
               child: ListTile(
-                leading: Icon(Icons.delete),
-                title: Text('Delete'),
+                leading: const Icon(Icons.delete),
+                title: Text(data!.shareUID == userController.userModel.value.uid ? 'Delete' : 'Hide'),
               ),
             ),
             const PopupMenuItem<String>(
@@ -370,9 +374,13 @@ class SharedPostComp extends GetView<NewsFeedController> {
                             if(addCommentController.text.isEmptyOrNull){
                               toast('The field is empty');
                             }else {
-                              final comment = await newsFeedController
-                                  .addCommentOnPost(data!.shareID!,
-                                  newsFeedController.commentModel.value);
+                              final comment = await newsFeedController.addCommentOnPost(data!.shareID!, newsFeedController.commentModel.value);
+                              if(comment){
+                                await newsFeedController.updateCollection(Collections.NEWSFEED, data!.shareID!,
+                                    {
+                                      NewsFeed.NO_OF_COMMENT : data!.noOfComment! + 1,
+                                    });
+                              }
                               (comment) ? addCommentController.clear() : null;
                               print("The comment has added $comment");
                             }
@@ -384,9 +392,14 @@ class SharedPostComp extends GetView<NewsFeedController> {
                                 toast('The field is empty');
 
                               }else {
-                                final comment = await newsFeedController
-                                    .addCommentOnPost(data!.shareID!,
+                                final comment = await newsFeedController.addCommentOnPost(data!.shareID!,
                                     newsFeedController.commentModel.value);
+                                if(comment){
+                                  await newsFeedController.updateCollection(Collections.NEWSFEED, data!.shareID!,
+                                      {
+                                        NewsFeed.NO_OF_COMMENT : data!.noOfComment! + 1,
+                                      });
+                                }
                                 (comment) ? addCommentController.clear() : null;
                                 print("The comment has added $comment");
                               }

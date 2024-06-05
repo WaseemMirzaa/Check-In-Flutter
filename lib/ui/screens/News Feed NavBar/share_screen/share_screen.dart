@@ -1,5 +1,6 @@
 import 'package:check_in/Services/newfeed_service.dart';
 import 'package:check_in/controllers/News%20Feed/news_feed_controller.dart';
+import 'package:check_in/core/constant/constant.dart';
 import 'package:check_in/model/NewsFeed%20Model/news_feed_model.dart';
 import 'package:check_in/ui/screens/News%20Feed%20NavBar/News%20Feed/Component/list_tile_container.dart';
 import 'package:check_in/ui/screens/News%20Feed%20NavBar/News%20Feed/Component/share_post_comp.dart';
@@ -26,6 +27,16 @@ class SharePostScreen extends StatelessWidget {
             icon: const Icon(Icons.send),
             onPressed: () async {
               final share = await feedController.sharePost(feedController.newsFeedModel.value);
+              print("Share : $share");
+              print("Number of shares are : ${data!.noOfShared}");
+              if(share){
+
+                print("The share id is:"+data.shareID!);
+                await feedController.updateCollection(Collections.NEWSFEED, data.id!,
+                    {
+                      NewsFeed.NO_OF_SHARED : data!.noOfShared! + 1,
+                    });
+              }
               share ?
               Get.back() : null; // Go back to the previous screen
             },

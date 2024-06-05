@@ -16,6 +16,7 @@ import 'package:nb_utils/nb_utils.dart';
 import 'package:sizer/sizer.dart';
 
 import 'firebase_options.dart';
+import 'ui/screens/News Feed NavBar/news_feed_onboarding/news_feed_onboarding.dart';
 
 List<Map<String, dynamic>> courtlist = [];
 late final FirebaseMessaging _messaging;
@@ -140,7 +141,7 @@ class MyApp extends StatelessWidget {
             scaffoldBackgroundColor: whiteColor,
           ),
           initialBinding: MyBinding(),
-          home: const Splash(),
+          home: const NewsFeedOnboarding(),
         );
       },
     );

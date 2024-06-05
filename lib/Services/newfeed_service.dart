@@ -14,11 +14,19 @@ import 'package:nb_utils/nb_utils.dart';
 
 class NewsFeedService {
   final db = FirebaseFirestore.instance;
-  final CollectionReference _newsFeedCollection =
-      FirebaseFirestore.instance.collection(Collections.NEWSFEED);
+  final CollectionReference _newsFeedCollection = FirebaseFirestore.instance.collection(Collections.NEWSFEED);
 
   final FirebaseStorage _storage = FirebaseStorage.instance;
   final userController = Get.put(UserController());
+
+  Future<bool> updateCollection(String collectionName, String docId, Map<String, dynamic> list)async{
+    try{
+      await db.collection(collectionName).doc(docId).update(list);
+      return true;
+    }catch (e){
+      return false;
+    }
+  }
 
  Stream<List<NewsFeedModel>> getNewsFeed() {
   return _newsFeedCollection
@@ -62,7 +70,7 @@ class NewsFeedService {
     }
   }
 
-   /// Create news feed post
+   /// Create news share feed post
   Future<bool> sharePost(NewsFeedModel newsFeedModel) async{
     try{
         DocumentReference docReff = FirebaseFirestore.instance.collection(
@@ -76,7 +84,6 @@ class NewsFeedService {
       return false;
     }
   }
-
 
   /// Like and unlike post
   Future<bool> toggleLikePost(String postId, String userId) async {
@@ -92,7 +99,7 @@ class NewsFeedService {
         final post = NewsFeedModel.fromJson(snapshot.data() as Map<String, dynamic>);
         if (post.likedBy!.contains(userId)) {
           post.likedBy!.remove(userId);
-          post.noOfLike -= 1;
+          post.noOfLike > 0 ? post.noOfLike -= 1 : post.noOfLike = 0;
         } else {
           post.likedBy!.add(userId);
           post.noOfLike += 1;
@@ -197,7 +204,7 @@ class NewsFeedService {
         final post = CommentModel.fromJson(snapshot.data() as Map<String, dynamic>);
         if (post.likedBy!.contains(userId)) {
           post.likedBy!.remove(userId);
-          post.likes -= 1;
+          post.likes > 0 ? post.likes -= 1 : post.likes = 0;
         } else {
           post.likedBy!.add(userId);
           post.likes += 1;
@@ -213,6 +220,14 @@ class NewsFeedService {
     }
   }
 
+  /// get the total number of comments on post
+  Stream<int> getNumOfComments(String newsFeedId) {
+    CollectionReference commentsRef = FirebaseFirestore.instance
+        .collection(Collections.NEWSFEED)
+        .doc(newsFeedId)
+        .collection(Collections.COMMENTS);
+    return commentsRef.snapshots().map((snapshot) => snapshot.size);
+  }
 
 
 /// Like and unlike the subcomment
@@ -296,6 +311,28 @@ class NewsFeedService {
     }
    
   }
+
+  /// Delete post permanently
+  Future<void> deleteSubcollection(String postId) async {
+    DocumentReference parentDocRef = _newsFeedCollection.doc(postId);
+    await deleteSubCollectionNewsFeed(parentDocRef);
+    await deleteNewsFeed(postId);
+  }
+
+  Future<void> deleteNewsFeed(String postId) async {
+    DocumentReference parentDocRef = _newsFeedCollection.doc(postId);
+    await parentDocRef.delete();
+  }
+
+  Future<void> deleteSubCollectionNewsFeed(DocumentReference docRef) async {
+    final comntCollection = await docRef.collection(Collections.COMMENTS).get();
+
+    for (var subCollection in comntCollection.docs) {
+      await deleteSubCollectionNewsFeed(subCollection.reference);
+      await subCollection.reference.delete();
+    }
+  }
+
 
   /// share through deep linking
   Future<String> createDynamicLink(String postId) async {

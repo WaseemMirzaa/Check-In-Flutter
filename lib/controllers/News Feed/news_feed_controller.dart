@@ -53,6 +53,11 @@ class NewsFeedController extends GetxController {
     return newsFeedService.getNewsFeed();
   }
 
+  /// Update the collection
+  Future<bool> updateCollection(String collectionName, String docId, Map<String, dynamic> list)async{
+    return await newsFeedService.updateCollection(collectionName, docId, list);
+  }
+
 /// Create post controller
   Future<bool> createPost(NewsFeedModel feedsModel,String compressImage) async{
     print("The post url ${newsFeedModel.value.postUrl}");
@@ -124,6 +129,11 @@ class NewsFeedController extends GetxController {
 /// get comments on comments
   Stream<List<CommentModel>> getCommentsOnComment(String postId, String commentId){
     return newsFeedService.getCommentsOnComment(postId, commentId);
+  }
+
+  /// get number of comments
+  Stream<int> getNumOfComments(String newsFeedId) {
+    return newsFeedService.getNumOfComments(newsFeedId);
   }
 
 /// like on comments controller
@@ -200,6 +210,11 @@ class NewsFeedController extends GetxController {
   /// hide post for me
   Future<bool> hidePost(String docId)async{
     return await newsFeedService.hidePost(docId);
+  }
+
+  /// Delete post for all
+  Future<void> deletePost(String docId)async{
+    return newsFeedService.deleteSubcollection(docId);
   }
 
 /// image compresser
