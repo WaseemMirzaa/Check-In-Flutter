@@ -1,5 +1,6 @@
 // ignore_for_file: avoid_print
 import 'package:check_in/core/constant/temp_language.dart';
+import 'package:check_in/ui/screens/News%20Feed%20NavBar/news_feed_onboarding/news_feed_onboarding.dart';
 import 'package:check_in/ui/screens/check_in.dart';
 import 'package:check_in/ui/screens/profile_screen.dart';
 import 'package:check_in/ui/screens/start.dart';
@@ -12,6 +13,7 @@ import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
+import 'package:nb_utils/nb_utils.dart';
 
 import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
 
@@ -154,14 +156,19 @@ class _HomeState extends State<Home> with AutomaticKeepAliveClientMixin {
   void initState() {
     // TODO: implement initState
     super.initState();
+    Future.microtask(() async{
+      FirebaseAuth.instance.currentUser != null && getStringAsync('first') != 'no' ?  Navigator.pushReplacement(
+          context, MaterialPageRoute(builder: (context) => const NewsFeedOnboarding())) : null;
+    });
     initDynamicLinks(context);
+
 
 }
   final List<Widget> _buildScreens = [
     const CheckIn(),
     MessageScreen(),
     //................ News Feed
-    NewsFeedScreen(),
+     NewsFeedScreen(),
     const HistoryView(),
     ProfileScreen()
     //KeyedSubtree(key: UniqueKey(), child: const ProfileScreen()),

@@ -13,6 +13,7 @@ import 'package:check_in/utils/loader.dart';
 import 'package:check_in/utils/styles.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:nb_utils/nb_utils.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
 import '../../../widgets/custom_appbar.dart';
 
@@ -68,7 +69,7 @@ class _NewsFeedScreenState extends State<NewsFeedScreen> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    // initDynamicLinks(context);
+     Future.microtask(() async=> await setValue('first', 'no'));
   }
 
   @override
@@ -111,6 +112,7 @@ class _NewsFeedScreenState extends State<NewsFeedScreen> {
                   ],
                 ),
               )),
+
               StreamBuilder<List<NewsFeedModel>>(
                   stream: controller.getNewsFeed(),
                   builder: (context, snapshot) {

@@ -21,11 +21,11 @@ dependencies:
     sdk: flutter
 
   google_maps_flutter_android:
-    path: /Users/developlogix.dev1/SABIR/check_in_hoop/google_maps_flutter/google_maps_flutter_android
+    path: D:/developloix/check_in_flutter/google_maps_flutter/google_maps_flutter_android
   google_maps_flutter_ios:
-    path: /Users/developlogix.dev1/SABIR/check_in_hoop/google_maps_flutter/google_maps_flutter_ios
+    path: D:/developloix/check_in_flutter/google_maps_flutter/google_maps_flutter_ios
   google_maps_flutter_platform_interface:
-    path: /Users/developlogix.dev1/SABIR/check_in_hoop/google_maps_flutter/google_maps_flutter_platform_interface
+    path: D:/developloix/check_in_flutter/google_maps_flutter/google_maps_flutter_platform_interface
 
 
 dev_dependencies:

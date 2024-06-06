@@ -5,6 +5,7 @@ import 'package:check_in/Services/push_notification_service.dart';
 import 'package:check_in/binding.dart';
 import 'package:check_in/model/notification_model.dart';
 import 'package:check_in/ui/screens/splash.dart';
+import 'package:check_in/ui/test_aids.dart';
 import 'package:device_preview/device_preview.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -12,6 +13,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:get/get_navigation/src/root/get_material_app.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:nb_utils/nb_utils.dart';
 import 'package:sizer/sizer.dart';
 
@@ -81,6 +83,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await init;
+  await initialize();
 
   // if (Platform.isIOS) {
   //   await Firebase.initializeApp(
@@ -91,6 +94,7 @@ void main() async {
   //   await Firebase.initializeApp();
   // }
   await Firebase.initializeApp();
+  MobileAds.instance.initialize();
   _messaging = FirebaseMessaging.instance;
   if (Platform.isIOS) {
     await _messaging.requestPermission();
@@ -141,7 +145,7 @@ class MyApp extends StatelessWidget {
             scaffoldBackgroundColor: whiteColor,
           ),
           initialBinding: MyBinding(),
-          home: const NewsFeedOnboarding(),
+          home: TestAdisInteg(),
         );
       },
     );
