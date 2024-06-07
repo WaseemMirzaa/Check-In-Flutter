@@ -20,7 +20,11 @@ class _SplashState extends State<Splash> {
   @override
   void initState() {
     super.initState();
-     _navigatetohome();
+    // Future.delayed(Duration(seconds: 6),(){
+    //   Navigator.push(context, MaterialPageRoute(builder: (context)=>MyHomePage()));
+    // });
+
+      _navigatetohome();
   }
 
 

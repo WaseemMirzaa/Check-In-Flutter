@@ -82,7 +82,7 @@ dependencies:
   dio: ^5.3.2
   firebase_dynamic_links: ^5.5.6
   share_plus: ^9.0.0
-  google_mobile_ads: ^2.4.0
+  google_mobile_ads: ^2.0.0
 #  google_maps_flutter_platform_interface:
 #      path: /Users/developlogix.dev1/SABIR/check_in/google_maps_flutter/google_maps_flutter_platform_interface
 #

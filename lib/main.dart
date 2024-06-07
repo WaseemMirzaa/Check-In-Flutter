@@ -5,7 +5,6 @@ import 'package:check_in/Services/push_notification_service.dart';
 import 'package:check_in/binding.dart';
 import 'package:check_in/model/notification_model.dart';
 import 'package:check_in/ui/screens/splash.dart';
-import 'package:check_in/ui/test_aids.dart';
 import 'package:device_preview/device_preview.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -81,7 +80,7 @@ Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
+  MobileAds.instance.initialize();
   await init;
   await initialize();
 
@@ -94,7 +93,6 @@ void main() async {
   //   await Firebase.initializeApp();
   // }
   await Firebase.initializeApp();
-  MobileAds.instance.initialize();
   _messaging = FirebaseMessaging.instance;
   if (Platform.isIOS) {
     await _messaging.requestPermission();
@@ -145,7 +143,7 @@ class MyApp extends StatelessWidget {
             scaffoldBackgroundColor: whiteColor,
           ),
           initialBinding: MyBinding(),
-          home: TestAdisInteg(),
+          home: Splash(),
         );
       },
     );

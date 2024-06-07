@@ -6,6 +6,7 @@ import 'package:check_in/ui/screens/News%20Feed%20NavBar/Create%20Post/create_po
 import 'package:check_in/ui/screens/News%20Feed%20NavBar/News%20Feed/Component/list_tile_container.dart';
 import 'package:check_in/ui/screens/News%20Feed%20NavBar/News%20Feed/Component/shared_post_comp.dart';
 import 'package:check_in/ui/screens/News%20Feed%20NavBar/News%20Feed/Component/top_container.dart';
+import 'package:check_in/ui/screens/News%20Feed%20NavBar/test_aid_comp/test_aid_comp.dart';
 import 'package:check_in/ui/widgets/custom_container.dart';
 import 'package:check_in/utils/Constants/images.dart';
 import 'package:check_in/utils/colors.dart';
@@ -128,9 +129,13 @@ class _NewsFeedScreenState extends State<NewsFeedScreen> {
                       return ListView.builder(
                           physics: const NeverScrollableScrollPhysics(),
                           shrinkWrap: true,
-                          itemCount: snapshot.data!.length,
+                          itemCount:   snapshot.data!.length + ( snapshot.data!.length ~/ 4),
                           itemBuilder: (context, index) {
-                            var data = snapshot.data![index];
+                            if (index % 5 == 4) {
+                              return const BannerAdWidget();
+                            }
+                            final itemIndex = index - (index ~/ 5);
+                            var data = snapshot.data![itemIndex];
                             return data.isOriginal! ? ListTileContainer(
                               data: data,
                             ) : SharedPostComp(data:data);
