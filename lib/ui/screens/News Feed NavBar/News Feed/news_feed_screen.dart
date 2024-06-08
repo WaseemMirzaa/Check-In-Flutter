@@ -129,10 +129,10 @@ class _NewsFeedScreenState extends State<NewsFeedScreen> {
                       return ListView.builder(
                           physics: const NeverScrollableScrollPhysics(),
                           shrinkWrap: true,
-                          itemCount:   snapshot.data!.length + ( snapshot.data!.length ~/ 4),
+                          itemCount:   snapshot.data!.length + ( snapshot.data!.length ~/ 4 ),
                           itemBuilder: (context, index) {
                             if (index % 5 == 4) {
-                              return const BannerAdWidget();
+                              return NativeTestAds();
                             }
                             final itemIndex = index - (index ~/ 5);
                             var data = snapshot.data![itemIndex];

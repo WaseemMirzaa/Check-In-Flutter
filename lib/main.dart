@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:check_in/Services/push_notification_service.dart';
 import 'package:check_in/binding.dart';
 import 'package:check_in/model/notification_model.dart';
+import 'package:check_in/ui/screens/News%20Feed%20NavBar/test_aid_comp/test_aid_comp.dart';
 import 'package:check_in/ui/screens/splash.dart';
 import 'package:device_preview/device_preview.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -143,7 +144,7 @@ class MyApp extends StatelessWidget {
             scaffoldBackgroundColor: whiteColor,
           ),
           initialBinding: MyBinding(),
-          home: Splash(),
+          home: const Splash(),
         );
       },
     );

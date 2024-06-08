@@ -1,69 +1,73 @@
-import 'package:check_in/utils/colors.dart';
+import 'package:check_in/ui/widgets/custom_container.dart';
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
-class BannerAdWidget extends StatefulWidget {
-  const BannerAdWidget({super.key});
+class NativeTestAds extends StatefulWidget {
+  const NativeTestAds({super.key});
 
   @override
-  _BannerAdWidgetState createState() => _BannerAdWidgetState();
+  _NativeTestAds createState() => _NativeTestAds();
 }
 
-class _BannerAdWidgetState extends State<BannerAdWidget> {
-  late BannerAd _bannerAd;
-  bool _isAdLoaded = false;
+class _NativeTestAds extends State<NativeTestAds> {
+  NativeAd? _nativeAd;
+  bool _nativeAdIsLoaded = false;
 
   @override
-  void initState() {
-    super.initState();
-    _bannerAd = BannerAd(
-      adUnitId: 'ca-app-pub-3940256099942544/6300978111', // Test ad unit ID
-      size: AdSize.fullBanner,
+  Widget build(BuildContext context) =>  Center(
+        child: Align(
+                  alignment: Alignment.center,
+                  child: CustomContainer1(
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(
+                        minWidth: 300,
+                        minHeight: 350,
+                        maxHeight: 400,
+                        maxWidth: 450,
+                      ),
+                      child: AdWidget(ad: _nativeAd!),
+                    ),
+                  )),
+      );
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Create the ad objects and load ads.
+    _nativeAd = NativeAd(
+      adUnitId: '/6499/example/native',
       request: const AdRequest(),
-      listener: BannerAdListener(
+      listener: NativeAdListener(
         onAdLoaded: (Ad ad) {
+          print('$NativeAd loaded.');
           setState(() {
-            _isAdLoaded = true;
+            _nativeAdIsLoaded = true;
           });
         },
         onAdFailedToLoad: (Ad ad, LoadAdError error) {
+          print('$NativeAd failedToLoad: $error');
           ad.dispose();
-          print('Ad failed to load: $error');
         },
+        onAdOpened: (Ad ad) => print('$NativeAd onAdOpened.'),
+        onAdClosed: (Ad ad) => print('$NativeAd onAdClosed.'),
       ),
-    );
-
-    _bannerAd.load();
+      nativeTemplateStyle: NativeTemplateStyle(
+        templateType: TemplateType.medium,
+        mainBackgroundColor: Colors.white12,
+        callToActionTextStyle: NativeTemplateTextStyle(
+          size: 16.0,
+        ),
+        primaryTextStyle: NativeTemplateTextStyle(
+          textColor: Colors.black38,
+          backgroundColor: Colors.white70,
+        ),
+      ),
+    )..load();
   }
 
   @override
   void dispose() {
-    _bannerAd.dispose();
     super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return _isAdLoaded
-        ? Container(
-      width: _bannerAd.size.width.toDouble(),
-      height: _bannerAd.size.height.toDouble(),
-      margin: const EdgeInsets.symmetric(horizontal: 10,vertical: 10),
-      decoration: BoxDecoration(
-          color: appWhiteColor,
-          boxShadow: [
-            BoxShadow(
-                color: greyColor.withOpacity(0.3),
-                spreadRadius: 2,
-                blurRadius: 6,
-                offset: const Offset(1, 4))
-          ],
-          borderRadius: BorderRadius.circular(10)
-      ),
-      child: ClipRRect(
-          borderRadius: BorderRadius.circular(10),
-          child: AdWidget(ad: _bannerAd)),
-    )
-        : const SizedBox(height: 50); // Adjust the height to match your layout
+    _nativeAd?.dispose();
   }
 }

@@ -65,7 +65,7 @@
                android:value="AIzaSyAWfUP79VGyEn-89MFapzNHNiYfT92zdBs"/>
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="ca-app-pub-9186158101020180~5632407845"/>
+            android:value="ca-app-pub-3940256099942544~3347511713"/>
 
         <service
            android:name="com.dexterous.flutterlocalnotifications.ForegroundService"
