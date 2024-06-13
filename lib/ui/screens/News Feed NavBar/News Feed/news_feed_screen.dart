@@ -85,6 +85,7 @@ class _NewsFeedScreenState extends State<NewsFeedScreen> {
           child: Column(
             children: [
               TopContainer(
+
                 ontap: () {
                   pushNewScreen(context,
                       screen: CreatePost(), withNavBar: true);
@@ -127,18 +128,22 @@ class _NewsFeedScreenState extends State<NewsFeedScreen> {
                       return Center(child: Text(snapshot.error.toString()),);
                     } else {
                       return ListView.builder(
+                        key: ValueKey('ListView'),
                           physics: const NeverScrollableScrollPhysics(),
                           shrinkWrap: true,
                           itemCount:   snapshot.data!.length + ( snapshot.data!.length ~/ 4 ),
                           itemBuilder: (context, index) {
                             if (index % 5 == 4) {
-                              return NativeTestAds();
+                              return const NativeTestAds(key: ValueKey('aid'),);
                             }
                             final itemIndex = index - (index ~/ 5);
                             var data = snapshot.data![itemIndex];
                             return data.isOriginal! ? ListTileContainer(
+                              key: ValueKey(data.id),
                               data: data,
-                            ) : SharedPostComp(data:data);
+                            ) : SharedPostComp(
+                                key: ValueKey(data.id),
+                                data:data);
                           });
                     }
                   })

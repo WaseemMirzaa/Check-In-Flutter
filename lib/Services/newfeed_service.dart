@@ -43,6 +43,19 @@ class NewsFeedService {
           .toList());
 }
 
+  ///my posts
+  Stream<List<NewsFeedModel>> getMyPosts(String id) {
+    return _newsFeedCollection
+        .where(NewsFeed.USER_ID, isEqualTo: id)
+        .orderBy(NewsFeed.TIME_STAMP, descending: true)
+        .snapshots()
+        .map((querySnapshot) => querySnapshot.docs
+        .map<NewsFeedModel>((doc) {
+      return NewsFeedModel.fromJson(doc.data() as Map<String, dynamic>);
+    })
+        .toList());
+  }
+
   /// Create news feed post
   Future<bool> createPost(NewsFeedModel newsFeedModel,String compress) async{
     try{

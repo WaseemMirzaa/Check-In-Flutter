@@ -1,5 +1,6 @@
 // ignore_for_file: avoid_print
 import 'package:check_in/core/constant/temp_language.dart';
+import 'package:check_in/ui/screens/News%20Feed%20NavBar/my_posts/my_posts.dart';
 import 'package:check_in/ui/screens/News%20Feed%20NavBar/news_feed_onboarding/news_feed_onboarding.dart';
 import 'package:check_in/ui/screens/check_in.dart';
 import 'package:check_in/ui/screens/profile_screen.dart';
@@ -168,7 +169,7 @@ class _HomeState extends State<Home> with AutomaticKeepAliveClientMixin {
     const CheckIn(),
     MessageScreen(),
     //................ News Feed
-     NewsFeedScreen(),
+    MyPostsNewsFeed(),
     const HistoryView(),
     ProfileScreen()
     //KeyedSubtree(key: UniqueKey(), child: const ProfileScreen()),

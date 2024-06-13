@@ -53,6 +53,11 @@ class NewsFeedController extends GetxController {
     return newsFeedService.getNewsFeed();
   }
 
+  /// get my (posts) controller
+  Stream<List<NewsFeedModel>> getMyPosts(String id) {
+    return newsFeedService.getMyPosts(id);
+  }
+
   /// Update the collection
   Future<bool> updateCollection(String collectionName, String docId, Map<String, dynamic> list)async{
     return await newsFeedService.updateCollection(collectionName, docId, list);
