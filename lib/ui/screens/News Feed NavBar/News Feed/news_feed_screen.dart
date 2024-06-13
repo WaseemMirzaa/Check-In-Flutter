@@ -91,29 +91,29 @@ class _NewsFeedScreenState extends State<NewsFeedScreen> {
                       screen: CreatePost(), withNavBar: true);
                 },
               ),
-              CustomContainer1(
-                  child: Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        poppinsText(
-                            TempLanguage.checkOutHot, 20, bold, appBlackColor),
-                        Padding(
-                          padding: const EdgeInsets.only(left: 10),
-                          child: poppinsText(TempLanguage.contentThatTrendingAndPopular,
-                              9, medium, greyColor),
-                        ),
-                      ],
-                    ),
-                    Image.asset(AppImage.fire)
-                  ],
-                ),
-              )),
+              // CustomContainer1(
+              //     child: Padding(
+              //   padding:
+              //       const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+              //   child: Row(
+              //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              //     children: [
+              //       Column(
+              //         crossAxisAlignment: CrossAxisAlignment.start,
+              //         children: [
+              //           poppinsText(
+              //               TempLanguage.checkOutHot, 20, bold, appBlackColor),
+              //           Padding(
+              //             padding: const EdgeInsets.only(left: 10),
+              //             child: poppinsText(TempLanguage.contentThatTrendingAndPopular,
+              //                 9, medium, greyColor),
+              //           ),
+              //         ],
+              //       ),
+              //       Image.asset(AppImage.fire)
+              //     ],
+              //   ),
+              // )),
 
               StreamBuilder<List<NewsFeedModel>>(
                   stream: controller.getNewsFeed(),
