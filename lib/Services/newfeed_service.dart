@@ -11,6 +11,8 @@ import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:get/get.dart';
 import 'package:nb_utils/nb_utils.dart';
+import 'package:rxdart/rxdart.dart' as RES;
+
 
 class NewsFeedService {
   final db = FirebaseFirestore.instance;
@@ -45,16 +47,52 @@ class NewsFeedService {
 
   ///my posts
   Stream<List<NewsFeedModel>> getMyPosts(String id) {
-    return _newsFeedCollection
+    // Query for posts where NewsFeed.USER_ID is equal to id
+    final userPostsStream = _newsFeedCollection
         .where(NewsFeed.USER_ID, isEqualTo: id)
         .orderBy(NewsFeed.TIME_STAMP, descending: true)
-        .snapshots()
-        .map((querySnapshot) => querySnapshot.docs
-        .map<NewsFeedModel>((doc) {
-      return NewsFeedModel.fromJson(doc.data() as Map<String, dynamic>);
-    })
-        .toList());
+        .snapshots();
+
+    // Query for posts where NewsFeed.SHARE_UID is equal to id
+    final sharedPostsStream = _newsFeedCollection
+        .where(NewsFeed.SHARE_UID, isEqualTo: id)
+        .orderBy(NewsFeed.TIME_STAMP, descending: true)
+        .snapshots();
+
+    // Combine the streams and merge the results
+    return RES.Rx.combineLatest2(
+      userPostsStream,
+      sharedPostsStream,
+          (QuerySnapshot userPostsSnapshot, QuerySnapshot sharedPostsSnapshot) {
+        // Combine the documents from both snapshots
+        final combinedDocs = [...userPostsSnapshot.docs, ...sharedPostsSnapshot.docs];
+
+        // Remove duplicates (if any)
+        final uniqueDocs = {for (var doc in combinedDocs) doc.id: doc}.values.toList();
+
+        // Filter out documents where NewsFeed.IS_ORIGINAL is false and NewsFeed.USER_ID is equal to id
+        final filteredDocs = uniqueDocs.where((doc) {
+          final data = doc.data() as Map<String, dynamic>;
+          final isOriginal = data[NewsFeed.IS_ORIGINAL] as bool;
+          final userId = data[NewsFeed.USER_ID] as String;
+          return !(isOriginal == false && userId == id);
+        }).toList();
+
+        // Sort by timestamp
+        filteredDocs.sort((a, b) {
+          final timestampA = a[NewsFeed.TIME_STAMP] as Timestamp;
+          final timestampB = b[NewsFeed.TIME_STAMP] as Timestamp;
+          return timestampB.compareTo(timestampA);
+        });
+
+        // Map to NewsFeedModel
+        return filteredDocs
+            .map<NewsFeedModel>((doc) => NewsFeedModel.fromJson(doc.data() as Map<String, dynamic>))
+            .toList();
+      },
+    );
   }
+
 
   /// Create news feed post
   Future<bool> createPost(NewsFeedModel newsFeedModel,String compress) async{
