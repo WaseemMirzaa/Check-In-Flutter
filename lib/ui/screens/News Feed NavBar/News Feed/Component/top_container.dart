@@ -37,24 +37,15 @@ class TopContainer extends GetView<NewsFeedController> {
                 clipBehavior: Clip.none,
                 alignment: Alignment.bottomRight,
                 children: [
-                  (userController.userModel.value.photoUrl != null)
+                  (userController.userModel.value.photoUrl!.isNotEmpty)
                       ? Container(
                       height: 5.8.h,
                       width: 5.8.h,
                       decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           image: DecorationImage(
-                              image: NetworkImage(userController.userModel.value.photoUrl as String), fit: BoxFit.fill)))
-                      : (!userController.userModel.value.photoUrl.isEmptyOrNull)
-                      ? Container(
-                      height: 5.8.h,
-                      width: 5.8.h,
-                      decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          image: DecorationImage(
-                              image: NetworkImage(
-                                  userController.userModel.value.photoUrl ?? ""),
-                              fit: BoxFit.fill)))
+                            // image:  AssetImage(AppAssets.LOGO_NEW), fit: BoxFit.fill)))
+                               image: NetworkImage(userController.userModel.value.photoUrl ?? ''), fit: BoxFit.fill)))
                       : Container(
                     height: 5.8.h,
                     width: 5.8.h,
