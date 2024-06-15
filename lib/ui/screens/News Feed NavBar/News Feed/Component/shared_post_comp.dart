@@ -17,7 +17,6 @@ import 'package:check_in/ui/screens/News%20Feed%20NavBar/News%20Feed/Component/v
 import 'package:check_in/ui/widgets/text_field.dart';
 import 'package:check_in/utils/loader.dart';
 import 'package:chewie/chewie.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:check_in/ui/widgets/custom_container.dart';
 import 'package:check_in/utils/Constants/images.dart';
@@ -26,16 +25,16 @@ import 'package:check_in/utils/gaps.dart';
 import 'package:check_in/utils/styles.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:nb_utils/nb_utils.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:sizer/sizer.dart';
 import 'package:video_player/video_player.dart';
 
-class ListTileContainer extends GetView<NewsFeedController> {
+
+class SharedPostComp extends GetView<NewsFeedController> {
   NewsFeedModel? data;
-  ListTileContainer({super.key, this.data});
+  SharedPostComp({super.key, this.data});
 
   NewsFeedController newsFeedController = Get.put(NewsFeedController(NewsFeedService()));
   final addCommentController = TextEditingController();
@@ -50,6 +49,120 @@ class ListTileContainer extends GetView<NewsFeedController> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+             Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8),
+              child: Row(
+                children: [
+                  GestureDetector(
+                    onTap: (){
+                      if(userController.userModel.value.uid == data!.shareUID){
+                        pushNewScreen(context, screen: ProfileScreen(isNavBar: false,));
+                      }else{
+                        pushNewScreen(context,
+                                        screen: OtherProfileView(uid: data!.shareUID!));
+                      }
+                      
+                    },
+                    child: Stack(
+                      children: [
+                        SizedBox(
+                          height: 44,
+                          width: 43,
+                          child: CustomPaint(
+                                  painter: MyPainter(),
+                                  size: const Size(200, 200),
+                                ),
+                              ),
+                              Positioned(
+                                top: 1.5,
+                                left: 1,
+                                child: Container(
+                                    height: 40,
+                                    width: 40,
+                                    decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        image: DecorationImage(
+                                            image: data!.shareImage == '' ? NetworkImage(AppImage.userImagePath) : NetworkImage(data!.shareImage!),fit: BoxFit.cover))),
+                              )
+                            ],
+                          ),
+                  ),
+                  
+                  horizontalGap(10),
+                  Expanded(
+                    child:  GestureDetector(
+                    onTap: (){
+                      if(userController.userModel.value.uid == data!.shareUID){
+                        pushNewScreen(context, screen: ProfileScreen(isNavBar: false,));
+                      }else{
+                        pushNewScreen(context,
+                                        screen: OtherProfileView(uid: data!.shareUID!));
+                      }
+                      
+                    },
+                    child:richText(data!.shareName??'', 'shared a post'),
+                    ),
+                  ),
+                  horizontalGap(5),
+                   PopupMenuButton<String>(
+          icon: Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: BoxDecoration(
+                          shape: BoxShape.circle, color: appGreyColor1),
+                      child: Icon(
+                        Icons.more_horiz,
+                        color: greyColor,
+                      ),
+                    ),
+          onSelected: (String result) async{
+            switch (result) {
+              case 'Hide':
+                newsFeedController.hidePost(data!.shareID!);
+                break;
+              case 'Delete':
+                newsFeedController.deletePost(data!.shareID!);
+                break;
+              case 'Share':
+                 String link = await newsFeedController.createDynamicLink(data!.shareID!);
+                      print("The link is: $link");
+                      if(link.isNotEmpty){
+                        Share.share('Check out this post: $link');
+                      }
+                break;
+            }
+          },
+          itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+             PopupMenuItem<String>(
+              value: data!.shareUID == userController.userModel.value.uid ? 'Delete' : 'Hide',
+              child: ListTile(
+                leading: const Icon(Icons.delete),
+                title: Text(data!.shareUID == userController.userModel.value.uid ? 'Delete' : 'Hide'),
+              ),
+            ),
+            const PopupMenuItem<String>(
+              value: 'Share',
+              child: ListTile(
+                leading: Icon(Icons.share),
+                title: Text('Share'),
+              ),
+            ),
+          ]),
+                
+                ],
+              ),
+            ),
+            
+             verticalGap(8),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10.0),
+              child: poppinsText(data!.shareText ?? "", 12, medium,
+                  appDarkBlue.withOpacity(0.8),
+                  maxlines: 3),
+            ),
+            Padding(padding: EdgeInsets.only(left: 20),child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+            SizedBox(height: 2.h),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 8),
               child: Row(
@@ -106,68 +219,16 @@ class ListTileContainer extends GetView<NewsFeedController> {
                     ),
                   ),
                   horizontalGap(5),
-                   PopupMenuButton<String>(
-          icon: Container(
-                      padding: const EdgeInsets.all(4),
-                      decoration: BoxDecoration(
-                          shape: BoxShape.circle, color: appGreyColor1),
-                      child: Icon(
-                        Icons.more_horiz,
-                        color: greyColor,
-                      ),
-                    ),
-          onSelected: (String result) async{
-            switch (result) {
-              case 'Hide':
-                newsFeedController.hidePost(data!.id!);
-                break;
-              case 'Delete':
-                 newsFeedController.deletePost(data!.id!);
-                break;
-              case 'Share':
-                 String link = await newsFeedController.createDynamicLink(data!.id!);
-                      print("The link is: $link");
-                      if(link.isNotEmpty){
-                        Share.share('Check out this post: $link');
-                      }
-                break;
-            }
-          },
-          itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-             PopupMenuItem<String>(
-              value: data!.userId == userController.userModel.value.uid ? 'Delete' : 'Hide',
-              child: ListTile(
-                leading: const Icon(Icons.delete),
-                title: Text(data!.userId == userController.userModel.value.uid ? 'Delete' : 'Hide'),
-              ),
-            ),
-            const PopupMenuItem<String>(
-              value: 'Share',
-              child: ListTile(
-                leading: Icon(Icons.share),
-                title: Text('Share'),
-              ),
-            ),
-          ]),
                 
                 ],
               ),
             ),
             verticalGap(8),
-             Padding(
+            Padding(
               padding: const EdgeInsets.symmetric(horizontal: 10.0),
-              child: ReadMoreText(
-                data!.description ?? "",
-                trimMode: TrimMode.Line,
-                trimLines: 6,
-                colorClickableText: Colors.blue,
-                trimCollapsedText: ' Show more',
-                style: GoogleFonts.poppins(fontSize: 12, fontWeight: medium, color: appDarkBlue.withOpacity(0.8)),
-                trimExpandedText: ' Show less',
-              )
-              // poppinsText(data!.description ?? "", 12, medium,
-              //     appDarkBlue.withOpacity(0.8),
-              //     maxlines: 10),
+              child: poppinsText(data!.description ?? "", 12, medium,
+                  appDarkBlue.withOpacity(0.8),
+                  maxlines: 3),
             ),
             verticalGap(8),
             data!.isType == 'image' && data!.postUrl!.isNotEmpty
@@ -189,13 +250,13 @@ class ListTileContainer extends GetView<NewsFeedController> {
                   )
                 : data!.isType == 'video' ? newsFeedController.videoLoad.value
                 ? loaderView()
-                : VideoPlayerWidget(videoUrl: data!.postUrl!,) : const SizedBox(),
+                : VideoPlayerWidget(videoUrl: data!.postUrl!,) : SizedBox(),
             verticalGap(10),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 10),
               child: Row(
                 children: [
-                  poppinsText("${data!.noOfComment} ", 11, medium, appDarkBlue),
+                  poppinsText("${data!.noOfComment}", 11, medium, appDarkBlue),
                   poppinsText(' comments . ', 11, medium, appDarkBlue),
                   poppinsText("${data!.noOfShared} ", 11, medium, appDarkBlue),
                   poppinsText('shared', 11, medium, appDarkBlue),
@@ -209,7 +270,7 @@ class ListTileContainer extends GetView<NewsFeedController> {
                 children: [
                   GestureDetector(
                       onTap: () async{
-                        await newsFeedController.likePost(data!.id!, userController.userModel.value!.uid!);
+                        await newsFeedController.likePost(data!.shareID!, userController.userModel.value!.uid!);
                         },
                       child: data!.likedBy!.contains(userController.userModel.value.uid)
                           ? Container(
@@ -313,10 +374,9 @@ class ListTileContainer extends GetView<NewsFeedController> {
                             if(addCommentController.text.isEmptyOrNull){
                               toast('The field is empty');
                             }else {
-                              final comment = await newsFeedController.addCommentOnPost(data!.id!,
-                                  newsFeedController.commentModel.value);
+                              final comment = await newsFeedController.addCommentOnPost(data!.shareID!, newsFeedController.commentModel.value);
                               if(comment){
-                                await newsFeedController.updateCollection(Collections.NEWSFEED, data!.id!,
+                                await newsFeedController.updateCollection(Collections.NEWSFEED, data!.shareID!,
                                     {
                                       NewsFeed.NO_OF_COMMENT : data!.noOfComment! + 1,
                                     });
@@ -332,9 +392,10 @@ class ListTileContainer extends GetView<NewsFeedController> {
                                 toast('The field is empty');
 
                               }else {
-                                final comment = await newsFeedController.addCommentOnPost(data!.id!, newsFeedController.commentModel.value);
+                                final comment = await newsFeedController.addCommentOnPost(data!.shareID!,
+                                    newsFeedController.commentModel.value);
                                 if(comment){
-                                  await newsFeedController.updateCollection(Collections.NEWSFEED, data!.id!,
+                                  await newsFeedController.updateCollection(Collections.NEWSFEED, data!.shareID!,
                                       {
                                         NewsFeed.NO_OF_COMMENT : data!.noOfComment! + 1,
                                       });
@@ -354,7 +415,7 @@ class ListTileContainer extends GetView<NewsFeedController> {
                           hintText: 'Write a comment',
                         )),
                     StreamBuilder(
-                      stream: newsFeedController.getPostComments(data!.id!),
+                      stream: newsFeedController.getPostComments(data!.shareID!),
                       builder: (context, snapshot) {
                         if(snapshot.connectionState == ConnectionState.waiting){
                           return const Center(child: CircularProgressIndicator(),);
@@ -399,11 +460,15 @@ class ListTileContainer extends GetView<NewsFeedController> {
 
                   ],
                 )))
+            ],),)
           ],
         ),
       ),
     );
   }
+
+  
+
 
 }
 

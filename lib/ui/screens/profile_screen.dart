@@ -1,33 +1,41 @@
 import 'dart:developer';
 import 'dart:io';
 
+import 'package:check_in/Services/newfeed_service.dart';
+import 'package:check_in/controllers/News%20Feed/news_feed_controller.dart';
 import 'package:check_in/controllers/user_controller.dart';
 import 'package:check_in/core/constant/app_assets.dart';
 import 'package:check_in/core/constant/constant.dart';
 import 'package:check_in/core/constant/temp_language.dart';
+import 'package:check_in/model/NewsFeed%20Model/news_feed_model.dart';
 import 'package:check_in/model/user_modal.dart';
+import 'package:check_in/ui/screens/News%20Feed%20NavBar/News%20Feed/Component/list_tile_container.dart';
+import 'package:check_in/ui/screens/News%20Feed%20NavBar/News%20Feed/Component/shared_post_comp.dart';
+import 'package:check_in/ui/screens/add_home_court.dart';
 import 'package:check_in/ui/screens/unique_courts_screen.dart';
 import 'package:check_in/ui/widgets/about_section.dart';
 import 'package:check_in/utils/colors.dart';
-import 'package:check_in/utils/common.dart';
+import 'package:check_in/utils/loader.dart';
 import 'package:check_in/utils/styles.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:nb_utils/nb_utils.dart' as nbutils;
 import 'package:percent_indicator/circular_percent_indicator.dart';
-
+import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
 // import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:sizer/sizer.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../auth_service.dart';
-import '../../utils/gaps.dart';
 
 class ProfileScreen extends StatefulWidget {
-  const ProfileScreen({Key? key}) : super(key: key);
+  ProfileScreen({Key? key,this.isNavBar = true}) : super(key: key);
+  bool isNavBar;
 
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();
@@ -36,7 +44,10 @@ class ProfileScreen extends StatefulWidget {
 int? totalCount = 10;
 
 class UserService {
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance; bool tapped = false;
+
+
+
 
   Stream<List<UserModel>> get users {
     return _firestore.collection(Collections.USER).snapshots().map((snapshot) {
@@ -128,8 +139,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       });
 
       final storage = FirebaseStorage.instance;
-      final ref = storage
-          .ref()
+      final ref = storage.ref()
           // .child('profile/${DateTime.now().millisecondsSinceEpoch}');
           .child('profile/${FirebaseAuth.instance.currentUser?.uid ?? ""}');
       final uploadTask = ref.putFile(_imageFile!);
@@ -230,6 +240,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
       print(e);
     }
   }
+  final controller = Get.put(NewsFeedController(NewsFeedService()));
+
+  String aboutMe = '';
+  TextEditingController aboutMeController = TextEditingController();
+  bool tapped = false;
 
   @override
   Widget build(BuildContext context) {
@@ -240,6 +255,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
         automaticallyImplyLeading: false,
         centerTitle: true,
         backgroundColor: appWhiteColor,
+        leading: widget.isNavBar ? const SizedBox() : IconButton(onPressed: (){
+          Navigator.pop(context);
+        }, icon: const Icon(Icons.arrow_back_ios)),
         title: poppinsText(TempLanguage.profile, 20, FontWeight.bold, appBlackColor),
       ),
       body: SingleChildScrollView(
@@ -258,9 +276,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         children: [
                           Column(
                             children: [
-                              verticalGap(3.h),
                               SizedBox(
-                                width: 35.9.w,
+                                width: 32.9.w,
                                 //   padding: EdgeInsets.all(10),
                                 child: GestureDetector(
                                   onTap: _selectImage,
@@ -327,13 +344,25 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   ),
                                 ),
                               ),
-                              verticalGap(0.5.h),
                               poppinsText(
                                   // FirebaseAuth.instance.currentUser?.displayName
                                   //     as String,
                                   userController.userModel.value.userName ?? "",
                                   32,
                                   FontWeight.bold,
+                                  appBlackColor),
+                              // poppinsText(
+                              //     "@${userController.userModel.value.email.substring(0, userController.userModel.value.email.indexOf('@'))}",
+                              //     12,
+                              //     FontWeight.normal,
+                              //     blackColor),
+
+                              poppinsText(
+                                // FirebaseAuth.instance.currentUser?.displayName
+                                //     as String,
+                                  userController.userModel.value.email ?? "",
+                                  12,
+                                  FontWeight.normal,
                                   appBlackColor),
                               // poppinsText(
                               //     "@${userController.userModel.value.email.substring(0, userController.userModel.value.email.indexOf('@'))}",
@@ -458,9 +487,192 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             ],
                           ),
                           const SizedBox(
-                            height: 15,
+                            height: 10,
                           ),
-                          AboutSection(userController: userController),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 12),
+                            child: Stack(
+                              clipBehavior: Clip.none,
+                              alignment: Alignment.topCenter,
+                              children: [
+                                Container(
+                                  width: 100.w,
+                                  padding: const EdgeInsets.symmetric(horizontal: 6,vertical: 4),
+                                  decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(8),
+                                      color: const Color(0xff9f9f9f).withOpacity(0.4)),
+                                  child: TextField(
+                                    controller: aboutMeController,
+                                    textInputAction: TextInputAction.done,
+                                    onSubmitted: (value) {
+                                      // setState(() {
+                                      //   // userController.userModel.value.
+                                      //   //..........
+                                      //   aboutMe = value;
+                                      //   widget.userController.userModel.value.aboutMe = value;
+                                      //   FirebaseFirestore.instance
+                                      //       .collection(Collections.USER)
+                                      //       .doc(FirebaseAuth.instance.currentUser!.uid)
+                                      //       .update({UserKey.ABOUT_ME: aboutMe});
+                                      // });
+                                    },
+                                    maxLines: userController.userModel.value.aboutMe.isEmptyOrNull ? 1 : 3,
+                                    onChanged: (val) {},
+                                    decoration: InputDecoration(
+                                        border: InputBorder.none,
+                                        enabled: tapped,
+                                        enabledBorder: InputBorder.none,
+                                        disabledBorder: InputBorder.none,
+                                        errorBorder: InputBorder.none,
+                                        focusedBorder: InputBorder.none,
+                                        focusedErrorBorder: InputBorder.none,
+                                        hintText: TempLanguage.tellUsAboutGame,
+                                        helperStyle: GoogleFonts.poppins(fontSize: 14, fontWeight: regular, color: silverColor)),
+                                  ),
+                                ),
+
+                                //   child: poppinsText(userController.userModel.value.aboutMe.isEmptyOrNull
+                                // ? TempLanguage.tellUsAboutGame
+                                // : userController.userModel.value.aboutMe ?? TempLanguage.tellUsAboutGame, 12, FontWeight.normal, appBlackColor),),
+                                Align(
+                                  alignment: Alignment.topRight,
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(5.0),
+                                    child: InkWell(
+                                      onTap: () => setState(() {
+                                        if (tapped) {
+                                          setState(() {
+                                            // userController.userModel.value.
+                                            //..........
+                                            aboutMe = aboutMeController.text;
+                                            userController.userModel.value.aboutMe = aboutMe;
+                                            FirebaseFirestore.instance.collection(Collections.USER)
+                                                .doc(FirebaseAuth.instance.currentUser!.uid)
+                                                .update({UserKey.ABOUT_ME: aboutMe});
+                                          });
+                                        }
+                                        tapped = !tapped;
+                                      }),
+                                      child: Padding(
+                                          padding: const EdgeInsets.only(left: 8),
+                                          child: tapped
+                                              ? poppinsText(TempLanguage.save, 14, semiBold, appGreenColor)
+                                              : const ImageIcon(
+                                            AssetImage(
+                                              AppAssets.EDIT_ICON,
+                                            ),
+                                            size: 20,
+                                          )),
+                                    ),
+                                  ),
+                                ),
+                                Positioned(
+                                    top: -10,
+
+                                    child: Center(
+                                      child: Container(
+                                        padding: const EdgeInsets.symmetric(horizontal: 12,vertical: 3),
+                                        decoration: BoxDecoration(
+                                            borderRadius: BorderRadius.circular(30),
+                                            color: appGreenColor),
+                                        child: poppinsText('About', 12, FontWeight.w400, appWhiteColor),),
+                                    ))
+                              ],
+                            ),
+                          ),
+
+                          const SizedBox(height: 25,),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 12),
+                            child: Stack(
+                              clipBehavior: Clip.none,
+                              alignment: Alignment.topCenter,
+                              children: [
+                                Container(
+                                  width: 100.w,
+                                  padding: const EdgeInsets.symmetric(horizontal: 12,vertical: 10),
+                                  decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(8),
+                                      color: const Color(0xff9f9f9f).withOpacity(0.4)),child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          poppinsText(userController.userModel.value.homeCourt.isEmptyOrNull
+                                                                              ? ''
+                                                                              : userController.userModel.value.homeCourt ?? '', 12, FontWeight.normal, appBlackColor),
+                                          Align(
+                                            alignment: Alignment.centerRight,
+                                            child: Padding(
+                                              padding: const EdgeInsets.all(5.0),
+                                              child: InkWell(
+                                                onTap: () {
+                                                  pushNewScreen(context, screen:  const AddHomeCourt(), withNavBar: false);
+                                                },
+                                                child: SizedBox(
+                                                  height: 2.3.h,
+                                                  width: 4.47.w,
+                                                  child: Image.asset(AppAssets.MAP_PIN),
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),),
+
+                                Positioned(
+                                    top: -10,
+
+                                    child: Center(
+                                      child: Container(
+                                        padding: const EdgeInsets.symmetric(horizontal: 12,vertical: 3),
+                                        decoration: BoxDecoration(
+                                            borderRadius: BorderRadius.circular(20),
+                                            color: appGreenColor),
+                                        child: poppinsText('Home Court', 12, FontWeight.w400, appWhiteColor),),
+                                    ))
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 10,),
+                          Center(child: Container(
+                            width: 70,
+                            padding: const EdgeInsets.symmetric(horizontal: 8,vertical: 4,),decoration: BoxDecoration(color: const Color(0xff9f9f9f).withOpacity(0.5),borderRadius: BorderRadius.circular(30)),child: Center(child: poppinsText('Post', 12, FontWeight.normal, appBlackColor )),),),
+                          const SizedBox(height: 10,),
+                          StreamBuilder<List<NewsFeedModel>>(
+                            stream: controller.getMyPosts(FirebaseAuth.instance.currentUser?.uid ?? ''),
+                            builder: (context, snapshot) {
+                              if (snapshot.connectionState == ConnectionState.waiting) {
+                                return loaderView();
+                              } else if (snapshot.hasError) {
+                                return Center(
+                                  child: Text(snapshot.error.toString()),
+                                );
+                              } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                                return Center(child: Text(TempLanguage.noPostFound));
+                              } else {
+                                return ListView.builder(
+                                  key: const PageStorageKey('listViewBuilder'),
+                                  physics: const NeverScrollableScrollPhysics(),
+                                  shrinkWrap: true,
+                                  itemCount: snapshot.data!.length,
+                                  itemBuilder: (context, index) {
+                                    var data = snapshot.data![index];
+                                    if (data.isOriginal!) {
+                                      return ListTileContainer(
+                                        key: ValueKey(data.id),
+                                        data: data,
+                                      );
+                                    } else {
+                                      return SharedPostComp(
+                                        key: ValueKey(data.id),
+                                        data: data,
+                                      );
+                                    }
+                                  },
+                                );
+                              }
+                            },
+                          )
+
                         ],
                       ),
                     )

@@ -236,7 +236,7 @@ class _SignupViewState extends State<SignupView> {
                           child: Text(
                             TempLanguage.privacyPolicy,
                             style: TextStyle(
-                              color: blueColor,
+                              color: appBlueColor,
                               fontWeight: FontWeight.bold,
                               fontSize: 1.2.h,
                             ),
@@ -262,7 +262,7 @@ class _SignupViewState extends State<SignupView> {
                           child: Text(
                             TempLanguage.termsAndConditions,
                             style: TextStyle(
-                              color: blueColor,
+                              color: appBlueColor,
                               fontWeight: FontWeight.bold,
                               fontSize: 1.2.h,
                             ),

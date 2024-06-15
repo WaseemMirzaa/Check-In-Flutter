@@ -140,7 +140,7 @@ class _ImageDateContainerState extends State<ImageDateContainer> {
                         ? greyColor.withOpacity(0.3)
                         : widget.mymsg!
                             ? appGreenColor
-                            : greyColor1.withOpacity(1),
+                            : appGreyColor1.withOpacity(1),
                   ),
                   padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
                   child: Text(

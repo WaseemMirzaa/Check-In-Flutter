@@ -1,7 +1,10 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:check_in/ui/screens/News%20Feed%20NavBar/News%20Feed/news_feed_screen.dart';
+import 'package:check_in/ui/screens/profile_screen.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/material.dart';
-import 'dart:developer';
 import 'package:check_in/Services/payment_service.dart';
 import 'package:check_in/auth_service.dart';
 import 'package:check_in/core/constant/app_assets.dart';
@@ -29,11 +32,9 @@ import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-// import 'package:google_maps_flutter_heatmap/google_maps_flutter_heatmap.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:google_maps_webservice/places.dart';
-
-// import 'package:location/location.dart' ;
+import 'package:nb_utils/nb_utils.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../constants.dart';
@@ -44,7 +45,7 @@ import 'Players.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
-
+import 'dart:developer'as developer;
 class CheckIn extends StatefulWidget {
   const CheckIn({Key? key}) : super(key: key);
 
@@ -608,6 +609,50 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
     // addLocationChangeListener();
     // _checkIfWithinRadius();
     super.initState();
+    initDynamicLinks(context);
+  }
+
+
+  /// The deep link
+  Future<void> initDynamicLinks(BuildContext context) async {
+    await Firebase.initializeApp();
+    // Handle initial link when the app is first opened
+    final PendingDynamicLinkData? initialLinkData = await FirebaseDynamicLinks.instance.getInitialLink();
+    _handleDeepLink(context, initialLinkData?.link);
+
+    // Set up the listener for any dynamic links clicked while the app is in the background or foreground
+    FirebaseDynamicLinks.instance.onLink.listen(
+          (PendingDynamicLinkData dynamicLinkData) {
+        _handleDeepLink(context, dynamicLinkData?.link);
+      },
+      onError: (error) async {
+        developer.log('Dynamic Link Failed: ${error.toString()}');
+      },
+    );
+  }
+
+  void _handleDeepLink(BuildContext context, Uri? deepLink) {
+    if (deepLink != null) {
+      var isPost = deepLink.pathSegments.contains('post');
+      if (isPost) {
+        var postId = deepLink.queryParameters['postId'];
+        if (postId != null) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => NewsFeedScreen(postId: postId,),
+            ),
+          );
+        }else{
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => ProfileScreen(),
+            ),
+          );
+        }
+      }
+    }
   }
 
   @override
@@ -789,7 +834,7 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
                                     0.2,
                                   ),
                                   HeatmapGradientColor(
-                                    redColor,
+                                    appRedColor,
                                     0.6,
                                   ),
                                   // HeatmapGradientColor(
@@ -801,7 +846,7 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
                                   //   0.8,
                                   // ),
                                   HeatmapGradientColor(
-                                    blueColor,
+                                    appBlueColor,
                                     1,
                                   ),
                                 ],

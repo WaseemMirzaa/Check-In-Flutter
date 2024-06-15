@@ -21,7 +21,6 @@ class MyBinding implements Bindings {
     Get.lazyPut(() => NewMessageController(MessageService()), fenix: true);
     Get.lazyPut(() => NewsFeedController(NewsFeedService()), fenix: true);
     Get.lazyPut(() => AddGroupMembersController(MessageService()), fenix: true);
-    Get.lazyPut(() => CreatePostController(), fenix: true);
     Get.lazyPut(() => UserController(), fenix: true);
   }
 }

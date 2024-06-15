@@ -1,5 +1,7 @@
 // ignore_for_file: avoid_print
 import 'package:check_in/core/constant/temp_language.dart';
+import 'package:check_in/ui/screens/News%20Feed%20NavBar/my_posts/my_posts.dart';
+import 'package:check_in/ui/screens/News%20Feed%20NavBar/news_feed_onboarding/news_feed_onboarding.dart';
 import 'package:check_in/ui/screens/check_in.dart';
 import 'package:check_in/ui/screens/profile_screen.dart';
 import 'package:check_in/ui/screens/start.dart';
@@ -7,16 +9,20 @@ import 'package:check_in/utils/colors.dart';
 import 'package:check_in/utils/common.dart';
 import 'package:check_in/utils/styles.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
+import 'package:nb_utils/nb_utils.dart';
 
 import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
 
 import ' Messages NavBar/Messages/messages.dart';
 import 'History.dart';
 import '../../controllers/nav_bar_controller.dart';
-
+import 'News Feed NavBar/News Feed/news_feed_screen.dart';
+import 'dart:developer' as developer;
 class BottomNav {
   String icon;
   Color iconColor;
@@ -147,16 +153,63 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> with AutomaticKeepAliveClientMixin {
   final NavBarController navBarController = Get.put(NavBarController());
+@override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    Future.microtask(() async{
+      FirebaseAuth.instance.currentUser != null && getStringAsync('first') != 'no' ?  Navigator.pushReplacement(
+          context, MaterialPageRoute(builder: (context) => const NewsFeedOnboarding())) : null;
+    });
+    initDynamicLinks(context);
 
+
+}
   final List<Widget> _buildScreens = [
     const CheckIn(),
     MessageScreen(),
     //................ News Feed
-    // const NewsFeedScreen(),
+    NewsFeedScreen(),
     const HistoryView(),
-    const ProfileScreen()
+    ProfileScreen()
     //KeyedSubtree(key: UniqueKey(), child: const ProfileScreen()),
   ];
+  /// The deep link
+  Future<void> initDynamicLinks(BuildContext context) async {
+    await Firebase.initializeApp();
+    // Handle initial link when the app is first opened
+    final PendingDynamicLinkData? initialLinkData = await FirebaseDynamicLinks.instance.getInitialLink();
+    _handleDeepLink(context, initialLinkData?.link);
+
+    // Set up the listener for any dynamic links clicked while the app is in the background or foreground
+    FirebaseDynamicLinks.instance.onLink.listen(
+          (PendingDynamicLinkData dynamicLinkData) {
+        _handleDeepLink(context, dynamicLinkData?.link);
+      },
+      onError: (error) async {
+        developer.log('Dynamic Link Failed: ${error.toString()}');
+      },
+    );
+  }
+
+  void _handleDeepLink(BuildContext context, Uri? deepLink) {
+    if (deepLink != null) {
+      var isPost = deepLink.pathSegments.contains('post');
+      print("THe collection contains---> $isPost");
+      if (isPost) {
+        var postId = deepLink.queryParameters['postId=12'];
+        if (postId != null) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => NewsFeedScreen(postId: postId,),
+            ),
+          );
+        }
+      }
+    }
+  }
+
 
   List<BottomNavigationBarItem> _navBarsItems() {
     return [
@@ -178,29 +231,29 @@ class _HomeState extends State<Home> with AutomaticKeepAliveClientMixin {
       ).getBottomNavItem(),
 
       //.......................... News Feed
-      // BottomNav(
-      //   label: 'NewsFeed',
-      //   boxColor:
-      //       navBarController.controller.index == 2 ? greenColor : whiteColor,
-      //   icon: "calendar",
-      //   iconColor:
-      //       navBarController.controller.index == 2 ? whiteColor : blackColor,
-      // ).getBottomNavItem(),
       BottomNav(
-        label: 'History',
+        label: 'NewsFeed',
         boxColor:
             navBarController.controller.index == 2 ? appGreenColor : appWhiteColor,
-        icon: "Icon awesome-history",
+        icon: "calendar",
         iconColor:
             navBarController.controller.index == 2 ? appWhiteColor : appBlackColor,
       ).getBottomNavItem(),
       BottomNav(
-        label: 'Profile',
+        label: 'History',
         boxColor:
             navBarController.controller.index == 3 ? appGreenColor : appWhiteColor,
-        icon: "Icon material-person",
+        icon: "Icon awesome-history",
         iconColor:
             navBarController.controller.index == 3 ? appWhiteColor : appBlackColor,
+      ).getBottomNavItem(),
+      BottomNav(
+        label: 'Profile',
+        boxColor:
+            navBarController.controller.index == 4 ? appGreenColor : appWhiteColor,
+        icon: "Icon material-person",
+        iconColor:
+            navBarController.controller.index == 4 ? appWhiteColor : appBlackColor,
       ).getBottomNavItem(),
     ];
   }

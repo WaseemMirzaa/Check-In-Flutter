@@ -62,5 +62,10 @@
     <string>This app uses bluetooth only for the working of the internal library. We don't have any functionality dependent on bluetooth.</string>
     <key>NSBluetoothAlwaysUsageDescription</key>
     <string>This app uses bluetooth only for the working of the internal library. We don't have any functionality dependent on bluetooth.</string>
+    <key>GADApplicationIdentifier</key>
+    <string>ca-app-pub-3940256099942544~1458002511</string>
+    <key>io.flutter.embedded_views_preview</key>
+    <true/>
+
 </dict>
 </plist>

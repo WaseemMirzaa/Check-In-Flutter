@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'package:check_in/core/constant/constant.dart';
 import 'package:check_in/ui/screens/%20Messages%20NavBar/other_profile/other_profile_view.dart';
 import 'package:check_in/ui/screens/News%20Feed%20NavBar/share_screen/share_screen.dart';
 import 'package:check_in/ui/screens/profile_screen.dart';
@@ -8,34 +7,25 @@ import 'package:check_in/Services/newfeed_service.dart';
 import 'package:check_in/auth_service.dart';
 import 'package:check_in/controllers/News%20Feed/news_feed_controller.dart';
 import 'package:check_in/model/NewsFeed%20Model/news_feed_model.dart';
-import 'package:check_in/ui/screens/News%20Feed%20NavBar/All%20Comments/all_comments.dart';
-import 'package:check_in/ui/screens/News%20Feed%20NavBar/All%20Likes/post_all_likes_view.dart';
 import 'package:check_in/ui/screens/News%20Feed%20NavBar/Full%20Screen%20Image/full_screen_image.dart';
-import 'package:check_in/ui/screens/News%20Feed%20NavBar/News%20Feed/Component/comment_container.dart';
 import 'package:check_in/ui/screens/News%20Feed%20NavBar/News%20Feed/Component/custom_paint.dart';
 import 'package:check_in/ui/screens/News%20Feed%20NavBar/News%20Feed/Component/video_player_widget.dart';
-import 'package:check_in/ui/widgets/text_field.dart';
 import 'package:check_in/utils/loader.dart';
 import 'package:chewie/chewie.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:check_in/ui/widgets/custom_container.dart';
 import 'package:check_in/utils/Constants/images.dart';
 import 'package:check_in/utils/colors.dart';
 import 'package:check_in/utils/gaps.dart';
 import 'package:check_in/utils/styles.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:nb_utils/nb_utils.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
-import 'package:share_plus/share_plus.dart';
-import 'package:sizer/sizer.dart';
 import 'package:video_player/video_player.dart';
 
-class ListTileContainer extends GetView<NewsFeedController> {
+class SharePostComp extends GetView<NewsFeedController> {
   NewsFeedModel? data;
-  ListTileContainer({super.key, this.data});
+  SharePostComp({super.key, this.data});
 
   NewsFeedController newsFeedController = Get.put(NewsFeedController(NewsFeedService()));
   final addCommentController = TextEditingController();
@@ -43,7 +33,6 @@ class ListTileContainer extends GetView<NewsFeedController> {
   @override
   Widget build(BuildContext context) {
     newsFeedController.commentModel.value.userId = data!.userId;
-    RxBool isVisible = false.obs;
     return CustomContainer1(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 15),
@@ -106,68 +95,16 @@ class ListTileContainer extends GetView<NewsFeedController> {
                     ),
                   ),
                   horizontalGap(5),
-                   PopupMenuButton<String>(
-          icon: Container(
-                      padding: const EdgeInsets.all(4),
-                      decoration: BoxDecoration(
-                          shape: BoxShape.circle, color: appGreyColor1),
-                      child: Icon(
-                        Icons.more_horiz,
-                        color: greyColor,
-                      ),
-                    ),
-          onSelected: (String result) async{
-            switch (result) {
-              case 'Hide':
-                newsFeedController.hidePost(data!.id!);
-                break;
-              case 'Delete':
-                 newsFeedController.deletePost(data!.id!);
-                break;
-              case 'Share':
-                 String link = await newsFeedController.createDynamicLink(data!.id!);
-                      print("The link is: $link");
-                      if(link.isNotEmpty){
-                        Share.share('Check out this post: $link');
-                      }
-                break;
-            }
-          },
-          itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-             PopupMenuItem<String>(
-              value: data!.userId == userController.userModel.value.uid ? 'Delete' : 'Hide',
-              child: ListTile(
-                leading: const Icon(Icons.delete),
-                title: Text(data!.userId == userController.userModel.value.uid ? 'Delete' : 'Hide'),
-              ),
-            ),
-            const PopupMenuItem<String>(
-              value: 'Share',
-              child: ListTile(
-                leading: Icon(Icons.share),
-                title: Text('Share'),
-              ),
-            ),
-          ]),
-                
+                     
                 ],
               ),
             ),
             verticalGap(8),
-             Padding(
+            Padding(
               padding: const EdgeInsets.symmetric(horizontal: 10.0),
-              child: ReadMoreText(
-                data!.description ?? "",
-                trimMode: TrimMode.Line,
-                trimLines: 6,
-                colorClickableText: Colors.blue,
-                trimCollapsedText: ' Show more',
-                style: GoogleFonts.poppins(fontSize: 12, fontWeight: medium, color: appDarkBlue.withOpacity(0.8)),
-                trimExpandedText: ' Show less',
-              )
-              // poppinsText(data!.description ?? "", 12, medium,
-              //     appDarkBlue.withOpacity(0.8),
-              //     maxlines: 10),
+              child: poppinsText(data!.description ?? "", 12, medium,
+                  appDarkBlue.withOpacity(0.8),
+                  maxlines: 3),
             ),
             verticalGap(8),
             data!.isType == 'image' && data!.postUrl!.isNotEmpty
@@ -189,221 +126,37 @@ class ListTileContainer extends GetView<NewsFeedController> {
                   )
                 : data!.isType == 'video' ? newsFeedController.videoLoad.value
                 ? loaderView()
-                : VideoPlayerWidget(videoUrl: data!.postUrl!,) : const SizedBox(),
+                : VideoPlayerWidget(videoUrl: data!.postUrl!,) : SizedBox(),
             verticalGap(10),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 10),
-              child: Row(
-                children: [
-                  poppinsText("${data!.noOfComment} ", 11, medium, appDarkBlue),
-                  poppinsText(' comments . ', 11, medium, appDarkBlue),
-                  poppinsText("${data!.noOfShared} ", 11, medium, appDarkBlue),
-                  poppinsText('shared', 11, medium, appDarkBlue),
-                ],
-              ),
-            ),
-            verticalGap(15),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 10),
-              child: Row(
-                children: [
-                  GestureDetector(
-                      onTap: () async{
-                        await newsFeedController.likePost(data!.id!, userController.userModel.value!.uid!);
-                        },
-                      child: data!.likedBy!.contains(userController.userModel.value.uid)
-                          ? Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: appGreenColor,boxShadow: [
-                          BoxShadow(color: const Color(0x65719029).withOpacity(0.2),blurRadius: 15,offset: const Offset(0, 3))
-                        ]),
-                        child: SvgPicture.asset(
-                              AppImage.like,
-                              color: appWhiteColor,
-                              height: 18,
-                            ),
-                          )
-                          : Container(
-                        padding: const EdgeInsets.all(8),
-                            decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: appWhiteColor,boxShadow: [
-                              BoxShadow(color: const Color(0x65719029).withOpacity(0.2),blurRadius: 15,offset: const Offset(0, 3))
-                            ]),
-                            child: SvgPicture.asset(
-                                AppImage.like,
-                                height: 20,
-                              ),
-                          )),
-                  horizontalGap(3.w),
-                  GestureDetector(
-                    onTap: () {
-                      isVisible.value = !isVisible.value;
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: appWhiteColor,boxShadow: [
-                        BoxShadow(color: const Color(0x65719029).withOpacity(0.2),blurRadius: 15,offset: const Offset(0, 3))
-                      ]),
-                      child: SvgPicture.asset(
-                        AppImage.comment,
-                        height: 20,
-                      ),
-                    ),
-                  ),
-                  horizontalGap(3.w),
-                  GestureDetector(
-                    onTap: () async{
-                      pushNewScreen(context, screen: SharePostScreen(data: data!));
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: appWhiteColor,boxShadow: [
-                        BoxShadow(color: const Color(0x65719029).withOpacity(0.2),blurRadius: 15,offset: const Offset(0, 3))
-                      ]),
-                      child: SvgPicture.asset(
-                        AppImage.share,
-                        height: 20,
-                      ),
-                    ),
-                  ),
-                  Expanded(
-                    child: GestureDetector(
-                        onTap: () {
-                          pushNewScreen(context, screen: PostAllLikesView(postId: data!.id!,));
-                        },
-                        child: Align(
-                          alignment: Alignment.centerRight,
-                          child: poppinsText('Liked by ${data!.noOfLike} People',
-                              11, medium, greyColor,maxlines: 1,overflow: TextOverflow.ellipsis),
-                        )),
-                  ),
-                  horizontalGap(2.w),
-                  SvgPicture.asset(
-                    AppImage.multiplelike,
-                    height: 16,
-                  ),
-                ],
-              ),
-            ),
-            verticalGap(8),
-            const Divider(),
-            verticalGap(7),
-            Obx(() => Visibility(
-                visible: isVisible.value,
-                child: Column(
-                  children: [
-                    Container(
-                        decoration: BoxDecoration(
-                            color: greyColor.withOpacity(0.2),
-                            borderRadius: BorderRadius.circular(25)),
-                        padding: const EdgeInsets.symmetric(horizontal: 15),
-                        child: CustomTextfield1(
-                          controller: addCommentController,
-                          onChanged: (value){
-                            newsFeedController.commentModel.value.content = value;
-                          },
-                          onEditingCompleted: () async{
-                            if(addCommentController.text.isEmptyOrNull){
-                              toast('The field is empty');
-                            }else {
-                              final comment = await newsFeedController.addCommentOnPost(data!.id!,
-                                  newsFeedController.commentModel.value);
-                              if(comment){
-                                await newsFeedController.updateCollection(Collections.NEWSFEED, data!.id!,
-                                    {
-                                      NewsFeed.NO_OF_COMMENT : data!.noOfComment! + 1,
-                                    });
-                              }
-                              (comment) ? addCommentController.clear() : null;
-                              print("The comment has added $comment");
-                            }
-
-                          },
-                          suffixIcon: GestureDetector(
-                            onTap: () async{
-                              if(addCommentController.text.isEmptyOrNull){
-                                toast('The field is empty');
-
-                              }else {
-                                final comment = await newsFeedController.addCommentOnPost(data!.id!, newsFeedController.commentModel.value);
-                                if(comment){
-                                  await newsFeedController.updateCollection(Collections.NEWSFEED, data!.id!,
-                                      {
-                                        NewsFeed.NO_OF_COMMENT : data!.noOfComment! + 1,
-                                      });
-                                }
-                                (comment) ? addCommentController.clear() : null;
-                                print("The comment has added $comment");
-                              }
-                            },
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 12.0),
-                              child: SvgPicture.asset(
-                                AppImage.messageappbaricon,
-                                color: appGreenColor,
-                              ),
-                            ),
-                          ),
-                          hintText: 'Write a comment',
-                        )),
-                    StreamBuilder(
-                      stream: newsFeedController.getPostComments(data!.id!),
-                      builder: (context, snapshot) {
-                        if(snapshot.connectionState == ConnectionState.waiting){
-                          return const Center(child: CircularProgressIndicator(),);
-                        }else if(snapshot.hasError){
-                          return Center(child: Text(snapshot.error.toString()),);
-                        }else if(!snapshot.hasData){
-                          return const Center(child: Text('No data found'),);
-                        }else{
-                          return Column(
-                            children: [
-                              ListView.separated(
-                                shrinkWrap: true,
-                                physics: const NeverScrollableScrollPhysics(),
-                                itemCount: snapshot.data!.length,
-                              padding: const EdgeInsets.all(8),
-                              scrollDirection: Axis.vertical,
-                              separatorBuilder: (context, index) =>
-                              const SizedBox(height: 20,),
-                              itemBuilder: (context,
-                                  index) => CommentContainer(commentModel: snapshot.data![index],),),
-
-                              verticalGap(10),
-                              Divider(
-                                color: greyColor,
-                                indent: 20.w,
-                                endIndent: 20.w,
-                              ),
-                              verticalGap(10),
-                              GestureDetector(
-                                  onTap: () {
-                                    pushNewScreen(context,
-                                        screen: AllCommentsScreen(docId:snapshot.data!.first.postId!));
-                                  },
-                                  child: poppinsText('Show more', 15, bold, appGreenColor))
-                            ],
-                          );
-
-    }
-                      }
-                    ),
-
-
-                  ],
-                )))
-          ],
+    ],
         ),
       ),
     );
   }
+
+  Future<String> createDynamicLink(String postId) async {
+    try{
+      final DynamicLinkParameters parameters = DynamicLinkParameters(
+        uriPrefix: 'https://developlogix.page.link', // Your Firebase Dynamic Links URL prefix
+        link: Uri.parse('https://yourapp.com/post?postId=12'), // Deep link URL
+        androidParameters: const AndroidParameters(
+          packageName: 'com.developlogix.checkinapp', // Your package name
+          minimumVersion: 0,
+        ),
+        iosParameters: const IOSParameters(
+          bundleId: 'com.developlogix.checkin', // Your bundle ID
+          minimumVersion: '0',
+        ),
+      );
+
+      final ShortDynamicLink shortDynamicLink = await FirebaseDynamicLinks.instance.buildShortLink(parameters);
+      return shortDynamicLink.shortUrl.toString();
+    }catch (e){
+      log("The error is----------\n\n\n\n\n\n\ $e\n\n\n");
+      return '';
+    }
+    }
+
 
 }
 
