@@ -159,7 +159,7 @@ class SharedPostComp extends GetView<NewsFeedController> {
                   appDarkBlue.withOpacity(0.8),
                   maxlines: 3),
             ),
-            Padding(padding: EdgeInsets.only(left: 20),child: Column(
+            Padding(padding: const EdgeInsets.only(left: 20),child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
             SizedBox(height: 2.h),
@@ -250,7 +250,7 @@ class SharedPostComp extends GetView<NewsFeedController> {
                   )
                 : data!.isType == 'video' ? newsFeedController.videoLoad.value
                 ? loaderView()
-                : VideoPlayerWidget(videoUrl: data!.postUrl!,) : SizedBox(),
+                : VideoPlayerWidget(videoUrl: data!.postUrl!,) : const SizedBox(),
             verticalGap(10),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 10),
@@ -341,20 +341,20 @@ class SharedPostComp extends GetView<NewsFeedController> {
                         },
                         child: Align(
                           alignment: Alignment.centerRight,
-                          child: poppinsText('Liked by ${data!.noOfLike} People',
+                          child: data!.noOfLike <=1 ? poppinsText('Liked by ${data!.noOfLike} Person', 11, medium, greyColor,maxlines: 1,overflow: TextOverflow.ellipsis) :  poppinsText('Liked by ${data!.noOfLike} People',
                               11, medium, greyColor,maxlines: 1,overflow: TextOverflow.ellipsis),
                         )),
                   ),
                   horizontalGap(2.w),
                   SvgPicture.asset(
-                    AppImage.multiplelike,
+                    AppImage.like,
                     height: 16,
                   ),
                 ],
               ),
             ),
-            verticalGap(8),
-            const Divider(),
+            // verticalGap(8),
+            // const Divider(),
             verticalGap(7),
             Obx(() => Visibility(
                 visible: isVisible.value,

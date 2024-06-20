@@ -85,7 +85,6 @@ class _NewsFeedScreenState extends State<NewsFeedScreen> {
           child: Column(
             children: [
               TopContainer(
-
                 ontap: () {
                   pushNewScreen(context,
                       screen: CreatePost(), withNavBar: true);
@@ -128,7 +127,7 @@ class _NewsFeedScreenState extends State<NewsFeedScreen> {
                       return Center(child: Text(snapshot.error.toString()),);
                     } else {
                       return ListView.builder(
-                        key: ValueKey('ListView'),
+                        key: const ValueKey('ListView'),
                           physics: const NeverScrollableScrollPhysics(),
                           shrinkWrap: true,
                           itemCount:   snapshot.data!.length + ( snapshot.data!.length ~/ 4 ),
