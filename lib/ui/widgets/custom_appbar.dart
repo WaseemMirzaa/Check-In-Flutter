@@ -1,3 +1,4 @@
+import 'package:check_in/ui/screens/persistent_nav_bar.dart';
 import 'package:flutter/material.dart';
 
 // ignore: must_be_immutable
@@ -7,6 +8,7 @@ class CustomAppbar extends StatelessWidget implements PreferredSizeWidget {
   Color backgroundColor;
   Color iconColor;
   List<Widget>? actions;
+  bool isOnbard;
   CustomAppbar({
     super.key,
     this.title,
@@ -14,6 +16,7 @@ class CustomAppbar extends StatelessWidget implements PreferredSizeWidget {
     this.showicon = true,
     this.backgroundColor = Colors.white,
     this.iconColor = Colors.black,
+    this.isOnbard = false,
   });
 
   @override
@@ -23,7 +26,7 @@ class CustomAppbar extends StatelessWidget implements PreferredSizeWidget {
             ? IconButton(
                 icon: Icon(Icons.arrow_back_ios, color: iconColor),
                 onPressed: () {
-                  Navigator.of(context).pop();
+                  isOnbard ? Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>Home()), (route) => false) : Navigator.of(context).pop();
                 },
               )
             : const SizedBox(),

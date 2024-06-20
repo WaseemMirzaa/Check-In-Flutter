@@ -4,6 +4,7 @@ import 'package:check_in/controllers/News%20Feed/create_post_controller.dart';
 import 'package:check_in/controllers/News%20Feed/news_feed_controller.dart';
 import 'package:check_in/controllers/user_controller.dart';
 import 'package:check_in/core/constant/app_assets.dart';
+import 'package:check_in/ui/screens/persistent_nav_bar.dart';
 import 'package:check_in/ui/widgets/custom_appbar.dart';
 import 'package:check_in/utils/Constants/images.dart';
 import 'package:check_in/utils/colors.dart';
@@ -18,9 +19,11 @@ import 'package:sizer/sizer.dart';
 import 'package:chewie/chewie.dart';
 
 class CreatePost extends StatelessWidget {
-  CreatePost({super.key});
+  CreatePost({super.key,this.isOnboard = false});
+  bool isOnboard;
   UserController userController = Get.put(UserController());
   NewsFeedController newsFeedController = Get.put(NewsFeedController(NewsFeedService()));
+  
 
   @override
   Widget build(BuildContext context) {
@@ -38,7 +41,7 @@ class CreatePost extends StatelessWidget {
                 await newsFeedController.createPost(newsFeedController.newsFeedModel.value,newsFeedController.originalPath ).then((value) {
                   newsFeedController.newsFeedModel.value.postUrl = null;
                   newsFeedController.originalPath = '';
-                  Navigator.pop(context);
+                  isOnboard ? Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>Home()), (route) => false) : Navigator.pop(context);
                 } );
               }
             },
@@ -62,7 +65,8 @@ class CreatePost extends StatelessWidget {
         ),
       ),
       appBar: CustomAppbar(
-        title: poppinsText('Create Post', 15, FontWeight.bold, appBlackColor),
+        title: poppinsText('Create Post', 15, FontWeight.bold, appBlackColor,),
+        isOnbard: isOnboard,
       ),
       body: Column(
         children: [

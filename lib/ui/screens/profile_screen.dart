@@ -498,13 +498,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               children: [
                                 Container(
                                   width: 100.w,
-                                  padding: const EdgeInsets.symmetric(horizontal: 6,vertical: 4),
+                                  padding: const EdgeInsets.symmetric(horizontal: 10,vertical: 4),
                                   decoration: BoxDecoration(
                                       borderRadius: BorderRadius.circular(8),
-                                      color: const Color(0xff9f9f9f).withOpacity(0.4)),
+                                      color: appGreyColor1),
                                   child: TextField(
                                     controller: aboutMeController,
                                     textInputAction: TextInputAction.done,
+
                                     onSubmitted: (value) {
                                       // setState(() {
                                       //   // userController.userModel.value.
@@ -555,7 +556,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                         tapped = !tapped;
                                       }),
                                       child: Padding(
-                                          padding: const EdgeInsets.only(left: 8),
+                                          padding: const EdgeInsets.all( 8),
                                           child: tapped
                                               ? poppinsText(TempLanguage.save, 14, semiBold, appGreenColor)
                                               : const ImageIcon(
@@ -594,12 +595,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   padding: const EdgeInsets.symmetric(horizontal: 12,vertical: 10),
                                   decoration: BoxDecoration(
                                       borderRadius: BorderRadius.circular(8),
-                                      color: const Color(0xff9f9f9f).withOpacity(0.4)),child: Row(
+                                      color: appGreyColor1),child: Row(
                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                         children: [
                                           poppinsText(userController.userModel.value.homeCourt.isEmptyOrNull
                                                                               ? ''
-                                                                              : userController.userModel.value.homeCourt ?? '', 12, FontWeight.normal, appBlackColor),
+                                                                              : userController.userModel.value.homeCourt ?? '', 14,FontWeight.w500, silverColor),
                                           Align(
                                             alignment: Alignment.centerRight,
                                             child: Padding(
@@ -635,8 +636,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           ),
                           const SizedBox(height: 10,),
                           Center(child: Container(
-                            width: 70,
-                            padding: const EdgeInsets.symmetric(horizontal: 8,vertical: 4,),decoration: BoxDecoration(color: const Color(0xff9f9f9f).withOpacity(0.5),borderRadius: BorderRadius.circular(30)),child: Center(child: poppinsText('Post', 12, FontWeight.normal, appBlackColor )),),),
+                            width: 80,
+                            padding: const EdgeInsets.symmetric(horizontal: 10,vertical: 4,),decoration: BoxDecoration(color: appGreyColor1,borderRadius: BorderRadius.circular(30)),child: Center(child: poppinsText('My Posts', 12, FontWeight.normal, appBlackColor )),),),
                           const SizedBox(height: 10,),
                           StreamBuilder<List<NewsFeedModel>>(
                             stream: controller.getMyPosts(FirebaseAuth.instance.currentUser?.uid ?? ''),

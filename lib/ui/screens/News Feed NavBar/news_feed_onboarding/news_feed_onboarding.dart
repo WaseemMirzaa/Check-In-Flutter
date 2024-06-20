@@ -53,7 +53,7 @@ class NewsFeedOnboarding extends StatelessWidget {
               poppinsText('Grow your following and brand by posting photos, videos, and interacting with other hoop enthusiasts!', 12.sp, regular, appBlackColor,maxlines: 3,align: TextAlign.center),
               SizedBox(height: 3.h,),
               ElevatedButton(onPressed: (){
-                pushNewScreen(context, screen: CreatePost());
+                pushNewScreen(context, screen: CreatePost(isOnboard: true,)).then((value) async=> await setValue('first', 'no'));
               },style: ButtonStyle(backgroundColor: MaterialStateProperty.resolveWith((states) => appGreenColor)), child: Center(child: poppinsText('Create My First News Feed Post', 12.sp, medium, appWhiteColor)),)
       
       
