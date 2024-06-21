@@ -223,7 +223,7 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
         if (mounted) setState(() {});
       }
     } catch (e) {
-      print(e);
+      print("The error in locaton is: $e");
     }
 
     // ADDING PLACCES API COURTS LOCATION MARKER
