@@ -9,9 +9,11 @@ import 'package:check_in/model/NewsFeed%20Model/comment_model.dart';
 import 'package:check_in/model/NewsFeed%20Model/news_feed_model.dart';
 import 'package:check_in/model/user_modal.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:get/get.dart';
+import 'package:get/get_rx/get_rx.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:chewie/chewie.dart';
 import 'package:video_player/video_player.dart';
@@ -41,41 +43,46 @@ class NewsFeedController extends GetxController {
   String thumbnailPath = '';
   String originalPath = '';
 
+  RxBool isLoader = false.obs;
+
   @override
   void onInit() {
     super.onInit();
     postController = TextEditingController();
     postFocusNode = FocusNode();
     fetchInitialNewsFeed();
+    getMyPosts();
   }
   final _newsFeed = <NewsFeedModel>[].obs;
-  DocumentSnapshot? lastDocument;
+   DocumentSnapshot? lastPostDoc;
 
   List<NewsFeedModel> get newsFeed => _newsFeed;
   void fetchInitialNewsFeed() {
     newsFeedService.getNewsFeed().listen((newsFeedList) {
       print("The news feed list is: ${newsFeedList.length}");
       if (newsFeedList.isNotEmpty) {
-        lastDocument = newsFeedList.last['snapshot'] as DocumentSnapshot;
-        print("The last document is: ${lastDocument!.id}");
+        lastPostDoc = newsFeedList.last['snapshot'] as DocumentSnapshot;
+        print("The last document is: ${lastPostDoc!.id}");
       }
       _newsFeed.assignAll(newsFeedList.map((e) => e['model'] as NewsFeedModel).toList());
     });
   }
 
   void fetchMoreNewsFeed() {
-    print("The news feed document is: ${lastDocument!.id}");
+    print("The news feed document is: ${lastPostDoc!.id}");
 
-    if (lastDocument == null) return;
-    print("The news feed document is: ${lastDocument!.id}");
+    if (lastPostDoc == null) return;
+    print("The news feed document is: ${lastPostDoc!.id}");
+    isLoader.value = true;
 
-    newsFeedService.getNewsFeed(startAfter: lastDocument).listen((newsFeedList) {
+    newsFeedService.getNewsFeed(startAfter: lastPostDoc).listen((newsFeedList) {
       if (newsFeedList.isNotEmpty) {
-        lastDocument = newsFeedList.last['snapshot'] as DocumentSnapshot;
-        print("The last document is: ${lastDocument!.id}");
+        lastPostDoc = newsFeedList.last['snapshot'] as DocumentSnapshot;
+        print("The last document is: ${lastPostDoc!.id}");
 
         _newsFeed.addAll(newsFeedList.map((e) => e['model'] as NewsFeedModel).toList());
       }
+      isLoader.value = false;
     });
   }
 
@@ -84,9 +91,38 @@ class NewsFeedController extends GetxController {
 //     return newsFeedService.getNewsFeed();
 //   }
 
-  /// get my (posts) controller
-  Stream<List<NewsFeedModel>> getMyPosts(String id) {
-    return newsFeedService.getMyPosts(id);
+  // /// get my (posts) controller
+  // Stream<List<NewsFeedModel>> getMyPosts(String id) {
+  //   return newsFeedService.getMyPosts(id);
+  // }
+
+  final _myPosts = <NewsFeedModel>[].obs;
+  DocumentSnapshot? lastDocument;
+  final myPostLoader = false.obs;
+
+  List<NewsFeedModel> get myPosts => _myPosts;
+  bool get isLoadingMore => myPostLoader.value;
+
+  void getMyPosts() {
+    newsFeedService.getMyPosts(FirebaseAuth.instance.currentUser?.uid ?? '').listen((postList) {
+      if (postList.isNotEmpty) {
+        lastDocument = postList.last['snapshot'] as DocumentSnapshot;
+      }
+      _myPosts.assignAll(postList.map((e) => e['model'] as NewsFeedModel).toList());
+    });
+  }
+
+  void fetchMoreMyPosts() async {
+    print("Hello  ++++++++++++++++++++++++  ");
+    if (lastDocument == null || myPostLoader.value) return;
+    myPostLoader.value = true;
+    newsFeedService.getMyPosts(FirebaseAuth.instance.currentUser?.uid ?? '', startAfter: lastDocument).listen((postList) {
+      if (postList.isNotEmpty) {
+        lastDocument = postList.last['snapshot'] as DocumentSnapshot;
+        _myPosts.addAll(postList.map((e) => e['model'] as NewsFeedModel).toList());
+      }
+      myPostLoader.value = false;
+    });
   }
 
   /// Update the collection

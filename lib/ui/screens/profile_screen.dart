@@ -205,6 +205,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     // TODO: implement initState
 
     super.initState();
+    _scrollController.addListener(_onScroll);
   }
 
   sendEmail(String name, String email, String homeCourt) async {
@@ -247,6 +248,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
   TextEditingController aboutMeController = TextEditingController();
   bool tapped = false;
 
+  final ScrollController _scrollController = ScrollController();
+
+
+  void _onScroll() {
+    if (_scrollController.position.pixels == _scrollController.position.maxScrollExtent) {
+      controller.fetchMoreMyPosts();
+    }
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     // return GetBuilder<UserController>(builder: (userController) {
@@ -261,16 +277,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
         }, icon: const Icon(Icons.arrow_back_ios)),
         title: poppinsText(TempLanguage.profile, 20, FontWeight.bold, appBlackColor),
       ),
-      body: SingleChildScrollView(
-        child: SizedBox(
+      body: SizedBox(
           height: MediaQuery.of(context).size.height * 0.8,
-          child:
-              // if (!snapshot.hasData) {
-              //   return const Center(child: CircularProgressIndicator());
-              // }
-              // final users = snapshot.data;
-              !userController.userModel.value.uid.isEmptyOrNull
+          child: !userController.userModel.value.uid.isEmptyOrNull
                   ? SingleChildScrollView(
+            controller: _scrollController,
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         crossAxisAlignment: CrossAxisAlignment.center,
@@ -290,11 +301,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                           ? Container(
                                         height: 20.h,
                                         width: 35.h,
-                                        decoration: BoxDecoration(
+                                        decoration: const BoxDecoration(
                                           shape: BoxShape.circle,
                                           color: Colors.white, // White background
                                         ),
-                                        child: Center(
+                                        child: const Center(
                                           child: CircularProgressIndicator(),
                                         ),
                                       )
@@ -622,7 +633,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
                                 Positioned(
                                     top: -10,
-
                                     child: Center(
                                       child: Container(
                                         padding: const EdgeInsets.symmetric(horizontal: 12,vertical: 3),
@@ -639,41 +649,39 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             width: 80,
                             padding: const EdgeInsets.symmetric(horizontal: 10,vertical: 4,),decoration: BoxDecoration(color: appGreyColor1,borderRadius: BorderRadius.circular(30)),child: Center(child: poppinsText('My Posts', 12, FontWeight.normal, appBlackColor )),),),
                           const SizedBox(height: 10,),
-                          StreamBuilder<List<NewsFeedModel>>(
-                            stream: controller.getMyPosts(FirebaseAuth.instance.currentUser?.uid ?? ''),
-                            builder: (context, snapshot) {
-                              if (snapshot.connectionState == ConnectionState.waiting) {
-                                return loaderView();
-                              } else if (snapshot.hasError) {
-                                return Center(
-                                  child: Text(snapshot.error.toString()),
-                                );
-                              } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                                return Center(child: Text(TempLanguage.noPostFound));
-                              } else {
-                                return ListView.builder(
-                                  key: const PageStorageKey('listViewBuilder'),
-                                  physics: const NeverScrollableScrollPhysics(),
-                                  shrinkWrap: true,
-                                  itemCount: snapshot.data!.length,
-                                  itemBuilder: (context, index) {
-                                    var data = snapshot.data![index];
-                                    if (data.isOriginal!) {
-                                      return ListTileContainer(
-                                        key: ValueKey(data.id),
-                                        data: data,
-                                      );
-                                    } else {
-                                      return SharedPostComp(
-                                        key: ValueKey(data.id),
-                                        data: data,
-                                      );
-                                    }
-                                  },
-                                );
-                              }
-                            },
-                          )
+                          Obx(() {
+                            if (controller.myPosts.isEmpty) {
+                              return Center(child: Text(TempLanguage.noPostFound));
+                            } else {
+                              return ListView.builder(
+                // controller: _scrollController,
+                                physics: const NeverScrollableScrollPhysics(),
+                                shrinkWrap: true,
+                                itemCount: controller.myPosts.length + (controller.isLoadingMore ? 1 : 0),
+                                itemBuilder: (context, index) {
+                                  if (index == controller.myPosts.length) {
+                                    return const Center(child: CircularProgressIndicator());
+                                  }
+                                  var data = controller.myPosts[index];
+                                  return data.isOriginal!
+                                      ? ListTileContainer(
+                                    key: ValueKey(data.id),
+                                    data: data,
+                                  )
+                      : SharedPostComp(
+                    key: ValueKey(data.id),
+                    data: data,
+                  );
+                },
+              );
+            }
+          }),
+
+                          controller.myPostLoader.value ? const Center(
+                            key: ValueKey('Loader'),
+                            child: CircularProgressIndicator(),) : const SizedBox(key: ValueKey('Empty'),),
+
+                          SizedBox(height: 2.h,)
 
                         ],
                       ),
@@ -681,7 +689,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   : const Center(child: CircularProgressIndicator()),
           // : const Center(child: Text("Loading...")),
         ),
-      ),
     );
     // });
   }

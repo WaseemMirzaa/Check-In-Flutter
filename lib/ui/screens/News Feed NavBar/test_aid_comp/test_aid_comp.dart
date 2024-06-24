@@ -18,14 +18,18 @@ class _NativeTestAds extends State<NativeTestAds> {
         child: Align(
                   alignment: Alignment.center,
                   child: CustomContainer1(
-                    child: ConstrainedBox(
-                      constraints: const BoxConstraints(
-                        minWidth: 300,
-                        minHeight: 350,
-                        maxHeight: 400,
-                        maxWidth: 450,
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: ConstrainedBox(
+                        constraints: const BoxConstraints(
+                          minWidth: 300,
+                          minHeight: 350,
+                          maxHeight: 400,
+                          maxWidth: 450,
+                          
+                        ),
+                        child:_nativeAd == null ? const SizedBox() :  AdWidget(ad: _nativeAd!),
                       ),
-                      child:_nativeAd == null ? SizedBox() :  AdWidget(ad: _nativeAd!),
                     ),
                   )),
       );

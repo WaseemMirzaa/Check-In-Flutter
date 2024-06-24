@@ -73,35 +73,35 @@ class _MyPostsNewsFeedState extends State<MyPostsNewsFeed> {
             ),
 
 
-              StreamBuilder<List<NewsFeedModel>>(
-                  stream: controller.getMyPosts(FirebaseAuth.instance.currentUser?.uid ?? ''),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return loaderView();
-                    } else if (!snapshot.hasData) {
-                      return Center(child: Text(TempLanguage.noPostFound));
-                    }else if (snapshot.data!.isEmpty) {
-                      return Center(child: Text(TempLanguage.noPostFound));
-                    } else if(snapshot.hasError){
-                      return Center(child: Text(snapshot.error.toString()),);
-                    } else {
-                      return ListView.builder(
-                          key: const ValueKey('listViewBuilder'),
-                          physics: const NeverScrollableScrollPhysics(),
-                          shrinkWrap: true,
-                          itemCount:  snapshot.data!.length,
-                          itemBuilder: (context, index) {
-
-                            var data = snapshot.data![index];
-                            return data.isOriginal! ? ListTileContainer(
-                              key: ValueKey(data.id),
-                              data: data,
-                            ) : SharedPostComp(
-                                key: ValueKey(data.id),
-                                data:data);
-                          });
-                    }
-                  })
+              // StreamBuilder<List<NewsFeedModel>>(
+              //     stream: controller.getMyPosts(FirebaseAuth.instance.currentUser?.uid ?? ''),
+              //     builder: (context, snapshot) {
+              //       if (snapshot.connectionState == ConnectionState.waiting) {
+              //         return loaderView();
+              //       } else if (!snapshot.hasData) {
+              //         return Center(child: Text(TempLanguage.noPostFound));
+              //       }else if (snapshot.data!.isEmpty) {
+              //         return Center(child: Text(TempLanguage.noPostFound));
+              //       } else if(snapshot.hasError){
+              //         return Center(child: Text(snapshot.error.toString()),);
+              //       } else {
+              //         return ListView.builder(
+              //             key: const ValueKey('listViewBuilder'),
+              //             physics: const NeverScrollableScrollPhysics(),
+              //             shrinkWrap: true,
+              //             itemCount:  snapshot.data!.length,
+              //             itemBuilder: (context, index) {
+              //
+              //               var data = snapshot.data![index];
+              //               return data.isOriginal! ? ListTileContainer(
+              //                 key: ValueKey(data.id),
+              //                 data: data,
+              //               ) : SharedPostComp(
+              //                   key: ValueKey(data.id),
+              //                   data:data);
+              //             });
+              //       }
+              //     })
             ],
           ),
         ));

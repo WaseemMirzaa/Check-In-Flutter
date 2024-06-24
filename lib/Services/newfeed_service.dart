@@ -45,8 +45,7 @@ class NewsFeedService {
 //           .toList());
 // }
   Stream<List<Map<String, dynamic>>> getNewsFeed({DocumentSnapshot? startAfter}) {
-    Query query = _newsFeedCollection
-        .orderBy(NewsFeed.TIME_STAMP, descending: true)
+    Query query = _newsFeedCollection.orderBy(NewsFeed.TIME_STAMP, descending: true)
         .limit(5);
 
     if (startAfter != null) {
@@ -68,24 +67,78 @@ class NewsFeedService {
 
 
 
-  ///my posts
-  Stream<List<NewsFeedModel>> getMyPosts(String id) {
+  // ///my posts
+  // Stream<List<NewsFeedModel>> getMyPosts(String id) {
+  //   // Query for posts where NewsFeed.USER_ID is equal to id
+  //   final userPostsStream = _newsFeedCollection
+  //       .where(NewsFeed.USER_ID, isEqualTo: id)
+  //       .orderBy(NewsFeed.TIME_STAMP, descending: true)
+  //       .snapshots();
+  //
+  //   // Query for posts where NewsFeed.SHARE_UID is equal to id
+  //   final sharedPostsStream = _newsFeedCollection
+  //       .where(NewsFeed.SHARE_UID, isEqualTo: id)
+  //       .orderBy(NewsFeed.TIME_STAMP, descending: true)
+  //       .snapshots();
+  //
+  //   // Combine the streams and merge the results
+  //   return RES.Rx.combineLatest2(
+  //     userPostsStream,
+  //     sharedPostsStream,
+  //         (QuerySnapshot userPostsSnapshot, QuerySnapshot sharedPostsSnapshot) {
+  //       // Combine the documents from both snapshots
+  //       final combinedDocs = [...userPostsSnapshot.docs, ...sharedPostsSnapshot.docs];
+  //
+  //       // Remove duplicates (if any)
+  //       final uniqueDocs = {for (var doc in combinedDocs) doc.id: doc}.values.toList();
+  //
+  //       // Filter out documents where NewsFeed.IS_ORIGINAL is false and NewsFeed.USER_ID is equal to id
+  //       final filteredDocs = uniqueDocs.where((doc) {
+  //         final data = doc.data() as Map<String, dynamic>;
+  //         final isOriginal = data[NewsFeed.IS_ORIGINAL] as bool;
+  //         final userId = data[NewsFeed.USER_ID] as String;
+  //         return !(isOriginal == false && userId == id);
+  //       }).toList();
+  //
+  //       // Sort by timestamp
+  //       filteredDocs.sort((a, b) {
+  //         final timestampA = a[NewsFeed.TIME_STAMP] as Timestamp;
+  //         final timestampB = b[NewsFeed.TIME_STAMP] as Timestamp;
+  //         return timestampB.compareTo(timestampA);
+  //       });
+  //
+  //       // Map to NewsFeedModel
+  //       return filteredDocs
+  //           .map<NewsFeedModel>((doc) => NewsFeedModel.fromJson(doc.data() as Map<String, dynamic>))
+  //           .toList();
+  //     },
+  //   );
+  // }
+  Stream<List<Map<String, dynamic>>> getMyPosts(String id, {DocumentSnapshot? startAfter}) {
     // Query for posts where NewsFeed.USER_ID is equal to id
-    final userPostsStream = _newsFeedCollection
+    Query userPostsQuery = _newsFeedCollection
         .where(NewsFeed.USER_ID, isEqualTo: id)
         .orderBy(NewsFeed.TIME_STAMP, descending: true)
-        .snapshots();
+        .limit(3);
+
+    if (startAfter != null) {
+      userPostsQuery = userPostsQuery.startAfterDocument(startAfter);
+    }
 
     // Query for posts where NewsFeed.SHARE_UID is equal to id
-    final sharedPostsStream = _newsFeedCollection
+    Query sharedPostsQuery = _newsFeedCollection
         .where(NewsFeed.SHARE_UID, isEqualTo: id)
         .orderBy(NewsFeed.TIME_STAMP, descending: true)
-        .snapshots();
+        .limit(3);
+
+    if (startAfter != null) {
+      sharedPostsQuery = sharedPostsQuery.startAfterDocument(startAfter);
+    }
 
     // Combine the streams and merge the results
     return RES.Rx.combineLatest2(
-      userPostsStream,
-      sharedPostsStream,
+      userPostsQuery.snapshots(),
+      sharedPostsQuery.snapshots(),
           (QuerySnapshot userPostsSnapshot, QuerySnapshot sharedPostsSnapshot) {
         // Combine the documents from both snapshots
         final combinedDocs = [...userPostsSnapshot.docs, ...sharedPostsSnapshot.docs];
@@ -110,7 +163,10 @@ class NewsFeedService {
 
         // Map to NewsFeedModel
         return filteredDocs
-            .map<NewsFeedModel>((doc) => NewsFeedModel.fromJson(doc.data() as Map<String, dynamic>))
+            .map<Map<String, dynamic>>((doc) => {
+          'model': NewsFeedModel.fromJson(doc.data() as Map<String, dynamic>),
+          'snapshot': doc
+        })
             .toList();
       },
     );
