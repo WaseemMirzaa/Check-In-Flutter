@@ -25,7 +25,7 @@ class _NativeTestAds extends State<NativeTestAds> {
                         maxHeight: 400,
                         maxWidth: 450,
                       ),
-                      child: AdWidget(ad: _nativeAd!),
+                      child:_nativeAd == null ? SizedBox() :  AdWidget(ad: _nativeAd!),
                     ),
                   )),
       );

@@ -30,20 +30,43 @@ class NewsFeedService {
     }
   }
 
- Stream<List<NewsFeedModel>> getNewsFeed() {
-  return _newsFeedCollection
-      .orderBy(NewsFeed.TIME_STAMP, descending: true)
-      .snapshots()
-      .map((querySnapshot) => querySnapshot.docs
-          .where((doc) =>
-              doc.data() != null &&
-              (doc.data() as Map<String, dynamic>?)![NewsFeed.HIDE_USER] is List &&
-              !(doc.data() as Map<String, dynamic>)[NewsFeed.HIDE_USER].contains(userController.userModel.value.uid))
-          .map<NewsFeedModel>((doc) {
-            return NewsFeedModel.fromJson(doc.data() as Map<String, dynamic>);
-          })
-          .toList());
-}
+//  Stream<List<NewsFeedModel>> getNewsFeed() {
+//   return _newsFeedCollection
+//       .orderBy(NewsFeed.TIME_STAMP, descending: true)
+//       .snapshots()
+//       .map((querySnapshot) => querySnapshot.docs
+//           .where((doc) =>
+//               doc.data() != null &&
+//               (doc.data() as Map<String, dynamic>?)![NewsFeed.HIDE_USER] is List &&
+//               !(doc.data() as Map<String, dynamic>)[NewsFeed.HIDE_USER].contains(userController.userModel.value.uid))
+//           .map<NewsFeedModel>((doc) {
+//             return NewsFeedModel.fromJson(doc.data() as Map<String, dynamic>);
+//           })
+//           .toList());
+// }
+  Stream<List<Map<String, dynamic>>> getNewsFeed({DocumentSnapshot? startAfter}) {
+    Query query = _newsFeedCollection
+        .orderBy(NewsFeed.TIME_STAMP, descending: true)
+        .limit(5);
+
+    if (startAfter != null) {
+      query = query.startAfterDocument(startAfter);
+    }
+
+    return query.snapshots().map((querySnapshot) => querySnapshot.docs
+        .where((doc) =>
+    doc.data() != null &&
+        (doc.data() as Map<String, dynamic>)[NewsFeed.HIDE_USER] is List &&
+        !(doc.data() as Map<String, dynamic>)[NewsFeed.HIDE_USER].contains(userController.userModel.value.uid))
+        .map((doc) {
+      return {
+        'model': NewsFeedModel.fromJson(doc.data() as Map<String, dynamic>),
+        'snapshot': doc
+      };
+    }).toList());
+  }
+
+
 
   ///my posts
   Stream<List<NewsFeedModel>> getMyPosts(String id) {

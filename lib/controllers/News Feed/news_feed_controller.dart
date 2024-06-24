@@ -46,12 +46,43 @@ class NewsFeedController extends GetxController {
     super.onInit();
     postController = TextEditingController();
     postFocusNode = FocusNode();
+    fetchInitialNewsFeed();
+  }
+  final _newsFeed = <NewsFeedModel>[].obs;
+  DocumentSnapshot? lastDocument;
+
+  List<NewsFeedModel> get newsFeed => _newsFeed;
+  void fetchInitialNewsFeed() {
+    newsFeedService.getNewsFeed().listen((newsFeedList) {
+      print("The news feed list is: ${newsFeedList.length}");
+      if (newsFeedList.isNotEmpty) {
+        lastDocument = newsFeedList.last['snapshot'] as DocumentSnapshot;
+        print("The last document is: ${lastDocument!.id}");
+      }
+      _newsFeed.assignAll(newsFeedList.map((e) => e['model'] as NewsFeedModel).toList());
+    });
   }
 
-/// get news feed (posts) controller
-  Stream<List<NewsFeedModel>> getNewsFeed() {
-    return newsFeedService.getNewsFeed();
+  void fetchMoreNewsFeed() {
+    print("The news feed document is: ${lastDocument!.id}");
+
+    if (lastDocument == null) return;
+    print("The news feed document is: ${lastDocument!.id}");
+
+    newsFeedService.getNewsFeed(startAfter: lastDocument).listen((newsFeedList) {
+      if (newsFeedList.isNotEmpty) {
+        lastDocument = newsFeedList.last['snapshot'] as DocumentSnapshot;
+        print("The last document is: ${lastDocument!.id}");
+
+        _newsFeed.addAll(newsFeedList.map((e) => e['model'] as NewsFeedModel).toList());
+      }
+    });
   }
+
+// /// get news feed (posts) controller
+//   Stream<List<NewsFeedModel>> getNewsFeed() {
+//     return newsFeedService.getNewsFeed();
+//   }
 
   /// get my (posts) controller
   Stream<List<NewsFeedModel>> getMyPosts(String id) {
