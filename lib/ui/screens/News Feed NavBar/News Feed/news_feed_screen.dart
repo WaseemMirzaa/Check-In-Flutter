@@ -99,11 +99,15 @@ class _NewsFeedScreenState extends State<NewsFeedScreen> {
                     );
                   }
                 }),
-                controller.isLoader.value ? const Center(child: Padding(
+                controller.isLoader.value ? const Center(
+                  key: ValueKey('LOADER'),
+                  child: Padding(
                   padding: EdgeInsets.all(2.0),
                   child: CircularProgressIndicator(),
-                ),) : const SizedBox(),
-                SizedBox(height: 2.h,)
+                ),) : const SizedBox(key: ValueKey('empty'),),
+                SizedBox(
+                  key: const ValueKey('For space'),
+                  height: 2.h,)
               ],
             );
           }
