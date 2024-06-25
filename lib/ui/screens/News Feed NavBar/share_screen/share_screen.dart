@@ -19,6 +19,10 @@ class SharePostScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     feedController.newsFeedModel.value = data;
+    feedController.newsFeedModel.value.likedBy = [];
+    feedController.newsFeedModel.value.noOfLike = 0;
+    feedController.newsFeedModel.value.noOfComment = 0;
+    feedController.newsFeedModel.value.noOfShared = 0;
     return Scaffold(
       appBar: AppBar(
         title: const Text('Share Post'),
@@ -26,16 +30,24 @@ class SharePostScreen extends StatelessWidget {
           IconButton(
             icon: const Icon(Icons.send),
             onPressed: () async {
+              if(data.shareID!.isNotEmpty){
+                print("True");
+                await feedController.updateCollection(
+                    Collections.NEWSFEED, data.shareID!,
+                    {
+                      NewsFeed.NO_OF_SHARED: data!.noOfShared! + 1,
+                    });
+              }
               final share = await feedController.sharePost(feedController.newsFeedModel.value);
               print("Share : $share");
               print("Number of shares are : ${data!.noOfShared}");
               if(share){
-
-                print("The share id is:"+data.shareID!);
-                await feedController.updateCollection(Collections.NEWSFEED, data.id!,
-                    {
-                      NewsFeed.NO_OF_SHARED : data!.noOfShared! + 1,
-                    });
+                print("The share id is:${data.shareID!}");
+                  await feedController.updateCollection(
+                      Collections.NEWSFEED, data.id!,
+                      {
+                        NewsFeed.NO_OF_SHARED: data!.noOfShared! + 1,
+                      });
               }
               share ?
               Get.back() : null; // Go back to the previous screen

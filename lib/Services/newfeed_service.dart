@@ -46,7 +46,7 @@ class NewsFeedService {
 // }
   Stream<List<Map<String, dynamic>>> getNewsFeed({DocumentSnapshot? startAfter}) {
     Query query = _newsFeedCollection.orderBy(NewsFeed.TIME_STAMP, descending: true)
-        .limit(5);
+        .limit(10);
 
     if (startAfter != null) {
       query = query.startAfterDocument(startAfter);
@@ -119,7 +119,7 @@ class NewsFeedService {
     Query userPostsQuery = _newsFeedCollection
         .where(NewsFeed.USER_ID, isEqualTo: id)
         .orderBy(NewsFeed.TIME_STAMP, descending: true)
-        .limit(6);
+        .limit(10);
 
     if (startAfter != null) {
       userPostsQuery = userPostsQuery.startAfterDocument(startAfter);
@@ -129,7 +129,7 @@ class NewsFeedService {
     Query sharedPostsQuery = _newsFeedCollection
         .where(NewsFeed.SHARE_UID, isEqualTo: id)
         .orderBy(NewsFeed.TIME_STAMP, descending: true)
-        .limit(6);
+        .limit(10);
 
     if (startAfter != null) {
       sharedPostsQuery = sharedPostsQuery.startAfterDocument(startAfter);

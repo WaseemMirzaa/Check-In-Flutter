@@ -1,8 +1,8 @@
 import 'package:check_in/Services/newfeed_service.dart';
 import 'package:check_in/controllers/News%20Feed/news_feed_controller.dart';
 import 'package:check_in/controllers/user_controller.dart';
+import 'package:check_in/core/constant/app_assets.dart';
 import 'package:check_in/model/NewsFeed%20Model/comment_model.dart';
-import 'package:check_in/ui/screens/News%20Feed%20NavBar/News%20Feed/Component/comment_all_lIkes_view.dart';
 import 'package:check_in/ui/screens/News%20Feed%20NavBar/News%20Feed/Component/subcomment_all_likes.dart';
 import 'package:check_in/utils/Constants/images.dart';
 import 'package:check_in/utils/colors.dart';
@@ -46,7 +46,14 @@ class SubCommentComp extends StatelessWidget {
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            CircleAvatar(
+            commentModel.userImage!.isEmpty ? Container(
+          height: 4.h,
+          width: 4.h,
+          decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(width: 2, color: appGreenColor),
+              image: const DecorationImage(
+                  image: AssetImage(AppAssets.LOGO_NEW), fit: BoxFit.fill))) : CircleAvatar(
               backgroundImage: NetworkImage(commentModel.userImage!),
               radius: 17,
             ),
@@ -100,7 +107,7 @@ class SubCommentComp extends StatelessWidget {
                           ));
                     },
                     child: SvgPicture.asset(
-                      AppImage.multiplelike,
+                      AppImage.like1,
                       height: 14,
                     ),
                   ),

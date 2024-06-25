@@ -1,7 +1,9 @@
 import 'package:check_in/Services/newfeed_service.dart';
 import 'package:check_in/auth_service.dart';
 import 'package:check_in/controllers/News%20Feed/news_feed_controller.dart';
+import 'package:check_in/core/constant/constant.dart';
 import 'package:check_in/model/NewsFeed%20Model/comment_model.dart';
+import 'package:check_in/model/NewsFeed%20Model/news_feed_model.dart';
 import 'package:check_in/ui/screens/News%20Feed%20NavBar/News%20Feed/Component/comment_container.dart';
 import 'package:check_in/ui/widgets/custom_appbar.dart';
 import 'package:check_in/ui/widgets/text_field.dart';
@@ -12,11 +14,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:get/get_rx/src/rx_types/rx_types.dart';
+import 'package:nb_utils/nb_utils.dart';
 
 class AllCommentsScreen extends StatelessWidget {
-  AllCommentsScreen({super.key,required this.docId});
+  AllCommentsScreen({super.key,required this.docId, required this.newsFeedModel, this.isShare = false});
   String docId;
+  NewsFeedModel newsFeedModel;
+  bool isShare;
   final newsFeedController = Get.put(NewsFeedController(NewsFeedService()));
+  final addCommentController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -84,11 +90,49 @@ class AllCommentsScreen extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(horizontal: 15),
                   child: CustomTextfield1(
                     hintText: 'Write a comment',
-                    suffixIcon: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 12.0),
-                      child: SvgPicture.asset(
-                        AppImage.messageappbaricon,
-                        color: appGreenColor,
+                    onChanged: (value){
+                      newsFeedController.commentModel.value.content = value;
+                    },
+                    onEditingCompleted: () async{
+                      if(addCommentController.text.isEmptyOrNull){
+                        toast('The field is empty');
+                      }else {
+                        final comment = await newsFeedController.addCommentOnPost(isShare ? newsFeedModel.shareID! : newsFeedModel.id!,
+                            newsFeedController.commentModel.value);
+                        if(comment){
+                          await newsFeedController.updateCollection(Collections.NEWSFEED,isShare ? newsFeedModel.shareID! : newsFeedModel.id!,
+                              {
+                                NewsFeed.NO_OF_COMMENT : newsFeedModel.noOfComment! + 1,
+                              });
+                        }
+                        (comment) ? addCommentController.clear() : null;
+                        print("The comment has added $comment");
+                      }
+
+                    },
+                    controller: addCommentController,
+                    suffixIcon: GestureDetector(
+                      onTap: () async{
+                        if(addCommentController.text.isEmptyOrNull){
+                          toast('The field is empty');
+                        }else {
+                          final comment = await newsFeedController.addCommentOnPost(isShare ? newsFeedModel.shareID! : newsFeedModel.id!,newsFeedController.commentModel.value);
+                          if(comment){
+                            await newsFeedController.updateCollection(Collections.NEWSFEED,isShare ? newsFeedModel.shareID! : newsFeedModel.id!,
+                                {
+                                  NewsFeed.NO_OF_COMMENT : newsFeedModel.noOfComment! + 1,
+                                });
+                          }
+                          (comment) ? addCommentController.clear() : null;
+                          print("The comment has added $comment");
+                        }
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 12.0),
+                        child: SvgPicture.asset(
+                          AppImage.messageappbaricon,
+                          color: appGreenColor,
+                        ),
                       ),
                     ),
                   )),

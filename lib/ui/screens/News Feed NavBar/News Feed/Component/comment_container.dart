@@ -109,10 +109,10 @@ class CommentContainer extends StatelessWidget {
                     horizontalGap(5),
                     GestureDetector(
                       onTap: (){
-                        pushNewScreen(context, screen: CommentAllLikesView(postId: commentModel.parentId!,commentId: commentModel.commentId!,));
+                        pushNewScreen(context, screen: CommentAllLikesView(postId: commentModel.parentId!,commentId: commentModel.commentId!));
                       },
                       child: SvgPicture.asset(
-                        AppImage.multiplelike,
+                        AppImage.like1,
                         height: 14,
                       ),
                     ),
@@ -181,7 +181,7 @@ class CommentContainer extends StatelessWidget {
                               }
                             },
 
-                            style: TextStyle(fontSize: 12),
+                            style: const TextStyle(fontSize: 12),
                             controller: replyComment,
                             onChanged:(value){
                               newsFeedController.commentModel.value.content = value;
@@ -209,7 +209,7 @@ class CommentContainer extends StatelessWidget {
                                   ),
                                 ),
                                 hintText: 'Write a comment',
-                                contentPadding: EdgeInsets.symmetric(horizontal: 20,vertical: 6),
+                                contentPadding: const EdgeInsets.symmetric(horizontal: 20,vertical: 6),
                                 hintStyle: TextStyle(
                                     fontSize: 12, fontWeight: medium, fontFamily: 'Poppins'),
                                 border: InputBorder.none,

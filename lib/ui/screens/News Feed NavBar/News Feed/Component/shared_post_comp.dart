@@ -135,7 +135,7 @@ class SharedPostComp extends GetView<NewsFeedController> {
              PopupMenuItem<String>(
               value: data!.shareUID == userController.userModel.value.uid ? 'Delete' : 'Hide',
               child: ListTile(
-                leading: const Icon(Icons.delete),
+                leading: Icon(data!.userId == userController.userModel.value.uid ? Icons.delete : Icons.visibility_off),
                 title: Text(data!.shareUID == userController.userModel.value.uid ? 'Delete' : 'Hide'),
               ),
             ),
@@ -447,7 +447,7 @@ class SharedPostComp extends GetView<NewsFeedController> {
                               GestureDetector(
                                   onTap: () {
                                     pushNewScreen(context,
-                                        screen: AllCommentsScreen(docId:snapshot.data!.first.postId!));
+                                        screen: AllCommentsScreen(docId:snapshot.data!.first.postId!, newsFeedModel: data!,isShare: true,));
                                   },
                                   child: poppinsText('Show more', 15, bold, appGreenColor))
                             ],

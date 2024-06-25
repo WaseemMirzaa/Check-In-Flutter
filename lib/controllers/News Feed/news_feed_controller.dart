@@ -86,6 +86,12 @@ class NewsFeedController extends GetxController {
     });
   }
 
+  void clearNewsFeeds() {
+    _newsFeed.clear();
+    lastPostDoc = null;
+    isLoader.value = false;
+  }
+
 // /// get news feed (posts) controller
 //   Stream<List<NewsFeedModel>> getNewsFeed() {
 //     return newsFeedService.getNewsFeed();
@@ -123,6 +129,11 @@ class NewsFeedController extends GetxController {
       }
       myPostLoader.value = false;
     });
+  }
+  void clearMyPosts() {
+    _myPosts.clear();
+    lastDocument = null;
+    myPostLoader.value = false;
   }
 
   /// Update the collection

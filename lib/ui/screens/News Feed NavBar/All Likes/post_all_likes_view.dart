@@ -13,8 +13,9 @@ import 'package:nb_utils/nb_utils.dart';
 import 'package:sizer/sizer.dart';
 
 class PostAllLikesView extends StatelessWidget {
-  PostAllLikesView({super.key, required this.postId});
+  PostAllLikesView({super.key, required this.postId, this.isComment = false});
   String postId;
+  bool isComment;
   final newsFeedController = Get.put(NewsFeedController(NewsFeedService()));
 
   @override
@@ -41,9 +42,9 @@ class PostAllLikesView extends StatelessWidget {
           if(snapshot.connectionState == ConnectionState.waiting){
             return const Center(child: CircularProgressIndicator());
           }else if(!snapshot.hasData){
-            return const Padding(
-              padding: EdgeInsets.all(8.0),
-              child: Center(child: Text('There are no reacts on the post')),
+            return Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Center(child: Text(isComment ? 'No react on comments' : 'There are no reacts on the post')),
             );
           }else {
             return Column(

@@ -1,13 +1,16 @@
 import 'package:check_in/Services/newfeed_service.dart';
 import 'package:check_in/controllers/News%20Feed/news_feed_controller.dart';
+import 'package:check_in/core/constant/app_assets.dart';
 import 'package:check_in/ui/widgets/custom_appbar.dart';
 import 'package:check_in/utils/Constants/images.dart';
+import 'package:check_in/utils/colors.dart';
 import 'package:check_in/utils/gaps.dart';
 import 'package:check_in/utils/styles.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:nb_utils/nb_utils.dart';
+import 'package:sizer/sizer.dart';
 
 class SubCommentAllLikesView extends StatelessWidget {
   SubCommentAllLikesView({super.key, required this.postId,required this.parentId, required this.commentId,});
@@ -42,7 +45,7 @@ class SubCommentAllLikesView extends StatelessWidget {
             }else if(!snapshot.hasData){
               return const Padding(
                 padding: EdgeInsets.all(8.0),
-                child: Center(child: Text('There are no reacts on the post')),
+                child: Center(child: Text('No react on the comment')),
               );
             }else {
               return Column(
@@ -63,7 +66,16 @@ class SubCommentAllLikesView extends StatelessWidget {
                                     height: 60,
                                     child: Stack(
                                       children: [
-                                        CircleAvatar(
+                                       snapshot.data![index].photoUrl!.isEmpty ?
+                                    Container(
+                                    height: 6.h,
+                                        width: 6.h,
+                                        decoration: BoxDecoration(
+                                            shape: BoxShape.circle,
+                                            border: Border.all(width: 2, color: appGreenColor),
+                                            image: const DecorationImage(
+                                                image: AssetImage(AppAssets.LOGO_NEW), fit: BoxFit.fill)),)
+                                           : CircleAvatar(
                                           radius: 26,
                                           backgroundImage: NetworkImage(
                                               snapshot.data![index].photoUrl!),

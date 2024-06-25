@@ -83,7 +83,7 @@ class FullScreenImage extends StatelessWidget {
                         pushNewScreen(context, screen: PostAllLikesView(postId: newsFeedModel.id!,));
                       },
                       child: SvgPicture.asset(
-                        AppImage.multiplelike,
+                        AppImage.like1,
                         height: 23,
                       ),
                     ),

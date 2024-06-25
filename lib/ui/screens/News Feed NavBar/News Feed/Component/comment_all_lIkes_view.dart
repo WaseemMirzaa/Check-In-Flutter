@@ -8,6 +8,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:nb_utils/nb_utils.dart';
+import 'package:sizer/sizer.dart';
+
+import '../../../../../core/constant/app_assets.dart';
+import '../../../../../utils/colors.dart';
 
 class CommentAllLikesView extends StatelessWidget {
   CommentAllLikesView({super.key, required this.postId, required this.commentId,});
@@ -41,7 +45,7 @@ class CommentAllLikesView extends StatelessWidget {
             }else if(!snapshot.hasData){
               return const Padding(
                 padding: EdgeInsets.all(8.0),
-                child: Center(child: Text('There are no reacts on the post')),
+                child: Center(child: Text('No react on the comment')),
               );
             }else {
               return Column(
@@ -62,11 +66,19 @@ class CommentAllLikesView extends StatelessWidget {
                                     height: 60,
                                     child: Stack(
                                       children: [
-                                        CircleAvatar(
-                                          radius: 26,
-                                          backgroundImage: NetworkImage(
-                                              snapshot.data![index].photoUrl!),
-                                        ),
+                                    snapshot.data![index].photoUrl!.isEmpty ?
+                                    Container(
+                                    height: 6.h,
+                                      width: 6.h,
+                                      decoration: BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          border: Border.all(width: 2, color: appGreenColor),
+                                          image: const DecorationImage(
+                                              image: AssetImage(AppAssets.LOGO_NEW), fit: BoxFit.fill)),)
+                                    : CircleAvatar(
+                                radius: 26,
+                                backgroundImage: NetworkImage(
+                                    snapshot.data![index].photoUrl!)),
                                         Positioned(
                                           bottom: 1,
                                           right: 1,

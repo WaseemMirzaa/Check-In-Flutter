@@ -48,8 +48,6 @@ class UserService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance; bool tapped = false;
 
 
-
-
   Stream<List<UserModel>> get users {
     return _firestore.collection(Collections.USER).snapshots().map((snapshot) {
       return snapshot.docs
@@ -654,7 +652,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               return Center(child: Text(TempLanguage.noPostFound));
                             } else {
                               return ListView.builder(
-                // controller: _scrollController,
                                 physics: const NeverScrollableScrollPhysics(),
                                 shrinkWrap: true,
                                 itemCount: controller.myPosts.length + (controller.isLoadingMore ? 1 : 0),

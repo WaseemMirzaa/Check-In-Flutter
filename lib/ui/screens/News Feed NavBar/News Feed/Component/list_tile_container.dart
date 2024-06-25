@@ -137,7 +137,7 @@ class ListTileContainer extends GetView<NewsFeedController> {
              PopupMenuItem<String>(
               value: data!.userId == userController.userModel.value.uid ? 'Delete' : 'Hide',
               child: ListTile(
-                leading: const Icon(Icons.delete),
+                leading: Icon(data!.userId == userController.userModel.value.uid ? Icons.delete : Icons.visibility_off),
                 title: Text(data!.userId == userController.userModel.value.uid ? 'Delete' : 'Hide'),
               ),
             ),
@@ -330,7 +330,6 @@ class ListTileContainer extends GetView<NewsFeedController> {
                             onTap: () async{
                               if(addCommentController.text.isEmptyOrNull){
                                 toast('The field is empty');
-
                               }else {
                                 final comment = await newsFeedController.addCommentOnPost(data!.id!, newsFeedController.commentModel.value);
                                 if(comment){
@@ -383,10 +382,10 @@ class ListTileContainer extends GetView<NewsFeedController> {
                                 endIndent: 20.w,
                               ),
                               verticalGap(10),
-                              GestureDetector(
+                              snapshot.data!.isEmpty ? const SizedBox() : GestureDetector(
                                   onTap: () {
                                     pushNewScreen(context,
-                                        screen: AllCommentsScreen(docId:snapshot.data!.first.postId!));
+                                        screen: AllCommentsScreen(docId:snapshot.data?.first.postId ?? '',newsFeedModel: data!,));
                                   },
                                   child: poppinsText('Show more', 15, bold, appGreenColor))
                             ],
