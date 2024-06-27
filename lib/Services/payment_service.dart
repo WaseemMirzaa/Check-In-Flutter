@@ -11,6 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:nb_utils/nb_utils.dart';
 
+import '../utils/custom/own_dialog_custom.dart';
 import 'dio_config.dart';
 
 class PaymentService {
@@ -75,7 +76,7 @@ class PaymentService {
         );
         await Stripe.instance.presentPaymentSheet();
 
-        showConfirmDialogCustom(
+        ownShowConfirmDialogCustom(
           context,
           barrierDismissible: false,
           cancelable: false,
@@ -86,10 +87,6 @@ class PaymentService {
             Navigator.pop(ctx);
             Navigator.pop(context);
           },
-          onCancel: (ctx){
-            Navigator.pop(ctx);
-            Navigator.pop(context);
-          }
         );
 
         await FirebaseFirestore.instance.collection(Collections.USER).doc(FirebaseAuth.instance.currentUser?.uid ?? '')

@@ -96,9 +96,9 @@ class _MessageListTileState extends State<MessageListTile> {
                         builder: (_, snap){
                           if(snap.hasData && snap.data != null) {
                             return SizedBox(
-                              width: 50.w,
+                              width: 45.w,
                               child: poppinsText(
-                                snap.data ?? '',
+                                (snap.data ?? '').contains('https://') ? 'Photo' : (snap.data ?? ''),
                                 12,
                                 medium,
                                 appBlackColor.withOpacity(0.65),

@@ -1,8 +1,11 @@
 
 
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
 
 var courtsList = [
   'pexels-king-siberia-2277981',
@@ -111,4 +114,32 @@ Timestamp? convertDateToTimeStamp(String date) {
    DateTime dateTime = DateTime.parse(date);
   Timestamp firebaseTimestamp = Timestamp.fromDate(dateTime);
   return firebaseTimestamp;
+}
+
+Future<File> compressImage(XFile fileImage, {int quality = 50, int height = 500, int width = 500}) async {
+  // final lastIndex = fileImage.value!.path.lastIndexOf(RegExp(r'.'));
+  // final splitted = fileImage.value!.path.substring(0, (lastIndex));
+  // thumbnailPath = "${fileImage!.path}_thumbnail";
+  String originalPath = "${fileImage!.path}_original";
+  FlutterImageCompress.validator.ignoreCheckExtName = true;
+  // print('thumbnailpath =$thumbnailPath');
+//............. for thumbnail
+//   await FlutterImageCompress.compressAndGetFile(
+//     fileImage!.path,
+//     thumbnailPath,
+//     quality: 20,
+//     minHeight: 300,
+//     minWidth: 300,
+//   );
+//............. for original image
+  await FlutterImageCompress.compressAndGetFile(
+    fileImage!.path,
+    originalPath,
+    quality: quality,
+    minHeight: height,
+    minWidth: width,
+  );
+
+  return File(originalPath);
+
 }

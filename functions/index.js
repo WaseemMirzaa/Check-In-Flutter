@@ -9,53 +9,44 @@ const stripe = require("stripe")("sk_live_51P9IBQRwQJgokiPYmjlW82NIBc3oO5RxmRYnL
 // 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
 
 
-exports.deleteLastCheckedIn = functions.pubsub.schedule("every 60 minutes")
-    .onRun((context) => {
-      const currentTime = new Date();
+exports.deleteLastCheckedIn = functions.pubsub.schedule("every 60 minutes").onRun((context) => {
+    const currentTime = new Date();
 
-      firestore.collection("USER").get()
-          .then((querySnapshot) => {
+    return firestore.collection("USER").get()  // Added 'return' here
+        .then((querySnapshot) => {
             const batch = firestore.batch();
 
             querySnapshot.forEach((doc) => {
-              const lastCheckin = doc.get("lastCheckin");
-              // console.log("lastCheckin:" + lastCheckin);
-              // console.log("checkedIn:" + doc.get("checkedIn"));
+                const lastCheckin = doc.get("lastCheckin");
 
-              if (lastCheckin) {
-                const lastCheckedInTime = lastCheckin.toDate();
-                // console.log("lastCheckedInTime:" + lastCheckedInTime);
+                if (lastCheckin) {
+                    const lastCheckedInTime = lastCheckin.toDate();
+                    const hoursSinceLastCheckedIn = Math.abs(currentTime - lastCheckedInTime) / (1000 * 60 * 60);
 
-                const hoursSinceLastCheckedIn = Math.abs(currentTime -
-              lastCheckedInTime) / (1000 * 60 * 60);
+                    if (hoursSinceLastCheckedIn >= 3) {
+                        console.log("CheckedOut email:" + doc.get("email"));
 
+                        // Delete the lastCheckedIn field
+                        batch.update(doc.ref, { lastCheckin: admin.firestore.FieldValue.delete() });
 
-                // console.log("hoursSinceLastCheckedIn:" + hoursSinceLastCheckedIn);
-
-                if (hoursSinceLastCheckedIn >= 3) {
-                  console.log("CheckedOut email:" + doc.get("email"));
-
-                  // Delete the lastCheckedIn field
-                  batch.update(doc.ref,
-                      {lastCheckin: admin.firestore.FieldValue.delete()});
-
-                  // Set the checkedIn field to false
-                  batch.update(doc.ref, {checkedIn: false});
+                        // Set the checkedIn field to false
+                        batch.update(doc.ref, { checkedIn: false });
+                    }
                 }
-              }
             });
 
             // Commit the batch
             return batch.commit();
-          })
-          .then(() => {
+        })
+        .then(() => {
             console.log("Function successfully ran!");
             return null;
-          })
-          .catch((error) => {
+        })
+        .catch((error) => {
             console.error("Error getting documents:", error);
-          });
-    });
+            throw new Error("Error getting documents: " + error);
+        });
+});
 
 
 // Function to create a record in AdditionalLocationsLog collection

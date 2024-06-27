@@ -14,7 +14,7 @@ import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:get/get_navigation/src/root/get_material_app.dart';
 import 'package:nb_utils/nb_utils.dart';
 import 'package:sizer/sizer.dart';
-
+import 'package:firebase_app_check/firebase_app_check.dart';
 import 'firebase_options.dart';
 
 List<Map<String, dynamic>> courtlist = [];
@@ -104,6 +104,7 @@ void main() async {
   Stripe.merchantIdentifier = 'merchant.flutter.stripe.test';
   Stripe.urlScheme = 'flutterstripe';
   await Stripe.instance.applySettings();
+  await FirebaseAppCheck.instance.activate();
 
   // SharedPreferences prefs = await SharedPreferences.getInstance();
   // var email = prefs.getString('email');

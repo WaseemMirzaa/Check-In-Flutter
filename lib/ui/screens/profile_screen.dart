@@ -9,6 +9,7 @@ import 'package:check_in/model/user_modal.dart';
 import 'package:check_in/ui/screens/unique_courts_screen.dart';
 import 'package:check_in/ui/widgets/about_section.dart';
 import 'package:check_in/utils/colors.dart';
+import 'package:check_in/utils/common.dart';
 import 'package:check_in/utils/styles.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -18,6 +19,7 @@ import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:nb_utils/nb_utils.dart' as nbutils;
 import 'package:percent_indicator/circular_percent_indicator.dart';
+
 // import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:sizer/sizer.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -96,8 +98,11 @@ Future<int> getGoldenLocationsCount() async {
 class _ProfileScreenState extends State<ProfileScreen> {
   UserController userController = Get.put(UserController());
 
+  bool isUploading = false;
+
   // UserModel userd = UserModel();
   bool isVerified = false;
+
   getUser() async {
     DocumentSnapshot snapshot =
         await FirebaseFirestore.instance.collection(Collections.USER).doc(userController.userModel.value.uid).get();
@@ -113,8 +118,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Future<void> _selectImage() async {
     final pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
+      isUploading = true;
+
+      _imageFile = await compressImage(pickedFile);
+
       setState(() {
-        _imageFile = File(pickedFile.path);
+        // _imageFile = File(pickedFile.path);
+
       });
 
       final storage = FirebaseStorage.instance;
@@ -126,6 +136,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
       final snapshot = await uploadTask.whenComplete(() {});
       final downloadUrl = await snapshot.ref.getDownloadURL();
 
+      isUploading = false;
+
       setState(() {
         _downloadUrl = downloadUrl;
       });
@@ -135,7 +147,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
       await firestore.collection(Collections.USER).doc(userId).update({UserKey.PHOTO_URL: downloadUrl});
       CollectionReference messagesRef = FirebaseFirestore.instance.collection(Collections.MESSAGES);
 
-      QuerySnapshot messagesQuery = await messagesRef.where(MessageField.SENDER_ID, isEqualTo: userController.userModel.value.uid).get();
+      QuerySnapshot messagesQuery =
+          await messagesRef.where(MessageField.SENDER_ID, isEqualTo: userController.userModel.value.uid).get();
 
       // Iterate through the documents and update senderImage field
       messagesQuery.docs.forEach((doc) async {
@@ -144,7 +157,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
           MessageField.SENDER_IMG: downloadUrl,
         });
       });
-      await firestore.collection(Collections.MESSAGES).where(MessageField.SENDER_ID, isEqualTo: userController.userModel.value.uid);
+      await firestore
+          .collection(Collections.MESSAGES)
+          .where(MessageField.SENDER_ID, isEqualTo: userController.userModel.value.uid);
+
+
     }
   }
 
@@ -251,33 +268,46 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     //  clipBehavior: Clip.antiAliasWithSaveLayer,
                                     alignment: Alignment.bottomCenter,
                                     children: [
-                                      (_downloadUrl != null)
+                                      isUploading
                                           ? Container(
-                                              height: 20.h,
-                                              width: 35.h,
-                                              decoration: BoxDecoration(
-                                                  shape: BoxShape.circle,
-                                                  image: DecorationImage(
-                                                      image: NetworkImage(_downloadUrl as String), fit: BoxFit.fill)))
-                                          : (!userController.userModel.value.photoUrl.isEmptyOrNull)
+                                        height: 20.h,
+                                        width: 35.h,
+                                        decoration: BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          color: Colors.white, // White background
+                                        ),
+                                        child: Center(
+                                          child: CircularProgressIndicator(),
+                                        ),
+                                      )
+                                          : (_downloadUrl != null)
                                               ? Container(
                                                   height: 20.h,
                                                   width: 35.h,
                                                   decoration: BoxDecoration(
                                                       shape: BoxShape.circle,
                                                       image: DecorationImage(
-                                                          image: NetworkImage(
-                                                              userController.userModel.value.photoUrl ?? ""),
+                                                          image: NetworkImage(_downloadUrl as String),
                                                           fit: BoxFit.fill)))
-                                              : Container(
-                                                  height: 20.h,
-                                                  width: 35.h,
-                                                  decoration: BoxDecoration(
-                                                      shape: BoxShape.circle,
-                                                      border: Border.all(width: 2, color: appGreenColor),
-                                                      image: const DecorationImage(
-                                                          image: AssetImage(AppAssets.LOGO_NEW), fit: BoxFit.fill)),
-                                                ),
+                                              : (!userController.userModel.value.photoUrl.isEmptyOrNull)
+                                                  ? Container(
+                                                      height: 20.h,
+                                                      width: 35.h,
+                                                      decoration: BoxDecoration(
+                                                          shape: BoxShape.circle,
+                                                          image: DecorationImage(
+                                                              image: NetworkImage(
+                                                                  userController.userModel.value.photoUrl ?? ""),
+                                                              fit: BoxFit.fill)))
+                                                  : Container(
+                                                      height: 20.h,
+                                                      width: 35.h,
+                                                      decoration: BoxDecoration(
+                                                          shape: BoxShape.circle,
+                                                          border: Border.all(width: 2, color: appGreenColor),
+                                                          image: const DecorationImage(
+                                                              image: AssetImage(AppAssets.LOGO_NEW), fit: BoxFit.fill)),
+                                                    ),
                                       if (userController.userModel.value.isVerified == null ||
                                           userController.userModel.value.isVerified == true)
                                         Align(
@@ -287,7 +317,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                             width: 12.1.w,
                                             decoration: const BoxDecoration(
                                                 shape: BoxShape.circle,
-                                                image: DecorationImage(image: AssetImage(AppAssets.INSTAGRAM_VERIFICATION))),
+                                                image: DecorationImage(
+                                                    image: AssetImage(AppAssets.INSTAGRAM_VERIFICATION))),
                                           ),
                                         )
                                       else
@@ -343,7 +374,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                               lineWidth: 8.0,
                                               animation: true,
                                               percent:
-                                              ((snapshot.data?.length ?? 0) / (totalCount ?? 10)).clamp(0.0, 1.0),
+                                                  ((snapshot.data?.length ?? 0) / (totalCount ?? 10)).clamp(0.0, 1.0),
                                               center: Text(
                                                 "${snapshot.data?.length ?? 0}\nCheck ins",
                                                 textAlign: TextAlign.center,
