@@ -1,15 +1,24 @@
-import 'package:check_in/auth_service.dart';
+import 'package:check_in/Services/newfeed_service.dart';
+import 'package:check_in/controllers/News%20Feed/news_feed_controller.dart';
 import 'package:check_in/core/constant/app_assets.dart';
 import 'package:check_in/core/constant/constant.dart';
 import 'package:check_in/core/constant/temp_language.dart';
 import 'package:check_in/model/user_modal.dart';
+import 'package:check_in/ui/screens/News%20Feed%20NavBar/News%20Feed/Component/list_tile_container.dart';
+import 'package:check_in/ui/screens/add_home_court.dart';
+import 'package:check_in/ui/screens/profile_screen.dart';
 import 'package:check_in/utils/colors.dart';
-import 'package:check_in/utils/gaps.dart';
 import 'package:check_in/utils/styles.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:nb_utils/nb_utils.dart';
+import 'package:percent_indicator/percent_indicator.dart';
+import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
 import 'package:sizer/sizer.dart';
+
+import '../../News Feed NavBar/News Feed/Component/shared_post_comp.dart';
 
 
 class OtherProfileView extends StatefulWidget {
@@ -38,6 +47,30 @@ class _OtherProfileViewState extends State<OtherProfileView> {
       }
     });
   }
+  final ScrollController _scrollController = ScrollController();
+
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _scrollController.addListener(_onScroll);
+    controller.getUserPosts(widget.uid);
+  }
+  void _onScroll() {
+    if (_scrollController.position.pixels == _scrollController.position.maxScrollExtent) {
+      controller.fetchMoreUserPosts(widget.uid);
+    }
+  }
+  final controller = Get.put(NewsFeedController(NewsFeedService()));
+
+  @override
+  void dispose() {
+    super.dispose();
+    _scrollController.dispose();
+    controller.clearUserPosts();
+
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -52,7 +85,7 @@ class _OtherProfileViewState extends State<OtherProfileView> {
               height: 2.1.h,
               width: 2.9.w,
               child: Material(
-                  color: transparentColor,
+                  color: appTransparentColor,
                   child: InkWell(
                       onTap: () {
                         Navigator.pop(context);
@@ -66,156 +99,323 @@ class _OtherProfileViewState extends State<OtherProfileView> {
         backgroundColor: appWhiteColor,
         title: poppinsText(TempLanguage.profile, 20, FontWeight.bold, appBlackColor),
       ),
-      body: StreamBuilder<UserModel>(
-        stream: getProfile(widget.uid),
-        builder: (context, snapshot) {
-          if(snapshot.connectionState == ConnectionState.waiting){
-            return const Column(crossAxisAlignment: CrossAxisAlignment.center,mainAxisAlignment: MainAxisAlignment.center,children: [
-              Center(child: CircularProgressIndicator()),
-            ],);
-          }else if(snapshot.hasError){
-            return Text(snapshot.error.toString());
-          }else {
-            final userItems = snapshot.data!;
-            return Column(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Expanded(
-                  flex: 4,
-                  child: Column(
-                    children: [
-                      verticalGap(3.h),
-                      SizedBox(
-                        width: 35.9.w,
-                        child: Stack(
-                          alignment: Alignment.bottomCenter,
+      body:  SingleChildScrollView(
+        controller: _scrollController,
+        child: StreamBuilder<UserModel>(
+          stream: getProfile(widget.uid),
+          builder: (context, snapshot) {
+            if(snapshot.connectionState == ConnectionState.waiting){
+              return const Column(crossAxisAlignment: CrossAxisAlignment.center,mainAxisAlignment: MainAxisAlignment.center,children: [
+                Center(child: CircularProgressIndicator()),
+              ],);
+            }else if(snapshot.hasError){
+              return Text(snapshot.error.toString());
+            }else {
+              final userItems = snapshot.data!;
+              return Column(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                        Column(
                           children: [
-                            Container(
-                              height: 15.h,
+                            SizedBox(
                               width: 32.9.w,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                border: userItems.photoUrl == ""
-                                    ? Border.all(
-                                    width: 2, color: appGreenColor)
-                                    : null,
-                                image: userItems.photoUrl != ""
-                                    ? DecorationImage(
-                                    fit: BoxFit.fill,
-                                    image:
-                                    // AssetImage(
-                                    //     "assets/images/Mask Group 1.png")
-                                    NetworkImage(
-                                      userItems.photoUrl!,
-                                    ))
-                                    : const DecorationImage(
-                                    fit: BoxFit.fill,
-                                    image: AssetImage(
-                                      AppAssets.LOGO_NEW,
-                                    )),
+                              //   padding: EdgeInsets.all(10),
+                              child: Stack(
+                                //  clipBehavior: Clip.antiAliasWithSaveLayer,
+                                alignment: Alignment.bottomCenter,
+                                children: [
+                                   (snapshot.data!.photoUrl!.isEmptyOrNull)
+                                      ? Container(
+                                     height: 20.h,
+                                     width: 35.h,
+                                     decoration: BoxDecoration(
+                                         shape: BoxShape.circle,
+                                         border: Border.all(width: 2, color: appGreenColor),
+                                         image: const DecorationImage(
+                                             image: AssetImage(AppAssets.LOGO_NEW), fit: BoxFit.fill)),
+                                   )
+                                      :  Container(
+                                      height: 20.h,
+                                      width: 35.h,
+                                      decoration: BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          image: DecorationImage(
+                                              image: NetworkImage(
+                                                  snapshot.data!.photoUrl ?? ""),
+                                              fit: BoxFit.fill))),
+                                  if (snapshot.data!.isVerified == null ||
+                                      snapshot.data!.isVerified == true)
+                                    Align(
+                                      alignment: Alignment.bottomRight,
+                                      child: Container(
+                                        height: 5.5.h,
+                                        width: 12.1.w,
+                                        decoration: const BoxDecoration(
+                                            shape: BoxShape.circle,
+                                            image: DecorationImage(
+                                                image: AssetImage(AppAssets.INSTAGRAM_VERIFICATION))),
+                                      ),
+                                    )
+                                  else
+                                    const SizedBox(),
+                                ],
                               ),
                             ),
-                            userItems.isVerified == false
-                                ? const SizedBox()
-                                : Align(
-                              alignment: Alignment.bottomRight,
-                              child: Container(
-                                height: 5.5.h,
-                                width: 12.1.w,
-                                decoration: const BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    image: DecorationImage(
-                                        image: AssetImage(
-                                            AppAssets
-                                                .INSTAGRAM_VERIFICATION))),
-                              ),
+                            poppinsText(
+                              // FirebaseAuth.instance.currentUser?.displayName
+                              //     as String,
+                                snapshot.data!.userName ?? "",
+                                32,
+                                FontWeight.bold,
+                                appBlackColor),
+                            // poppinsText(
+                            //     "@${userController.userModel.value.email.substring(0, userController.userModel.value.email.indexOf('@'))}",
+                            //     12,
+                            //     FontWeight.normal,
+                            //     blackColor),
+
+                            poppinsText(
+                              // FirebaseAuth.instance.currentUser?.displayName
+                              //     as String,
+                                snapshot.data!.email ?? "",
+                                12,
+                                FontWeight.normal,
+                                appBlackColor),
+                            // poppinsText(
+                            //     "@${userController.userModel.value.email.substring(0, userController.userModel.value.email.indexOf('@'))}",
+                            //     12,
+                            //     FontWeight.normal,
+                            //     blackColor),
+                            const SizedBox(
+                              height: 10,
                             ),
-                          ],
-                        ),
-                      ),
-                      verticalGap(0.5.h),
-                      poppinsText(
-                          userItems.userName!, 32, FontWeight.bold,
-                          appBlackColor),
-                      poppinsText(
-                          "@${userItems.email!.substring(0, userItems.email!
-                              .indexOf('@'))}",
-                          12,
-                          FontWeight.normal,
-                          appBlackColor),
-                    ],
-                  ),
-                ),
-                Expanded(
-                  flex: 2,
-                  child: Column(
-                    children: [
-                      Container(
-                        padding:
-                        const EdgeInsets.only(
-                            left: 30, right: 30, top: 30),
-                        height: 200,
-                        decoration: BoxDecoration(
-                          color: appWhiteColor,
-                          borderRadius: const BorderRadius.only(
-                              topLeft: Radius.circular(10),
-                              topRight: Radius.circular(10)),
-                          boxShadow: [
-                            BoxShadow(
-                              color: greyColor.withOpacity(0.2),
-                              blurRadius: 1,
-                              //   spreadRadius: -12,
-                              offset: const Offset(
-                                  0, -3), // changes position of shadow
-                            ),
-                          ],
-                        ),
-                        child: Column(
-                          children: [
+
                             Row(
-                              mainAxisAlignment: MainAxisAlignment
-                                  .spaceBetween,
+                              mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                poppinsText(
-                                    TempLanguage.aboutMe, 14, semiBold,
-                                    appBlackColor),
+                                Container(
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    border: Border.all(
+                                      color: offWhiteColor,
+                                      width: 8.0,
+                                    ),
+                                  ),
+                                  child: FutureBuilder<List<UserModel>?>(
+                                    future: getUniqueCourtNameMaps(),
+                                    builder: (context, snapshot) {
+                                      if (snapshot.connectionState == ConnectionState.waiting) {
+                                        return const SizedBox(
+                                            height: 110,
+                                            width: 110,
+                                            child: Center(child: CircularProgressIndicator()));
+                                      } else if (snapshot.hasData && snapshot.data != null) {
+                                        return CircularPercentIndicator(
+                                          radius: 55.0,
+                                          lineWidth: 8.0,
+                                          animation: true,
+                                          percent:
+                                          ((snapshot.data?.length ?? 0) / (totalCount ?? 10)).clamp(0.0, 1.0),
+                                          center: Text(
+                                            "${snapshot.data?.length ?? 0}\nCheck ins",
+                                            textAlign: TextAlign.center,
+                                            style: const TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 18.0,
+                                            ),
+                                          ),
+                                          circularStrokeCap: CircularStrokeCap.round,
+                                          progressColor: darkYellowColor,
+                                        );
+                                      } else if (snapshot.hasError) {
+                                        return Center(
+                                          child: Text(TempLanguage.wentWrong),
+                                        );
+                                      } else {
+                                        return CircularPercentIndicator(
+                                          radius: 55.0,
+                                          lineWidth: 8.0,
+                                          animation: true,
+                                          percent: (0 / (totalCount ?? 10)).clamp(0.0, 1.0),
+                                          center: const Text(
+                                            "0\nCheck ins",
+                                            textAlign: TextAlign.center,
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 18.0,
+                                            ),
+                                          ),
+                                          circularStrokeCap: CircularStrokeCap.round,
+                                          progressColor: darkYellowColor,
+                                        );
+                                      }
+                                    },
+                                  ),
+                                ),
+                                const SizedBox(
+                                  width: 15,
+                                ),
+                                Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    poppinsText("Golden", 22, FontWeight.bold, appBlackColor),
+                                    poppinsText("Courts", 22, FontWeight.bold, appBlackColor),
+                                    FutureBuilder<List<UserModel>?>(
+                                      future: getUniqueCourtNameMaps(),
+                                      builder: (context, snapshot) {
+                                        if (snapshot.connectionState == ConnectionState.waiting) {
+                                          // return const Center(child: CircularProgressIndicator());
+                                          return const Center(child: CircularProgressIndicator());
+                                        } else if (snapshot.hasData && snapshot.data != null) {
+                                          return poppinsText("${snapshot.data?.length ?? 0} Check ins", 12,
+                                              FontWeight.normal, appBlackColor);
+                                        } else if (snapshot.hasError) {
+                                          return Center(
+                                            child: Text(TempLanguage.wentWrong),
+                                          );
+                                        } else {
+                                          return poppinsText("0 Check ins", 12, FontWeight.normal, appBlackColor);
+                                        }
+                                      },
+                                    ),
+                                  ],
+                                ),
                               ],
                             ),
-                            TextFormField(
-                              maxLines: 4,
-                              decoration: InputDecoration(
-                                  border: InputBorder.none,
-                                  enabledBorder: InputBorder.none,
-                                  disabledBorder: InputBorder.none,
-                                  errorBorder: InputBorder.none,
-                                  focusedBorder: InputBorder.none,
-                                  focusedErrorBorder: InputBorder.none,
-                                  enabled: false,
-                                  hintText: userItems.aboutMe! == ""
-                                      ? ""
-                                      : userItems.aboutMe!,
-                                  helperStyle: GoogleFonts.poppins(
-                                      fontSize: 14,
-                                      fontWeight: regular,
-                                      color: textColor)),
-                            ),
-                            Spacer(),
-                            Container(
-                              height: 1,
-                              color: greyColor,
-                            )
                           ],
                         ),
-                      ),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 12),
+                          child: Stack(
+                            clipBehavior: Clip.none,
+                            alignment: Alignment.topCenter,
+                            children: [
+                              Container(
+                                width: 100.w,
+                                padding: const EdgeInsets.symmetric(horizontal: 15,vertical: 12),
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(8),
+                                    color: appGreyColor1),
+                                child: Text(snapshot.data!.aboutMe.toString(),style: GoogleFonts.poppins(fontSize: 14, fontWeight: regular, color: silverColor),)
+                              ),
 
-                    ],
-                  ),
-                ),
-              ],
-            );
+                              Positioned(
+                                  top: -10,
+
+                                  child: Center(
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 12,vertical: 3),
+                                      decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.circular(30),
+                                          color: appGreenColor),
+                                      child: poppinsText('About', 12, FontWeight.w400, appWhiteColor),),
+                                  ))
+                            ],
+                          ),
+                        ),
+
+                        const SizedBox(height: 25,),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 12),
+                          child: Stack(
+                            clipBehavior: Clip.none,
+                            alignment: Alignment.topCenter,
+                            children: [
+                              Container(
+                                width: 100.w,
+                                padding: const EdgeInsets.symmetric(horizontal: 12,vertical: 10),
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(8),
+                                    color: appGreyColor1),child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  poppinsText(snapshot.data!.homeCourt.isEmptyOrNull
+                                      ? ''
+                                      : snapshot.data!.homeCourt ?? '', 14,FontWeight.w500, silverColor),
+                                  Align(
+                                    alignment: Alignment.centerRight,
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(5.0),
+                                      child: InkWell(
+                                        onTap: () {
+                                          pushNewScreen(context, screen:  const AddHomeCourt(), withNavBar: false);
+                                        },
+                                        child: SizedBox(
+                                          height: 2.3.h,
+                                          width: 4.47.w,
+                                          child: Image.asset(AppAssets.MAP_PIN),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),),
+
+                              Positioned(
+                                  top: -10,
+                                  child: Center(
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 12,vertical: 3),
+                                      decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.circular(20),
+                                          color: appGreenColor),
+                                      child: poppinsText('Home Court', 12, FontWeight.w400, appWhiteColor),),
+                                  ))
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 10,),
+                        Center(child: Container(
+                          width: 80,
+                          padding: const EdgeInsets.symmetric(horizontal: 10,vertical: 4,),decoration: BoxDecoration(color: appGreyColor1,borderRadius: BorderRadius.circular(30)),child: Center(child: poppinsText('His Posts', 12, FontWeight.normal, appBlackColor )),),),
+                        const SizedBox(height: 10,),
+                        Obx(() {
+                          if (controller.userPosts.isEmpty) {
+                            return Center(child: Text(TempLanguage.noPostFound));
+                          } else {
+                            return ListView.builder(
+                              physics: const NeverScrollableScrollPhysics(),
+                              shrinkWrap: true,
+                              itemCount: controller.userPosts.length + (controller.isUserPostMore ? 1 : 0),
+                              itemBuilder: (context, index) {
+                                if (index == controller.userPosts.length) {
+                                  return const Center(child: CircularProgressIndicator());
+                                }
+                                print("Length ${controller.userPosts.length}");
+
+                                var data = controller.userPosts[index];
+                                return data.isOriginal!
+                                    ? ListTileContainer(
+                                  isOtherProfile: true,
+                                  key: ValueKey(data.id),
+                                  data: data,
+                                )
+                                    : SharedPostComp(
+                                  isOtherProfile: true,
+                                  key: ValueKey(data.id),
+                                  data: data,
+                                );
+                              },
+                            );
+                          }
+                        }),
+
+                        controller.userPostLoader.value ? const Center(
+                          key: ValueKey('Loader'),
+                          child: CircularProgressIndicator(),) : const SizedBox(key: ValueKey('Empty'),),
+
+                        SizedBox(height: 2.h,)
+
+                ],
+              );
+            }
           }
-        }
+        ),
       ),
     );
   }

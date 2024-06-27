@@ -13,7 +13,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:get/get.dart';
-import 'package:get/get_rx/get_rx.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:chewie/chewie.dart';
 import 'package:video_player/video_player.dart';
@@ -86,6 +85,42 @@ class NewsFeedController extends GetxController {
     });
   }
 
+
+  final _userPosts = <NewsFeedModel>[].obs;
+  DocumentSnapshot? userLastDoc;
+  final userPostLoader = false.obs;
+
+  List<NewsFeedModel> get userPosts => _userPosts;
+  bool get isUserPostMore => userPostLoader.value;
+
+  void getUserPosts(String userId) {
+    newsFeedService.getMyPosts(userId).listen((postList) {
+      if (postList.isNotEmpty) {
+        userLastDoc = postList.last['snapshot'] as DocumentSnapshot;
+        print("User do is: ${userLastDoc!.id}");
+      }
+      _userPosts.assignAll(postList.map((e) => e['model'] as NewsFeedModel).toList());
+    });
+  }
+
+  void fetchMoreUserPosts(String userId) async {
+    print("Fetching more posts for user: $userId");
+    if (userLastDoc == null || userPostLoader.value) return;
+    userPostLoader.value = true;
+    newsFeedService.getMyPosts(userId, startAfter: userLastDoc).listen((postList) {
+      if (postList.isNotEmpty) {
+        userLastDoc = postList.last['snapshot'] as DocumentSnapshot;
+        _userPosts.addAll(postList.map((e) => e['model'] as NewsFeedModel).toList());
+      }
+      userPostLoader.value = false;
+    });
+  }
+  void clearUserPosts() {
+    _userPosts.clear();
+    userLastDoc = null;
+    userPostLoader.value = false;
+  }
+
   void clearNewsFeeds() {
     _newsFeed.clear();
     lastPostDoc = null;
@@ -112,7 +147,7 @@ class NewsFeedController extends GetxController {
   void getMyPosts() {
     newsFeedService.getMyPosts(FirebaseAuth.instance.currentUser?.uid ?? '').listen((postList) {
       if (postList.isNotEmpty) {
-        lastDocument = postList.last['snapshot'] as DocumentSnapshot;
+        userLastDoc = postList.last['snapshot'] as DocumentSnapshot;
       }
       _myPosts.assignAll(postList.map((e) => e['model'] as NewsFeedModel).toList());
     });
@@ -120,11 +155,11 @@ class NewsFeedController extends GetxController {
 
   void fetchMoreMyPosts() async {
     print("Hello  ++++++++++++++++++++++++  ");
-    if (lastDocument == null || myPostLoader.value) return;
+    if (userLastDoc == null || myPostLoader.value) return;
     myPostLoader.value = true;
-    newsFeedService.getMyPosts(FirebaseAuth.instance.currentUser?.uid ?? '', startAfter: lastDocument).listen((postList) {
+    newsFeedService.getMyPosts(FirebaseAuth.instance.currentUser?.uid ?? '', startAfter: userLastDoc).listen((postList) {
       if (postList.isNotEmpty) {
-        lastDocument = postList.last['snapshot'] as DocumentSnapshot;
+        userLastDoc = postList.last['snapshot'] as DocumentSnapshot;
         _myPosts.addAll(postList.map((e) => e['model'] as NewsFeedModel).toList());
       }
       myPostLoader.value = false;
@@ -132,7 +167,7 @@ class NewsFeedController extends GetxController {
   }
   void clearMyPosts() {
     _myPosts.clear();
-    lastDocument = null;
+    userLastDoc = null;
     myPostLoader.value = false;
   }
 
@@ -167,8 +202,6 @@ class NewsFeedController extends GetxController {
     feedsModel.shareImage = userController.userModel.value.photoUrl;
     feedsModel.sharePostID = feedsModel.id;
     feedsModel.timestamp = Timestamp.now();
-    feedsModel.shareTimestamp = Timestamp.now();
-    print("Shared-------${feedsModel.shareTimestamp}");
     return await newsFeedService.sharePost(feedsModel);
   }
 

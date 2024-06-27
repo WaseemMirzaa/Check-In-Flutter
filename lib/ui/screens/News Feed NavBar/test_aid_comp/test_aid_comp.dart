@@ -14,27 +14,6 @@ class _NativeTestAds extends State<NativeTestAds> {
   bool _nativeAdIsLoaded = false;
 
   @override
-  Widget build(BuildContext context) =>  Center(
-        child: Align(
-                  alignment: Alignment.center,
-                  child: CustomContainer1(
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(12),
-                      child: ConstrainedBox(
-                        constraints: const BoxConstraints(
-                          minWidth: 300,
-                          minHeight: 350,
-                          maxHeight: 400,
-                          maxWidth: 450,
-                          
-                        ),
-                        child:_nativeAd == null ? const SizedBox() :  AdWidget(ad: _nativeAd!),
-                      ),
-                    ),
-                  )),
-      );
-
-  @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     // Create the ad objects and load ads.
@@ -43,17 +22,17 @@ class _NativeTestAds extends State<NativeTestAds> {
       request: const AdRequest(),
       listener: NativeAdListener(
         onAdLoaded: (Ad ad) {
-          print('$NativeAd loaded.');
+          print('NativeAd loaded.');
           setState(() {
             _nativeAdIsLoaded = true;
           });
         },
         onAdFailedToLoad: (Ad ad, LoadAdError error) {
-          print('$NativeAd failedToLoad: $error');
+          print('NativeAd failedToLoad: $error');
           ad.dispose();
         },
-        onAdOpened: (Ad ad) => print('$NativeAd onAdOpened.'),
-        onAdClosed: (Ad ad) => print('$NativeAd onAdClosed.'),
+        onAdOpened: (Ad ad) => print('NativeAd onAdOpened.'),
+        onAdClosed: (Ad ad) => print('NativeAd onAdClosed.'),
       ),
       nativeTemplateStyle: NativeTemplateStyle(
         templateType: TemplateType.medium,
@@ -71,7 +50,32 @@ class _NativeTestAds extends State<NativeTestAds> {
 
   @override
   void dispose() {
-    super.dispose();
     _nativeAd?.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Align(
+        alignment: Alignment.center,
+        child: _nativeAdIsLoaded ? CustomContainer1(
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(12),
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(
+                minWidth: 300,
+                minHeight: 350,
+                maxHeight: 400,
+                maxWidth: 450,
+              ),
+              child: _nativeAdIsLoaded
+                  ? AdWidget(ad: _nativeAd!)
+                  : const SizedBox.shrink(), // Show loading indicator while ad is loading
+            ),
+          ),
+        ) : const SizedBox.shrink(),
+      ),
+    );
   }
 }

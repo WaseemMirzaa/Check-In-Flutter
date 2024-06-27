@@ -35,8 +35,9 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../auth_service.dart';
 
 class ProfileScreen extends StatefulWidget {
-  ProfileScreen({Key? key,this.isNavBar = true}) : super(key: key);
+  ProfileScreen({Key? key,this.isNavBar = true, this.isOther = false}) : super(key: key);
   bool isNavBar;
+  bool isOther;
 
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();
@@ -204,6 +205,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     super.initState();
     _scrollController.addListener(_onScroll);
+    controller.getMyPosts();
+
   }
 
   sendEmail(String name, String email, String homeCourt) async {
@@ -257,12 +260,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   void dispose() {
-    _scrollController.dispose();
     super.dispose();
+    _scrollController.dispose();
+    controller.clearMyPosts();
   }
 
   @override
   Widget build(BuildContext context) {
+    aboutMeController.text = userController.userModel.value.aboutMe ?? '';
     // return GetBuilder<UserController>(builder: (userController) {
     return Scaffold(
       appBar: AppBar(
@@ -276,7 +281,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         title: poppinsText(TempLanguage.profile, 20, FontWeight.bold, appBlackColor),
       ),
       body: SizedBox(
-          height: MediaQuery.of(context).size.height * 0.8,
+          height: MediaQuery.of(context).size.height,
           child: !userController.userModel.value.uid.isEmptyOrNull
                   ? SingleChildScrollView(
             controller: _scrollController,
@@ -565,7 +570,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                         tapped = !tapped;
                                       }),
                                       child: Padding(
-                                          padding: const EdgeInsets.all( 8),
+                                          padding: const EdgeInsets.all( 4),
                                           child: tapped
                                               ? poppinsText(TempLanguage.save, 14, semiBold, appGreenColor)
                                               : const ImageIcon(
@@ -662,10 +667,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   var data = controller.myPosts[index];
                                   return data.isOriginal!
                                       ? ListTileContainer(
+                                    isMyProfile: true,
                                     key: ValueKey(data.id),
                                     data: data,
                                   )
                       : SharedPostComp(
+                                    isMyProfile: true,
+                    isOtherProfile: widget.isOther,
                     key: ValueKey(data.id),
                     data: data,
                   );

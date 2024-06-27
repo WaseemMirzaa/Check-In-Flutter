@@ -4,6 +4,7 @@ import 'package:check_in/core/constant/constant.dart';
 import 'package:check_in/model/NewsFeed%20Model/news_feed_model.dart';
 import 'package:check_in/ui/screens/News%20Feed%20NavBar/News%20Feed/Component/list_tile_container.dart';
 import 'package:check_in/ui/screens/News%20Feed%20NavBar/News%20Feed/Component/share_post_comp.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sizer/sizer.dart';
@@ -23,6 +24,7 @@ class SharePostScreen extends StatelessWidget {
     feedController.newsFeedModel.value.noOfLike = 0;
     feedController.newsFeedModel.value.noOfComment = 0;
     feedController.newsFeedModel.value.noOfShared = 0;
+    feedController.newsFeedModel.value.timestamp = Timestamp.now();
     return Scaffold(
       appBar: AppBar(
         title: const Text('Share Post'),

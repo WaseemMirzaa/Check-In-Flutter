@@ -23,7 +23,6 @@ class NewsFeedModel {
   String? shareUID;
   String? sharePostID;
   String? shareText;
-  Timestamp? shareTimestamp;
 
   NewsFeedModel(
       {this.id,
@@ -46,7 +45,6 @@ class NewsFeedModel {
       this.shareID,
       this.sharePostID,
       this.shareText,
-      this.shareTimestamp,
       });
 
   factory NewsFeedModel.fromJson(Map<String, dynamic> json) {
@@ -71,7 +69,6 @@ class NewsFeedModel {
         shareID: json[NewsFeed.SHARE_ID],
         shareText: json[NewsFeed.SHARE_TEXT],
         sharePostID: json[NewsFeed.SHARE_POSTID],
-        shareTimestamp: json[NewsFeed.SHARE_TIMESTAMP],
     );
   }
   Map<String, dynamic> toJson() {
@@ -87,7 +84,7 @@ class NewsFeedModel {
     data[NewsFeed.IS_ORIGINAL] = isOriginal ?? true;
     data[NewsFeed.NO_OF_SHARED] = noOfShared ?? 0;
     data[NewsFeed.POST_URL] = postUrl ?? '';
-    data[NewsFeed.TIME_STAMP] = timestamp ?? '';
+    data[NewsFeed.TIME_STAMP] = timestamp ?? Timestamp.now();
     data[NewsFeed.USER_IMAGE] = userImage ?? '';
     data[NewsFeed.HIDE_USER] = hideUsers ?? [];
     data[NewsFeed.SHARE_ID] = shareID ?? '';
@@ -96,7 +93,6 @@ class NewsFeedModel {
     data[NewsFeed.SHARE_NAME] = shareName ?? '';
     data[NewsFeed.SHARE_IMAGE] = shareImage ?? '';
     data[NewsFeed.SHARE_TEXT] = shareText ?? '';
-    data[NewsFeed.SHARE_TIMESTAMP] = shareTimestamp ?? Timestamp.now();
     return data;
   }
 }

@@ -34,7 +34,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
               height: 2.1.h,
               width: 2.9.w,
               child: Material(
-                  color: transparentColor,
+                  color: appTransparentColor,
                   child: InkWell(
                       onTap: () {
                         Navigator.pop(context);

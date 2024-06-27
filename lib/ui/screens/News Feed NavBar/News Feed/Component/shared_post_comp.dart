@@ -34,7 +34,9 @@ import 'package:video_player/video_player.dart';
 
 class SharedPostComp extends GetView<NewsFeedController> {
   NewsFeedModel? data;
-  SharedPostComp({super.key, this.data});
+  bool isMyProfile;
+  bool isOtherProfile;
+  SharedPostComp({super.key, this.data, this.isMyProfile = false, this.isOtherProfile = false});
 
   NewsFeedController newsFeedController = Get.put(NewsFeedController(NewsFeedService()));
   final addCommentController = TextEditingController();
@@ -54,51 +56,37 @@ class SharedPostComp extends GetView<NewsFeedController> {
               child: Row(
                 children: [
                   GestureDetector(
-                    onTap: (){
+                    onTap: isMyProfile && userController.userModel.value.uid == data!.shareUID ? null : (){
                       if(userController.userModel.value.uid == data!.shareUID){
-                        pushNewScreen(context, screen: ProfileScreen(isNavBar: false,));
+                        isOtherProfile ? Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>ProfileScreen(isNavBar: false,isOther: true,))) : pushNewScreen(context, screen: ProfileScreen(isNavBar: false,));
+                      }else if(isOtherProfile && data!.userId!.isNotEmpty){
+
                       }else{
-                        pushNewScreen(context,
-                                        screen: OtherProfileView(uid: data!.shareUID!));
+                        isOtherProfile ? Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>OtherProfileView(uid: data!.userId!))) : pushNewScreen(context, screen: OtherProfileView(uid: data!.userId!));
+
                       }
-                      
                     },
-                    child: Stack(
-                      children: [
-                        SizedBox(
-                          height: 44,
-                          width: 43,
-                          child: CustomPaint(
-                                  painter: MyPainter(),
-                                  size: const Size(200, 200),
-                                ),
-                              ),
-                              Positioned(
-                                top: 1.5,
-                                left: 1,
-                                child: Container(
+                    child: Container(
                                     height: 40,
                                     width: 40,
                                     decoration: BoxDecoration(
                                         shape: BoxShape.circle,
                                         image: DecorationImage(
                                             image: data!.shareImage == '' ? NetworkImage(AppImage.userImagePath) : NetworkImage(data!.shareImage!),fit: BoxFit.cover))),
-                              )
-                            ],
-                          ),
                   ),
                   
                   horizontalGap(10),
                   Expanded(
                     child:  GestureDetector(
-                    onTap: (){
+                    onTap:isMyProfile && userController.userModel.value.uid == data!.shareUID ? null : (){
                       if(userController.userModel.value.uid == data!.shareUID){
-                        pushNewScreen(context, screen: ProfileScreen(isNavBar: false,));
+                        isOtherProfile ? Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>ProfileScreen(isNavBar: false,isOther: true,))) : pushNewScreen(context, screen: ProfileScreen(isNavBar: false,));
+                      }else if(isOtherProfile && data!.userId!.isNotEmpty){
+
                       }else{
-                        pushNewScreen(context,
-                                        screen: OtherProfileView(uid: data!.shareUID!));
+                        isOtherProfile ? Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>OtherProfileView(uid: data!.userId!))) : pushNewScreen(context, screen: OtherProfileView(uid: data!.userId!));
+
                       }
-                      
                     },
                     child:richText(data!.shareName??'', 'shared a post'),
                     ),
@@ -135,7 +123,7 @@ class SharedPostComp extends GetView<NewsFeedController> {
              PopupMenuItem<String>(
               value: data!.shareUID == userController.userModel.value.uid ? 'Delete' : 'Hide',
               child: ListTile(
-                leading: Icon(data!.userId == userController.userModel.value.uid ? Icons.delete : Icons.visibility_off),
+                leading: Icon(data!.shareUID == userController.userModel.value.uid ? Icons.delete : Icons.visibility_off),
                 title: Text(data!.shareUID == userController.userModel.value.uid ? 'Delete' : 'Hide'),
               ),
             ),
@@ -168,51 +156,36 @@ class SharedPostComp extends GetView<NewsFeedController> {
               child: Row(
                 children: [
                   GestureDetector(
-                    onTap: (){
+                    onTap:  isMyProfile && userController.userModel.value.uid == data!.userId ? null :  (){
                       if(userController.userModel.value.uid == data!.userId){
-                        pushNewScreen(context, screen: ProfileScreen(isNavBar: false,));
-                      }else{
-                        pushNewScreen(context,
-                                        screen: OtherProfileView(uid: data!.userId!));
+                        isOtherProfile ? Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>ProfileScreen(isNavBar: false,isOther: true,))) :  pushNewScreen(context, screen: ProfileScreen(isNavBar: false,));
+                      } else if(isOtherProfile && data!.shareUID!.isNotEmpty){
+
+                      } else{
+                        isOtherProfile ? Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>OtherProfileView(uid: data!.userId!))) : pushNewScreen(context, screen: OtherProfileView(uid: data!.userId!));
                       }
                       
                     },
-                    child: Stack(
-                      children: [
-                        SizedBox(
-                          height: 44,
-                          width: 43,
-                          child: CustomPaint(
-                                  painter: MyPainter(),
-                                  size: const Size(200, 200),
-                                ),
-                              ),
-                              Positioned(
-                                top: 1.5,
-                                left: 1,
-                                child: Container(
-                                    height: 40,
-                                    width: 40,
-                                    decoration: BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        image: DecorationImage(
-                                            image: data!.userImage == '' ? NetworkImage(AppImage.userImagePath) : NetworkImage(data!.userImage!),fit: BoxFit.cover))),
-                              )
-                            ],
-                          ),
+                    child: Container(
+                        height: 40,
+                        width: 40,
+                        decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            image: DecorationImage(
+                                image: data!.userImage == '' ? NetworkImage(AppImage.userImagePath) : NetworkImage(data!.userImage!),fit: BoxFit.cover)))
                   ),
                   
                   horizontalGap(10),
                   Expanded(
                     child:  GestureDetector(
-                    onTap: (){
+                    onTap:isMyProfile && userController.userModel.value.uid == data!.userId ? null :  (){
                       if(userController.userModel.value.uid == data!.userId){
-                        pushNewScreen(context, screen: ProfileScreen(isNavBar: false,));
-                      }else{
-                        pushNewScreen(context,
-                                        screen: OtherProfileView(uid: data!.userId!));
+                        isOtherProfile ? Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>ProfileScreen(isNavBar: false,isOther: true,))) :  pushNewScreen(context, screen: ProfileScreen(isNavBar: false,));
+                      } else if(isOtherProfile && data!.shareUID!.isNotEmpty){
+
+                      } else{
+                        isOtherProfile ? Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>OtherProfileView(uid: data!.userId!))) : pushNewScreen(context, screen: OtherProfileView(uid: data!.userId!));
                       }
-                      
                     },
                     child: poppinsText(data!.name ?? '', 14, bold, appDarkBlue,
                           overflow: TextOverflow.ellipsis),
@@ -270,7 +243,7 @@ class SharedPostComp extends GetView<NewsFeedController> {
                 children: [
                   GestureDetector(
                       onTap: () async{
-                        await newsFeedController.likePost(data!.shareID!, userController.userModel.value!.uid!);
+                        await newsFeedController.likePost(data!.shareID!, userController.userModel.value.uid!);
                         },
                       child: data!.likedBy!.contains(userController.userModel.value.uid)
                           ? Container(

@@ -8,7 +8,6 @@ import 'package:check_in/model/user_modal.dart';
 import 'package:check_in/ui/screens/%20Messages%20NavBar/add_group_details/add_group_details.dart';
 import 'package:check_in/ui/widgets/custom_appbar.dart';
 import 'package:check_in/ui/widgets/text_field.dart';
-import 'package:check_in/utils/Constants/app_toast.dart';
 import 'package:check_in/utils/Constants/images.dart';
 import 'package:check_in/utils/colors.dart';
 import 'package:check_in/utils/gaps.dart';

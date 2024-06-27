@@ -44,38 +44,22 @@ class SharePostComp extends GetView<NewsFeedController> {
               child: Row(
                 children: [
                   GestureDetector(
-                    onTap: (){
+                    onTap:  (){
                       if(userController.userModel.value.uid == data!.userId){
                         pushNewScreen(context, screen: ProfileScreen(isNavBar: false,));
                       }else{
                         pushNewScreen(context,
-                                        screen: OtherProfileView(uid: data!.userId!));
+                                        screen: OtherProfileView(uid: data!.shareUID!));
                       }
                       
                     },
-                    child: Stack(
-                      children: [
-                        SizedBox(
-                          height: 44,
-                          width: 43,
-                          child: CustomPaint(
-                                  painter: MyPainter(),
-                                  size: const Size(200, 200),
-                                ),
-                              ),
-                              Positioned(
-                                top: 1.5,
-                                left: 1,
-                                child: Container(
+                    child: Container(
                                     height: 40,
                                     width: 40,
                                     decoration: BoxDecoration(
                                         shape: BoxShape.circle,
                                         image: DecorationImage(
                                             image: data!.userImage == '' ? NetworkImage(AppImage.userImagePath) : NetworkImage(data!.userImage!),fit: BoxFit.cover))),
-                              )
-                            ],
-                          ),
                   ),
                   
                   horizontalGap(10),
@@ -85,10 +69,9 @@ class SharePostComp extends GetView<NewsFeedController> {
                       if(userController.userModel.value.uid == data!.userId){
                         pushNewScreen(context, screen: ProfileScreen(isNavBar: false,));
                       }else{
-                        pushNewScreen(context,
-                                        screen: OtherProfileView(uid: data!.userId!));
+                        pushNewScreen(context, screen: OtherProfileView(uid: data!.userId!));
                       }
-                      
+
                     },
                     child: poppinsText(data!.name ?? '', 14, bold, appDarkBlue,
                           overflow: TextOverflow.ellipsis),

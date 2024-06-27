@@ -101,6 +101,7 @@ Future<void> logout(context) async {
   final token = await FCMManager.getFCMToken();
   newsFeedController.clearNewsFeeds();
   newsFeedController.clearMyPosts();
+  newsFeedController.clearUserPosts();
   //Checkout
   print('-----------token-----------$token');
   snap.collection(Collections.USER).doc(auth.currentUser!.uid).update({
