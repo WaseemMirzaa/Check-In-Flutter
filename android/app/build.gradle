@@ -68,16 +68,39 @@ android {
             storePassword keystoreProperties['storePassword']
         }
     }
-    buildTypes {
-        release {
-            signingConfig signingConfigs.release
-        }
-    }
+//    buildTypes {
+//        release {
+//            signingConfig signingConfigs.release
+//            minifyEnabled false
+//            shrinkResources false
+//        }
+//    }
     lintOptions {
         checkReleaseBuilds false
         // Or, if you prefer, you can continue to check for errors in release builds,
         // but continue the build even when errors are found:
         abortOnError false
+    }
+    android {
+        buildTypes {
+            getByName("release") {
+                isMinifyEnabled = true
+
+                // Enables resource shrinking, which is performed by the
+                // Android Gradle plugin.
+                isShrinkResources = true
+
+                proguardFiles(
+                        // Includes the default ProGuard rules files that are packaged with
+                        // the Android Gradle plugin. To learn more, go to the section about
+                        // R8 configuration files.
+                        getDefaultProguardFile("proguard-android-optimize.txt"),
+
+                        // Includes a local, custom Proguard rules file
+                        "proguard-rules.pro"
+                )
+            }
+        }
     }
 //    buildTypes {
 //        release {

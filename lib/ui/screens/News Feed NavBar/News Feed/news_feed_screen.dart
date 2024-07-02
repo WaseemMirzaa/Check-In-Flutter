@@ -7,6 +7,7 @@ import 'package:check_in/ui/screens/News%20Feed%20NavBar/News%20Feed/Component/s
 import 'package:check_in/ui/screens/News%20Feed%20NavBar/News%20Feed/Component/top_container.dart';
 import 'package:check_in/ui/screens/News%20Feed%20NavBar/test_aid_comp/test_aid_comp.dart';
 import 'package:check_in/utils/colors.dart';
+import 'package:check_in/utils/custom/own_dialog_custom.dart';
 import 'package:check_in/utils/styles.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -53,8 +54,8 @@ class _NewsFeedScreenState extends State<NewsFeedScreen> {
     return Scaffold(
         appBar: CustomAppbar(
           showicon: false,
-          title: poppinsText(
-              TempLanguage.newsFeed, 15, FontWeight.bold, appBlackColor),
+          title:  poppinsText(
+                TempLanguage.newsFeed, 15, FontWeight.bold, appBlackColor),
         ),
         body: SingleChildScrollView(
           controller: _scrollController,
