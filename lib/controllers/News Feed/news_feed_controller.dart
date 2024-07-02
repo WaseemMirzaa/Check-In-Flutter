@@ -252,6 +252,10 @@ class NewsFeedController extends GetxController {
     return newsFeedService.getNumOfComments(newsFeedId);
   }
 
+  Future<void> reportPost(String postId, String reportedBy, String reason) async {
+    return newsFeedService.reportPost(postId, reportedBy, reason);
+  }
+
 /// like on comments controller
   Future<bool> toggleLikeComment(String postId, String commentId ,String userId) async {
     return await newsFeedService.toggleLikeComment(postId, commentId, userId);

@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:check_in/controllers/user_controller.dart';
 import 'package:check_in/core/constant/constant.dart';
 import 'package:check_in/ui/screens/%20Messages%20NavBar/other_profile/other_profile_view.dart';
 import 'package:check_in/ui/screens/News%20Feed%20NavBar/share_screen/share_screen.dart';
@@ -17,6 +18,7 @@ import 'package:check_in/ui/screens/News%20Feed%20NavBar/News%20Feed/Component/v
 import 'package:check_in/ui/widgets/text_field.dart';
 import 'package:check_in/utils/loader.dart';
 import 'package:chewie/chewie.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:check_in/ui/widgets/custom_container.dart';
 import 'package:check_in/utils/Constants/images.dart';
@@ -31,6 +33,8 @@ import 'package:share_plus/share_plus.dart';
 import 'package:sizer/sizer.dart';
 import 'package:video_player/video_player.dart';
 
+import 'report_on_post_comp.dart';
+
 
 class SharedPostComp extends GetView<NewsFeedController> {
   NewsFeedModel? data;
@@ -40,6 +44,7 @@ class SharedPostComp extends GetView<NewsFeedController> {
 
   NewsFeedController newsFeedController = Get.put(NewsFeedController(NewsFeedService()));
   final addCommentController = TextEditingController();
+  UserController userController = Get.put(UserController());
 
   @override
   Widget build(BuildContext context) {
@@ -62,7 +67,7 @@ class SharedPostComp extends GetView<NewsFeedController> {
                       }else if(isOtherProfile && data!.userId!.isNotEmpty){
 
                       }else{
-                        isOtherProfile ? Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>OtherProfileView(uid: data!.userId!))) : pushNewScreen(context, screen: OtherProfileView(uid: data!.userId!));
+                        isOtherProfile ? Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>OtherProfileView(uid: data!.shareUID!))) : pushNewScreen(context, screen: OtherProfileView(uid: data!.shareUID!));
 
                       }
                     },
@@ -92,52 +97,78 @@ class SharedPostComp extends GetView<NewsFeedController> {
                     ),
                   ),
                   horizontalGap(5),
-                   PopupMenuButton<String>(
-          icon: Container(
+                  PopupMenuButton<String>(
+                    icon: Container(
                       padding: const EdgeInsets.all(4),
                       decoration: BoxDecoration(
-                          shape: BoxShape.circle, color: appGreyColor1),
+                          shape: BoxShape.circle,
+                          color: appGreyColor1
+                      ),
                       child: Icon(
                         Icons.more_horiz,
                         color: greyColor,
                       ),
                     ),
-          onSelected: (String result) async{
-            switch (result) {
-              case 'Hide':
-                newsFeedController.hidePost(data!.shareID!);
-                break;
-              case 'Delete':
-                newsFeedController.deletePost(data!.shareID!);
-                break;
-              case 'Share':
-                 String link = await newsFeedController.createDynamicLink(data!.shareID!);
-                      print("The link is: $link");
-                      if(link.isNotEmpty){
-                        Share.share('Check out this post: $link');
+                    onSelected: (String result) async {
+                      switch (result) {
+                        case 'Hide':
+                          newsFeedController.hidePost(data!.shareID!);
+                          break;
+                        case 'Delete':
+                          newsFeedController.deletePost(data!.shareID!);
+                          break;
+                        case 'Share':
+                          String link = await newsFeedController.createDynamicLink(data!.shareID!);
+                          if (kDebugMode) {
+                            print("The link is: $link");
+                          }
+                          if (link.isNotEmpty) {
+                            Share.share('Check out this post: $link');
+                          }
+                          break;
+                        case 'Report':
+                          showReportDialog(
+                              context,
+                              data!.shareID!,
+                              userController.userModel.value.uid!
+                          );
+                          break;
                       }
-                break;
-            }
-          },
-          itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-             PopupMenuItem<String>(
-              value: data!.shareUID == userController.userModel.value.uid ? 'Delete' : 'Hide',
-              child: ListTile(
-                leading: Icon(data!.shareUID == userController.userModel.value.uid ? Icons.delete : Icons.visibility_off),
-                title: Text(data!.shareUID == userController.userModel.value.uid ? 'Delete' : 'Hide'),
-              ),
-            ),
-            const PopupMenuItem<String>(
-              value: 'Share',
-              child: ListTile(
-                leading: Icon(Icons.share),
-                title: Text('Share'),
-              ),
-            ),
-          ]),
-                
-                ],
-              ),
+                    },
+                    itemBuilder: (BuildContext context) {
+                      List<PopupMenuEntry<String>> items = [
+                        PopupMenuItem<String>(
+                          value: data!.shareUID == userController.userModel.value.uid ? 'Delete' : 'Hide',
+                          child: ListTile(
+                            leading: Icon(data!.shareUID == userController.userModel.value.uid ? Icons.delete : Icons.visibility_off),
+                            title: Text(data!.shareUID == userController.userModel.value.uid ? 'Delete' : 'Hide'),
+                          ),
+                        ),
+                        const PopupMenuItem<String>(
+                          value: 'Share',
+                          child: ListTile(
+                            leading: Icon(Icons.share),
+                            title: Text('Share'),
+                          ),
+                        ),
+                      ];
+
+                      if (data!.shareUID != userController.userModel.value.uid) {
+                        items.add(
+                          const PopupMenuItem<String>(
+                            value: 'Report',
+                            child: ListTile(
+                              leading: Icon(Icons.report),
+                              title: Text('Report'),
+                            ),
+                          ),
+                        );
+                      }
+
+                      return items;
+                    },
+                  )
+                ]),
             ),
             
              verticalGap(8),
@@ -232,7 +263,7 @@ class SharedPostComp extends GetView<NewsFeedController> {
                   poppinsText("${data!.noOfComment}", 11, medium, appDarkBlue),
                   poppinsText(' comments . ', 11, medium, appDarkBlue),
                   poppinsText("${data!.noOfShared} ", 11, medium, appDarkBlue),
-                  poppinsText('shared', 11, medium, appDarkBlue),
+                  poppinsText('shares', 11, medium, appDarkBlue),
                 ],
               ),
             ),

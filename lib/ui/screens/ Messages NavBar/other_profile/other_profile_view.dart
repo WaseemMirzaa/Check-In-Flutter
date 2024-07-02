@@ -10,6 +10,7 @@ import 'package:check_in/ui/screens/profile_screen.dart';
 import 'package:check_in/utils/colors.dart';
 import 'package:check_in/utils/styles.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -175,13 +176,13 @@ class _OtherProfileViewState extends State<OtherProfileView> {
                             //     FontWeight.normal,
                             //     blackColor),
 
-                            poppinsText(
-                              // FirebaseAuth.instance.currentUser?.displayName
-                              //     as String,
-                                snapshot.data!.email ?? "",
-                                12,
-                                FontWeight.normal,
-                                appBlackColor),
+                            // poppinsText(
+                            //   // FirebaseAuth.instance.currentUser?.displayName
+                            //   //     as String,
+                            //     snapshot.data!.email ?? "",
+                            //     12,
+                            //     FontWeight.normal,
+                            //     appBlackColor),
                             // poppinsText(
                             //     "@${userController.userModel.value.email.substring(0, userController.userModel.value.email.indexOf('@'))}",
                             //     12,
@@ -313,7 +314,7 @@ class _OtherProfileViewState extends State<OtherProfileView> {
                                       decoration: BoxDecoration(
                                           borderRadius: BorderRadius.circular(30),
                                           color: appGreenColor),
-                                      child: poppinsText('About', 12, FontWeight.w400, appWhiteColor),),
+                                      child: poppinsText('About Me', 12, FontWeight.w400, appWhiteColor),),
                                   ))
                             ],
                           ),
@@ -370,9 +371,16 @@ class _OtherProfileViewState extends State<OtherProfileView> {
                           ),
                         ),
                         const SizedBox(height: 10,),
-                        Center(child: Container(
-                          width: 80,
-                          padding: const EdgeInsets.symmetric(horizontal: 10,vertical: 4,),decoration: BoxDecoration(color: appGreyColor1,borderRadius: BorderRadius.circular(30)),child: Center(child: poppinsText('His Posts', 12, FontWeight.normal, appBlackColor )),),),
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 15,vertical: 4,),
+                              decoration: BoxDecoration(color: appGreyColor1,borderRadius: BorderRadius.circular(30)),
+                              child: Center(child: Text("${snapshot.data!.userName}'s Posts")),),
+                          ],
+                        ),
                         const SizedBox(height: 10,),
                         Obx(() {
                           if (controller.userPosts.isEmpty) {

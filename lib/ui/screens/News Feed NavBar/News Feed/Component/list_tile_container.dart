@@ -33,6 +33,8 @@ import 'package:share_plus/share_plus.dart';
 import 'package:sizer/sizer.dart';
 import 'package:video_player/video_player.dart';
 
+import 'report_on_post_comp.dart';
+
 class ListTileContainer extends GetView<NewsFeedController> {
   NewsFeedModel? data;
   bool isMyProfile;
@@ -119,24 +121,47 @@ class ListTileContainer extends GetView<NewsFeedController> {
                         Share.share('Check out this post: $link');
                       }
                 break;
+              case 'Report':
+                showReportDialog(
+                    context,
+                    data!.userId!,
+                    userController.userModel.value.uid!
+                );
+                break;
             }
           },
-          itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-             PopupMenuItem<String>(
-              value: data!.userId == userController.userModel.value.uid ? 'Delete' : 'Hide',
-              child: ListTile(
-                leading: Icon(data!.userId == userController.userModel.value.uid ? Icons.delete : Icons.visibility_off),
-                title: Text(data!.userId == userController.userModel.value.uid ? 'Delete' : 'Hide'),
+          itemBuilder: (BuildContext context) {
+            List<PopupMenuEntry<String>> items = [
+              PopupMenuItem<String>(
+                value: data!.userId == userController.userModel.value.uid ? 'Delete' : 'Hide',
+                child: ListTile(
+                  leading: Icon(data!.userId == userController.userModel.value.uid ? Icons.delete : Icons.visibility_off),
+                  title: Text(data!.userId == userController.userModel.value.uid ? 'Delete' : 'Hide'),
+                ),
               ),
-            ),
-            const PopupMenuItem<String>(
-              value: 'Share',
-              child: ListTile(
-                leading: Icon(Icons.share),
-                title: Text('Share'),
+              const PopupMenuItem<String>(
+                value: 'Share',
+                child: ListTile(
+                  leading: Icon(Icons.share),
+                  title: Text('Share'),
+                ),
               ),
-            ),
-          ]),
+            ];
+            if (data!.userId != userController.userModel.value.uid) {
+                         items.add(
+                           const PopupMenuItem<String>(
+                             value: 'Report',
+                             child: ListTile(
+                               leading: Icon(Icons.report),
+                               title: Text('Report'),
+                             ),
+                           ),
+                         );
+                       }
+
+                       return items;
+                     },
+                   )
                 
                 ],
               ),
@@ -186,7 +211,7 @@ class ListTileContainer extends GetView<NewsFeedController> {
                   poppinsText("${data!.noOfComment} ", 11, medium, appDarkBlue),
                   poppinsText(' comments . ', 11, medium, appDarkBlue),
                   poppinsText("${data!.noOfShared} ", 11, medium, appDarkBlue),
-                  poppinsText('shared', 11, medium, appDarkBlue),
+                  poppinsText('shares', 11, medium, appDarkBlue),
                 ],
               ),
             ),

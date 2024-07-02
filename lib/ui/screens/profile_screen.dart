@@ -372,13 +372,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               //     FontWeight.normal,
                               //     blackColor),
 
-                              poppinsText(
-                                // FirebaseAuth.instance.currentUser?.displayName
-                                //     as String,
-                                  userController.userModel.value.email ?? "",
-                                  12,
-                                  FontWeight.normal,
-                                  appBlackColor),
+                              // poppinsText(
+                              //   // FirebaseAuth.insztance.currentUser?.displayName
+                              //   //     as String,
+                              //     userController.userModel.value.email ?? "",
+                              //     12,
+                              //     FontWeight.normal,
+                              //     appBlackColor),
                               // poppinsText(
                               //     "@${userController.userModel.value.email.substring(0, userController.userModel.value.email.indexOf('@'))}",
                               //     12,
@@ -591,7 +591,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                         decoration: BoxDecoration(
                                             borderRadius: BorderRadius.circular(30),
                                             color: appGreenColor),
-                                        child: poppinsText('About', 12, FontWeight.w400, appWhiteColor),),
+                                        child: poppinsText('About Me', 12, FontWeight.w400, appWhiteColor),),
                                     ))
                               ],
                             ),
