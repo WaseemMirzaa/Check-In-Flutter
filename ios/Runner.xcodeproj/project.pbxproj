@@ -404,11 +404,11 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = Runner/Runner.entitlements;
-				CURRENT_PROJECT_VERSION = 45;
+				CURRENT_PROJECT_VERSION = 46;
 				DEVELOPMENT_TEAM = N4WKQQL833;
 				ENABLE_BITCODE = NO;
-				FLUTTER_BUILD_NAME = 3.0.15;
-				FLUTTER_BUILD_NUMBER = 45;
+				FLUTTER_BUILD_NAME = 3.0.16;
+				FLUTTER_BUILD_NUMBER = 46;
 				INFOPLIST_FILE = Runner/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Check In";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.sports";
@@ -417,7 +417,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 3.0.15;
+				MARKETING_VERSION = 3.0.16;
 				PRODUCT_BUNDLE_IDENTIFIER = com.developlogix.checkinapp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -546,11 +546,11 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = Runner/Runner.entitlements;
-				CURRENT_PROJECT_VERSION = 45;
+				CURRENT_PROJECT_VERSION = 46;
 				DEVELOPMENT_TEAM = N4WKQQL833;
 				ENABLE_BITCODE = NO;
-				FLUTTER_BUILD_NAME = 3.0.15;
-				FLUTTER_BUILD_NUMBER = 45;
+				FLUTTER_BUILD_NAME = 3.0.16;
+				FLUTTER_BUILD_NUMBER = 46;
 				INFOPLIST_FILE = Runner/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Check In";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.sports";
@@ -559,7 +559,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 3.0.15;
+				MARKETING_VERSION = 3.0.16;
 				PRODUCT_BUNDLE_IDENTIFIER = com.developlogix.checkinapp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -580,11 +580,11 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = Runner/Runner.entitlements;
-				CURRENT_PROJECT_VERSION = 45;
+				CURRENT_PROJECT_VERSION = 46;
 				DEVELOPMENT_TEAM = N4WKQQL833;
 				ENABLE_BITCODE = NO;
-				FLUTTER_BUILD_NAME = 3.0.15;
-				FLUTTER_BUILD_NUMBER = 45;
+				FLUTTER_BUILD_NAME = 3.0.16;
+				FLUTTER_BUILD_NUMBER = 46;
 				INFOPLIST_FILE = Runner/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Check In";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.sports";
@@ -593,7 +593,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 3.0.15;
+				MARKETING_VERSION = 3.0.16;
 				PRODUCT_BUNDLE_IDENTIFIER = com.developlogix.checkinapp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";

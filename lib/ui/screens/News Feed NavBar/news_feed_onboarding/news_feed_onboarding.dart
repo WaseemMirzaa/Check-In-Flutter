@@ -20,7 +20,7 @@ class NewsFeedOnboarding extends StatelessWidget {
         clipBehavior: Clip.none,
         children: [
           Positioned(
-            top: -15.h,
+            top: -7.h,
             child: Container(
               height: 85.h,
               width: 100.w,
