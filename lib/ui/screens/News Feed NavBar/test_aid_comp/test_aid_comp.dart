@@ -1,6 +1,9 @@
+import 'dart:io';
+
 import 'package:check_in/ui/widgets/custom_container.dart';
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:nb_utils/nb_utils.dart';
 
 class NativeTestAds extends StatefulWidget {
   const NativeTestAds({super.key});
@@ -18,7 +21,7 @@ class _NativeTestAds extends State<NativeTestAds> {
     super.didChangeDependencies();
     // Create the ad objects and load ads.
     _nativeAd = NativeAd(
-      adUnitId: '/6499/example/native',
+      adUnitId: Platform.isAndroid ?  'ca-app-pub-7171017916477454/3594087778' : 'ca-app-pub-7171017916477454/4321045773',
       request: const AdRequest(),
       listener: NativeAdListener(
         onAdLoaded: (Ad ad) {

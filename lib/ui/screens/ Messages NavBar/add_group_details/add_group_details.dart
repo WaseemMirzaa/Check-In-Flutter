@@ -79,7 +79,7 @@ class AddGroupDetails extends GetView<GroupDetailController> {
                   controller.loadNewGroup.value = false;
                   chatcontroller.sendNotificationMethod(
                       '', '${userController.userModel.value.userName!} created a new group with you');
-                  pushNewScreen(context, screen: const ChatScreen()).then((_) {
+                  pushNewScreen(context, screen: ChatScreen()).then((_) {
                     Get.back();
                     Get.back();
                   });

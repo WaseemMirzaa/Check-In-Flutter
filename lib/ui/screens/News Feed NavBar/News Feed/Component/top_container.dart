@@ -5,12 +5,14 @@ import 'package:check_in/controllers/News%20Feed/news_feed_controller.dart';
 import 'package:check_in/controllers/user_controller.dart';
 import 'package:check_in/core/constant/app_assets.dart';
 import 'package:check_in/ui/screens/News%20Feed%20NavBar/Create%20Post/create_post_screen.dart';
+import 'package:check_in/ui/screens/profile_screen.dart';
 import 'package:check_in/ui/widgets/custom_container.dart';
 import 'package:check_in/ui/widgets/text_field.dart';
 import 'package:check_in/utils/Constants/images.dart';
 import 'package:check_in/utils/colors.dart';
 import 'package:check_in/utils/gaps.dart';
 import 'package:check_in/utils/styles.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
@@ -37,23 +39,28 @@ class TopContainer extends GetView<NewsFeedController> {
                 clipBehavior: Clip.none,
                 alignment: Alignment.bottomRight,
                 children: [
-                  (userController.userModel.value.photoUrl!.isNotEmpty)
-                      ? Container(
+                  GestureDetector(
+                    onTap: (){
+                      pushNewScreen(context, screen: ProfileScreen(isNavBar: false,));
+                    },
+                    child: (userController.userModel.value.photoUrl!.isNotEmpty)
+                        ? Container(
+                        height: 5.8.h,
+                        width: 5.8.h,
+                        decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            image: DecorationImage(
+                              // image:  AssetImage(AppAssets.LOGO_NEW), fit: BoxFit.fill)))
+                                 image: NetworkImage(userController.userModel.value.photoUrl ?? ''), fit: BoxFit.fill)))
+                        : Container(
                       height: 5.8.h,
                       width: 5.8.h,
                       decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          image: DecorationImage(
-                            // image:  AssetImage(AppAssets.LOGO_NEW), fit: BoxFit.fill)))
-                               image: NetworkImage(userController.userModel.value.photoUrl ?? ''), fit: BoxFit.fill)))
-                      : Container(
-                    height: 5.8.h,
-                    width: 5.8.h,
-                    decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        border: Border.all(width: 2, color: appGreenColor),
-                        image: const DecorationImage(
-                            image: AssetImage(AppAssets.LOGO_NEW), fit: BoxFit.fill)),
+                          border: Border.all(width: 2, color: appGreenColor),
+                          image: const DecorationImage(
+                              image: AssetImage(AppAssets.LOGO_NEW), fit: BoxFit.fill)),
+                    ),
                   ),
                   if (userController.userModel.value.isVerified == null ||
                       userController.userModel.value.isVerified == true)

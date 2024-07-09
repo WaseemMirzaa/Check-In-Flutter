@@ -92,6 +92,31 @@ Future<List<UserModel>?> getUniqueCourtNameMaps() async {
   }
 }
 
+Future<List<UserModel>?> getUniqueCourtOtherNameMaps(String uid) async {
+  CollectionReference<Map<String, dynamic>> collectionReference =
+  FirebaseFirestore.instance.collection(Collections.USER);
+  DocumentSnapshot<Map<String, dynamic>> document =
+  await collectionReference.doc(uid).get();
+
+  Set<int> uniqueCourtIds = <int>{};
+  List<UserModel> resultMaps = [];
+
+  try {
+    List<Map<String, dynamic>> mapsArray = List<Map<String, dynamic>>.from(document.data()?[CourtKey.CHECKED_COURTS]);
+    for (var map in mapsArray) {
+      int courtId = map[CourtKey.ID] ?? 0;
+      bool isGold = map[CourtKey.IS_GOLDEN] ?? false;
+      if (isGold && courtId > 0 && !uniqueCourtIds.contains(courtId)) {
+        resultMaps.add(UserModel.fromMap(map));
+        uniqueCourtIds.add(courtId);
+      }
+    }
+    return resultMaps;
+  } catch (e) {
+    return null;
+  }
+}
+
 Future<int> getGoldenLocationsCount() async {
   try {
     QuerySnapshot querySnapshot = await FirebaseFirestore.instance
@@ -502,7 +527,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             ],
                           ),
                           const SizedBox(
-                            height: 10,
+                            height: 20,
                           ),
                           Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 12),

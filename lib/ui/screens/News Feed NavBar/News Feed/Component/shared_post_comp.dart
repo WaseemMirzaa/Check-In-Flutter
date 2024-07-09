@@ -1,6 +1,8 @@
 import 'dart:io';
+import 'package:check_in/Services/user_services.dart';
 import 'package:check_in/controllers/user_controller.dart';
 import 'package:check_in/core/constant/constant.dart';
+import 'package:check_in/model/user_modal.dart';
 import 'package:check_in/ui/screens/%20Messages%20NavBar/other_profile/other_profile_view.dart';
 import 'package:check_in/ui/screens/News%20Feed%20NavBar/share_screen/share_screen.dart';
 import 'package:check_in/ui/screens/profile_screen.dart';
@@ -36,21 +38,46 @@ import 'package:video_player/video_player.dart';
 import 'report_on_post_comp.dart';
 
 
-class SharedPostComp extends GetView<NewsFeedController> {
+class SharedPostComp extends StatefulWidget {
   NewsFeedModel? data;
   bool isMyProfile;
   bool isOtherProfile;
   SharedPostComp({super.key, this.data, this.isMyProfile = false, this.isOtherProfile = false});
 
+  @override
+  State<SharedPostComp> createState() => _SharedPostCompState();
+}
+
+class _SharedPostCompState extends State<SharedPostComp> {
   NewsFeedController newsFeedController = Get.put(NewsFeedController(NewsFeedService()));
+
   final addCommentController = TextEditingController();
+
   UserController userController = Get.put(UserController());
+
+  final userServices = UserServices();
+
+  UserModel? shareUserData;
+  UserModel? postUserData;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    Future.microtask(() async{
+      shareUserData = await userServices.getUserData(widget.data!.shareUID!);
+      postUserData = await userServices.getUserData(widget.data!.userId!);
+      setState(() {
+
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    newsFeedController.commentModel.value.userId = data!.userId;
+    newsFeedController.commentModel.value.userId = widget.data!.userId;
     RxBool isVisible = false.obs;
-    return CustomContainer1(
+    return shareUserData == null || postUserData == null ? SizedBox() : CustomContainer1(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 15),
         child: Column(
@@ -61,13 +88,13 @@ class SharedPostComp extends GetView<NewsFeedController> {
               child: Row(
                 children: [
                   GestureDetector(
-                    onTap: isMyProfile && userController.userModel.value.uid == data!.shareUID ? null : (){
-                      if(userController.userModel.value.uid == data!.shareUID){
-                        isOtherProfile ? Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>ProfileScreen(isNavBar: false,isOther: true,))) : pushNewScreen(context, screen: ProfileScreen(isNavBar: false,));
-                      }else if(isOtherProfile && data!.userId!.isNotEmpty){
+                    onTap: widget.isMyProfile && userController.userModel.value.uid == widget.data!.shareUID ? null : (){
+                      if(userController.userModel.value.uid == widget.data!.shareUID){
+                        widget.isOtherProfile ? Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>ProfileScreen(isNavBar: false,isOther: true,))) : pushNewScreen(context, screen: ProfileScreen(isNavBar: false,));
+                      }else if(widget.isOtherProfile && widget.data!.userId!.isNotEmpty){
 
                       }else{
-                        isOtherProfile ? Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>OtherProfileView(uid: data!.shareUID!))) : pushNewScreen(context, screen: OtherProfileView(uid: data!.shareUID!));
+                        widget.isOtherProfile ? Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>OtherProfileView(uid: widget.data!.shareUID!))) : pushNewScreen(context, screen: OtherProfileView(uid: widget.data!.shareUID!));
 
                       }
                     },
@@ -77,23 +104,23 @@ class SharedPostComp extends GetView<NewsFeedController> {
                                     decoration: BoxDecoration(
                                         shape: BoxShape.circle,
                                         image: DecorationImage(
-                                            image: data!.shareImage == '' ? NetworkImage(AppImage.userImagePath) : NetworkImage(data!.shareImage!),fit: BoxFit.cover))),
+                                            image: shareUserData!.photoUrl.isEmptyOrNull ? NetworkImage(AppImage.userImagePath) : NetworkImage(shareUserData!.photoUrl ?? ''),fit: BoxFit.cover))),
                   ),
-                  
+
                   horizontalGap(10),
                   Expanded(
-                    child:  GestureDetector(
-                    onTap:isMyProfile && userController.userModel.value.uid == data!.shareUID ? null : (){
-                      if(userController.userModel.value.uid == data!.shareUID){
-                        isOtherProfile ? Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>ProfileScreen(isNavBar: false,isOther: true,))) : pushNewScreen(context, screen: ProfileScreen(isNavBar: false,));
-                      }else if(isOtherProfile && data!.userId!.isNotEmpty){
+                    child: GestureDetector(
+                    onTap: widget.isMyProfile && userController.userModel.value.uid == widget.data!.shareUID ? null : (){
+                      if(userController.userModel.value.uid == widget.data!.shareUID){
+                        widget.isOtherProfile ? Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>ProfileScreen(isNavBar: false,isOther: true,))) : pushNewScreen(context, screen: ProfileScreen(isNavBar: false,));
+                      }else if(widget.isOtherProfile && widget.data!.userId!.isNotEmpty){
 
                       }else{
-                        isOtherProfile ? Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>OtherProfileView(uid: data!.userId!))) : pushNewScreen(context, screen: OtherProfileView(uid: data!.userId!));
+                        widget.isOtherProfile ? Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>OtherProfileView(uid: widget.data!.shareUID!))) : pushNewScreen(context, screen: OtherProfileView(uid: widget.data!.shareUID!));
 
                       }
                     },
-                    child:richText(data!.shareName??'', 'shared a post'),
+                    child:richText(shareUserData!.userName??'', 'shared a post'),
                     ),
                   ),
                   horizontalGap(5),
@@ -112,13 +139,13 @@ class SharedPostComp extends GetView<NewsFeedController> {
                     onSelected: (String result) async {
                       switch (result) {
                         case 'Hide':
-                          newsFeedController.hidePost(data!.shareID!);
+                          newsFeedController.hidePost(widget.data!.shareID!);
                           break;
                         case 'Delete':
-                          newsFeedController.deletePost(data!.shareID!);
+                          newsFeedController.deletePost(widget.data!.shareID!);
                           break;
                         case 'Share':
-                          String link = await newsFeedController.createDynamicLink(data!.shareID!);
+                          String link = await newsFeedController.createDynamicLink(widget.data!.shareID!);
                           if (kDebugMode) {
                             print("The link is: $link");
                           }
@@ -129,7 +156,7 @@ class SharedPostComp extends GetView<NewsFeedController> {
                         case 'Report':
                           showReportDialog(
                               context,
-                              data!.shareID!,
+                              widget.data!.shareID!,
                               userController.userModel.value.uid!
                           );
                           break;
@@ -138,10 +165,10 @@ class SharedPostComp extends GetView<NewsFeedController> {
                     itemBuilder: (BuildContext context) {
                       List<PopupMenuEntry<String>> items = [
                         PopupMenuItem<String>(
-                          value: data!.shareUID == userController.userModel.value.uid ? 'Delete' : 'Hide',
+                          value: widget.data!.shareUID == userController.userModel.value.uid ? 'Delete' : 'Hide',
                           child: ListTile(
-                            leading: Icon(data!.shareUID == userController.userModel.value.uid ? Icons.delete : Icons.visibility_off),
-                            title: Text(data!.shareUID == userController.userModel.value.uid ? 'Delete' : 'Hide'),
+                            leading: Icon(widget.data!.shareUID == userController.userModel.value.uid ? Icons.delete : Icons.visibility_off),
+                            title: Text(widget.data!.shareUID == userController.userModel.value.uid ? 'Delete' : 'Hide'),
                           ),
                         ),
                         const PopupMenuItem<String>(
@@ -153,7 +180,7 @@ class SharedPostComp extends GetView<NewsFeedController> {
                         ),
                       ];
 
-                      if (data!.shareUID != userController.userModel.value.uid) {
+                      if (widget.data!.shareUID != userController.userModel.value.uid) {
                         items.add(
                           const PopupMenuItem<String>(
                             value: 'Report',
@@ -170,11 +197,11 @@ class SharedPostComp extends GetView<NewsFeedController> {
                   )
                 ]),
             ),
-            
+
              verticalGap(8),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 10.0),
-              child: poppinsText(data!.shareText ?? "", 12, medium,
+              child: poppinsText(widget.data!.shareText ?? "", 12, medium,
                   appDarkBlue.withOpacity(0.8),
                   maxlines: 3),
             ),
@@ -187,15 +214,15 @@ class SharedPostComp extends GetView<NewsFeedController> {
               child: Row(
                 children: [
                   GestureDetector(
-                    onTap:  isMyProfile && userController.userModel.value.uid == data!.userId ? null :  (){
-                      if(userController.userModel.value.uid == data!.userId){
-                        isOtherProfile ? Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>ProfileScreen(isNavBar: false,isOther: true,))) :  pushNewScreen(context, screen: ProfileScreen(isNavBar: false,));
-                      } else if(isOtherProfile && data!.shareUID!.isNotEmpty){
+                    onTap:  widget.isMyProfile && userController.userModel.value.uid == widget.data!.userId ? null :  (){
+                      if(userController.userModel.value.uid == widget.data!.userId){
+                        widget.isOtherProfile ? Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>ProfileScreen(isNavBar: false,isOther: true,))) :  pushNewScreen(context, screen: ProfileScreen(isNavBar: false,));
+                      } else if(widget.isOtherProfile && widget.data!.shareUID!.isNotEmpty){
 
                       } else{
-                        isOtherProfile ? Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>OtherProfileView(uid: data!.userId!))) : pushNewScreen(context, screen: OtherProfileView(uid: data!.userId!));
+                        widget.isOtherProfile ? Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>OtherProfileView(uid: widget.data!.userId!))) : pushNewScreen(context, screen: OtherProfileView(uid: widget.data!.userId!));
                       }
-                      
+
                     },
                     child: Container(
                         height: 40,
@@ -203,42 +230,43 @@ class SharedPostComp extends GetView<NewsFeedController> {
                         decoration: BoxDecoration(
                             shape: BoxShape.circle,
                             image: DecorationImage(
-                                image: data!.userImage == '' ? NetworkImage(AppImage.userImagePath) : NetworkImage(data!.userImage!),fit: BoxFit.cover)))
+                                image: postUserData!.photoUrl.isEmptyOrNull ? NetworkImage(AppImage.userImagePath) : NetworkImage(postUserData!.photoUrl!),fit: BoxFit.cover)))
                   ),
-                  
+
                   horizontalGap(10),
                   Expanded(
-                    child:  GestureDetector(
-                    onTap:isMyProfile && userController.userModel.value.uid == data!.userId ? null :  (){
-                      if(userController.userModel.value.uid == data!.userId){
-                        isOtherProfile ? Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>ProfileScreen(isNavBar: false,isOther: true,))) :  pushNewScreen(context, screen: ProfileScreen(isNavBar: false,));
-                      } else if(isOtherProfile && data!.shareUID!.isNotEmpty){
+                    child: GestureDetector(
+                    onTap: widget.isMyProfile && userController.userModel.value.uid == widget.data!.userId ? null :  (){
+                      if(userController.userModel.value.uid == widget.data!.userId){
+                        widget.isOtherProfile ? Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>ProfileScreen(isNavBar: false,isOther: true,))) :  pushNewScreen(context, screen: ProfileScreen(isNavBar: false,));
+                      } else if(widget.isOtherProfile && widget.data!.shareUID!.isNotEmpty){
 
                       } else{
-                        isOtherProfile ? Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>OtherProfileView(uid: data!.userId!))) : pushNewScreen(context, screen: OtherProfileView(uid: data!.userId!));
+                        widget.isOtherProfile ? Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>OtherProfileView(uid: widget.data!.userId!))) : pushNewScreen(context, screen: OtherProfileView(uid: widget.data!.userId!));
                       }
+
                     },
-                    child: poppinsText(data!.name ?? '', 14, bold, appDarkBlue,
+                    child: poppinsText(postUserData!.userName ?? '', 14, bold, appDarkBlue,
                           overflow: TextOverflow.ellipsis),
                     ),
                   ),
                   horizontalGap(5),
-                
+
                 ],
               ),
             ),
             verticalGap(8),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 10.0),
-              child: poppinsText(data!.description ?? "", 12, medium,
+              child: poppinsText(widget.data!.description ?? "", 12, medium,
                   appDarkBlue.withOpacity(0.8),
                   maxlines: 3),
             ),
             verticalGap(8),
-            data!.isType == 'image' && data!.postUrl!.isNotEmpty
+            widget.data!.isType == 'image' && widget.data!.postUrl!.isNotEmpty
                 ? GestureDetector(
                     onTap: () {
-                      pushNewScreen(context, screen: FullScreenImage(newsFeedModel: data!,));
+                      pushNewScreen(context, screen: FullScreenImage(newsFeedModel: widget.data!,));
                     },
                     child: SizedBox(
                       height: 200,
@@ -246,23 +274,23 @@ class SharedPostComp extends GetView<NewsFeedController> {
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(8),
                         child: Image.network(
-                          data!.postUrl ?? '',
+                          widget.data!.postUrl ?? '',
                           fit: BoxFit.cover,
                         ),
                       ),
                     ),
                   )
-                : data!.isType == 'video' ? newsFeedController.videoLoad.value
+                : widget.data!.isType == 'video' ? newsFeedController.videoLoad.value
                 ? loaderView()
-                : VideoPlayerWidget(videoUrl: data!.postUrl!,) : const SizedBox(),
+                : VideoPlayerWidget(videoUrl: widget.data!.postUrl!,) : const SizedBox(),
             verticalGap(10),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 10),
               child: Row(
                 children: [
-                  poppinsText("${data!.noOfComment}", 11, medium, appDarkBlue),
+                  poppinsText("${widget.data!.noOfComment}", 11, medium, appDarkBlue),
                   poppinsText(' comments . ', 11, medium, appDarkBlue),
-                  poppinsText("${data!.noOfShared} ", 11, medium, appDarkBlue),
+                  poppinsText("${widget.data!.noOfShared} ", 11, medium, appDarkBlue),
                   poppinsText('shares', 11, medium, appDarkBlue),
                 ],
               ),
@@ -274,9 +302,9 @@ class SharedPostComp extends GetView<NewsFeedController> {
                 children: [
                   GestureDetector(
                       onTap: () async{
-                        await newsFeedController.likePost(data!.shareID!, userController.userModel.value.uid!);
+                        await newsFeedController.likePost(widget.data!.shareID!, userController.userModel.value.uid!);
                         },
-                      child: data!.likedBy!.contains(userController.userModel.value.uid)
+                      child: widget.data!.likedBy!.contains(userController.userModel.value.uid)
                           ? Container(
                         padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
@@ -323,7 +351,7 @@ class SharedPostComp extends GetView<NewsFeedController> {
                   horizontalGap(3.w),
                   GestureDetector(
                     onTap: () async{
-                      pushNewScreen(context, screen: SharePostScreen(data: data!));
+                      pushNewScreen(context, screen: SharePostScreen(data: widget.data!));
                     },
                     child: Container(
                       padding: const EdgeInsets.all(8),
@@ -341,11 +369,11 @@ class SharedPostComp extends GetView<NewsFeedController> {
                   Expanded(
                     child: GestureDetector(
                         onTap: () {
-                          pushNewScreen(context, screen: PostAllLikesView(postId: data!.id!,));
+                          pushNewScreen(context, screen: PostAllLikesView(postId: widget.data!.id!,));
                         },
                         child: Align(
                           alignment: Alignment.centerRight,
-                          child: data!.noOfLike <=1 ? poppinsText('Liked by ${data!.noOfLike} Person', 11, medium, greyColor,maxlines: 1,overflow: TextOverflow.ellipsis) :  poppinsText('Liked by ${data!.noOfLike} People',
+                          child: widget.data!.noOfLike <=1 ? poppinsText('Liked by ${widget.data!.noOfLike} Person', 11, medium, greyColor,maxlines: 1,overflow: TextOverflow.ellipsis) :  poppinsText('Liked by ${widget.data!.noOfLike} People',
                               11, medium, greyColor,maxlines: 1,overflow: TextOverflow.ellipsis),
                         )),
                   ),
@@ -378,11 +406,11 @@ class SharedPostComp extends GetView<NewsFeedController> {
                             if(addCommentController.text.isEmptyOrNull){
                               toast('The field is empty');
                             }else {
-                              final comment = await newsFeedController.addCommentOnPost(data!.shareID!, newsFeedController.commentModel.value);
+                              final comment = await newsFeedController.addCommentOnPost(widget.data!.shareID!, newsFeedController.commentModel.value);
                               if(comment){
-                                await newsFeedController.updateCollection(Collections.NEWSFEED, data!.shareID!,
+                                await newsFeedController.updateCollection(Collections.NEWSFEED, widget.data!.shareID!,
                                     {
-                                      NewsFeed.NO_OF_COMMENT : data!.noOfComment! + 1,
+                                      NewsFeed.NO_OF_COMMENT : widget.data!.noOfComment! + 1,
                                     });
                               }
                               (comment) ? addCommentController.clear() : null;
@@ -396,12 +424,12 @@ class SharedPostComp extends GetView<NewsFeedController> {
                                 toast('The field is empty');
 
                               }else {
-                                final comment = await newsFeedController.addCommentOnPost(data!.shareID!,
+                                final comment = await newsFeedController.addCommentOnPost(widget.data!.shareID!,
                                     newsFeedController.commentModel.value);
                                 if(comment){
-                                  await newsFeedController.updateCollection(Collections.NEWSFEED, data!.shareID!,
+                                  await newsFeedController.updateCollection(Collections.NEWSFEED, widget.data!.shareID!,
                                       {
-                                        NewsFeed.NO_OF_COMMENT : data!.noOfComment! + 1,
+                                        NewsFeed.NO_OF_COMMENT : widget.data!.noOfComment! + 1,
                                       });
                                 }
                                 (comment) ? addCommentController.clear() : null;
@@ -419,7 +447,7 @@ class SharedPostComp extends GetView<NewsFeedController> {
                           hintText: 'Write a comment',
                         )),
                     StreamBuilder(
-                      stream: newsFeedController.getPostComments(data!.shareID!),
+                      stream: newsFeedController.getPostComments(widget.data!.shareID!),
                       builder: (context, snapshot) {
                         if(snapshot.connectionState == ConnectionState.waiting){
                           return const Center(child: CircularProgressIndicator(),);
@@ -451,7 +479,7 @@ class SharedPostComp extends GetView<NewsFeedController> {
                               GestureDetector(
                                   onTap: () {
                                     pushNewScreen(context,
-                                        screen: AllCommentsScreen(docId:snapshot.data!.first.postId!, newsFeedModel: data!,isShare: true,));
+                                        screen: AllCommentsScreen(docId:snapshot.data!.first.postId!, newsFeedModel: widget.data!,isShare: true,));
                                   },
                                   child: poppinsText('Show more', 15, bold, appGreenColor))
                             ],
@@ -470,10 +498,6 @@ class SharedPostComp extends GetView<NewsFeedController> {
       ),
     );
   }
-
-  
-
-
 }
 
 class ChewieDemo extends StatefulWidget {

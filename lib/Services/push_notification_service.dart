@@ -207,7 +207,7 @@ class PushNotificationServices {
         chatcontroller.memberId.value = NotificationModel.memberIds;
         //.............................
 
-        Get.to(() => const ChatScreen());
+        Get.to(() => ChatScreen());
 
         // print('Opened message: ${message.notification?.title}');
         // handle the opened message here, for example by navigating to a specific screen
@@ -254,7 +254,7 @@ class PushNotificationServices {
         chatcontroller.memberId.value = NotificationModel.memberIds;
         //.............................
 
-        Get.to(() => const ChatScreen());
+        Get.to(() => ChatScreen());
 
         // if (NotificationModel.type == PushNotificationType.msg) {
         //   print('Step 7');

@@ -38,9 +38,11 @@ final chatQuery = FirebaseFirestore.instance.collection(Collections.MESSAGES).wi
     );
 
 class ChatScreen extends StatefulWidget {
-  const ChatScreen({
+  ChatScreen({
     super.key,
+    this.image = '',
   });
+  String? image;
 
   // bool isFirstTime;
 
@@ -235,9 +237,9 @@ class _ChatScreenState extends State<ChatScreen> {
                   },
             child: Row(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.center, children: [
               Obx(() => CircleAvatar(
-                    backgroundImage: controller.image.value == ''
+                    backgroundImage: widget.image == '' || controller.image.value == ''
                         ? AssetImage(AppImage.user) as ImageProvider
-                        : CachedNetworkImageProvider(controller.image.value),
+                        : CachedNetworkImageProvider(widget.image ?? controller.name.value),
                     radius: 20,
                   )),
               horizontalGap(10),

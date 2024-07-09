@@ -197,6 +197,7 @@ class NewsFeedController extends GetxController {
   Future<bool> sharePost(NewsFeedModel feedsModel) async{
     print("The post url ${newsFeedModel.value.postUrl}");
     feedsModel.isOriginal = false;
+    feedsModel.noOfShared = 0;
     feedsModel.shareUID = userController.userModel.value.uid;
     feedsModel.shareName = userController.userModel.value.userName;
     feedsModel.shareImage = userController.userModel.value.photoUrl;

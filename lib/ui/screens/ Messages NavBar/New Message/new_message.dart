@@ -119,7 +119,7 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
                         // clear map mydata
                         controller.mydata.clear();
                         pushNewScreen(context,
-                                screen: const ChatScreen(
+                                screen: ChatScreen(
                                     // name: model.userName!.obs,
                                     // isGroup: false,
                                     // image: model.photoUrl!.obs,

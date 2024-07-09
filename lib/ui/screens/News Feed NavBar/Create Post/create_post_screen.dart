@@ -1,6 +1,5 @@
 import 'dart:io';
 import 'package:check_in/Services/newfeed_service.dart';
-import 'package:check_in/controllers/News%20Feed/create_post_controller.dart';
 import 'package:check_in/controllers/News%20Feed/news_feed_controller.dart';
 import 'package:check_in/controllers/user_controller.dart';
 import 'package:check_in/core/constant/app_assets.dart';

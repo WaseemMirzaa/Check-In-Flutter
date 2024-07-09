@@ -12,6 +12,7 @@ import 'package:check_in/utils/styles.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:nb_utils/nb_utils.dart';
@@ -106,9 +107,13 @@ class _OtherProfileViewState extends State<OtherProfileView> {
           stream: getProfile(widget.uid),
           builder: (context, snapshot) {
             if(snapshot.connectionState == ConnectionState.waiting){
-              return const Column(crossAxisAlignment: CrossAxisAlignment.center,mainAxisAlignment: MainAxisAlignment.center,children: [
-                Center(child: CircularProgressIndicator()),
-              ],);
+              return SizedBox(
+                height: 80.h,
+                width: 100.w,
+                child: const Column(crossAxisAlignment: CrossAxisAlignment.center,mainAxisAlignment: MainAxisAlignment.center,children: [
+                  Center(child: CircularProgressIndicator()),
+                ],),
+              );
             }else if(snapshot.hasError){
               return Text(snapshot.error.toString());
             }else {
@@ -204,22 +209,22 @@ class _OtherProfileViewState extends State<OtherProfileView> {
                                     ),
                                   ),
                                   child: FutureBuilder<List<UserModel>?>(
-                                    future: getUniqueCourtNameMaps(),
-                                    builder: (context, snapshot) {
-                                      if (snapshot.connectionState == ConnectionState.waiting) {
+                                    future: getUniqueCourtOtherNameMaps(snapshot.data!.uid!),
+                                    builder: (context, courtsSnapshot) {
+                                      if (courtsSnapshot.connectionState == ConnectionState.waiting) {
                                         return const SizedBox(
                                             height: 110,
                                             width: 110,
                                             child: Center(child: CircularProgressIndicator()));
-                                      } else if (snapshot.hasData && snapshot.data != null) {
+                                      } else if (courtsSnapshot.hasData && courtsSnapshot.data != null) {
                                         return CircularPercentIndicator(
                                           radius: 55.0,
                                           lineWidth: 8.0,
                                           animation: true,
                                           percent:
-                                          ((snapshot.data?.length ?? 0) / (totalCount ?? 10)).clamp(0.0, 1.0),
+                                          ((courtsSnapshot.data?.length ?? 0) / (totalCount ?? 10)).clamp(0.0, 1.0),
                                           center: Text(
-                                            "${snapshot.data?.length ?? 0}\nCheck ins",
+                                            "${courtsSnapshot.data?.length ?? 0}\nCheck ins",
                                             textAlign: TextAlign.center,
                                             style: const TextStyle(
                                               fontWeight: FontWeight.bold,
@@ -229,7 +234,7 @@ class _OtherProfileViewState extends State<OtherProfileView> {
                                           circularStrokeCap: CircularStrokeCap.round,
                                           progressColor: darkYellowColor,
                                         );
-                                      } else if (snapshot.hasError) {
+                                      } else if (courtsSnapshot.hasError) {
                                         return Center(
                                           child: Text(TempLanguage.wentWrong),
                                         );
@@ -264,15 +269,15 @@ class _OtherProfileViewState extends State<OtherProfileView> {
                                     poppinsText("Golden", 22, FontWeight.bold, appBlackColor),
                                     poppinsText("Courts", 22, FontWeight.bold, appBlackColor),
                                     FutureBuilder<List<UserModel>?>(
-                                      future: getUniqueCourtNameMaps(),
-                                      builder: (context, snapshot) {
-                                        if (snapshot.connectionState == ConnectionState.waiting) {
+                                      future: getUniqueCourtOtherNameMaps(snapshot.data!.uid!),
+                                      builder: (context, goldenSnapshot) {
+                                        if (goldenSnapshot.connectionState == ConnectionState.waiting) {
                                           // return const Center(child: CircularProgressIndicator());
                                           return const Center(child: CircularProgressIndicator());
-                                        } else if (snapshot.hasData && snapshot.data != null) {
-                                          return poppinsText("${snapshot.data?.length ?? 0} Check ins", 12,
+                                        } else if (goldenSnapshot.hasData && goldenSnapshot.data != null) {
+                                          return poppinsText("${goldenSnapshot.data?.length ?? 0} Check ins", 12,
                                               FontWeight.normal, appBlackColor);
-                                        } else if (snapshot.hasError) {
+                                        } else if (goldenSnapshot.hasError) {
                                           return Center(
                                             child: Text(TempLanguage.wentWrong),
                                           );
@@ -288,7 +293,7 @@ class _OtherProfileViewState extends State<OtherProfileView> {
                           ],
                         ),
                         const SizedBox(
-                          height: 10,
+                          height: 15,
                         ),
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 12),

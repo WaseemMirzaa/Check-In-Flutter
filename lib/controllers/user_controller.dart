@@ -1,3 +1,4 @@
+import 'package:check_in/Services/user_services.dart';
 import 'package:check_in/model/user_modal.dart';
 import 'package:get/get.dart';
 
@@ -8,4 +9,7 @@ class UserController extends GetxController {
       val?.goldenCheckin = newGoldenCheckin;
     });
   }
+
+
+
 }
