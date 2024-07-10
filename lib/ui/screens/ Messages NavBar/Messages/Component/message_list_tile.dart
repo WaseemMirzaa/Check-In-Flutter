@@ -68,9 +68,9 @@ class _MessageListTileState extends State<MessageListTile> {
               children: [
                 CircleAvatar(
                   backgroundColor: appGreenColor.withOpacity(0.6),
-                  backgroundImage: widget.userModel!.photoUrl.isEmptyOrNull
+                  backgroundImage: widget.userModel!.photoUrl.isEmptyOrNull && widget.message!.image.isEmptyOrNull
                       ? AssetImage(AppImage.user) as ImageProvider
-                      : CachedNetworkImageProvider(widget.userModel!.photoUrl!),
+                      : CachedNetworkImageProvider(widget.userModel?.photoUrl ?? widget.message!.image!),
                   radius: 30,
                 ),
                 Padding(
@@ -90,7 +90,7 @@ class _MessageListTileState extends State<MessageListTile> {
                           SizedBox(
                             width: 45.w,
                             child:
-                                poppinsText(widget.userModel!.userName!, 15, medium, appBlackColor, overflow: TextOverflow.ellipsis),
+                                poppinsText(widget.userModel?.userName ?? widget.message!.name!, 15, medium, appBlackColor, overflow: TextOverflow.ellipsis),
                           ),
                         ],
                       ),

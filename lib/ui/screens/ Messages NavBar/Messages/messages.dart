@@ -64,10 +64,13 @@ class MessageScreen extends GetView<MessageController> {
                           itemBuilder: (context, index) {
                             var message = snapshot.data?[index];
                             if (message!.showMessageTile!) {
-                              return FutureBuilder(
-                              future: userServices.getUserData(snapshot.data![index].recieverId == userController.userModel.value.uid ? snapshot.data![index].senderId! : snapshot.data![index].recieverId!),
+                              return (snapshot.data![index].isgroup == false) ? FutureBuilder(
+                              future: userServices.getUserData(
+                                  snapshot.data![index].recieverId == FirebaseAuth.instance.currentUser!.uid ? snapshot.data![index].senderId! : snapshot.data![index].recieverId!),
                                   builder: (context, userSnap) {
                                 if(userSnap.connectionState == ConnectionState.waiting){
+                                  return SizedBox();
+                                }else if(!userSnap.hasData){
                                   return SizedBox();
                                 }
                                 return Obx(() {
@@ -104,7 +107,7 @@ class MessageScreen extends GetView<MessageController> {
                     //.........................
                     chatcontroller.name.value = message.name ?? '';
                     chatcontroller.isgroup = message.isgroup ?? false;
-                    chatcontroller.image.value = userSnap.data!.photoUrl ?? '';
+                    chatcontroller.image.value = userSnap.data?.photoUrl ?? '';
                     chatcontroller.memberId.value = message.memberIds ?? [];
                     chatcontroller.senderName.value = message.yourname ?? '';
                     chatcontroller.members.value = message.members ?? [];
@@ -113,7 +116,7 @@ class MessageScreen extends GetView<MessageController> {
                     pushNewScreen(
                       context,
                       screen: ChatScreen(
-                        image: userSnap.data!.photoUrl,
+                        image: userSnap.data?.photoUrl ?? '',
                         //   name: message.name!.obs,isGroup: message.isgroup,
                         // image:message.image!.obs,memberId: message.memberIds!.obs,senderName: message.senderName!.obs,
                       ),
@@ -127,7 +130,60 @@ class MessageScreen extends GetView<MessageController> {
         }
       });
     }
-                              );
+                              ) : Obx(() {
+                                if (snapshot.data![index].name!.toLowerCase().contains(controller.searchQuery.toLowerCase())) {
+                                  return Padding(
+                                      padding: const EdgeInsets.symmetric(vertical: 6),
+                                      child: Slidable(
+                                        endActionPane: ActionPane(
+                                          extentRatio: 0.27,
+                                          motion: const ScrollMotion(),
+                                          children: [
+                                            SlidableAction(
+                                              onPressed: (_) {
+                                                messageDeleteDialog(onTap: () {
+                                                  controller.deleteMessage(
+                                                      message.id!, userController.userModel.value.uid!).then((_) => Get.back());});
+                                              },
+                                              backgroundColor: appRedColor,
+                                              foregroundColor: appWhiteColor,
+                                              borderRadius: BorderRadius.only(
+                                                  topLeft: const Radius.circular(5),
+                                                  bottomLeft: radiusCircular(5)),
+                                              icon: Icons.delete,
+                                              label: 'Delete',
+                                            ),
+                                          ],
+                                        ),
+                                        child: MessageListTile(
+                                          message: snapshot.data![index],
+                                          ontap: () {
+                                            GlobalVariable.docId = chatcontroller.docId.value =
+                                            message.id!;
+                                            //.........................
+                                            chatcontroller.name.value = message.name ?? '';
+                                            chatcontroller.isgroup = message.isgroup ?? false;
+                                            chatcontroller.image.value = message.image ?? '';
+                                            chatcontroller.memberId.value = message.memberIds ?? [];
+                                            chatcontroller.senderName.value = message.yourname ?? '';
+                                            chatcontroller.members.value = message.members ?? [];
+                                            //...............
+                                            // chatcontroller.updateLastSeenMethod();
+                                            pushNewScreen(
+                                              context,
+                                              screen: ChatScreen(
+                                                //   name: message.name!.obs,isGroup: message.isgroup,
+                                                // image:message.image!.obs,memberId: message.memberIds!.obs,senderName: message.senderName!.obs,
+                                              ),
+                                            );
+                                          },
+                                          userModel: UserModel(),
+                                        ),
+                                      ));
+                                } else {
+                                  return Container();
+                                }
+                              });
                             } else {
                               return const SizedBox.shrink();
                             }

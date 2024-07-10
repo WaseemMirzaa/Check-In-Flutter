@@ -205,6 +205,11 @@ class NewsFeedController extends GetxController {
     feedsModel.timestamp = Timestamp.now();
     return await newsFeedService.sharePost(feedsModel);
   }
+/// Share count get
+  Future<int?> getNumberOfShares(String postID) async {
+    return await newsFeedService.getNumberOfShares(postID);
+  }
+
 
 /// Like post controller
   Future<bool> likePost(String postId, String userId)async{
@@ -237,6 +242,11 @@ class NewsFeedController extends GetxController {
     commentModel.likes = 0;
     return await newsFeedService.addCommentOnComment(postId, commentId ,commentModel);
   }
+/// get post by id
+  Future<NewsFeedModel?> getPostById(String docId) async {
+    return await newsFeedService.getPostById(docId);
+  }
+
 
 /// get post comments controller
   Stream<List<CommentModel>> getPostComments(String postId){

@@ -68,16 +68,27 @@ class CommentContainer extends StatelessWidget {
               ),
               horizontalGap(10),
               Expanded(
-                child: Container(
-                    width: MediaQuery.sizeOf(context).width * 0.65,
-                    padding: const EdgeInsets.all(15),
-                    decoration: BoxDecoration(
+                child:  Builder(
+                    builder: (context) {
+                      bool containsEmojis = hasEmojis(commentModel.content!); // Function to check emojis
+
+                    return Container(
+                      width: MediaQuery.sizeOf(context).width * 0.65,
+                      padding: const EdgeInsets.all(14),
+                      decoration: BoxDecoration(
                         color: appDarkBlue.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(10)),
-                    child: poppinsText(commentModel.content!, 12,
-                        medium, appBlackColor,
-                        overflow: TextOverflow.ellipsis,
-                        maxlines: 5)),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: poppinsText(
+                            commentModel.content!, 14, // Use dynamic font size
+                            medium,
+                            appBlackColor,
+                            overflow: TextOverflow.ellipsis,
+                            maxlines: 5,
+                      ),
+                    );
+                  }
+                )
               )
             ],
           ),
@@ -224,5 +235,13 @@ class CommentContainer extends StatelessWidget {
         ],
       ),
     );
+  }
+  bool hasEmojis(String text) {
+    RegExp regex = RegExp(
+      r"(\p{Emoji_Presentation}|\p{Emoji}\uFE0F)",
+      unicode: true,
+      caseSensitive: false,
+    );
+    return regex.hasMatch(text);
   }
 }

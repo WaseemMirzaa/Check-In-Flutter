@@ -72,12 +72,12 @@ class _SharedPostCompState extends State<SharedPostComp> {
       });
     });
   }
-
+  RxBool isVisible = false.obs;
   @override
   Widget build(BuildContext context) {
     newsFeedController.commentModel.value.userId = widget.data!.userId;
-    RxBool isVisible = false.obs;
-    return shareUserData == null || postUserData == null ? SizedBox() : CustomContainer1(
+    print("Called Agaaaaaaain BUild \n\n\n");
+    return shareUserData == null || postUserData == null ? const SizedBox() : CustomContainer1(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 15),
         child: Column(
@@ -95,17 +95,17 @@ class _SharedPostCompState extends State<SharedPostComp> {
 
                       }else{
                         widget.isOtherProfile ? Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>OtherProfileView(uid: widget.data!.shareUID!))) : pushNewScreen(context, screen: OtherProfileView(uid: widget.data!.shareUID!));
-
                       }
                     },
                     child: Container(
-                                    height: 40,
-                                    width: 40,
-                                    decoration: BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        image: DecorationImage(
-                                            image: shareUserData!.photoUrl.isEmptyOrNull ? NetworkImage(AppImage.userImagePath) : NetworkImage(shareUserData!.photoUrl ?? ''),fit: BoxFit.cover))),
-                  ),
+                        height: 40,
+                        width: 40,
+                        decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            image: DecorationImage(
+                                image: shareUserData!.photoUrl.isEmptyOrNull ? NetworkImage(AppImage.userImagePath) :
+                                NetworkImage(shareUserData!.photoUrl ?? ''),
+                                fit: BoxFit.cover))),),
 
                   horizontalGap(10),
                   Expanded(
@@ -218,11 +218,9 @@ class _SharedPostCompState extends State<SharedPostComp> {
                       if(userController.userModel.value.uid == widget.data!.userId){
                         widget.isOtherProfile ? Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>ProfileScreen(isNavBar: false,isOther: true,))) :  pushNewScreen(context, screen: ProfileScreen(isNavBar: false,));
                       } else if(widget.isOtherProfile && widget.data!.shareUID!.isNotEmpty){
-
                       } else{
                         widget.isOtherProfile ? Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>OtherProfileView(uid: widget.data!.userId!))) : pushNewScreen(context, screen: OtherProfileView(uid: widget.data!.userId!));
                       }
-
                     },
                     child: Container(
                         height: 40,
@@ -244,7 +242,6 @@ class _SharedPostCompState extends State<SharedPostComp> {
                       } else{
                         widget.isOtherProfile ? Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>OtherProfileView(uid: widget.data!.userId!))) : pushNewScreen(context, screen: OtherProfileView(uid: widget.data!.userId!));
                       }
-
                     },
                     child: poppinsText(postUserData!.userName ?? '', 14, bold, appDarkBlue,
                           overflow: TextOverflow.ellipsis),
@@ -369,7 +366,7 @@ class _SharedPostCompState extends State<SharedPostComp> {
                   Expanded(
                     child: GestureDetector(
                         onTap: () {
-                          pushNewScreen(context, screen: PostAllLikesView(postId: widget.data!.id!,));
+                          pushNewScreen(context, screen: PostAllLikesView(postId: widget.data!.shareID!,));
                         },
                         child: Align(
                           alignment: Alignment.centerRight,
@@ -378,9 +375,14 @@ class _SharedPostCompState extends State<SharedPostComp> {
                         )),
                   ),
                   horizontalGap(2.w),
-                  SvgPicture.asset(
-                    AppImage.like,
-                    height: 16,
+                  GestureDetector(
+                    onTap: () {
+                      pushNewScreen(context, screen: PostAllLikesView(postId: widget.data!.shareID!,));
+                    },
+                    child: SvgPicture.asset(
+                      AppImage.like,
+                      height: 16,
+                    ),
                   ),
                 ],
               ),
@@ -395,7 +397,8 @@ class _SharedPostCompState extends State<SharedPostComp> {
                     Container(
                         decoration: BoxDecoration(
                             color: greyColor.withOpacity(0.2),
-                            borderRadius: BorderRadius.circular(25)),
+                            borderRadius: BorderRadius.circular(25)
+                        ),
                         padding: const EdgeInsets.symmetric(horizontal: 15),
                         child: CustomTextfield1(
                           controller: addCommentController,
@@ -461,14 +464,13 @@ class _SharedPostCompState extends State<SharedPostComp> {
                               ListView.separated(
                                 shrinkWrap: true,
                                 physics: const NeverScrollableScrollPhysics(),
-                                itemCount: snapshot.data!.length,
+                                itemCount: snapshot.data!.length >5 ? 5 : snapshot.data!.length,
                               padding: const EdgeInsets.all(8),
                               scrollDirection: Axis.vertical,
                               separatorBuilder: (context, index) =>
                               const SizedBox(height: 20,),
                               itemBuilder: (context,
                                   index) => CommentContainer(commentModel: snapshot.data![index],),),
-
                               verticalGap(10),
                               Divider(
                                 color: greyColor,
@@ -476,7 +478,7 @@ class _SharedPostCompState extends State<SharedPostComp> {
                                 endIndent: 20.w,
                               ),
                               verticalGap(10),
-                              GestureDetector(
+                              snapshot.data!.isEmpty ? const SizedBox() : GestureDetector(
                                   onTap: () {
                                     pushNewScreen(context,
                                         screen: AllCommentsScreen(docId:snapshot.data!.first.postId!, newsFeedModel: widget.data!,isShare: true,));
@@ -484,12 +486,9 @@ class _SharedPostCompState extends State<SharedPostComp> {
                                   child: poppinsText('Show more', 15, bold, appGreenColor))
                             ],
                           );
-
-    }
+                        }
                       }
                     ),
-
-
                   ],
                 )))
             ],),)

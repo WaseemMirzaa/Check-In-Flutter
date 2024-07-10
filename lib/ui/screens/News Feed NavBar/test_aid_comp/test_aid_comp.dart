@@ -4,15 +4,16 @@ import 'package:check_in/ui/widgets/custom_container.dart';
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:nb_utils/nb_utils.dart';
+import 'package:sizer/sizer.dart';
 
-class NativeTestAds extends StatefulWidget {
-  const NativeTestAds({super.key});
+class NavtiveAdsComp extends StatefulWidget {
+  const NavtiveAdsComp({super.key});
 
   @override
   _NativeTestAds createState() => _NativeTestAds();
 }
 
-class _NativeTestAds extends State<NativeTestAds> {
+class _NativeTestAds extends State<NavtiveAdsComp> {
   NativeAd? _nativeAd;
   bool _nativeAdIsLoaded = false;
 
@@ -66,11 +67,11 @@ class _NativeTestAds extends State<NativeTestAds> {
           child: ClipRRect(
             borderRadius: BorderRadius.circular(12),
             child: ConstrainedBox(
-              constraints: const BoxConstraints(
-                minWidth: 300,
-                minHeight: 350,
-                maxHeight: 400,
-                maxWidth: 450,
+              constraints: BoxConstraints(
+                minWidth: 100.w,
+                minHeight: 50.h,
+                maxHeight: 50.h,
+                maxWidth: 100.w,
               ),
               child: _nativeAdIsLoaded
                   ? AdWidget(ad: _nativeAd!)

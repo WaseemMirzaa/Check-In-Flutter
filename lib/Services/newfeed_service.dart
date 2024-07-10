@@ -149,6 +149,29 @@ class NewsFeedService {
     }
   }
 
+  /// get share count
+  Future<int?> getNumberOfShares(String postID) async {
+    try {
+      // Reference to the specific document in the newsFeed collection
+      DocumentSnapshot documentSnapshot = await FirebaseFirestore.instance
+          .collection(Collections.NEWSFEED)
+          .doc(postID)
+          .get();
+
+      // Check if the document exists and has the field
+      if (documentSnapshot.exists && documentSnapshot.data() != null) {
+        Map<String, dynamic> data = documentSnapshot.data() as Map<String, dynamic>;
+        return data[NewsFeed.NO_OF_SHARED] as int?;
+      } else {
+        print('Document does not exist or has no data.');
+        return null;
+      }
+    } catch (e) {
+      print('Error fetching document: $e');
+      return null;
+    }
+  }
+
   /// Like and unlike post
   Future<bool> toggleLikePost(String postId, String userId) async {
     try{
@@ -415,13 +438,50 @@ class NewsFeedService {
     }
   }
 
+  /// news feed single post for deep linking
+  Future<NewsFeedModel?> getPostById(String docId) async {
+    try {
+      DocumentSnapshot doc = await _newsFeedCollection.doc(docId).get();
+      if (doc.exists) {
+        return NewsFeedModel.fromJson(doc.data() as Map<String, dynamic>);
+      } else {
+        print('Document does not exist');
+        return null;
+      }
+    } catch (e) {
+      print('Error getting document: $e');
+      return null;
+    }
+  }
 
-  /// share through deep linking
+  // /// share through deep linking
+  // Future<String> createDynamicLink(String postId) async {
+  //   try{
+  //     final DynamicLinkParameters parameters = DynamicLinkParameters(
+  //       uriPrefix: 'https://developlogix.page.link', // Your Firebase Dynamic Links URL prefix
+  //       link: Uri.parse('https://yourapp.com/post?postId=12'), // Deep link URL
+  //       androidParameters: const AndroidParameters(
+  //         packageName: 'com.developlogix.checkinapp', // Your package name
+  //         minimumVersion: 0,
+  //       ),
+  //       iosParameters: const IOSParameters(
+  //         bundleId: 'com.developlogix.checkin', // Your bundle ID
+  //         minimumVersion: '0',
+  //       ),
+  //     );
+  //
+  //     final ShortDynamicLink shortDynamicLink = await FirebaseDynamicLinks.instance.buildShortLink(parameters);
+  //     return shortDynamicLink.shortUrl.toString();
+  //   }catch (e){
+  //     log("The error is----------\n\n\n\n\n\n\ $e\n\n\n");
+  //     return '';
+  //   }
+  //   }
   Future<String> createDynamicLink(String postId) async {
-    try{
+    try {
       final DynamicLinkParameters parameters = DynamicLinkParameters(
         uriPrefix: 'https://developlogix.page.link', // Your Firebase Dynamic Links URL prefix
-        link: Uri.parse('https://yourapp.com/post?postId=12'), // Deep link URL
+        link: Uri.parse('https://yourapp.com/post?postId=$postId'), // Deep link URL
         androidParameters: const AndroidParameters(
           packageName: 'com.developlogix.checkinapp', // Your package name
           minimumVersion: 0,
@@ -434,11 +494,11 @@ class NewsFeedService {
 
       final ShortDynamicLink shortDynamicLink = await FirebaseDynamicLinks.instance.buildShortLink(parameters);
       return shortDynamicLink.shortUrl.toString();
-    }catch (e){
+    } catch (e) {
       log("The error is----------\n\n\n\n\n\n\ $e\n\n\n");
       return '';
     }
-    }
+  }
 
 /// Upload image to firebase for news feed
   Future<String> uploadChatImageToFirebase( String imagePath, String uId, String time, String extension) async {

@@ -236,12 +236,17 @@ class _ChatScreenState extends State<ChatScreen> {
                     pushNewScreen(context, screen: OtherProfileView(uid: controller.otherUserId.value));
                   },
             child: Row(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.center, children: [
-              Obx(() => CircleAvatar(
-                    backgroundImage: widget.image == '' || controller.image.value == ''
+            controller.isgroup ?  Obx(() => CircleAvatar(
+                    backgroundImage: widget.image.isEmptyOrNull && controller.image.value.isEmptyOrNull
                         ? AssetImage(AppImage.user) as ImageProvider
-                        : CachedNetworkImageProvider(widget.image ?? controller.name.value),
+                        : CachedNetworkImageProvider(controller.isgroup  ? controller.image.value : widget.image?? ''),
                     radius: 20,
-                  )),
+                  )) : CircleAvatar(
+    backgroundImage: widget.image.isEmptyOrNull && controller.image.value.isEmptyOrNull
+    ? AssetImage(AppImage.user) as ImageProvider
+        : CachedNetworkImageProvider(controller.isgroup  ? controller.image.value : widget.image?? ''),
+    radius: 20,
+    ),
               horizontalGap(10),
               controller.isgroup ? SvgPicture.asset(AppImage.chatgroupicon) : const SizedBox(),
               horizontalGap(2),

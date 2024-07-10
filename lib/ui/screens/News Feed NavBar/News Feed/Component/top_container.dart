@@ -43,7 +43,7 @@ class TopContainer extends GetView<NewsFeedController> {
                     onTap: (){
                       pushNewScreen(context, screen: ProfileScreen(isNavBar: false,));
                     },
-                    child: (userController.userModel.value.photoUrl!.isNotEmpty)
+                    child: (userController.userModel.value.photoUrl == null || !userController.userModel.value.photoUrl.isEmptyOrNull)
                         ? Container(
                         height: 5.8.h,
                         width: 5.8.h,

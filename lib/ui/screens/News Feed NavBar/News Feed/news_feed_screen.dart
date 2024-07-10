@@ -1,17 +1,14 @@
 import 'package:check_in/Services/newfeed_service.dart';
-import 'package:check_in/Services/user_services.dart';
 import 'package:check_in/controllers/News%20Feed/news_feed_controller.dart';
 import 'package:check_in/core/constant/temp_language.dart';
-import 'package:check_in/model/user_modal.dart';
 import 'package:check_in/ui/screens/News%20Feed%20NavBar/Create%20Post/create_post_screen.dart';
 import 'package:check_in/ui/screens/News%20Feed%20NavBar/News%20Feed/Component/list_tile_container.dart';
 import 'package:check_in/ui/screens/News%20Feed%20NavBar/News%20Feed/Component/shared_post_comp.dart';
 import 'package:check_in/ui/screens/News%20Feed%20NavBar/News%20Feed/Component/top_container.dart';
 import 'package:check_in/ui/screens/News%20Feed%20NavBar/test_aid_comp/test_aid_comp.dart';
-import 'package:check_in/ui/screens/Players.dart';
 import 'package:check_in/utils/colors.dart';
-import 'package:check_in/utils/custom/own_dialog_custom.dart';
 import 'package:check_in/utils/styles.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:nb_utils/nb_utils.dart';
@@ -90,7 +87,7 @@ class _NewsFeedScreenState extends State<NewsFeedScreen> {
                         shrinkWrap: true,
                         itemBuilder: (context, index) {
                           if (index % 5 == 4) {
-                            return const NativeTestAds(key: ValueKey('aid'));
+                            return const NavtiveAdsComp(key: ValueKey('Aid'));
                           }
                           final itemIndex = index - (index ~/ 5);
                           log("\n\nThe Length of the posts are: ${controller
@@ -101,7 +98,7 @@ class _NewsFeedScreenState extends State<NewsFeedScreen> {
                             key: ValueKey(data.id),
                             data: data,
                           ) : SharedPostComp(
-                              key: ValueKey(data.id),
+                              key: ValueKey(data.shareUID),
                               data: data);
                         }
                     );

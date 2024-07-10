@@ -1,7 +1,9 @@
 import 'dart:io';
+import 'package:check_in/Services/user_services.dart';
 import 'package:check_in/ui/screens/%20Messages%20NavBar/other_profile/other_profile_view.dart';
 import 'package:check_in/ui/screens/News%20Feed%20NavBar/share_screen/share_screen.dart';
 import 'package:check_in/ui/screens/profile_screen.dart';
+import 'package:device_preview/device_preview.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:check_in/Services/newfeed_service.dart';
 import 'package:check_in/auth_service.dart';
@@ -29,118 +31,101 @@ class SharePostComp extends GetView<NewsFeedController> {
 
   NewsFeedController newsFeedController = Get.put(NewsFeedController(NewsFeedService()));
   final addCommentController = TextEditingController();
+  final userServices = UserServices();
 
   @override
   Widget build(BuildContext context) {
     newsFeedController.commentModel.value.userId = data!.userId;
-    return CustomContainer1(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 15),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8),
-              child: Row(
-                children: [
-                  GestureDetector(
-                    onTap:  (){
-                      if(userController.userModel.value.uid == data!.userId){
-                        pushNewScreen(context, screen: ProfileScreen(isNavBar: false,));
-                      }else{
-                        pushNewScreen(context,
-                                        screen: OtherProfileView(uid: data!.shareUID!));
-                      }
-                      
-                    },
-                    child: Container(
-                                    height: 40,
-                                    width: 40,
-                                    decoration: BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        image: DecorationImage(
-                                            image: data!.userImage == '' ? NetworkImage(AppImage.userImagePath) : NetworkImage(data!.userImage!),fit: BoxFit.cover))),
-                  ),
-                  
-                  horizontalGap(10),
-                  Expanded(
-                    child:  GestureDetector(
-                    onTap: (){
-                      if(userController.userModel.value.uid == data!.userId){
-                        pushNewScreen(context, screen: ProfileScreen(isNavBar: false,));
-                      }else{
-                        pushNewScreen(context, screen: OtherProfileView(uid: data!.userId!));
-                      }
+    return FutureBuilder(future: userServices.getUserData(data!.userId!),
+        builder: (context, snapshot) {
+      if(snapshot.connectionState == ConnectionState.waiting){
+        return const SizedBox();
+      }
+        return CustomContainer1(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 15),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  child: Row(
+                    children: [
+                      GestureDetector(
+                        onTap:  (){
+                          if(userController.userModel.value.uid == data!.userId){
+                            pushNewScreen(context, screen: ProfileScreen(isNavBar: false,));
+                          }else{
+                            pushNewScreen(context,
+                                            screen: OtherProfileView(uid: data!.shareUID!));
+                          }
 
-                    },
-                    child: poppinsText(data!.name ?? '', 14, bold, appDarkBlue,
-                          overflow: TextOverflow.ellipsis),
-                    ),
-                  ),
-                  horizontalGap(5),
-                     
-                ],
-              ),
-            ),
-            verticalGap(8),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 10.0),
-              child: poppinsText(data!.description ?? "", 12, medium,
-                  appDarkBlue.withOpacity(0.8),
-                  maxlines: 3),
-            ),
-            verticalGap(8),
-            data!.isType == 'image' && data!.postUrl!.isNotEmpty
-                ? GestureDetector(
-                    onTap: () {
-                      pushNewScreen(context, screen: FullScreenImage(newsFeedModel: data!,));
-                    },
-                    child: SizedBox(
-                      height: 200,
-                      width: double.infinity,
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(8),
-                        child: Image.network(
-                          data!.postUrl ?? '',
-                          fit: BoxFit.cover,
+                        },
+                        child: Container(
+                                        height: 40,
+                                        width: 40,
+                                        decoration: BoxDecoration(
+                                            shape: BoxShape.circle,
+                                            image: DecorationImage(
+                                                image: snapshot.data!.photoUrl!.isEmptyOrNull ? NetworkImage(AppImage.userImagePath) : NetworkImage(snapshot.data!.photoUrl!),fit: BoxFit.cover))),
+                      ),
+
+                      horizontalGap(10),
+                      Expanded(
+                        child:  GestureDetector(
+                        onTap: (){
+                          if(userController.userModel.value.uid == data!.userId){
+                            pushNewScreen(context, screen: ProfileScreen(isNavBar: false,));
+                          }else{
+                            pushNewScreen(context, screen: OtherProfileView(uid: data!.userId!));
+                          }
+
+                        },
+                        child: poppinsText(snapshot.data?.userName ?? '', 14, bold, appDarkBlue,
+                              overflow: TextOverflow.ellipsis),
                         ),
                       ),
-                    ),
-                  )
-                : data!.isType == 'video' ? newsFeedController.videoLoad.value
-                ? loaderView()
-                : VideoPlayerWidget(videoUrl: data!.postUrl!,) : SizedBox(),
-            verticalGap(10),
-    ],
-        ),
-      ),
+                      horizontalGap(5),
+
+                    ],
+                  ),
+                ),
+                verticalGap(8),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                  child: poppinsText(data!.description ?? "", 12, medium,
+                      appDarkBlue.withOpacity(0.8),
+                      maxlines: 3),
+                ),
+                verticalGap(8),
+                data!.isType == 'image' && data!.postUrl!.isNotEmpty
+                    ? GestureDetector(
+                        onTap: () {
+                          pushNewScreen(context, screen: FullScreenImage(newsFeedModel: data!,));
+                        },
+                        child: SizedBox(
+                          height: 200,
+                          width: double.infinity,
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(8),
+                            child: Image.network(
+                              data!.postUrl ?? '',
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                        ),
+                      )
+                    : data!.isType == 'video' ? newsFeedController.videoLoad.value
+                    ? loaderView()
+                    : VideoPlayerWidget(videoUrl: data!.postUrl!,) : SizedBox(),
+                verticalGap(10),
+        ],
+            ),
+          ),
+        );
+      }
     );
   }
-
-  Future<String> createDynamicLink(String postId) async {
-    try{
-      final DynamicLinkParameters parameters = DynamicLinkParameters(
-        uriPrefix: 'https://developlogix.page.link', // Your Firebase Dynamic Links URL prefix
-        link: Uri.parse('https://yourapp.com/post?postId=12'), // Deep link URL
-        androidParameters: const AndroidParameters(
-          packageName: 'com.developlogix.checkinapp', // Your package name
-          minimumVersion: 0,
-        ),
-        iosParameters: const IOSParameters(
-          bundleId: 'com.developlogix.checkin', // Your bundle ID
-          minimumVersion: '0',
-        ),
-      );
-
-      final ShortDynamicLink shortDynamicLink = await FirebaseDynamicLinks.instance.buildShortLink(parameters);
-      return shortDynamicLink.shortUrl.toString();
-    }catch (e){
-      log("The error is----------\n\n\n\n\n\n\ $e\n\n\n");
-      return '';
-    }
-    }
-
-
 }
 
 class ChewieDemo extends StatefulWidget {

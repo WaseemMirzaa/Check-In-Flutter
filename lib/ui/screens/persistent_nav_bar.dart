@@ -22,6 +22,8 @@ import 'History.dart';
 import '../../controllers/nav_bar_controller.dart';
 import 'News Feed NavBar/News Feed/news_feed_screen.dart';
 import 'dart:developer' as developer;
+
+import 'News Feed NavBar/deep_link_screen/deep_link_view.dart';
 class BottomNav {
   String icon;
   Color iconColor;
@@ -175,12 +177,13 @@ class _HomeState extends State<Home> with AutomaticKeepAliveClientMixin {
   ];
   /// The deep link
   Future<void> initDynamicLinks(BuildContext context) async {
+    print("\n\n\n\n\n First Call \n\n\n");
     await Firebase.initializeApp();
+
     // Handle initial link when the app is first opened
     final PendingDynamicLinkData? initialLinkData = await FirebaseDynamicLinks.instance.getInitialLink();
     _handleDeepLink(context, initialLinkData?.link);
 
-    // Set up the listener for any dynamic links clicked while the app is in the background or foreground
     FirebaseDynamicLinks.instance.onLink.listen(
           (PendingDynamicLinkData dynamicLinkData) {
         _handleDeepLink(context, dynamicLinkData?.link);
@@ -192,22 +195,34 @@ class _HomeState extends State<Home> with AutomaticKeepAliveClientMixin {
   }
 
   void _handleDeepLink(BuildContext context, Uri? deepLink) {
+    print("\n\n\n\n\n 2nd Call \n\n\n");
+
     if (deepLink != null) {
+      print("Deep Link URL: ${deepLink.toString()}");
       var isPost = deepLink.pathSegments.contains('post');
-      print("THe collection contains---> $isPost");
+      print("The collection contains---> $isPost");
       if (isPost) {
-        var postId = deepLink.queryParameters['postId=12'];
+        var postId = deepLink.queryParameters['postId'];
+        print("Post ID: $postId"); // Added debug statement
         if (postId != null) {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => NewsFeedScreen(postId: postId,),
+              builder: (context) => DeepLinkView(jobPost: postId),
             ),
           );
+        } else {
+          print("Post ID is null");
         }
+      } else {
+        print("Deep Link does not contain 'post' in path segments");
       }
+    } else {
+      print("Deep Link is null");
     }
   }
+
+
 
 
   List<BottomNavigationBarItem> _navBarsItems() {

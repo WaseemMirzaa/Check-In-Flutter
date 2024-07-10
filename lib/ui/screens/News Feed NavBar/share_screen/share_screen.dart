@@ -38,6 +38,15 @@ class SharePostScreen extends StatelessWidget {
                     {
                       NewsFeed.NO_OF_SHARED: data!.noOfShared! + 1,
                     });
+                int? share = await feedController.getNumberOfShares(data.id!);
+                if(share != null){
+                  await feedController.updateCollection(
+                      Collections.NEWSFEED, data.id!,
+                      {
+                        NewsFeed.NO_OF_SHARED: share! + 1,
+                      });
+                }
+
               }else{
                 await feedController.updateCollection(
                     Collections.NEWSFEED, data.id!,
@@ -45,6 +54,7 @@ class SharePostScreen extends StatelessWidget {
                       NewsFeed.NO_OF_SHARED: data!.noOfShared! + 1,
                     });
               }
+
                feedController.newsFeedModel.value.noOfShared = 0;
               final share = await feedController.sharePost(feedController.newsFeedModel.value);
               print("Share : $share");

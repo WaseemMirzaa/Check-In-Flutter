@@ -71,11 +71,11 @@ class _ListTileContainerState extends State<ListTileContainer> {
       });
     });
   }
+  RxBool isVisible = false.obs;
 
   @override
   Widget build(BuildContext context) {
     newsFeedController.commentModel.value.userId = widget.data!.userId;
-    RxBool isVisible = false.obs;
         return userData == null ? SizedBox() : LoaderOverlay(
           child: CustomContainer1(
             child: Padding(
@@ -327,9 +327,14 @@ class _ListTileContainerState extends State<ListTileContainer> {
                               )),
                         ),
                         horizontalGap(2.w),
-                        SvgPicture.asset(
-                          AppImage.like,
-                          height: 16,
+                        GestureDetector(
+                          onTap: () {
+                            pushNewScreen(context, screen: PostAllLikesView(postId: widget.data!.id!,));
+                          },
+                          child: SvgPicture.asset(
+                            AppImage.like,
+                            height: 16,
+                          ),
                         ),
                       ],
                     ),
@@ -409,7 +414,7 @@ class _ListTileContainerState extends State<ListTileContainer> {
                                     ListView.separated(
                                       shrinkWrap: true,
                                       physics: const NeverScrollableScrollPhysics(),
-                                      itemCount: snapshot.data!.length,
+                                      itemCount:snapshot.data!.length >5 ? 5 : snapshot.data!.length,
                                     padding: const EdgeInsets.all(8),
                                     scrollDirection: Axis.vertical,
                                     separatorBuilder: (context, index) =>
@@ -432,12 +437,9 @@ class _ListTileContainerState extends State<ListTileContainer> {
                                         child: poppinsText('Show more', 15, bold, appGreenColor))
                                   ],
                                 );
-
-          }
+                              }
                             }
                           ),
-
-
                         ],
                       )))
                 ],

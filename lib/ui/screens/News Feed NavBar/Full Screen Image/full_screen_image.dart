@@ -80,7 +80,7 @@ class FullScreenImage extends StatelessWidget {
                   children: [
                     GestureDetector(
                       onTap: (){
-                        pushNewScreen(context, screen: PostAllLikesView(postId: newsFeedModel.id!,));
+                        pushNewScreen(context, screen: PostAllLikesView(postId: newsFeedModel.isOriginal! ? newsFeedModel.id! : newsFeedModel.shareID!,));
                       },
                       child: SvgPicture.asset(
                         AppImage.like1,

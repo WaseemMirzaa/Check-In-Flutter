@@ -58,15 +58,28 @@ class SubCommentComp extends StatelessWidget {
               radius: 17,
             ),
             horizontalGap(10),
-            Container(
-              width: MediaQuery.sizeOf(context).width * 0.48,
-                padding: const EdgeInsets.all(15),
-                decoration: BoxDecoration(
-                    color: appDarkBlue.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(10)),
-                child: poppinsText(
-                    commentModel.content!, 12, medium, appBlackColor,
-                    maxlines: 5))
+            Builder(
+                builder: (context) {
+                  bool containsEmojis = hasEmojis(commentModel.content!); // Function to check emojis
+
+                  return Container(
+                    width: MediaQuery.sizeOf(context).width * 0.4,
+                    padding: containsEmojis ? const EdgeInsets.symmetric(horizontal: 10,vertical: 4) : const EdgeInsets.all(14),
+                    decoration: BoxDecoration(
+                      color: appDarkBlue.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: poppinsText(
+                      commentModel.content!,
+                      containsEmojis ? 25 : 14, // Use dynamic font size
+                      medium,
+                      appBlackColor,
+                      overflow: TextOverflow.ellipsis,
+                      maxlines: 5,
+                    ),
+                  );
+                }
+            )
           ],
         ),
         Container(
@@ -119,4 +132,12 @@ class SubCommentComp extends StatelessWidget {
       ]),
     );
   }
+   bool hasEmojis(String text) {
+     RegExp regex = RegExp(
+       r"(\p{Emoji_Presentation}|\p{Emoji}\uFE0F)",
+       unicode: true,
+       caseSensitive: false,
+     );
+     return regex.hasMatch(text);
+   }
 }
