@@ -799,21 +799,21 @@ packages:
   google_maps_flutter_android:
     dependency: transitive
     description:
-      path: "/Users/apple/StudioProjects/Check-In-Flutter/google_maps_flutter/google_maps_flutter_android"
+      path: "/Users/user/Documents/Projects/Check-In-Flutter/google_maps_flutter/google_maps_flutter_android"
       relative: false
     source: path
     version: "2.5.0"
   google_maps_flutter_ios:
     dependency: transitive
     description:
-      path: "/Users/apple/StudioProjects/Check-In-Flutter/google_maps_flutter/google_maps_flutter_ios"
+      path: "/Users/user/Documents/Projects/Check-In-Flutter/google_maps_flutter/google_maps_flutter_ios"
       relative: false
     source: path
     version: "2.3.0"
   google_maps_flutter_platform_interface:
     dependency: transitive
     description:
-      path: "/Users/apple/StudioProjects/Check-In-Flutter/google_maps_flutter/google_maps_flutter_platform_interface"
+      path: "/Users/user/Documents/Projects/Check-In-Flutter/google_maps_flutter/google_maps_flutter_platform_interface"
       relative: false
     source: path
     version: "2.3.0"

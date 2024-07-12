@@ -419,7 +419,7 @@ class MessageService {
   }
 
   // ................ READ RECEIPTS
-  Future<bool> readReceipts(String messageDoc, String uid) async {
+  Future<bool> readRecDeipts(String messageDoc, String uid) async {
     try {
       final querySnapshot = await _messagesCollection
           .doc(messageDoc)
