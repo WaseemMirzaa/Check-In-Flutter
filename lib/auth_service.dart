@@ -74,7 +74,6 @@ Future<void> login(email, password, context) async {
         snap.collection(Collections.USER).doc(value.user!.uid).update(
           {
             UserKey.DEVICE_TOKEN: FieldValue.arrayUnion(tokens)
-            // UserKey.DEVICE_TOKEN: [token]
           },
         );
       }

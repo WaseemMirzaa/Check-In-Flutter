@@ -73,20 +73,36 @@ class NewsFeedController extends GetxController {
     if (lastPostDoc == null) return;
     print("The news feed document is: ${lastPostDoc!.id}");
     isLoader.value = true;
-
     newsFeedService.getNewsFeed(startAfter: lastPostDoc).listen((newsFeedList) {
       if (newsFeedList.isNotEmpty) {
         lastPostDoc = newsFeedList.last['snapshot'] as DocumentSnapshot;
         print("The last document is: ${lastPostDoc!.id}");
 
-        _newsFeed.addAll(newsFeedList.map((e) => e['model'] as NewsFeedModel).toList());
+        // Get the existing IDs from the _newsFeed list
+        final existingIds = _newsFeed.map((e) => e.id).toSet();
+
+        // Filter out posts that already exist in _newsFeed
+        final newPosts = newsFeedList
+            .map((e) => e['model'] as NewsFeedModel)
+            .where((post) => !existingIds.contains(post.id))
+            .toList();
+
+        // Add only new posts to _newsFeed
+        _newsFeed.addAll(newPosts);
       }
       isLoader.value = false;
     });
   }
 
+  void clearNewsFeeds() {
+    _newsFeed.clear();
+    lastPostDoc = null;
+    isLoader.value = false;
+  }
 
-  final _userPosts = <NewsFeedModel>[].obs;
+
+
+    final _userPosts = <NewsFeedModel>[].obs;
   DocumentSnapshot? userLastDoc;
   final userPostLoader = false.obs;
 
@@ -121,11 +137,7 @@ class NewsFeedController extends GetxController {
     userPostLoader.value = false;
   }
 
-  void clearNewsFeeds() {
-    _newsFeed.clear();
-    lastPostDoc = null;
-    isLoader.value = false;
-  }
+
 
 // /// get news feed (posts) controller
 //   Stream<List<NewsFeedModel>> getNewsFeed() {
@@ -247,8 +259,16 @@ class NewsFeedController extends GetxController {
     return await newsFeedService.getPostById(docId);
   }
 
+  ///liked by
+  Stream<List<String>?> getPostLikedBy(String postId){
+    return newsFeedService.getPostLikedBy(postId);
+  }
 
-/// get post comments controller
+  Stream<NewsFeedModel?> getPostsByDocID(String postId) {
+    return newsFeedService.getPostsByDocID(postId);
+  }
+
+    /// get post comments controller
   Stream<List<CommentModel>> getPostComments(String postId){
     return newsFeedService.getPostComments(postId);
   }

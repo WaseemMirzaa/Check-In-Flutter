@@ -105,8 +105,23 @@ class NewsFeedService {
   }
 
 
+/// Get post by spacific ID
+  Stream<NewsFeedModel?> getPostsByDocID(String postId) {
+    return FirebaseFirestore.instance
+        .collection(Collections.NEWSFEED)
+        .doc(postId)
+        .snapshots()
+        .map((snapshot) {
+      if (!snapshot.exists) {
+        return null; // Return null if the document doesn't exist
+      }
 
+      final data = snapshot.data();
+      final postModel = NewsFeedModel.fromJson(data!); // Create the model from JSON data
 
+      return postModel;
+    });
+  }
   /// Create news feed post
   Future<bool> createPost(NewsFeedModel newsFeedModel,String compress) async{
     try{
@@ -175,6 +190,7 @@ class NewsFeedService {
   /// Like and unlike post
   Future<bool> toggleLikePost(String postId, String userId) async {
     try{
+      print("Like Function called -------------------------");
       final docRef = FirebaseFirestore.instance.collection(Collections.NEWSFEED).doc(postId);
       log(docRef.id.toString());
       await FirebaseFirestore.instance.runTransaction((transaction) async {
@@ -185,9 +201,12 @@ class NewsFeedService {
         }
         final post = NewsFeedModel.fromJson(snapshot.data() as Map<String, dynamic>);
         if (post.likedBy!.contains(userId)) {
+          print("Already Liked removing... -------------------------");
           post.likedBy!.remove(userId);
           post.noOfLike > 0 ? post.noOfLike -= 1 : post.noOfLike = 0;
         } else {
+          print("Not Liked Liked Adding... -------------------------");
+
           post.likedBy!.add(userId);
           post.noOfLike += 1;
         }
@@ -196,11 +215,31 @@ class NewsFeedService {
           NewsFeed.LIKED_BY: post.likedBy,
         });
       });
+      print("Like Function Funished -------------------------");
+
       return true;
     }catch (e){
       return false;
     }
   }
+
+  /// LIKED BY
+  Stream<List<String>?> getPostLikedBy(String postId) {
+    return FirebaseFirestore.instance
+        .collection(Collections.NEWSFEED)
+        .doc(postId)
+        .snapshots()
+        .map((DocumentSnapshot<Map<String, dynamic>> snapshot) {
+      if (!snapshot.exists) {
+        return null; // Return null if the document doesn't exist
+      }
+      final data = snapshot.data();
+      final likedBy = data?[NewsFeed.LIKED_BY] as List<dynamic>? ?? [];
+      return likedBy.cast<String>().toList(); // Cast likedBy to List<String> and return
+    });
+  }
+
+
 
   /// Fetch all likers on posts
   Future<List<UserModel>> fetchLikerUsers(String postId) async {
@@ -513,5 +552,24 @@ class NewsFeedService {
       return '';
     }
   }
+/// Tried
+//   Future<List<NewsFeedModel>> fetchNewsFeed({required DocumentSnapshot? lastDoc, required int pageSize}) async {
+//     List<NewsFeedModel> posts = [];
+//     try {
+//       Query query = _newsFeedCollection.orderBy(NewsFeed.TIME_STAMP, descending: true).limit(pageSize);
+//       if (lastDoc != null) {
+//         query = query.startAfterDocument(lastDoc);
+//       }
+//
+//       QuerySnapshot snapshot = await query.get();
+//
+//       for (var doc in snapshot.docs) {
+//         posts.add(NewsFeedModel.fromJson(doc.data() as Map<String, dynamic>, doc: doc)); // Pass the doc reference
+//       }
+//     } catch (e) {
+//       print('Error fetching news feed: $e');
+//     }
+//     return posts;
+//   }
 
 }

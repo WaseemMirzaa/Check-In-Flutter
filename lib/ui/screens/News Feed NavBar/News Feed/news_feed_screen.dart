@@ -1,4 +1,5 @@
 import 'package:check_in/Services/newfeed_service.dart';
+import 'package:check_in/auth_service.dart';
 import 'package:check_in/controllers/News%20Feed/news_feed_controller.dart';
 import 'package:check_in/core/constant/temp_language.dart';
 import 'package:check_in/ui/screens/News%20Feed%20NavBar/Create%20Post/create_post_screen.dart';
@@ -8,7 +9,6 @@ import 'package:check_in/ui/screens/News%20Feed%20NavBar/News%20Feed/Component/t
 import 'package:check_in/ui/screens/News%20Feed%20NavBar/test_aid_comp/test_aid_comp.dart';
 import 'package:check_in/utils/colors.dart';
 import 'package:check_in/utils/styles.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:nb_utils/nb_utils.dart';
@@ -82,8 +82,7 @@ class _NewsFeedScreenState extends State<NewsFeedScreen> {
 
                     return ListView.builder(
                         physics: const NeverScrollableScrollPhysics(),
-                        itemCount: controller.newsFeed.length +
-                            (controller.newsFeed.length ~/ 4),
+                        itemCount: controller.newsFeed.length + (controller.newsFeed.length ~/ 4),
                         shrinkWrap: true,
                         itemBuilder: (context, index) {
                           if (index % 5 == 4) {
@@ -98,7 +97,7 @@ class _NewsFeedScreenState extends State<NewsFeedScreen> {
                             key: ValueKey(data.id),
                             data: data,
                           ) : SharedPostComp(
-                              key: ValueKey(data.shareUID),
+                              key: ValueKey(data.shareID),
                               data: data);
                         }
                     );

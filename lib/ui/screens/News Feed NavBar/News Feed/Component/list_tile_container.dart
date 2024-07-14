@@ -6,6 +6,9 @@ import 'package:check_in/model/user_modal.dart';
 import 'package:check_in/ui/screens/%20Messages%20NavBar/other_profile/other_profile_view.dart';
 import 'package:check_in/ui/screens/News%20Feed%20NavBar/share_screen/share_screen.dart';
 import 'package:check_in/ui/screens/profile_screen.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:device_preview/device_preview.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:check_in/Services/newfeed_service.dart';
 import 'package:check_in/auth_service.dart';
@@ -76,146 +79,203 @@ class _ListTileContainerState extends State<ListTileContainer> {
   @override
   Widget build(BuildContext context) {
     newsFeedController.commentModel.value.userId = widget.data!.userId;
-        return userData == null ? SizedBox() : LoaderOverlay(
+        return userData == null ? const SizedBox() : LoaderOverlay(
           child: CustomContainer1(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 15),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 8),
-                    child: Row(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 10, vertical: 15),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        GestureDetector(
-                          onTap: widget.isMyProfile && userController.userModel.value.uid == widget.data!.userId ? null : (){
-                            if(userController.userModel.value.uid == widget.data!.userId){
-                              pushNewScreen(context, screen: ProfileScreen(isNavBar: false,));
-                            }else if(widget.isOtherProfile && widget.data!.userId!.isNotEmpty){
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 8),
+                          child: Row(
+                            children: [
+                              GestureDetector(
+                                  onTap: widget.isMyProfile &&
+                                      userController.userModel.value.uid ==
+                                          widget.data!.userId ? null : () {
+                                    if (userController.userModel.value.uid ==
+                                        widget.data!.userId) {
+                                      pushNewScreen(context,
+                                          screen: ProfileScreen(
+                                            isNavBar: false,));
+                                    } else if (widget.isOtherProfile &&
+                                        widget.data!.userId!.isNotEmpty) {
 
-                            }else{
-                             widget.isOtherProfile ? Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>OtherProfileView(uid: widget.data!.userId!))) : pushNewScreen(context, screen: OtherProfileView(uid: widget.data!.userId!));
-                            }
+                                    } else {
+                                      widget.isOtherProfile
+                                          ? Navigator.pushReplacement(context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  OtherProfileView(
+                                                      uid: widget.data!
+                                                          .userId!)))
+                                          : pushNewScreen(context,
+                                          screen: OtherProfileView(
+                                              uid: widget.data!.userId!));
+                                    }
+                                  },
+                                  child: Container(
+                                      height: 40,
+                                      width: 40,
+                                      decoration: BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          image: DecorationImage(
+                                              image: userData!.photoUrl
+                                                  .isEmptyOrNull
+                                                  ? NetworkImage(
+                                                  AppImage.userImagePath)
+                                                  : NetworkImage(
+                                                  userData!.photoUrl ?? ''),
+                                              fit: BoxFit.cover)))
+                              ),
 
-                          },
-                          child: Container(
-                                        height: 40,
-                                        width: 40,
-                                        decoration: BoxDecoration(
-                                            shape: BoxShape.circle,
-                                            image: DecorationImage(
-                                                image: userData!.photoUrl.isEmptyOrNull ? NetworkImage(AppImage.userImagePath) : NetworkImage(userData!.photoUrl ?? ''),fit: BoxFit.cover)))
-                        ),
+                              horizontalGap(10),
+                              Expanded(
+                                child: GestureDetector(
+                                  onTap: widget.isMyProfile &&
+                                      userController.userModel.value.uid ==
+                                          widget.data!.userId ? null : () {
+                                    if (userController.userModel.value.uid ==
+                                        widget.data!.userId) {
+                                      pushNewScreen(context,
+                                          screen: ProfileScreen(
+                                            isNavBar: false,));
+                                    } else if (widget.isOtherProfile &&
+                                        widget.data!.userId!.isNotEmpty) {
 
-                        horizontalGap(10),
-                        Expanded(
-                          child:  GestureDetector(
-                          onTap: widget.isMyProfile && userController.userModel.value.uid == widget.data!.userId ? null : (){
-                            if(userController.userModel.value.uid == widget.data!.userId){
-                              pushNewScreen(context, screen: ProfileScreen(isNavBar: false,));
-                            }else if(widget.isOtherProfile && widget.data!.userId!.isNotEmpty){
+                                    } else {
+                                      widget.isOtherProfile
+                                          ? Navigator.pushReplacement(context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  OtherProfileView(
+                                                      uid: widget.data!
+                                                          .userId!)))
+                                          : pushNewScreen(context,
+                                          screen: OtherProfileView(
+                                              uid: widget.data!.userId!));
+                                    }
+                                  },
+                                  child: poppinsText(
+                                      userData!.userName ?? '', 14, bold,
+                                      appDarkBlue,
+                                      overflow: TextOverflow.ellipsis),
+                                ),
+                              ),
+                              horizontalGap(5),
+                              PopupMenuButton<String>(
+                                icon: Container(
+                                  padding: const EdgeInsets.all(4),
+                                  decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: appGreyColor1),
+                                  child: Icon(
+                                    Icons.more_horiz,
+                                    color: greyColor,
+                                  ),
+                                ),
+                                onSelected: (String result) async {
+                                  switch (result) {
+                                    case 'Hide':
+                                      newsFeedController.hidePost(
+                                          widget.data!.id!);
+                                      break;
+                                    case 'Delete':
+                                      newsFeedController.deletePost(
+                                          widget.data!.id!);
+                                      break;
+                                    case 'Share':
+                                      String link = await newsFeedController
+                                          .createDynamicLink(widget.data!.id!);
+                                      print("The link is: $link");
+                                      if (link.isNotEmpty) {
+                                        Share.share(
+                                            'Check out this post: $link');
+                                      }
+                                      break;
+                                    case 'Report':
+                                      showReportDialog(
+                                          context,
+                                          widget.data!.userId!,
+                                          userController.userModel.value.uid!
+                                      );
+                                      break;
+                                  }
+                                },
+                                itemBuilder: (BuildContext context) {
+                                  List<PopupMenuEntry<String>> items = [
+                                    PopupMenuItem<String>(
+                                      value: widget.data!.userId ==
+                                          userController.userModel.value.uid
+                                          ? 'Delete'
+                                          : 'Hide',
+                                      child: ListTile(
+                                        leading: Icon(widget.data!.userId ==
+                                            userController.userModel.value.uid
+                                            ? Icons.delete
+                                            : Icons.visibility_off),
+                                        title: Text(widget.data!.userId ==
+                                            userController.userModel.value.uid
+                                            ? 'Delete'
+                                            : 'Hide'),
+                                      ),
+                                    ),
+                                    const PopupMenuItem<String>(
+                                      value: 'Share',
+                                      child: ListTile(
+                                        leading: Icon(Icons.share),
+                                        title: Text('Share'),
+                                      ),
+                                    ),
+                                  ];
+                                  if (widget.data!.userId !=
+                                      userController.userModel.value.uid) {
+                                    items.add(
+                                      const PopupMenuItem<String>(
+                                        value: 'Report',
+                                        child: ListTile(
+                                          leading: Icon(Icons.report),
+                                          title: Text('Report'),
+                                        ),
+                                      ),
+                                    );
+                                  }
 
-                            }else{
-                              widget.isOtherProfile ? Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>OtherProfileView(uid: widget.data!.userId!))) : pushNewScreen(context, screen: OtherProfileView(uid: widget.data!.userId!));
-                            }
+                                  return items;
+                                },
+                              )
 
-                          },
-                          child: poppinsText(userData!.userName ?? '', 14, bold, appDarkBlue,
-                                overflow: TextOverflow.ellipsis),
+                            ],
                           ),
                         ),
-                        horizontalGap(5),
-                         PopupMenuButton<String>(
-                icon: Container(
-                            padding: const EdgeInsets.all(4),
-                            decoration: BoxDecoration(
-                                shape: BoxShape.circle, color: appGreyColor1),
-                            child: Icon(
-                              Icons.more_horiz,
-                              color: greyColor,
-                            ),
-                          ),
-                onSelected: (String result) async{
-                  switch (result) {
-                    case 'Hide':
-                      newsFeedController.hidePost(widget.data!.id!);
-                      break;
-                    case 'Delete':
-                       newsFeedController.deletePost(widget.data!.id!);
-                      break;
-                    case 'Share':
-                       String link = await newsFeedController.createDynamicLink(widget.data!.id!);
-                            print("The link is: $link");
-                            if(link.isNotEmpty){
-                              Share.share('Check out this post: $link');
-                            }
-                      break;
-                    case 'Report':
-                      showReportDialog(
-                          context,
-                          widget.data!.userId!,
-                          userController.userModel.value.uid!
-                      );
-                      break;
-                  }
-                },
-                itemBuilder: (BuildContext context) {
-                  List<PopupMenuEntry<String>> items = [
-                    PopupMenuItem<String>(
-                      value: widget.data!.userId == userController.userModel.value.uid ? 'Delete' : 'Hide',
-                      child: ListTile(
-                        leading: Icon(widget.data!.userId == userController.userModel.value.uid ? Icons.delete : Icons.visibility_off),
-                        title: Text(widget.data!.userId == userController.userModel.value.uid ? 'Delete' : 'Hide'),
-                      ),
-                    ),
-                    const PopupMenuItem<String>(
-                      value: 'Share',
-                      child: ListTile(
-                        leading: Icon(Icons.share),
-                        title: Text('Share'),
-                      ),
-                    ),
-                  ];
-                  if (widget.data!.userId != userController.userModel.value.uid) {
-                               items.add(
-                                 const PopupMenuItem<String>(
-                                   value: 'Report',
-                                   child: ListTile(
-                                     leading: Icon(Icons.report),
-                                     title: Text('Report'),
-                                   ),
-                                 ),
-                               );
-                             }
-
-                             return items;
-                           },
-                         )
-
-                      ],
-                    ),
-                  ),
-                  verticalGap(8),
-                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                    child: ReadMoreText(
-                      widget.data!.description ?? "",
-                      trimMode: TrimMode.Line,
-                      trimLines: 6,
-                      colorClickableText: Colors.blue,
-                      trimCollapsedText: ' Show more',
-                      style: GoogleFonts.poppins(fontSize: 12, fontWeight: medium, color: appDarkBlue.withOpacity(0.8)),
-                      trimExpandedText: ' Show less',
-                    )
-                    // poppinsText(data!.description ?? "", 12, medium,
-                    //     appDarkBlue.withOpacity(0.8),
-                    //     maxlines: 10),
-                  ),
-                  verticalGap(8),
-                  widget.data!.isType == 'image' && widget.data!.postUrl!.isNotEmpty
-                      ? GestureDetector(
+                        verticalGap(8),
+                        Padding(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 10.0),
+                            child: ReadMoreText(
+                              widget.data!.description ?? "",
+                              trimMode: TrimMode.Line,
+                              trimLines: 6,
+                              colorClickableText: Colors.blue,
+                              trimCollapsedText: ' Show more',
+                              style: GoogleFonts.poppins(fontSize: 12,
+                                  fontWeight: medium,
+                                  color: appDarkBlue.withOpacity(0.8)),
+                              trimExpandedText: ' Show less',
+                            )
+                          // poppinsText(data!.description ?? "", 12, medium,
+                          //     appDarkBlue.withOpacity(0.8),
+                          //     maxlines: 10),
+                        ),
+                        verticalGap(8),
+                        widget.data!.isType == 'image' &&
+                            widget.data!.postUrl!.isNotEmpty
+                            ? GestureDetector(
                           onTap: () {
-                            pushNewScreen(context, screen: FullScreenImage(newsFeedModel: widget.data!,));
+                            pushNewScreen(context, screen: FullScreenImage(
+                              newsFeedModel: widget.data!,));
                           },
                           child: SizedBox(
                             height: 200,
@@ -229,225 +289,379 @@ class _ListTileContainerState extends State<ListTileContainer> {
                             ),
                           ),
                         )
-                      : widget.data!.isType == 'video' ? newsFeedController.videoLoad.value
-                      ? loaderView()
-                      : VideoPlayerWidget(videoUrl: widget.data!.postUrl!,) : const SizedBox(),
-                  verticalGap(10),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 10),
-                    child: Row(
-                      children: [
-                        poppinsText("${widget.data!.noOfComment} ", 11, medium, appDarkBlue),
-                        poppinsText(' comments . ', 11, medium, appDarkBlue),
-                        poppinsText("${widget.data!.noOfShared} ", 11, medium, appDarkBlue),
-                        poppinsText('shares', 11, medium, appDarkBlue),
-                      ],
-                    ),
-                  ),
-                  verticalGap(15),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 10),
-                    child: Row(
-                      children: [
-                        GestureDetector(
-                            onTap: () async{
-                              await newsFeedController.likePost(widget.data!.id!, userController.userModel.value!.uid!);
-                              },
-                            child: widget.data!.likedBy!.contains(userController.userModel.value.uid)
-                                ? Container(
-                              padding: const EdgeInsets.all(8),
-                              decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: appGreenColor,boxShadow: [
-                                BoxShadow(color: const Color(0x65719029).withOpacity(0.2),blurRadius: 15,offset: const Offset(0, 3))
-                              ]),
-                              child: SvgPicture.asset(
-                                    AppImage.like,
-                                    color: appWhiteColor,
-                                    height: 18,
-                                  ),
-                                )
-                                : Container(
-                              padding: const EdgeInsets.all(8),
-                                  decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      color: appWhiteColor,boxShadow: [
-                                    BoxShadow(color: const Color(0x65719029).withOpacity(0.2),blurRadius: 15,offset: const Offset(0, 3))
-                                  ]),
-                                  child: SvgPicture.asset(
-                                      AppImage.like,
-                                      height: 20,
-                                    ),
-                                )),
-                        horizontalGap(3.w),
-                        GestureDetector(
-                          onTap: () {
-                            isVisible.value = !isVisible.value;
-                          },
-                          child: Container(
-                            padding: const EdgeInsets.all(8),
-                            decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: appWhiteColor,boxShadow: [
-                              BoxShadow(color: const Color(0x65719029).withOpacity(0.2),blurRadius: 15,offset: const Offset(0, 3))
-                            ]),
-                            child: SvgPicture.asset(
-                              AppImage.comment,
-                              height: 20,
-                            ),
+                            : widget.data!.isType == 'video'
+                            ? newsFeedController.videoLoad.value
+                            ? loaderView()
+                            : VideoPlayerWidget(videoUrl: widget.data!
+                            .postUrl!,)
+                            : const SizedBox(),
+                        verticalGap(10),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 10),
+                          child: Row(
+                            children: [
+                              poppinsText(
+                                  "${widget.data!.noOfComment} ", 11, medium,
+                                  appDarkBlue),
+                              poppinsText(
+                                  ' comments . ', 11, medium, appDarkBlue),
+                              poppinsText(
+                                  "${widget.data!.noOfShared} ", 11, medium,
+                                  appDarkBlue),
+                              poppinsText('shares', 11, medium, appDarkBlue),
+                            ],
                           ),
                         ),
-                        horizontalGap(3.w),
-                        GestureDetector(
-                          onTap: () async{
-                            pushNewScreen(context, screen: SharePostScreen(data: widget.data!));
-                          },
-                          child: Container(
-                            padding: const EdgeInsets.all(8),
-                            decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: appWhiteColor,boxShadow: [
-                              BoxShadow(color: const Color(0x65719029).withOpacity(0.2),blurRadius: 15,offset: const Offset(0, 3))
-                            ]),
-                            child: SvgPicture.asset(
-                              AppImage.share,
-                              height: 20,
-                            ),
-                          ),
-                        ),
-                        Expanded(
-                          child: GestureDetector(
-                              onTap: () {
-                                pushNewScreen(context, screen: PostAllLikesView(postId: widget.data!.id!,));
-                              },
-                              child: Align(
-                                alignment: Alignment.centerRight,
-                                child: widget.data!.noOfLike <=1 ? poppinsText('Liked by ${widget.data!.noOfLike} Person', 11, medium, greyColor,maxlines: 1,overflow: TextOverflow.ellipsis) :  poppinsText('Liked by ${widget.data!.noOfLike} People',
-                                    11, medium, greyColor,maxlines: 1,overflow: TextOverflow.ellipsis),
-                              )),
-                        ),
-                        horizontalGap(2.w),
-                        GestureDetector(
-                          onTap: () {
-                            pushNewScreen(context, screen: PostAllLikesView(postId: widget.data!.id!,));
-                          },
-                          child: SvgPicture.asset(
-                            AppImage.like,
-                            height: 16,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  // verticalGap(8),
-                  // const Divider(),
-                  verticalGap(7),
-                  Obx(() => Visibility(
-                      visible: isVisible.value,
-                      child: Column(
-                        children: [
-                          Container(
-                              decoration: BoxDecoration(
-                                  color: greyColor.withOpacity(0.2),
-                                  borderRadius: BorderRadius.circular(25)),
-                              padding: const EdgeInsets.symmetric(horizontal: 15),
-                              child: CustomTextfield1(
-                                controller: addCommentController,
-                                onChanged: (value){
-                                  newsFeedController.commentModel.value.content = value;
-                                },
-                                onEditingCompleted: () async{
-                                  if(addCommentController.text.isEmptyOrNull){
-                                    toast('The field is empty');
-                                  }else {
-                                    final comment = await newsFeedController.addCommentOnPost(widget.data!.id!,
-                                        newsFeedController.commentModel.value);
-                                    if(comment){
-                                      await newsFeedController.updateCollection(Collections.NEWSFEED, widget.data!.id!,
-                                          {
-                                            NewsFeed.NO_OF_COMMENT : widget.data!.noOfComment! + 1,
-                                          });
-                                    }
-                                    (comment) ? addCommentController.clear() : null;
-                                    print("The comment has added $comment");
-                                  }
+                        verticalGap(15),
 
-                                },
-                                suffixIcon: GestureDetector(
-                                  onTap: () async{
-                                    if(addCommentController.text.isEmptyOrNull){
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 10),
+                          child: StreamBuilder(stream: newsFeedController.getPostsByDocID(widget.data!.id??''),
+                              builder: (context, postSnap)
+                          {if (postSnap.connectionState == ConnectionState.waiting)
+                          {return rowComp();} else if (postSnap.hasError)
+                          {return rowComp();}
+                          else if (!postSnap.hasData) {return rowComp();}
+                          else {return Row(
+                                children: [
+                                  GestureDetector(
+                                              onTap: () async {
+                                                print(
+                                                    "The post id is: ${widget.data!
+                                                        .id} and the user id is ${FirebaseAuth
+                                                        .instance.currentUser!
+                                                        .uid}");
+                                                await newsFeedController.likePost(
+                                                    postSnap.data!.id!,
+                                                    FirebaseAuth.instance
+                                                        .currentUser?.uid ?? '');
+                                              },
+                                              child: postSnap.data!.likedBy!.contains(
+                                                  FirebaseAuth.instance.currentUser
+                                                      ?.uid)
+                                                  ? Container(
+                                                padding: const EdgeInsets.all(8),
+                                                decoration: BoxDecoration(
+                                                    shape: BoxShape.circle,
+                                                    color: appGreenColor,
+                                                    boxShadow: [
+                                                      BoxShadow(color: const Color(
+                                                          0x65719029).withOpacity(
+                                                          0.2),
+                                                          blurRadius: 15,
+                                                          offset: const Offset(
+                                                              0, 3))
+                                                    ]),
+                                                child: SvgPicture.asset(
+                                                  AppImage.like,
+                                                  color: appWhiteColor,
+                                                  height: 18,
+                                                ),)
+                                                  : Container(
+                                                padding: const EdgeInsets.all(8),
+                                                decoration: BoxDecoration(
+                                                    shape: BoxShape.circle,
+                                                    color: appWhiteColor,
+                                                    boxShadow: [
+                                                      BoxShadow(color: const Color(
+                                                          0x65719029).withOpacity(
+                                                          0.2),
+                                                          blurRadius: 15,
+                                                          offset: const Offset(
+                                                              0, 3))
+                                                    ]),
+                                                child: SvgPicture.asset(
+                                                  AppImage.like, height: 20,),)),
+                                  horizontalGap(3.w),
+                                  GestureDetector(
+                                    onTap: () {
+                                      isVisible.value = !isVisible.value;
+                                    },
+                                    child: Container(
+                                      padding: const EdgeInsets.all(8),
+                                      decoration: BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          color: appWhiteColor, boxShadow: [
+                                        BoxShadow(color: const Color(0x65719029)
+                                            .withOpacity(0.2),
+                                            blurRadius: 15,
+                                            offset: const Offset(0, 3))
+                                      ]),
+                                      child: SvgPicture.asset(
+                                        AppImage.comment,
+                                        height: 20,
+                                      ),
+                                    ),
+                                  ),
+                                  horizontalGap(3.w),
+                                  GestureDetector(
+                                    onTap: () async {
+                                      pushNewScreen(context,
+                                          screen: SharePostScreen(
+                                              data: widget.data!));
+                                    },
+                                    child: Container(
+                                      padding: const EdgeInsets.all(8),
+                                      decoration: BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          color: appWhiteColor, boxShadow: [
+                                        BoxShadow(color: const Color(0x65719029)
+                                            .withOpacity(0.2),
+                                            blurRadius: 15,
+                                            offset: const Offset(0, 3))
+                                      ]),
+                                      child: SvgPicture.asset(
+                                        AppImage.share,
+                                        height: 20,
+                                      ),
+                                    ),
+                                  ),
+                                  Expanded(
+                                    child: GestureDetector(
+                                        onTap: () {
+                                          pushNewScreen(context,
+                                              screen: PostAllLikesView(
+                                                postId: widget.data!.id!,));
+                                        },
+                                        child: Align(
+                                          alignment: Alignment.centerRight,
+                                          child: postSnap.data!.noOfLike <= 1
+                                              ? poppinsText(
+                                              'Liked by ${postSnap.data!
+                                                  .noOfLike} Person', 11, medium,
+                                              greyColor, maxlines: 1,
+                                              overflow: TextOverflow.ellipsis)
+                                              : poppinsText('Liked by ${postSnap.data!
+                                              .noOfLike} People',
+                                              11, medium, greyColor, maxlines: 1,
+                                              overflow: TextOverflow.ellipsis),
+                                        )),
+                                  ),
+                                  horizontalGap(2.w),
+                                  GestureDetector(
+                                    onTap: () {
+                                      pushNewScreen(context,
+                                          screen: PostAllLikesView(
+                                            postId: widget.data!.id!,));
+                                    },
+                                    child: SvgPicture.asset(
+                                      AppImage.like,
+                                      height: 16,
+                                    ),
+                                  ),
+                                ],
+                              );
+                          }})
+                          ),
+                        // verticalGap(8),
+                        // const Divider(),
+                        verticalGap(7),
+                        Obx(() =>
+                        isVisible.value ? Column(
+                          children: [
+                            Container(
+                                decoration: BoxDecoration(
+                                    color: greyColor.withOpacity(0.2),
+                                    borderRadius: BorderRadius.circular(25)),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 15),
+                                child: CustomTextfield1(
+                                  controller: addCommentController,
+                                  onChanged: (value) {
+                                    newsFeedController.commentModel.value.content = value;
+                                  },
+                                  onEditingCompleted: () async {
+                                    if (addCommentController.text
+                                        .isEmptyOrNull) {
                                       toast('The field is empty');
-                                    }else {
-                                      final comment = await newsFeedController.addCommentOnPost(widget.data!.id!, newsFeedController.commentModel.value);
-                                      if(comment){
-                                        await newsFeedController.updateCollection(Collections.NEWSFEED, widget.data!.id!,
+                                    } else {
+                                      final comment = await newsFeedController
+                                          .addCommentOnPost(widget.data!.id!,
+                                          newsFeedController.commentModel
+                                              .value);
+                                      if (comment) {
+                                        await newsFeedController
+                                            .updateCollection(
+                                            Collections.NEWSFEED,
+                                            widget.data!.id!,
                                             {
-                                              NewsFeed.NO_OF_COMMENT : widget.data!.noOfComment! + 1,
+                                              NewsFeed.NO_OF_COMMENT: widget
+                                                  .data!.noOfComment! + 1,
                                             });
                                       }
-                                      (comment) ? addCommentController.clear() : null;
+                                      (comment)
+                                          ? addCommentController.clear()
+                                          : null;
                                       print("The comment has added $comment");
                                     }
                                   },
-                                  child: Padding(
-                                    padding: const EdgeInsets.symmetric(vertical: 12.0),
-                                    child: SvgPicture.asset(
-                                      AppImage.messageappbaricon,
-                                      color: appGreenColor,
+                                  suffixIcon: GestureDetector(
+                                    onTap: () async {
+                                      if (addCommentController.text
+                                          .isEmptyOrNull) {
+                                        toast('The field is empty');
+                                      } else {
+                                        final comment = await newsFeedController
+                                            .addCommentOnPost(widget.data!.id!,
+                                            newsFeedController.commentModel
+                                                .value);
+                                        if (comment) {
+                                          await newsFeedController
+                                              .updateCollection(
+                                              Collections.NEWSFEED,
+                                              widget.data!.id!,
+                                              {
+                                                NewsFeed.NO_OF_COMMENT: widget
+                                                    .data!.noOfComment! + 1,
+                                              });
+                                        }
+                                        (comment)
+                                            ? addCommentController.clear()
+                                            : null;
+                                        print("The comment has added $comment");
+                                      }
+                                    },
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 12.0),
+                                      child: SvgPicture.asset(
+                                        AppImage.messageappbaricon,
+                                        color: appGreenColor,
+                                      ),
                                     ),
                                   ),
-                                ),
-                                hintText: 'Write a comment',
-                              )),
-                          StreamBuilder(
-                            stream: newsFeedController.getPostComments(widget.data!.id!),
-                            builder: (context, snapshot) {
-                              if(snapshot.connectionState == ConnectionState.waiting){
-                                return const Center(child: CircularProgressIndicator(),);
-                              }else if(snapshot.hasError){
-                                return Center(child: Text(snapshot.error.toString()),);
-                              }else if(!snapshot.hasData){
-                                return const Center(child: Text('No data found'),);
-                              }else{
-                                return Column(
-                                  children: [
-                                    ListView.separated(
-                                      shrinkWrap: true,
-                                      physics: const NeverScrollableScrollPhysics(),
-                                      itemCount:snapshot.data!.length >5 ? 5 : snapshot.data!.length,
-                                    padding: const EdgeInsets.all(8),
-                                    scrollDirection: Axis.vertical,
-                                    separatorBuilder: (context, index) =>
-                                    const SizedBox(height: 20,),
-                                    itemBuilder: (context,
-                                        index) => CommentContainer(commentModel: snapshot.data![index],),),
-
-                                    verticalGap(10),
-                                    Divider(
-                                      color: greyColor,
-                                      indent: 20.w,
-                                      endIndent: 20.w,
-                                    ),
-                                    verticalGap(10),
-                                    snapshot.data!.isEmpty ? const SizedBox() : GestureDetector(
-                                        onTap: () {
-                                          pushNewScreen(context,
-                                              screen: AllCommentsScreen(docId:snapshot.data?.first.postId ?? '',newsFeedModel: widget.data!,));
-                                        },
-                                        child: poppinsText('Show more', 15, bold, appGreenColor))
-                                  ],
-                                );
-                              }
-                            }
-                          ),
-                        ],
-                      )))
-                ],
-              ),
-            ),
-          ),
+                                  hintText: 'Write a comment',
+                                )),
+                            StreamBuilder(
+                                stream: newsFeedController.getPostComments(
+                                    widget.data!.id!),
+                                builder: (context, snapshot) {
+                                  if (snapshot.connectionState ==
+                                      ConnectionState.waiting) {
+                                    return const Center(
+                                      child: CircularProgressIndicator(),);
+                                  } else if (snapshot.hasError) {
+                                    return Center(
+                                      child: Text(snapshot.error.toString()),);
+                                  } else if (!snapshot.hasData) {
+                                    return const Center(
+                                      child: Text('No data found'),);
+                                  } else {
+                                    return Column(
+                                      children: [
+                                        ListView.separated(
+                                          shrinkWrap: true,
+                                          physics: const NeverScrollableScrollPhysics(),
+                                          itemCount: snapshot.data!.length > 5
+                                              ? 5
+                                              : snapshot.data!.length,
+                                          padding: const EdgeInsets.all(8),
+                                          scrollDirection: Axis.vertical,
+                                          separatorBuilder: (context, index) =>
+                                          const SizedBox(height: 20,),
+                                          itemBuilder: (context,
+                                              index) =>
+                                              CommentContainer(
+                                                commentModel: snapshot
+                                                    .data![index],),),
+                                        verticalGap(10),
+                                        Divider(
+                                          color: greyColor,
+                                          indent: 20.w,
+                                          endIndent: 20.w,
+                                        ),
+                                        verticalGap(10),
+                                        snapshot.data!.isEmpty
+                                            ? const SizedBox()
+                                            : GestureDetector(
+                                            onTap: () {
+                                              pushNewScreen(context,
+                                                  screen: AllCommentsScreen(
+                                                    docId: snapshot.data?.first
+                                                        .postId ?? '',
+                                                    newsFeedModel: widget
+                                                        .data!,));
+                                            },
+                                            child: poppinsText(
+                                                'Show more', 15, bold,
+                                                appGreenColor))
+                                      ],
+                                    );
+                                  }
+                                }
+                            ),
+                          ],
+                        ) : const SizedBox())
+                      ],
+                    ),
+                  ),
+                ),
         );
   }
+  Widget rowComp()=>Row(
+    children: [
+      Container(
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: appWhiteColor,
+            boxShadow: [
+              BoxShadow(color: const Color(
+                  0x65719029).withOpacity(
+                  0.2),
+                  blurRadius: 15,
+                  offset: const Offset(
+                      0, 3))
+            ]),
+        child: SvgPicture.asset(
+          AppImage.like, height: 20,),),
+      horizontalGap(3.w),
+      Container(
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: appWhiteColor, boxShadow: [
+          BoxShadow(color: const Color(0x65719029)
+              .withOpacity(0.2),
+              blurRadius: 15,
+              offset: const Offset(0, 3))
+        ]),
+        child: SvgPicture.asset(
+          AppImage.comment,
+          height: 20,
+        ),
+      ),
+      horizontalGap(3.w),
+      Container(
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: appWhiteColor, boxShadow: [
+          BoxShadow(color: const Color(0x65719029)
+              .withOpacity(0.2),
+              blurRadius: 15,
+              offset: const Offset(0, 3))
+        ]),
+        child: SvgPicture.asset(
+          AppImage.share,
+          height: 20,
+        ),
+      ),
+      Expanded(
+        child: Align(
+          alignment: Alignment.centerRight,
+          child: poppinsText(
+              'Liked by  Person', 11, medium,
+              greyColor, maxlines: 1,
+              overflow: TextOverflow.ellipsis)),
+      ),
+      horizontalGap(2.w),
+      SvgPicture.asset(
+        AppImage.like,
+        height: 16,
+      ),
+    ],
+  );
 }
 
 class ChewieDemo extends StatefulWidget {
