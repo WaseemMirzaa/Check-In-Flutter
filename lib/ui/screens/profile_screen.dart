@@ -33,6 +33,7 @@ import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
 import 'package:sizer/sizer.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../auth_service.dart';
+import 'package:check_in/Services/user_services.dart';
 
 class ProfileScreen extends StatefulWidget {
   ProfileScreen({Key? key,this.isNavBar = true, this.isOther = false}) : super(key: key);
@@ -132,7 +133,7 @@ Future<int> getGoldenLocationsCount() async {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  UserController userController = Get.put(UserController());
+  UserController userController = Get.put(UserController(UserServices()));
 
   bool isUploading = false;
 
@@ -308,9 +309,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
       body: SizedBox(
           height: MediaQuery.of(context).size.height,
           child: !userController.userModel.value.uid.isEmptyOrNull
-                  ? SingleChildScrollView(
-            controller: _scrollController,
-                      child: Column(
+                  ? ListView(
+              controller: _scrollController,
+                      keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+                      children:[ Column(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
@@ -715,6 +717,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
                         ],
                       ),
+        ]
                     )
                   : const Center(child: CircularProgressIndicator()),
           // : const Center(child: Text("Loading...")),

@@ -1,4 +1,5 @@
 import 'package:check_in/model/NewsFeed%20Model/news_feed_model.dart';
+import 'package:check_in/ui/screens/News%20Feed%20NavBar/All%20Comments/all_comments.dart';
 import 'package:check_in/ui/screens/News%20Feed%20NavBar/All%20Likes/post_all_likes_view.dart';
 import 'package:check_in/ui/widgets/custom_appbar.dart';
 import 'package:check_in/utils/Constants/images.dart';
@@ -6,6 +7,7 @@ import 'package:check_in/utils/colors.dart';
 import 'package:check_in/utils/gaps.dart';
 import 'package:check_in/utils/styles.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
@@ -90,7 +92,17 @@ class FullScreenImage extends StatelessWidget {
                     horizontalGap(5),
                     poppinsText(newsFeedModel.noOfLike.toString(), 12, medium, appWhiteColor),
                     const Spacer(),
-                    poppinsText("${newsFeedModel.noOfComment} Comments", 12, medium, appWhiteColor),
+                    GestureDetector(
+                        onTap: (){
+                          newsFeedModel.isOriginal! ? pushNewScreen(context,
+                              screen: AllCommentsScreen(
+                              docId: newsFeedModel.id!,
+                              newsFeedModel: newsFeedModel,)) : pushNewScreen(context,
+                              screen: AllCommentsScreen(
+                                docId: newsFeedModel.shareID!,
+                                newsFeedModel: newsFeedModel,));
+                        },
+                        child: poppinsText("${newsFeedModel.noOfComment} Comments", 12, medium, appWhiteColor)),
                   ],
                 )
               ],

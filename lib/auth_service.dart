@@ -2,6 +2,7 @@ import 'package:check_in/Services/dio_config.dart';
 import 'package:check_in/Services/newfeed_service.dart';
 import 'package:check_in/Services/payment_service.dart';
 import 'package:check_in/Services/push_notification_service.dart';
+import 'package:check_in/Services/user_services.dart';
 import 'package:check_in/controllers/News%20Feed/news_feed_controller.dart';
 import 'package:check_in/controllers/user_controller.dart';
 import 'package:check_in/core/constant/constant.dart';
@@ -16,7 +17,7 @@ import 'package:get/get.dart';
 import 'package:nb_utils/nb_utils.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
 
-UserController userController = Get.put(UserController());
+UserController userController = Get.put(UserController(UserServices()));
 final auth = FirebaseAuth.instance;
 final snap = FirebaseFirestore.instance;
 NewsFeedController newsFeedController = Get.put(NewsFeedController(NewsFeedService()));

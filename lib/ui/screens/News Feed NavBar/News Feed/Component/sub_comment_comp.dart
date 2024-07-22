@@ -3,24 +3,29 @@ import 'package:check_in/controllers/News%20Feed/news_feed_controller.dart';
 import 'package:check_in/controllers/user_controller.dart';
 import 'package:check_in/core/constant/app_assets.dart';
 import 'package:check_in/model/NewsFeed%20Model/comment_model.dart';
+import 'package:check_in/ui/screens/%20Messages%20NavBar/other_profile/other_profile_view.dart';
 import 'package:check_in/ui/screens/News%20Feed%20NavBar/News%20Feed/Component/subcomment_all_likes.dart';
+import 'package:check_in/ui/screens/profile_screen.dart';
 import 'package:check_in/utils/Constants/images.dart';
 import 'package:check_in/utils/colors.dart';
 import 'package:check_in/utils/gaps.dart';
 import 'package:check_in/utils/styles.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
 import 'package:sizer/sizer.dart';
+import 'package:check_in/Services/user_services.dart';
 
 class SubCommentComp extends StatelessWidget {
    SubCommentComp({super.key,required this.commentModel});
    CommentModel commentModel;
+
    final newsFeedController = Get.put(NewsFeedController(NewsFeedService()));
-   final userController = Get.put(UserController());
+   final userController = Get.put(UserController(UserServices()));
 
    final replyComment = TextEditingController();
    String formatTimestamp(Timestamp timestamp) {
@@ -46,16 +51,30 @@ class SubCommentComp extends StatelessWidget {
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            commentModel.userImage!.isEmpty ? Container(
-          height: 4.h,
-          width: 4.h,
-          decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              border: Border.all(width: 2, color: appGreenColor),
-              image: const DecorationImage(
-                  image: AssetImage(AppAssets.LOGO_NEW), fit: BoxFit.fill))) : CircleAvatar(
-              backgroundImage: NetworkImage(commentModel.userImage!),
-              radius: 17,
+            commentModel.userImage!.isEmpty ?  GestureDetector(
+              onTap: (){
+                  pushNewScreen(context, screen: OtherProfileView(uid: commentModel.userId!));
+              },
+              child:  Container(
+                        height: 4.h,
+                        width: 4.h,
+                        decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(width: 2, color: appGreenColor),
+                image: const DecorationImage(
+                    image: AssetImage(AppAssets.LOGO_NEW), fit: BoxFit.fill))),
+            ) :  GestureDetector(
+              onTap: (){
+                if(commentModel.userId == FirebaseAuth.instance.currentUser!.uid){
+                  pushNewScreen(context, screen: ProfileScreen(isNavBar: false,));
+                }else{
+                  pushNewScreen(context, screen: OtherProfileView(uid: commentModel.userId!));
+                }
+              },
+              child:  CircleAvatar(
+                backgroundImage: NetworkImage(commentModel.userImage!),
+                radius: 17,
+              ),
             ),
             horizontalGap(10),
             Builder(

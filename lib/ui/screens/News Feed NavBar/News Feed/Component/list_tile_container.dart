@@ -1,5 +1,7 @@
 import 'dart:io';
+import 'package:check_in/Services/message_service.dart';
 import 'package:check_in/Services/user_services.dart';
+import 'package:check_in/controllers/Messages/chat_controller.dart';
 import 'package:check_in/controllers/user_controller.dart';
 import 'package:check_in/core/constant/constant.dart';
 import 'package:check_in/model/user_modal.dart';
@@ -30,6 +32,7 @@ import 'package:check_in/utils/Constants/images.dart';
 import 'package:check_in/utils/colors.dart';
 import 'package:check_in/utils/gaps.dart';
 import 'package:check_in/utils/styles.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -40,6 +43,7 @@ import 'package:share_plus/share_plus.dart';
 import 'package:sizer/sizer.dart';
 import 'package:video_player/video_player.dart';
 
+import '../../../../../core/constant/app_assets.dart';
 import 'report_on_post_comp.dart';
 
 class ListTileContainer extends StatefulWidget{
@@ -57,11 +61,12 @@ class _ListTileContainerState extends State<ListTileContainer> {
 
   final addCommentController = TextEditingController();
 
-  UserController userController = Get.put(UserController());
+  UserController userController = Get.put(UserController(UserServices()));
 
   final userServices = UserServices();
 
   UserModel? userData;
+
 
   @override
   void initState() {
@@ -78,7 +83,9 @@ class _ListTileContainerState extends State<ListTileContainer> {
 
   @override
   Widget build(BuildContext context) {
-    newsFeedController.commentModel.value.userId = widget.data!.userId;
+    print("Before ${newsFeedController.commentModel.value.userId}");
+    newsFeedController.commentModel.value.userId = userController.userModel.value.uid ?? FirebaseAuth.instance.currentUser!.uid;
+    print("After ${newsFeedController.commentModel.value.userId}");
         return userData == null ? const SizedBox() : LoaderOverlay(
           child: CustomContainer1(
                   child: Padding(
@@ -91,44 +98,67 @@ class _ListTileContainerState extends State<ListTileContainer> {
                           padding: const EdgeInsets.symmetric(horizontal: 8),
                           child: Row(
                             children: [
-                              GestureDetector(
-                                  onTap: widget.isMyProfile &&
-                                      userController.userModel.value.uid ==
-                                          widget.data!.userId ? null : () {
-                                    if (userController.userModel.value.uid ==
-                                        widget.data!.userId) {
-                                      pushNewScreen(context,
-                                          screen: ProfileScreen(
-                                            isNavBar: false,));
-                                    } else if (widget.isOtherProfile &&
-                                        widget.data!.userId!.isNotEmpty) {
+                              Stack(
+                                clipBehavior: Clip.none,
+                                alignment: Alignment.bottomRight,
+                                children: [
+                                  GestureDetector(
+                                      onTap: widget.isMyProfile &&
+                                          userController.userModel.value.uid ==
+                                              widget.data!.userId ? null : () {
+                                        if (userController.userModel.value.uid ==
+                                            widget.data!.userId) {
+                                          pushNewScreen(context,
+                                              screen: ProfileScreen(
+                                                isNavBar: false,));
+                                        } else if (widget.isOtherProfile &&
+                                            widget.data!.userId!.isNotEmpty) {
 
-                                    } else {
-                                      widget.isOtherProfile
-                                          ? Navigator.pushReplacement(context,
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  OtherProfileView(
-                                                      uid: widget.data!
-                                                          .userId!)))
-                                          : pushNewScreen(context,
-                                          screen: OtherProfileView(
-                                              uid: widget.data!.userId!));
-                                    }
-                                  },
-                                  child: Container(
-                                      height: 40,
-                                      width: 40,
-                                      decoration: BoxDecoration(
-                                          shape: BoxShape.circle,
-                                          image: DecorationImage(
-                                              image: userData!.photoUrl
-                                                  .isEmptyOrNull
-                                                  ? NetworkImage(
-                                                  AppImage.userImagePath)
-                                                  : NetworkImage(
-                                                  userData!.photoUrl ?? ''),
-                                              fit: BoxFit.cover)))
+                                        } else {
+                                          widget.isOtherProfile
+                                              ? Navigator.pushReplacement(context,
+                                              MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      OtherProfileView(
+                                                          uid: widget.data!
+                                                              .userId!)))
+                                              : pushNewScreen(context,
+                                              screen: OtherProfileView(
+                                                  uid: widget.data!.userId!));
+                                        }
+                                      },
+                                      child: Container(
+                                          height: 40,
+                                          width: 40,
+                                          decoration: BoxDecoration(
+                                              shape: BoxShape.circle,
+                                              image: DecorationImage(
+                                                  image: userData!.photoUrl
+                                                      .isEmptyOrNull
+                                                      ? NetworkImage(
+                                                      AppImage.userImagePath)
+                                                      : NetworkImage(
+                                                      userData!.photoUrl ?? ''),
+                                                  fit: BoxFit.cover)))
+                                  ),
+
+                                  if (userData!.isVerified == null ||
+                                      userData!.isVerified == true)
+                                    Positioned(
+                                      right: -6,
+                                      bottom: -2,
+                                      child: Align(
+                                        alignment: Alignment.bottomRight,
+                                        child: Container(
+                                          height: 2.4.h,
+                                          width: 2.4.h,
+                                          decoration: const BoxDecoration(
+                                              shape: BoxShape.circle,
+                                              image: DecorationImage(image: AssetImage(AppAssets.INSTAGRAM_VERIFICATION))),
+                                        ),
+                                      ),
+                                    )
+                                ],
                               ),
 
                               horizontalGap(10),
@@ -326,15 +356,15 @@ class _ListTileContainerState extends State<ListTileContainer> {
                                 children: [
                                   GestureDetector(
                                               onTap: () async {
-                                                print(
-                                                    "The post id is: ${widget.data!
-                                                        .id} and the user id is ${FirebaseAuth
-                                                        .instance.currentUser!
-                                                        .uid}");
-                                                await newsFeedController.likePost(
-                                                    postSnap.data!.id!,
-                                                    FirebaseAuth.instance
-                                                        .currentUser?.uid ?? '');
+                                                print("The post id is: ${widget.data!.id} and the user id is ${FirebaseAuth.instance.currentUser!.uid}");
+                                                final result = await newsFeedController.likePost(postSnap.data!.id!, FirebaseAuth.instance.currentUser?.uid ?? '');
+                                                print("The Toggle is--------> $result");
+                                                if (result == 'liked') {
+                                                  await newsFeedController.sendNotificationMethod('newsFeed', "${userController.userModel.value.userName} liked your post",
+                                                      'New reaction',
+                                                      widget.data?.id ?? '', [FirebaseAuth.instance.currentUser!.uid, widget.data!.userId]
+                                                  );
+                                                }
                                               },
                                               child: postSnap.data!.likedBy!.contains(
                                                   FirebaseAuth.instance.currentUser
@@ -471,28 +501,26 @@ class _ListTileContainerState extends State<ListTileContainer> {
                                     newsFeedController.commentModel.value.content = value;
                                   },
                                   onEditingCompleted: () async {
-                                    if (addCommentController.text
-                                        .isEmptyOrNull) {
-                                      toast('The field is empty');
-                                    } else {
-                                      final comment = await newsFeedController
-                                          .addCommentOnPost(widget.data!.id!,
-                                          newsFeedController.commentModel
-                                              .value);
+                                    if (addCommentController.text.isNotEmpty) {
+                                      final comment = await newsFeedController.addCommentOnPost(widget.data!.id!,
+                                          newsFeedController.commentModel.value);
                                       if (comment) {
-                                        await newsFeedController
-                                            .updateCollection(
-                                            Collections.NEWSFEED,
-                                            widget.data!.id!,
+                                        await newsFeedController.updateCollection(Collections.NEWSFEED, widget.data!.id!,
                                             {
                                               NewsFeed.NO_OF_COMMENT: widget
                                                   .data!.noOfComment! + 1,
                                             });
+                                        await newsFeedController.sendNotificationMethod('newsFeed', '${userController.userModel.value.userName} commented on your post', 'New comment', widget.data?.id ?? '', [
+                                          FirebaseAuth.instance.currentUser!.uid,
+                                          widget.data!.userId
+                                        ]);
                                       }
                                       (comment)
                                           ? addCommentController.clear()
                                           : null;
                                       print("The comment has added $comment");
+                                    }else{
+                                      primaryFocus!.unfocus();
                                     }
                                   },
                                   suffixIcon: GestureDetector(
@@ -514,6 +542,10 @@ class _ListTileContainerState extends State<ListTileContainer> {
                                                 NewsFeed.NO_OF_COMMENT: widget
                                                     .data!.noOfComment! + 1,
                                               });
+                                          await newsFeedController.sendNotificationMethod('newsFeed', '${userController.userModel.value.userName} commented on your post', 'New comment', widget.data?.id ?? '', [
+                                            FirebaseAuth.instance.currentUser!.uid,
+                                            widget.data!.userId
+                                          ]);
                                         }
                                         (comment)
                                             ? addCommentController.clear()
@@ -560,8 +592,7 @@ class _ListTileContainerState extends State<ListTileContainer> {
                                           separatorBuilder: (context, index) =>
                                           const SizedBox(height: 20,),
                                           itemBuilder: (context,
-                                              index) =>
-                                              CommentContainer(
+                                              index) => CommentContainer(
                                                 commentModel: snapshot
                                                     .data![index],),),
                                         verticalGap(10),
@@ -577,10 +608,8 @@ class _ListTileContainerState extends State<ListTileContainer> {
                                             onTap: () {
                                               pushNewScreen(context,
                                                   screen: AllCommentsScreen(
-                                                    docId: snapshot.data?.first
-                                                        .postId ?? '',
-                                                    newsFeedModel: widget
-                                                        .data!,));
+                                                    docId: snapshot.data?.first.postId ?? '',
+                                                    newsFeedModel: widget.data!,));
                                             },
                                             child: poppinsText(
                                                 'Show more', 15, bold,

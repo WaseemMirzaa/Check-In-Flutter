@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:check_in/Services/newfeed_service.dart';
+import 'package:check_in/Services/user_services.dart';
 import 'package:check_in/controllers/News%20Feed/news_feed_controller.dart';
 import 'package:check_in/controllers/user_controller.dart';
 import 'package:check_in/core/constant/app_assets.dart';
@@ -21,7 +22,7 @@ import 'package:chewie/chewie.dart';
 class CreatePost extends StatelessWidget {
   CreatePost({super.key,this.isOnboard = false});
   bool isOnboard;
-  UserController userController = Get.put(UserController());
+  UserController userController = Get.put(UserController(UserServices()));
   NewsFeedController newsFeedController = Get.put(NewsFeedController(NewsFeedService()));
   
 
@@ -74,8 +75,10 @@ class CreatePost extends StatelessWidget {
         body: Column(
           children: [
             Expanded(
-              child: SingleChildScrollView(
-                child: Column(
+              child: ListView(
+                keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+                children: [
+                  Column(
                   children: [
                     verticalGap(10),
                     Padding(
@@ -158,6 +161,7 @@ class CreatePost extends StatelessWidget {
                             : const SizedBox()))
                   ],
                 ),
+      ]
               ),
             ),
             Container(

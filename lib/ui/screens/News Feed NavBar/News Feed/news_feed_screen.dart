@@ -17,8 +17,9 @@ import 'package:sizer/sizer.dart';
 import '../../../widgets/custom_appbar.dart';
 
 class NewsFeedScreen extends StatefulWidget {
-  NewsFeedScreen({super.key, this.postId = ''});
+  NewsFeedScreen({super.key, this.postId = '', this.isBack = false});
   String postId;
+  bool isBack;
 
   @override
   State<NewsFeedScreen> createState() => _NewsFeedScreenState();
@@ -54,12 +55,13 @@ class _NewsFeedScreenState extends State<NewsFeedScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: CustomAppbar(
-          showicon: false,
+          showicon: widget.isBack,
           title:  poppinsText(
                 TempLanguage.newsFeed, 15, FontWeight.bold, appBlackColor),
         ),
         body: SingleChildScrollView(
           controller: _scrollController,
+          keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
           child: Obx(() {
             return Column(
               children: [

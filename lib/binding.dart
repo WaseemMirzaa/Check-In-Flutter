@@ -1,4 +1,5 @@
 import 'package:check_in/Services/newfeed_service.dart';
+import 'package:check_in/Services/user_services.dart';
 import 'package:check_in/controllers/Messages/add_group_member_controller.dart';
 import 'package:check_in/controllers/Messages/messages_controller.dart';
 import 'package:check_in/controllers/Messages/new_message_controller.dart';
@@ -22,6 +23,6 @@ class MyBinding implements Bindings {
     Get.lazyPut(() => NewMessageController(MessageService()), fenix: true);
     Get.lazyPut(() => NewsFeedController(NewsFeedService()), fenix: true);
     Get.lazyPut(() => AddGroupMembersController(MessageService()), fenix: true);
-    Get.lazyPut(() => UserController(), fenix: true);
+    Get.lazyPut(() => UserController(UserServices()), fenix: true);
   }
 }

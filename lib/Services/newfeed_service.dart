@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:check_in/Services/user_services.dart';
 
 import 'package:check_in/controllers/News%20Feed/news_feed_controller.dart';
 import 'package:check_in/controllers/user_controller.dart';
@@ -23,7 +24,15 @@ class NewsFeedService {
   final FirebaseFirestore firebaseRef = FirebaseFirestore.instance;
 
   final FirebaseStorage _storage = FirebaseStorage.instance;
-  final userController = Get.put(UserController());
+  final userController = Get.put(UserController(UserServices()));
+
+  NewsFeedService._privateConstructor();
+
+  static final NewsFeedService _instance = NewsFeedService._privateConstructor();
+
+  factory NewsFeedService() {
+    return _instance;
+  }
 
   Future<bool> updateCollection(String collectionName, String docId, Map<String, dynamic> list)async{
     try{
@@ -187,43 +196,50 @@ class NewsFeedService {
     }
   }
 
-  /// Like and unlike post
-  Future<bool> toggleLikePost(String postId, String userId) async {
-    try{
+  /// LIKE AND UNLIKE POSTS
+  Future<String?> toggleLikePost(String postId, String userId) async {
+    try {
       print("Like Function called -------------------------");
       final docRef = FirebaseFirestore.instance.collection(Collections.NEWSFEED).doc(postId);
       log(docRef.id.toString());
-      await FirebaseFirestore.instance.runTransaction((transaction) async {
+
+      String result = await FirebaseFirestore.instance.runTransaction((transaction) async {
         final snapshot = await transaction.get(docRef);
         if (!snapshot.exists) {
           log("Post does not exist!");
-          return false;
+          return 'error';
         }
         final post = NewsFeedModel.fromJson(snapshot.data() as Map<String, dynamic>);
         if (post.likedBy!.contains(userId)) {
           print("Already Liked removing... -------------------------");
           post.likedBy!.remove(userId);
           post.noOfLike > 0 ? post.noOfLike -= 1 : post.noOfLike = 0;
+          transaction.update(docRef, {
+            NewsFeed.NO_OF_LIKE: post.noOfLike,
+            NewsFeed.LIKED_BY: post.likedBy,
+          });
+          return 'unliked';
         } else {
-          print("Not Liked Liked Adding... -------------------------");
-
+          print("Not Liked Adding... -------------------------");
           post.likedBy!.add(userId);
           post.noOfLike += 1;
+          transaction.update(docRef, {
+            NewsFeed.NO_OF_LIKE: post.noOfLike,
+            NewsFeed.LIKED_BY: post.likedBy,
+          });
+          print("Liked");
+          return 'liked';
         }
-        transaction.update(docRef, {
-          NewsFeed.NO_OF_LIKE: post.noOfLike,
-          NewsFeed.LIKED_BY: post.likedBy,
-        });
       });
-      print("Like Function Funished -------------------------");
 
-      return true;
-    }catch (e){
-      return false;
+      print("Like Function Finished -------------------------");
+      return result;
+    } catch (e) {
+      return 'error';
     }
   }
 
-  /// LIKED BY
+  /// GET LIKED BY USERS IDS
   Stream<List<String>?> getPostLikedBy(String postId) {
     return FirebaseFirestore.instance
         .collection(Collections.NEWSFEED)
@@ -551,6 +567,20 @@ class NewsFeedService {
       log(e.toString());
       return '';
     }
+  }
+
+  Future<List<dynamic>> getDeviceToken(String id) async {
+    DocumentReference userRef = FirebaseFirestore.instance.collection('USER').doc(id);
+
+    DocumentSnapshot userSnapshot = await userRef.get();
+    Map<String, dynamic>? userData = userSnapshot.data() as Map<String, dynamic>;
+    // print(userData[UserKey.DEVICE_TOKEN]);
+    //
+    // print(userData[UserKey.DEVICE_TOKEN].runtimeType);
+    // print(userData[UserKey.DEVICE_TOKEN]);
+
+    List<dynamic>? deviceTokens = userData[UserKey.DEVICE_TOKEN];
+    return deviceTokens ?? [];
   }
 /// Tried
 //   Future<List<NewsFeedModel>> fetchNewsFeed({required DocumentSnapshot? lastDoc, required int pageSize}) async {

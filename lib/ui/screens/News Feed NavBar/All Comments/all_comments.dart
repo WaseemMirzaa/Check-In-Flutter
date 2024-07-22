@@ -94,9 +94,8 @@ class AllCommentsScreen extends StatelessWidget {
                       newsFeedController.commentModel.value.content = value;
                     },
                     onEditingCompleted: () async{
-                      if(addCommentController.text.isEmptyOrNull){
-                        toast('The field is empty');
-                      }else {
+                      if(!addCommentController.text.isEmptyOrNull){
+
                         final comment = await newsFeedController.addCommentOnPost(isShare ? newsFeedModel.shareID! : newsFeedModel.id!,
                             newsFeedController.commentModel.value);
                         if(comment){
@@ -107,6 +106,8 @@ class AllCommentsScreen extends StatelessWidget {
                         }
                         (comment) ? addCommentController.clear() : null;
                         print("The comment has added $comment");
+                      }else{
+                        primaryFocus?.unfocus();
                       }
 
                     },

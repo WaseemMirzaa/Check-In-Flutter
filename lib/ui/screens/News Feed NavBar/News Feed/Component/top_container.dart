@@ -19,11 +19,12 @@ import 'package:get/get.dart';
 import 'package:nb_utils/nb_utils.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
 import 'package:sizer/sizer.dart';
+import 'package:check_in/Services/user_services.dart';
 
 class TopContainer extends GetView<NewsFeedController> {
   Function()? ontap;
   TopContainer({super.key, this.ontap});
-  UserController userController = Get.put(UserController());
+  UserController userController = Get.put(UserController(UserServices()));
   NewsFeedController newsFeedController = Get.put(NewsFeedController(NewsFeedService()));
 
 

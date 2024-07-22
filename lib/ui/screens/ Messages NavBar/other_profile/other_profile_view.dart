@@ -77,24 +77,25 @@ class _OtherProfileViewState extends State<OtherProfileView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            const SizedBox(
-              width: 25,
-            ),
-            SizedBox(
-              height: 2.1.h,
-              width: 2.9.w,
-              child: Material(
-                  color: appTransparentColor,
-                  child: InkWell(
-                      onTap: () {
-                        Navigator.pop(context);
-                      },
-                      child: Image.asset(AppAssets.LEFT_ARROW))),
-            )
-          ],
+        leading: InkWell(
+          onTap: () {
+            Navigator.pop(context);
+          },
+          child:  Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              const SizedBox(
+                width: 25,
+              ),
+              SizedBox(
+                height: 2.1.h,
+                width: 2.9.w,
+                child: Material(
+                    color: appTransparentColor,
+                    child: Image.asset(AppAssets.LEFT_ARROW)),
+              )
+            ],
+          ),
         ),
         elevation: 0,
         centerTitle: true,

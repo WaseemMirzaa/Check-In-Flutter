@@ -6,12 +6,14 @@ import 'package:check_in/model/NewsFeed%20Model/comment_model.dart';
 import 'package:check_in/ui/screens/News%20Feed%20NavBar/All%20Comments/all_comments.dart';
 import 'package:check_in/ui/screens/News%20Feed%20NavBar/News%20Feed/Component/comment_all_lIkes_view.dart';
 import 'package:check_in/ui/screens/News%20Feed%20NavBar/News%20Feed/Component/sub_comment_comp.dart';
+import 'package:check_in/ui/screens/profile_screen.dart';
 import 'package:check_in/ui/widgets/text_field.dart';
 import 'package:check_in/utils/Constants/images.dart';
 import 'package:check_in/utils/colors.dart';
 import 'package:check_in/utils/gaps.dart';
 import 'package:check_in/utils/styles.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -22,11 +24,14 @@ import 'package:nb_utils/nb_utils.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
 import 'package:sizer/sizer.dart';
 
+import '../../../ Messages NavBar/other_profile/other_profile_view.dart';
+import 'package:check_in/Services/user_services.dart';
+
 class CommentContainer extends StatelessWidget {
   CommentContainer({super.key, required this.commentModel,});
   CommentModel commentModel;
   final newsFeedController = Get.put(NewsFeedController(NewsFeedService()));
-  final userController = Get.put(UserController());
+  final userController = Get.put(UserController(UserServices()));
 
   final replyComment = TextEditingController();
   String formatTimestamp(Timestamp timestamp) {
@@ -53,18 +58,36 @@ class CommentContainer extends StatelessWidget {
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              commentModel.userImage!.isNotEmpty ?  CircleAvatar(
-                backgroundImage: NetworkImage(
-                    commentModel.userImage!),
-                radius: 17,
-              ) : Container(
-                height: 4.5.h,
-                width: 4.5.h,
-                decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    border: Border.all(width: 2, color: appGreenColor),
-                    image: const DecorationImage(
-                        image: AssetImage(AppAssets.LOGO_NEW), fit: BoxFit.fill)),
+              commentModel.userImage!.isNotEmpty ?  GestureDetector(
+                onTap: (){
+                  if(commentModel.userId == FirebaseAuth.instance.currentUser!.uid){
+                    pushNewScreen(context, screen: ProfileScreen(isNavBar: false,));
+                  }else{
+                    pushNewScreen(context, screen: OtherProfileView(uid: commentModel.userId!));
+                  }
+                },
+                child: CircleAvatar(
+                  backgroundImage: NetworkImage(
+                      commentModel.userImage!),
+                  radius: 17,
+                ),
+              ) : GestureDetector(
+                onTap: (){
+                  if(commentModel.userId == FirebaseAuth.instance.currentUser!.uid){
+                    pushNewScreen(context, screen: ProfileScreen(isNavBar: false,));
+                  }else{
+                    pushNewScreen(context, screen: OtherProfileView(uid: commentModel.userId!));
+                  }
+                },
+                child: Container(
+                  height: 4.5.h,
+                  width: 4.5.h,
+                  decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(width: 2, color: appGreenColor),
+                      image: const DecorationImage(
+                          image: AssetImage(AppAssets.LOGO_NEW), fit: BoxFit.fill)),
+                ),
               ),
               horizontalGap(10),
               Expanded(
@@ -181,14 +204,14 @@ class CommentContainer extends StatelessWidget {
                               borderRadius: BorderRadius.circular(25)),
                           child: TextFormField(
                             onEditingComplete: () async{
-                              if(replyComment.text.isEmptyOrNull){
-                                toast('The field is empty');
-                              }else {
+                              if(replyComment.text.isNotEmpty){
                                 final comment = await newsFeedController
                                     .addCommentOnComment(commentModel.postId!,commentModel.commentId!,
                                     newsFeedController.commentModel.value);
                                 (comment) ? replyComment.clear() : null;
                                 print("The comment has added $comment");
+                              }else{
+                                primaryFocus!.unfocus();
                               }
                             },
 
@@ -226,7 +249,7 @@ class CommentContainer extends StatelessWidget {
                                 border: InputBorder.none,
                                 focusedBorder: InputBorder.none),
                           ),
-                        
+
                     ),
                     )
 

@@ -6,10 +6,17 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:get/get.dart';
 
 class UserServices{
-  final db = FirebaseFirestore.instance;
+  FirebaseFirestore db = FirebaseFirestore.instance;
   final FirebaseFirestore firebaseRef = FirebaseFirestore.instance;
   final FirebaseStorage _storage = FirebaseStorage.instance;
-  final userController = Get.put(UserController());
+
+  UserServices._privateConstructor();
+
+  static final UserServices _instance = UserServices._privateConstructor();
+
+  factory UserServices() {
+    return _instance;
+  }
 
   Future<UserModel?> getUserData(String uid) async {
     try {

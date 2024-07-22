@@ -1,9 +1,6 @@
 import 'dart:developer';
 import 'dart:io';
-
-import 'package:check_in/Services/message_service.dart';
 import 'package:check_in/Services/newfeed_service.dart';
-import 'package:check_in/controllers/Messages/chat_controller.dart';
 import 'package:check_in/controllers/user_controller.dart';
 import 'package:check_in/model/NewsFeed%20Model/comment_model.dart';
 import 'package:check_in/model/NewsFeed%20Model/news_feed_model.dart';
@@ -16,6 +13,8 @@ import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:chewie/chewie.dart';
 import 'package:video_player/video_player.dart';
+import 'package:check_in/Services/push_notification_service.dart';
+import 'package:check_in/Services/user_services.dart';
 
 class NewsFeedController extends GetxController {
 
@@ -26,7 +25,7 @@ class NewsFeedController extends GetxController {
 
   late TextEditingController postController;
 
-  UserController userController = Get.put(UserController());
+  UserController userController = Get.put(UserController(UserServices()));
 
   late FocusNode postFocusNode;
 
@@ -224,7 +223,7 @@ class NewsFeedController extends GetxController {
 
 
 /// Like post controller
-  Future<bool> likePost(String postId, String userId)async{
+  Future<String?> likePost(String postId, String userId)async{
     return newsFeedService.toggleLikePost(postId, userId);
   }
 
@@ -367,6 +366,33 @@ class NewsFeedController extends GetxController {
   Future<void> deletePost(String docId)async{
     return newsFeedService.deleteSubcollection(docId);
   }
+
+
+  /// Send notification function
+
+  Future<void> sendNotificationMethod(String notificationType, String msg, String title, String docId,List memberId,{String? image}) async {
+    // print(senderName);
+    // print(memberId);
+    for (var element in memberId) {
+      print("The IDS are: $element");
+      print("THe currrnt iD is: ${FirebaseAuth.instance.currentUser!.uid}");
+      if (element != FirebaseAuth.instance.currentUser!.uid) {
+        List<dynamic> deviceToken = await newsFeedService.getDeviceToken(element);
+        // print(deviceToken.first);
+        // print(deviceToken.first.runtimeType);
+        sendNotification(
+            token: deviceToken,
+            notificationType: notificationType,
+            title: title,
+            msg: msg,
+            docId: docId,
+            image: image ?? '',
+            name: userController.userModel.value.userName ?? '',
+            memberIds: memberId, isGroup: false);
+      }
+    }
+  }
+
 
 /// image compresser
   Future<void> compressImage() async {

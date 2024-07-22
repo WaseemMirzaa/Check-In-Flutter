@@ -11,6 +11,7 @@ import 'package:check_in/ui/screens/splash.dart';
 import 'package:device_preview/device_preview.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -150,16 +151,27 @@ class MyApp extends StatelessWidget {
     // }
     return Sizer(
       builder: (context, orientation, deviceType) {
-        return GetMaterialApp(
-          debugShowCheckedModeBanner: false,
-          title: 'Check In',
-          builder: DevicePreview.appBuilder,
-          theme: ThemeData(
-            useMaterial3: true,
-            scaffoldBackgroundColor: whiteColor,
+        return GestureDetector(
+          onTap: (){
+            try {
+              FocusManager.instance.primaryFocus?.unfocus();
+            } catch (e, stacktrace) {
+              print('Error in onTap: $e');
+              print('Stacktrace: $stacktrace');
+              FirebaseCrashlytics.instance.recordError(e, stacktrace);
+            }
+          },
+          child: GetMaterialApp(
+            debugShowCheckedModeBanner: false,
+            title: 'Check In',
+            builder: DevicePreview.appBuilder,
+            theme: ThemeData(
+              useMaterial3: true,
+              scaffoldBackgroundColor: whiteColor,
+            ),
+            initialBinding: MyBinding(),
+            home: const Splash(),
           ),
-          initialBinding: MyBinding(),
-          home: const Splash(),
         );
       },
     );
