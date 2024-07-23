@@ -10,13 +10,6 @@ class UserServices{
   final FirebaseFirestore firebaseRef = FirebaseFirestore.instance;
   final FirebaseStorage _storage = FirebaseStorage.instance;
 
-  UserServices._privateConstructor();
-
-  static final UserServices _instance = UserServices._privateConstructor();
-
-  factory UserServices() {
-    return _instance;
-  }
 
   Future<UserModel?> getUserData(String uid) async {
     try {

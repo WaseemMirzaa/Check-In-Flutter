@@ -37,14 +37,6 @@ Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await init;
   // await Firebase.initializeApp();
   await initialize();
-  // FlutterLocalNotificationsPlugin notification = FlutterLocalNotificationsPlugin();
-  // AndroidNotificationChannel androidNotificationChannel = const AndroidNotificationChannel(
-  //   'high_importance_channel', // id
-  //   'High Importance Notifications', // title
-  //   description: 'This channel is used for important notifications.', // description
-  //   importance: Importance.high,
-  // );
-
   print("notification received in BACKGROUND");
   print(message.data);
 

@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:check_in/ui/screens/News%20Feed%20NavBar/News%20Feed/news_feed_screen.dart';
+import 'package:check_in/ui/screens/News%20Feed%20NavBar/open_post/open_post.dart';
 import 'package:check_in/ui/screens/profile_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
@@ -609,51 +610,51 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
     // addLocationChangeListener();
     // _checkIfWithinRadius();
     super.initState();
-    initDynamicLinks(context);
+    // initDynamicLinks(context);
   }
 
 
-  /// The deep link
-  Future<void> initDynamicLinks(BuildContext context) async {
-    await Firebase.initializeApp();
-    // Handle initial link when the app is first opened
-    final PendingDynamicLinkData? initialLinkData = await FirebaseDynamicLinks.instance.getInitialLink();
-    _handleDeepLink(context, initialLinkData?.link);
-
-    // Set up the listener for any dynamic links clicked while the app is in the background or foreground
-    FirebaseDynamicLinks.instance.onLink.listen(
-          (PendingDynamicLinkData dynamicLinkData) {
-        _handleDeepLink(context, dynamicLinkData?.link);
-      },
-      onError: (error) async {
-        developer.log('Dynamic Link Failed: ${error.toString()}');
-      },
-    );
-  }
-
-  void _handleDeepLink(BuildContext context, Uri? deepLink) {
-    if (deepLink != null) {
-      var isPost = deepLink.pathSegments.contains('post');
-      if (isPost) {
-        var postId = deepLink.queryParameters['postId'];
-        if (postId != null) {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => NewsFeedScreen(postId: postId,),
-            ),
-          );
-        }else{
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => ProfileScreen(),
-            ),
-          );
-        }
-      }
-    }
-  }
+  // /// The deep link
+  // Future<void> initDynamicLinks(BuildContext context) async {
+  //   await Firebase.initializeApp();
+  //   // Handle initial link when the app is first opened
+  //   final PendingDynamicLinkData? initialLinkData = await FirebaseDynamicLinks.instance.getInitialLink();
+  //   _handleDeepLink(context, initialLinkData?.link);
+  //
+  //   // Set up the listener for any dynamic links clicked while the app is in the background or foreground
+  //   FirebaseDynamicLinks.instance.onLink.listen(
+  //         (PendingDynamicLinkData dynamicLinkData) {
+  //       _handleDeepLink(context, dynamicLinkData?.link);
+  //     },
+  //     onError: (error) async {
+  //       developer.log('Dynamic Link Failed: ${error.toString()}');
+  //     },
+  //   );
+  // }
+  //
+  // void _handleDeepLink(BuildContext context, Uri? deepLink) {
+  //   if (deepLink != null) {
+  //     var isPost = deepLink.pathSegments.contains('post');
+  //     if (isPost) {
+  //       var postId = deepLink.queryParameters['postId'];
+  //       if (postId != null) {
+  //         Navigator.push(
+  //           context,
+  //           MaterialPageRoute(
+  //             builder: (context) => OpenPost(postId: postId,),
+  //           ),
+  //         );
+  //       }else{
+  //         Navigator.push(
+  //           context,
+  //           MaterialPageRoute(
+  //             builder: (context) => ProfileScreen(),
+  //           ),
+  //         );
+  //       }
+  //     }
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {

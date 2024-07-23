@@ -1,7 +1,5 @@
 import 'dart:io';
 import 'package:check_in/Services/user_services.dart';
-
-import 'package:check_in/controllers/News%20Feed/news_feed_controller.dart';
 import 'package:check_in/controllers/user_controller.dart';
 import 'package:check_in/core/constant/constant.dart';
 import 'package:check_in/model/NewsFeed%20Model/comment_model.dart';
@@ -25,14 +23,6 @@ class NewsFeedService {
 
   final FirebaseStorage _storage = FirebaseStorage.instance;
   final userController = Get.put(UserController(UserServices()));
-
-  NewsFeedService._privateConstructor();
-
-  static final NewsFeedService _instance = NewsFeedService._privateConstructor();
-
-  factory NewsFeedService() {
-    return _instance;
-  }
 
   Future<bool> updateCollection(String collectionName, String docId, Map<String, dynamic> list)async{
     try{
@@ -542,7 +532,7 @@ class NewsFeedService {
           minimumVersion: 0,
         ),
         iosParameters: const IOSParameters(
-          bundleId: 'com.developlogix.checkin', // Your bundle ID
+          bundleId: 'com.developlogix.checkinapp', // Your bundle ID
           minimumVersion: '0',
         ),
       );

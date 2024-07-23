@@ -1,6 +1,7 @@
 // ignore_for_file: avoid_print
 import 'package:check_in/core/constant/temp_language.dart';
 import 'package:check_in/ui/screens/News%20Feed%20NavBar/news_feed_onboarding/news_feed_onboarding.dart';
+import 'package:check_in/ui/screens/News%20Feed%20NavBar/open_post/open_post.dart';
 import 'package:check_in/ui/screens/check_in.dart';
 import 'package:check_in/ui/screens/profile_screen.dart';
 import 'package:check_in/ui/screens/start.dart';
@@ -208,7 +209,7 @@ class _HomeState extends State<Home> with AutomaticKeepAliveClientMixin {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => DeepLinkView(jobPost: postId),
+              builder: (context) => OpenPost(postId: postId),
             ),
           );
         } else {

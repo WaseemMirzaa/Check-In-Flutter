@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:check_in/ui/screens/News%20Feed%20NavBar/News%20Feed/news_feed_screen.dart';
+import 'package:check_in/ui/screens/News%20Feed%20NavBar/open_post/open_post.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -208,7 +209,7 @@ class PushNotificationServices {
         chatcontroller.memberId.value = NotificationModel.memberIds;
         //.............................
 
-        NotificationModel.type == 'newsFeed' ? Get.to(()=>NewsFeedScreen(isBack: true,)) : Get.to(() => ChatScreen());
+        NotificationModel.type == 'newsFeed' ? Get.to(()=>OpenPost(postId: NotificationModel.docId,))  : Get.to(() => ChatScreen());
 
         // print('Opened message: ${message.notification?.title}');
         // handle the opened message here, for example by navigating to a specific screen
@@ -255,7 +256,7 @@ class PushNotificationServices {
         chatcontroller.memberId.value = NotificationModel.memberIds;
         //.............................
 
-        NotificationModel.type == 'newsFeed' ? Get.to(()=>NewsFeedScreen(isBack: true,)) : Get.to(() => ChatScreen());
+        NotificationModel.type == 'newsFeed' ? Get.to(()=>OpenPost(postId: NotificationModel.docId,)) : Get.to(() => ChatScreen());
 
         // if (NotificationModel.type == PushNotificationType.msg) {
         //   print('Step 7');

@@ -68,5 +68,12 @@
     <key>GADApplicationIdentifier</key>
     <string>ca-app-pub-7171017916477454~2139743178</string>
 
+    <key>FirebaseDynamicLinksCustomDomains</key>
+    <array>
+        <string>https://developlogix.page.link</string>
+        <string>https://yourapp.com/post?postId=$postId</string>
+    </array>
+
+
 </dict>
 </plist>

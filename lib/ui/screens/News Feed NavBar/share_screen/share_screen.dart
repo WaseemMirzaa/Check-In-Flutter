@@ -53,10 +53,7 @@ class SharePostScreen extends StatelessWidget {
                       {
                         NewsFeed.NO_OF_SHARED: share! + 1,
                       });
-                  await feedController.sendNotificationMethod('newsFeed', '${userController.userModel.value.userName} shared your post', 'New share', data?.shareID ?? '', [
-                    FirebaseAuth.instance.currentUser!.uid,
-                    data.userId
-                  ]);
+
                 }
 
               }else{

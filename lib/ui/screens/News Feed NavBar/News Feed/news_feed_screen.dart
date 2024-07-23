@@ -6,6 +6,7 @@ import 'package:check_in/ui/screens/News%20Feed%20NavBar/Create%20Post/create_po
 import 'package:check_in/ui/screens/News%20Feed%20NavBar/News%20Feed/Component/list_tile_container.dart';
 import 'package:check_in/ui/screens/News%20Feed%20NavBar/News%20Feed/Component/shared_post_comp.dart';
 import 'package:check_in/ui/screens/News%20Feed%20NavBar/News%20Feed/Component/top_container.dart';
+import 'package:check_in/ui/screens/News%20Feed%20NavBar/open_post/open_post.dart';
 import 'package:check_in/ui/screens/News%20Feed%20NavBar/test_aid_comp/test_aid_comp.dart';
 import 'package:check_in/utils/colors.dart';
 import 'package:check_in/utils/styles.dart';
