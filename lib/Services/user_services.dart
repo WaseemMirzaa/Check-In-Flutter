@@ -13,6 +13,13 @@ class UserServices{
 
   Future<UserModel?> getUserData(String uid) async {
     try {
+
+      // Check if uid is not empty or null
+      if (uid.isEmpty || uid == null) {
+        print('Invalid user ID: $uid');
+        return null;
+      }
+
       DocumentSnapshot<Map<String, dynamic>> snapshot =
       await db.collection(Collections.USER).doc(uid).get();
 

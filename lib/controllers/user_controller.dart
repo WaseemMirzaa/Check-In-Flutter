@@ -16,14 +16,17 @@ class UserController extends GetxController {
   }
 
   Future<void> getUserData() async {
-    UserModel? userData = await userServices.getUserData(FirebaseAuth.instance.currentUser?.uid ?? '');
-    if (userData != null) {
-      userModel.value = userData;
-      print("User is: ${userModel.value.userName}");
-    } else {
-      print("User data is null");
+    if (FirebaseAuth.instance.currentUser != null) {
+      UserModel? userData = await userServices.getUserData(
+          FirebaseAuth.instance.currentUser?.uid ?? '');
+      if (userData != null) {
+        userModel.value = userData;
+        print("User is: ${userModel.value.userName}");
+      } else {
+        print("User data is null");
+      }
+      // Optionally, you can return the user data if needed
+      // return userData;
     }
-    // Optionally, you can return the user data if needed
-    // return userData;
   }
 }

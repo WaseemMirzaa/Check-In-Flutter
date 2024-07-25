@@ -3,6 +3,7 @@ import 'package:check_in/controllers/News%20Feed/news_feed_controller.dart';
 import 'package:check_in/controllers/user_controller.dart';
 import 'package:check_in/core/constant/app_assets.dart';
 import 'package:check_in/model/NewsFeed%20Model/comment_model.dart';
+import 'package:check_in/model/user_modal.dart';
 import 'package:check_in/ui/screens/News%20Feed%20NavBar/All%20Comments/all_comments.dart';
 import 'package:check_in/ui/screens/News%20Feed%20NavBar/News%20Feed/Component/comment_all_lIkes_view.dart';
 import 'package:check_in/ui/screens/News%20Feed%20NavBar/News%20Feed/Component/sub_comment_comp.dart';
@@ -27,13 +28,21 @@ import 'package:sizer/sizer.dart';
 import '../../../ Messages NavBar/other_profile/other_profile_view.dart';
 import 'package:check_in/Services/user_services.dart';
 
-class CommentContainer extends StatelessWidget {
+class CommentContainer extends StatefulWidget {
   CommentContainer({super.key, required this.commentModel,});
   CommentModel commentModel;
+
+  @override
+  State<CommentContainer> createState() => _CommentContainerState();
+}
+
+class _CommentContainerState extends State<CommentContainer> {
   final newsFeedController = Get.put(NewsFeedController(NewsFeedService()));
+
   final userController = Get.put(UserController(UserServices()));
 
   final replyComment = TextEditingController();
+
   String formatTimestamp(Timestamp timestamp) {
     final DateTime dateTime = timestamp.toDate();
     final DateFormat formatter = DateFormat('hh:mm a');
@@ -44,13 +53,33 @@ class CommentContainer extends StatelessWidget {
     }
     return parts.join(' ');
   }
+
   Rx<bool> isLiked = false.obs;
+
+  UserModel? userModel;
+
+  final userServices = UserServices();
+
+  getUserData() async {
+    userModel = await userServices.getUserData(widget.commentModel.userId ??"");
+    print("THE USER MODEL IS: ${userModel!.userName}");
+    setState(() {
+
+    });
+  }
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    Future.microtask(() async=> await getUserData());
+    // getUserData();
+  }
 
   @override
   Widget build(BuildContext context) {
     Rx isReply = false.obs;
-    isLiked.value = commentModel.likedBy!.contains(userController.userModel.value.uid);
-    return SizedBox(
+    isLiked.value = widget.commentModel.likedBy!.contains(userController.userModel.value.uid);
+    return  SizedBox(
       width: 100.w,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -58,25 +87,25 @@ class CommentContainer extends StatelessWidget {
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              commentModel.userImage!.isNotEmpty ?  GestureDetector(
+               userModel?.photoUrl != null?  GestureDetector(
                 onTap: (){
-                  if(commentModel.userId == FirebaseAuth.instance.currentUser!.uid){
+                  if(widget.commentModel.userId == FirebaseAuth.instance.currentUser!.uid){
                     pushNewScreen(context, screen: ProfileScreen(isNavBar: false,));
                   }else{
-                    pushNewScreen(context, screen: OtherProfileView(uid: commentModel.userId!));
+                    pushNewScreen(context, screen: OtherProfileView(uid: widget.commentModel.userId!));
                   }
                 },
                 child: CircleAvatar(
                   backgroundImage: NetworkImage(
-                      commentModel.userImage!),
+                      userModel?.photoUrl ?? ''),
                   radius: 17,
                 ),
               ) : GestureDetector(
                 onTap: (){
-                  if(commentModel.userId == FirebaseAuth.instance.currentUser!.uid){
+                  if(widget.commentModel.userId == FirebaseAuth.instance.currentUser!.uid){
                     pushNewScreen(context, screen: ProfileScreen(isNavBar: false,));
                   }else{
-                    pushNewScreen(context, screen: OtherProfileView(uid: commentModel.userId!));
+                    pushNewScreen(context, screen: OtherProfileView(uid: widget.commentModel.userId!));
                   }
                 },
                 child: Container(
@@ -93,7 +122,7 @@ class CommentContainer extends StatelessWidget {
               Expanded(
                 child:  Builder(
                     builder: (context) {
-                      bool containsEmojis = hasEmojis(commentModel.content!); // Function to check emojis
+                      bool containsEmojis = hasEmojis(widget.commentModel.content!); // Function to check emojis
 
                     return Container(
                       width: MediaQuery.sizeOf(context).width * 0.65,
@@ -103,7 +132,7 @@ class CommentContainer extends StatelessWidget {
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: poppinsText(
-                            commentModel.content!, 14, // Use dynamic font size
+                            widget.commentModel.content!, 14, // Use dynamic font size
                             medium,
                             appBlackColor,
                             overflow: TextOverflow.ellipsis,
@@ -121,15 +150,15 @@ class CommentContainer extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                poppinsText(formatTimestamp(commentModel.timestamp!), 12, regular, greyColor),
+                poppinsText(formatTimestamp(widget.commentModel.timestamp!), 12, regular, greyColor),
                 Obx(() => GestureDetector(
                           onTap: ()async{
-                            await newsFeedController.toggleLikeComment(commentModel.parentId! ,commentModel.commentId!, userController.userModel.value.uid!,).then((value) {
+                            await newsFeedController.toggleLikeComment(widget.commentModel.parentId! ,widget.commentModel.commentId!, userController.userModel.value.uid!,).then((value) {
                             });
-                            isLiked = commentModel.likedBy!.contains(userController.userModel.value.uid).obs;
+                            isLiked = widget.commentModel.likedBy!.contains(userController.userModel.value.uid).obs;
                             print("The liked obx is: $isLiked");
                           },
-                          child: commentModel.likedBy!.contains(userController.userModel.value.uid) || isLiked.value ? poppinsText('Liked', 12, bold, appGreenColor) : poppinsText('Like', 12, regular, greyColor)),
+                          child: widget.commentModel.likedBy!.contains(userController.userModel.value.uid) || isLiked.value ? poppinsText('Liked', 12, bold, appGreenColor) : poppinsText('Like', 12, regular, greyColor)),
                     ),
 
                 GestureDetector(
@@ -139,11 +168,11 @@ class CommentContainer extends StatelessWidget {
                     child: poppinsText('Reply', 12, regular, greyColor)),
                 Row(
                   children: [
-                    poppinsText(commentModel.likes.toString(), 12, regular, greyColor),
+                    poppinsText(widget.commentModel.likes.toString(), 12, regular, greyColor),
                     horizontalGap(5),
                     GestureDetector(
                       onTap: (){
-                        pushNewScreen(context, screen: CommentAllLikesView(postId: commentModel.parentId!,commentId: commentModel.commentId!));
+                        pushNewScreen(context, screen: CommentAllLikesView(postId: widget.commentModel.parentId!,commentId: widget.commentModel.commentId!));
                       },
                       child: SvgPicture.asset(
                         AppImage.like1,
@@ -162,7 +191,7 @@ class CommentContainer extends StatelessWidget {
                   children: [
                     SizedBox(height: 2.h,),
                     StreamBuilder(
-                        stream: newsFeedController.getCommentsOnComment(commentModel.parentId!, commentModel.commentId!),
+                        stream: newsFeedController.getCommentsOnComment(widget.commentModel.parentId!, widget.commentModel.commentId!),
                         builder: (context, snapshot) {
                           if(snapshot.connectionState == ConnectionState.waiting){
                             return const Center(child: CircularProgressIndicator(),);
@@ -203,10 +232,11 @@ class CommentContainer extends StatelessWidget {
                               color: greyColor.withOpacity(0.2),
                               borderRadius: BorderRadius.circular(25)),
                           child: TextFormField(
+
                             onEditingComplete: () async{
                               if(replyComment.text.isNotEmpty){
                                 final comment = await newsFeedController
-                                    .addCommentOnComment(commentModel.postId!,commentModel.commentId!,
+                                    .addCommentOnComment(widget.commentModel.postId!,widget.commentModel.commentId!,
                                     newsFeedController.commentModel.value);
                                 (comment) ? replyComment.clear() : null;
                                 print("The comment has added $comment");
@@ -214,6 +244,7 @@ class CommentContainer extends StatelessWidget {
                                 primaryFocus!.unfocus();
                               }
                             },
+
 
                             style: const TextStyle(fontSize: 12),
                             controller: replyComment,
@@ -228,7 +259,7 @@ class CommentContainer extends StatelessWidget {
 
                                     }else {
                                       final comment = await newsFeedController
-                                          .addCommentOnComment(commentModel.parentId!,commentModel.commentId!,
+                                          .addCommentOnComment(widget.commentModel.parentId!,widget.commentModel.commentId!,
                                           newsFeedController.commentModel.value);
                                       (comment) ? replyComment.clear() : null;
                                       print("The comment has added $comment");
@@ -243,7 +274,7 @@ class CommentContainer extends StatelessWidget {
                                   ),
                                 ),
                                 hintText: 'Write a comment',
-                                contentPadding: const EdgeInsets.symmetric(horizontal: 20,vertical: 6),
+                                contentPadding: const EdgeInsets.symmetric(horizontal: 20,vertical: 12),
                                 hintStyle: TextStyle(
                                     fontSize: 12, fontWeight: medium, fontFamily: 'Poppins'),
                                 border: InputBorder.none,
@@ -259,6 +290,7 @@ class CommentContainer extends StatelessWidget {
       ),
     );
   }
+
   bool hasEmojis(String text) {
     RegExp regex = RegExp(
       r"(\p{Emoji_Presentation}|\p{Emoji}\uFE0F)",

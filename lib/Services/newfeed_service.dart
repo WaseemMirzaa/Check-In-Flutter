@@ -300,6 +300,7 @@ class NewsFeedService {
         .orderBy('timestamp', descending: true)
         .snapshots()
         .map((QuerySnapshot<Map<String, dynamic>> snapshot) {
+
       return snapshot.docs.map((doc) {
         return CommentModel.fromJson(doc.data());
       }).toList();
