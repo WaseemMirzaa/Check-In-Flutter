@@ -283,6 +283,12 @@ class _HomeState extends State<Home> with AutomaticKeepAliveClientMixin {
       return true;
     }
   }
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    navBarController.currentIndex.value = 0;
+  }
 
   @override
   bool get wantKeepAlive => true;

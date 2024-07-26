@@ -69,8 +69,8 @@ class _SharedPostCompState extends State<SharedPostComp> {
     // TODO: implement initState
     super.initState();
     Future.microtask(() async{
-      shareUserData = await userServices.getUserData(widget.data!.shareUID!);
-      postUserData = await userServices.getUserData(widget.data!.userId!);
+      postUserData = await userServices.getUserData(widget.data?.userId??"");
+      shareUserData = await userServices.getUserData(widget.data?.shareUID??"");
       setState(() {
 
       });
@@ -537,7 +537,7 @@ class _SharedPostCompState extends State<SharedPostComp> {
                                       pushNewScreen(context,
                                           screen: PostAllLikesView(
                                             postId: widget.data!.shareID!,
-
+                                            isFromProfile: widget.isOtherProfile || widget.isMyProfile,
                                           ));
                                     },
                                     child: Align(
@@ -683,7 +683,9 @@ class _SharedPostCompState extends State<SharedPostComp> {
                                           index) =>
                                           CommentContainer(
                                             commentModel: snapshot
-                                                .data![index],),),
+                                                .data![index],
+                                            isFromProfile: widget.isMyProfile || widget.isOtherProfile,
+                                          ),),
                                     verticalGap(10),
                                     Divider(
                                       color: greyColor,

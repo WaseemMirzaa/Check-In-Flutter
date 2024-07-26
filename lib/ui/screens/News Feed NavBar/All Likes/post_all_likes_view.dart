@@ -18,14 +18,16 @@ import 'package:sizer/sizer.dart';
 import '../../ Messages NavBar/other_profile/other_profile_view.dart';
 
 class PostAllLikesView extends StatelessWidget {
-  PostAllLikesView({super.key, required this.postId, this.isComment = false});
+  PostAllLikesView({super.key, required this.postId, this.isComment = false, this.isFromProfile = false});
   String postId;
   bool isComment;
+  bool isFromProfile;
 
   final newsFeedController = Get.put(NewsFeedController(NewsFeedService()));
 
   @override
   Widget build(BuildContext context) {
+    print("The is From Profile is: ---------- \n $isFromProfile");
     return Scaffold(
       appBar: CustomAppbar(
         title: Row(
@@ -62,10 +64,21 @@ class PostAllLikesView extends StatelessWidget {
                     return GestureDetector(
                       onTap: (){
                         if(snapshot.data![index].uid == FirebaseAuth.instance.currentUser!.uid){
-                          pushNewScreen(context, screen: ProfileScreen(isNavBar: false,));
+                          if(isFromProfile){
+                            Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> ProfileScreen(isNavBar: false,toHome: isFromProfile,)));
+
+                          }else {
+                            pushNewScreen(context, screen: ProfileScreen(isNavBar: false,));
+                          }
                         }else{
-                          pushNewScreen(context, screen: OtherProfileView(uid: snapshot.data![index].uid!));
-                        }
+                          if(isFromProfile){
+                            Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> OtherProfileView(uid: snapshot.data![index].uid!,toHome: isFromProfile,)));
+
+                          }else {
+                            pushNewScreen(
+                                context, screen: OtherProfileView(uid: snapshot.data![index].uid!));
+                          }
+                          }
                       },
                       child:  Padding(
                         padding: const EdgeInsets.symmetric(

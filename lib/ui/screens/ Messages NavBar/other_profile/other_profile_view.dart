@@ -6,6 +6,7 @@ import 'package:check_in/core/constant/temp_language.dart';
 import 'package:check_in/model/user_modal.dart';
 import 'package:check_in/ui/screens/News%20Feed%20NavBar/News%20Feed/Component/list_tile_container.dart';
 import 'package:check_in/ui/screens/add_home_court.dart';
+import 'package:check_in/ui/screens/persistent_nav_bar.dart';
 import 'package:check_in/ui/screens/profile_screen.dart';
 import 'package:check_in/utils/colors.dart';
 import 'package:check_in/utils/styles.dart';
@@ -25,8 +26,9 @@ import '../../News Feed NavBar/News Feed/Component/shared_post_comp.dart';
 
 class OtherProfileView extends StatefulWidget {
   final String uid;
+  bool toHome;
 
-  const OtherProfileView({super.key, required this.uid});
+   OtherProfileView({super.key, required this.uid, this.toHome = false});
 
   @override
   State<OtherProfileView> createState() => _OtherProfileViewState();
@@ -79,7 +81,12 @@ class _OtherProfileViewState extends State<OtherProfileView> {
       appBar: AppBar(
         leading: InkWell(
           onTap: () {
-            Navigator.pop(context);
+            if(widget.toHome){
+              print("Home+++++++++++++++++++++++++++++");
+              Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>const Home()));
+            }else {
+              Navigator.pop(context);
+            }
           },
           child:  Row(
             mainAxisAlignment: MainAxisAlignment.start,

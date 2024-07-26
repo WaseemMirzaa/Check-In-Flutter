@@ -29,8 +29,9 @@ import '../../../ Messages NavBar/other_profile/other_profile_view.dart';
 import 'package:check_in/Services/user_services.dart';
 
 class CommentContainer extends StatefulWidget {
-  CommentContainer({super.key, required this.commentModel,});
+  CommentContainer({super.key, required this.commentModel,this.isFromProfile = false});
   CommentModel commentModel;
+  bool isFromProfile;
 
   @override
   State<CommentContainer> createState() => _CommentContainerState();
@@ -87,12 +88,25 @@ class _CommentContainerState extends State<CommentContainer> {
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-               userModel?.photoUrl != null?  GestureDetector(
+               userModel?.photoUrl != null && userModel?.photoUrl != '' ?  GestureDetector(
                 onTap: (){
                   if(widget.commentModel.userId == FirebaseAuth.instance.currentUser!.uid){
-                    pushNewScreen(context, screen: ProfileScreen(isNavBar: false,));
+                    if(widget.isFromProfile) {
+                      Navigator.pushReplacement(
+                          context, MaterialPageRoute(builder: (index) => ProfileScreen(
+                        isNavBar: false,)));
+                    }else{
+                      pushNewScreen(context, screen: ProfileScreen(isNavBar: false,));
+                    }
                   }else{
-                    pushNewScreen(context, screen: OtherProfileView(uid: widget.commentModel.userId!));
+                    if(widget.isFromProfile) {
+                      Navigator.pushReplacement(
+                          context, MaterialPageRoute(builder: (index) => OtherProfileView(
+                          uid: widget.commentModel.userId!)));
+                    }
+                    else{
+                      pushNewScreen(context, screen: OtherProfileView(uid: widget.commentModel.userId!));
+                    }
                   }
                 },
                 child: CircleAvatar(
@@ -103,9 +117,22 @@ class _CommentContainerState extends State<CommentContainer> {
               ) : GestureDetector(
                 onTap: (){
                   if(widget.commentModel.userId == FirebaseAuth.instance.currentUser!.uid){
-                    pushNewScreen(context, screen: ProfileScreen(isNavBar: false,));
+                    if(widget.isFromProfile) {
+                      Navigator.pushReplacement(
+                          context, MaterialPageRoute(builder: (index) => ProfileScreen(
+                        isNavBar: false,)));
+                    }else{
+                      pushNewScreen(context, screen: ProfileScreen(isNavBar: false,));
+                    }
                   }else{
-                    pushNewScreen(context, screen: OtherProfileView(uid: widget.commentModel.userId!));
+                    if(widget.isFromProfile) {
+                      Navigator.pushReplacement(
+                          context, MaterialPageRoute(builder: (index) => OtherProfileView(
+                          uid: widget.commentModel.userId!)));
+                    }
+                    else{
+                      pushNewScreen(context, screen: OtherProfileView(uid: widget.commentModel.userId!));
+                    }
                   }
                 },
                 child: Container(

@@ -451,7 +451,7 @@ class _ListTileContainerState extends State<ListTileContainer> {
                                         onTap: () {
                                           pushNewScreen(context,
                                               screen: PostAllLikesView(
-                                                postId: widget.data!.id!,));
+                                                postId: widget.data!.id!,isFromProfile: widget.isOtherProfile || widget.isMyProfile,));
                                         },
                                         child: Align(
                                           alignment: Alignment.centerRight,
@@ -594,7 +594,7 @@ class _ListTileContainerState extends State<ListTileContainer> {
                                           itemBuilder: (context,
                                               index) => CommentContainer(
                                                 commentModel: snapshot
-                                                    .data![index],),),
+                                                    .data![index],isFromProfile: widget.isMyProfile || widget.isOtherProfile,),),
                                         verticalGap(10),
                                         Divider(
                                           color: greyColor,

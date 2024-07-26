@@ -12,6 +12,7 @@ import 'package:check_in/model/user_modal.dart';
 import 'package:check_in/ui/screens/News%20Feed%20NavBar/News%20Feed/Component/list_tile_container.dart';
 import 'package:check_in/ui/screens/News%20Feed%20NavBar/News%20Feed/Component/shared_post_comp.dart';
 import 'package:check_in/ui/screens/add_home_court.dart';
+import 'package:check_in/ui/screens/persistent_nav_bar.dart';
 import 'package:check_in/ui/screens/unique_courts_screen.dart';
 import 'package:check_in/ui/widgets/about_section.dart';
 import 'package:check_in/utils/colors.dart';
@@ -36,9 +37,10 @@ import '../../auth_service.dart';
 import 'package:check_in/Services/user_services.dart';
 
 class ProfileScreen extends StatefulWidget {
-  ProfileScreen({Key? key,this.isNavBar = true, this.isOther = false}) : super(key: key);
+  ProfileScreen({Key? key,this.isNavBar = true, this.isOther = false,this.toHome = false}) : super(key: key);
   bool isNavBar;
   bool isOther;
+  bool toHome;
 
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();
@@ -302,7 +304,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
         centerTitle: true,
         backgroundColor: appWhiteColor,
         leading: widget.isNavBar ? const SizedBox() : IconButton(onPressed: (){
-          Navigator.pop(context);
+          if(widget.toHome){
+            Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>Home()));
+          }else {
+            Navigator.pop(context);
+          }
         }, icon: const Icon(Icons.arrow_back_ios)),
         title: poppinsText(TempLanguage.profile, 20, FontWeight.bold, appBlackColor),
       ),

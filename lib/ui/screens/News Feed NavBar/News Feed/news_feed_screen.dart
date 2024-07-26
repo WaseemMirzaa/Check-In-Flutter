@@ -1,12 +1,10 @@
 import 'package:check_in/Services/newfeed_service.dart';
-import 'package:check_in/auth_service.dart';
 import 'package:check_in/controllers/News%20Feed/news_feed_controller.dart';
 import 'package:check_in/core/constant/temp_language.dart';
 import 'package:check_in/ui/screens/News%20Feed%20NavBar/Create%20Post/create_post_screen.dart';
 import 'package:check_in/ui/screens/News%20Feed%20NavBar/News%20Feed/Component/list_tile_container.dart';
 import 'package:check_in/ui/screens/News%20Feed%20NavBar/News%20Feed/Component/shared_post_comp.dart';
 import 'package:check_in/ui/screens/News%20Feed%20NavBar/News%20Feed/Component/top_container.dart';
-import 'package:check_in/ui/screens/News%20Feed%20NavBar/open_post/open_post.dart';
 import 'package:check_in/ui/screens/News%20Feed%20NavBar/test_aid_comp/test_aid_comp.dart';
 import 'package:check_in/utils/colors.dart';
 import 'package:check_in/utils/styles.dart';
@@ -89,7 +87,7 @@ class _NewsFeedScreenState extends State<NewsFeedScreen> {
                         shrinkWrap: true,
                         itemBuilder: (context, index) {
                           if (index % 5 == 4) {
-                            return const NavtiveAdsComp(key: ValueKey('Aid'));
+                            return NavtiveAdsComp(key: ValueKey('Aid_${index}'));
                           }
                           final itemIndex = index - (index ~/ 5);
                           log("\n\nThe Length of the posts are: ${controller

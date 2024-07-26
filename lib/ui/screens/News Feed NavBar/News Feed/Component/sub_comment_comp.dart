@@ -75,19 +75,7 @@ class _SubCommentCompState extends State<SubCommentComp> {
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            userModel?.photoUrl == null ?  GestureDetector(
-              onTap: (){
-                  pushNewScreen(context, screen: OtherProfileView(uid: widget.commentModel.userId!));
-              },
-              child:  Container(
-                        height: 4.h,
-                        width: 4.h,
-                        decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(width: 2, color: appGreenColor),
-                image: const DecorationImage(
-                    image: AssetImage(AppAssets.LOGO_NEW), fit: BoxFit.fill))),
-            ) :  GestureDetector(
+            userModel?.photoUrl != null && userModel?.photoUrl != '' ? GestureDetector(
               onTap: (){
                 if(widget.commentModel.userId == FirebaseAuth.instance.currentUser!.uid){
                   pushNewScreen(context, screen: ProfileScreen(isNavBar: false,));
@@ -99,6 +87,22 @@ class _SubCommentCompState extends State<SubCommentComp> {
                 backgroundImage: NetworkImage(userModel?.photoUrl ?? ''),
                 radius: 17,
               ),
+            ) :  GestureDetector(
+              onTap: (){
+                if(widget.commentModel.userId == FirebaseAuth.instance.currentUser!.uid){
+                  pushNewScreen(context, screen: ProfileScreen(isNavBar: false,));
+                }else{
+                  pushNewScreen(context, screen: OtherProfileView(uid: widget.commentModel.userId!));
+                }
+              },
+              child: Container(
+                        height: 4.h,
+                        width: 4.h,
+                        decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(width: 2, color: appGreenColor),
+                image: const DecorationImage(
+                    image: AssetImage(AppAssets.LOGO_NEW), fit: BoxFit.fill))),
             ),
             horizontalGap(10),
             Builder(
