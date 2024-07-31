@@ -1,10 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-import 'package:check_in/ui/screens/News%20Feed%20NavBar/News%20Feed/news_feed_screen.dart';
-import 'package:check_in/ui/screens/News%20Feed%20NavBar/open_post/open_post.dart';
-import 'package:check_in/ui/screens/profile_screen.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/material.dart';
 import 'package:check_in/Services/payment_service.dart';
 import 'package:check_in/auth_service.dart';
@@ -25,9 +20,6 @@ import 'package:check_in/utils/colors.dart';
 import 'package:check_in/utils/styles.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
-
-//import 'package:flutter_typeahead/flutter_typeahead.dart';
 import '../../utils/custom/custom_type_ahead.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';

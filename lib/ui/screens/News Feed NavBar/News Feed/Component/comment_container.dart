@@ -4,20 +4,16 @@ import 'package:check_in/controllers/user_controller.dart';
 import 'package:check_in/core/constant/app_assets.dart';
 import 'package:check_in/model/NewsFeed%20Model/comment_model.dart';
 import 'package:check_in/model/user_modal.dart';
-import 'package:check_in/ui/screens/News%20Feed%20NavBar/All%20Comments/all_comments.dart';
 import 'package:check_in/ui/screens/News%20Feed%20NavBar/News%20Feed/Component/comment_all_lIkes_view.dart';
 import 'package:check_in/ui/screens/News%20Feed%20NavBar/News%20Feed/Component/sub_comment_comp.dart';
 import 'package:check_in/ui/screens/profile_screen.dart';
-import 'package:check_in/ui/widgets/text_field.dart';
 import 'package:check_in/utils/Constants/images.dart';
 import 'package:check_in/utils/colors.dart';
 import 'package:check_in/utils/gaps.dart';
 import 'package:check_in/utils/styles.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -64,9 +60,9 @@ class _CommentContainerState extends State<CommentContainer> {
   getUserData() async {
     userModel = await userServices.getUserData(widget.commentModel.userId ??"");
     print("THE USER MODEL IS: ${userModel!.userName}");
-    setState(() {
+    mounted ? setState(() {
 
-    });
+    }) : null;
   }
   @override
   void initState() {
@@ -262,6 +258,7 @@ class _CommentContainerState extends State<CommentContainer> {
 
                             onEditingComplete: () async{
                               if(replyComment.text.isNotEmpty){
+                                replyComment.clear();
                                 final comment = await newsFeedController
                                     .addCommentOnComment(widget.commentModel.postId!,widget.commentModel.commentId!,
                                     newsFeedController.commentModel.value);
@@ -279,12 +276,16 @@ class _CommentContainerState extends State<CommentContainer> {
                               newsFeedController.commentModel.value.content = value;
                               },
                             decoration: InputDecoration(
-                                suffixIcon: GestureDetector(
+                                suffixIcon:  newsFeedController.subCommentLoader.value ? const Padding(
+                                  padding: EdgeInsets.all(5.0),
+                                  child: CircularProgressIndicator(),
+                                ) : GestureDetector(
                                   onTap: () async{
                                     if(replyComment.text.isEmptyOrNull){
                                       toast('The field is empty');
 
                                     }else {
+
                                       final comment = await newsFeedController
                                           .addCommentOnComment(widget.commentModel.parentId!,widget.commentModel.commentId!,
                                           newsFeedController.commentModel.value);

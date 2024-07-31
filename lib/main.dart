@@ -113,8 +113,8 @@ void main() async {
 
   FirebaseAuth.instance.authStateChanges().listen((User? user) {
     if (user != null) {
-      newsFeedController.getMyPosts(); // Fetch posts for the logged-in user
-      newsFeedController.fetchInitialNewsFeed(); // Fetch posts for the logged-in user
+       newsFeedController.getMyPosts(); // Fetch posts for the logged-in user
+      // newsFeedController.fetchInitialNewsFeed(); // Fetch posts for the logged-in user
     } else {
       newsFeedController.clearMyPosts(); // Clear posts when no user is logged in
       newsFeedController.clearNewsFeeds(); // Clear posts when no user is logged in

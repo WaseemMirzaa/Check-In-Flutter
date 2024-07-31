@@ -10,6 +10,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:get/get.dart';
+import 'package:get/get_rx/get_rx.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:chewie/chewie.dart';
 import 'package:video_player/video_player.dart';
@@ -48,7 +49,7 @@ class NewsFeedController extends GetxController {
     super.onInit();
     postController = TextEditingController();
     postFocusNode = FocusNode();
-    fetchInitialNewsFeed();
+    // fetchInitialNewsFeed();
     getMyPosts();
   }
   final _newsFeed = <NewsFeedModel>[].obs;
@@ -182,6 +183,7 @@ class NewsFeedController extends GetxController {
     myPostLoader.value = false;
   }
 
+  RxBool commentLoader = false.obs;
   /// Update the collection
   Future<bool> updateCollection(String collectionName, String docId, Map<String, dynamic> list)async{
     return await newsFeedService.updateCollection(collectionName, docId, list);
@@ -234,24 +236,31 @@ class NewsFeedController extends GetxController {
 
 /// Add comment on post controller
   Future<bool> addCommentOnPost(String postId, CommentModel commentModel) async{
+    commentLoader.value = true;
     commentModel.parentId = postId;
     commentModel.postId = postId;
     commentModel.timestamp = Timestamp.now();
     commentModel.likedBy = [];
     commentModel.userImage = userController.userModel.value.photoUrl;
     commentModel.likes = 0;
-    return await newsFeedService.addCommentOnPost(postId, commentModel);
+    bool added = await newsFeedService.addCommentOnPost(postId, commentModel);
+    commentLoader.value = false;
+    return added;
   }
 
+  RxBool subCommentLoader = false.obs;
 /// Add comment on comment controller
   Future<bool> addCommentOnComment(String postId, String commentId ,CommentModel commentModel) async{
+    subCommentLoader.value = true;
     commentModel.parentId = commentId;
     commentModel.timestamp = Timestamp.now();
     commentModel.postId = postId;
     commentModel.likedBy = [];
     commentModel.userImage = userController.userModel.value.photoUrl;
     commentModel.likes = 0;
-    return await newsFeedService.addCommentOnComment(postId, commentId ,commentModel);
+    bool added = await newsFeedService.addCommentOnComment(postId, commentId ,commentModel);
+    subCommentLoader.value = false;
+    return added;
   }
 /// get post by id
   Future<NewsFeedModel?> getPostById(String docId) async {

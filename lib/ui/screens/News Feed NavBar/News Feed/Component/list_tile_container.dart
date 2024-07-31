@@ -74,9 +74,9 @@ class _ListTileContainerState extends State<ListTileContainer> {
     super.initState();
     Future.microtask(() async{
       userData = await userServices.getUserData(widget.data!.userId!);
-      setState(() {
+      mounted ? setState(() {
 
-      });
+      }) : null;
     });
   }
   RxBool isVisible = false.obs;
@@ -320,9 +320,9 @@ class _ListTileContainerState extends State<ListTileContainer> {
                           ),
                         )
                             : widget.data!.isType == 'video'
-                            ? newsFeedController.videoLoad.value
-                            ? loaderView()
-                            : VideoPlayerWidget(videoUrl: widget.data!
+                            // ? newsFeedController.videoLoad.value
+                            // ? loaderView()
+                            ? VideoPlayerWidget(videoUrl: widget.data!
                             .postUrl!,)
                             : const SizedBox(),
                         verticalGap(10),
@@ -487,7 +487,8 @@ class _ListTileContainerState extends State<ListTileContainer> {
                         // const Divider(),
                         verticalGap(7),
                         Obx(() =>
-                        isVisible.value ? Column(
+                         isVisible.value ?
+                            Column(
                           children: [
                             Container(
                                 decoration: BoxDecoration(
@@ -501,36 +502,24 @@ class _ListTileContainerState extends State<ListTileContainer> {
                                     newsFeedController.commentModel.value.content = value;
                                   },
                                   onEditingCompleted: () async {
-                                    if (addCommentController.text.isNotEmpty) {
-                                      final comment = await newsFeedController.addCommentOnPost(widget.data!.id!,
-                                          newsFeedController.commentModel.value);
-                                      if (comment) {
-                                        await newsFeedController.updateCollection(Collections.NEWSFEED, widget.data!.id!,
-                                            {
-                                              NewsFeed.NO_OF_COMMENT: widget
-                                                  .data!.noOfComment! + 1,
-                                            });
-                                        await newsFeedController.sendNotificationMethod('newsFeed', '${userController.userModel.value.userName} commented on your post', 'New comment', widget.data?.id ?? '', [
-                                          FirebaseAuth.instance.currentUser!.uid,
-                                          widget.data!.userId
-                                        ]);
-                                      }
-                                      (comment)
-                                          ? addCommentController.clear()
-                                          : null;
-                                      print("The comment has added $comment");
-                                    }else{
-                                      primaryFocus!.unfocus();
-                                    }
+                                      primaryFocus?.unfocus();
                                   },
-                                  suffixIcon: GestureDetector(
+                                  suffixIcon: newsFeedController.commentLoader.value ? SizedBox(
+                                      height: 1.5.h,width: 1.5.h,
+                                      child:Column(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        crossAxisAlignment: CrossAxisAlignment.center,
+                                        children: [
+                                          CircularProgressIndicator(strokeWidth: 2.sp,),
+                                        ],
+                                      )) : GestureDetector(
                                     onTap: () async {
                                       if (addCommentController.text
                                           .isEmptyOrNull) {
                                         toast('The field is empty');
                                       } else {
-                                        final comment = await newsFeedController
-                                            .addCommentOnPost(widget.data!.id!,
+                                        addCommentController.clear();
+                                        final comment = await newsFeedController.addCommentOnPost(widget.data!.id!,
                                             newsFeedController.commentModel
                                                 .value);
                                         if (comment) {
@@ -568,16 +557,12 @@ class _ListTileContainerState extends State<ListTileContainer> {
                                 stream: newsFeedController.getPostComments(
                                     widget.data!.id!),
                                 builder: (context, snapshot) {
-                                  if (snapshot.connectionState ==
-                                      ConnectionState.waiting) {
-                                    return const Center(
-                                      child: CircularProgressIndicator(),);
-                                  } else if (snapshot.hasError) {
+                                 if (snapshot.hasError) {
                                     return Center(
                                       child: Text(snapshot.error.toString()),);
                                   } else if (!snapshot.hasData) {
                                     return const Center(
-                                      child: Text('No data found'),);
+                                      child: SizedBox.shrink(),);
                                   } else {
                                     return Column(
                                       children: [
@@ -620,7 +605,9 @@ class _ListTileContainerState extends State<ListTileContainer> {
                                 }
                             ),
                           ],
-                        ) : const SizedBox())
+                        )
+                                 : const SizedBox()
+          )
                       ],
                     ),
                   ),

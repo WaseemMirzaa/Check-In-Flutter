@@ -1,3 +1,4 @@
+import 'package:check_in/utils/colors.dart';
 import 'package:chewie/chewie.dart';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
@@ -5,7 +6,7 @@ import 'package:video_player/video_player.dart';
 class VideoPlayerWidget extends StatefulWidget {
   final String videoUrl;
 
-  VideoPlayerWidget({required this.videoUrl});
+  const VideoPlayerWidget({required this.videoUrl});
 
   @override
   _VideoPlayerWidgetState createState() => _VideoPlayerWidgetState();
@@ -54,16 +55,26 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return _chewieController != null &&
-        _chewieController!.videoPlayerController.value.isInitialized
-        ? AspectRatio(
-      aspectRatio: 3 / 2, // Adjust as needed for your video
+    return
+      _chewieController != null
+          &&
+        _chewieController!.videoPlayerController.value.isInitialized ?
+      AspectRatio(
+      aspectRatio: 3 / 2,
       child: Chewie(
         controller: _chewieController!,
+
       ),
     )
-        : const Center(
-      child: CircularProgressIndicator(),
+        : AspectRatio(
+          aspectRatio: 3 / 2, // Adjust as needed for your video
+          child: Container(color: appBlackColor,child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              CircularProgressIndicator(color: appWhiteColor,),
+            ],
+          )),
     );
   }
 }

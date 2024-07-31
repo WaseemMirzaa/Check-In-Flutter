@@ -50,9 +50,9 @@ class _SubCommentCompState extends State<SubCommentComp> {
    UserModel? userModel;
    getUserData() async {
      userModel = await userServices.getUserData(widget.commentModel.userId ?? "");
-     setState(() {
+     mounted ? setState(() {
 
-     });
+     }) : null;
    }
    @override
    void initState() {

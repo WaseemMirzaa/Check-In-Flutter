@@ -71,9 +71,9 @@ class _SharedPostCompState extends State<SharedPostComp> {
     Future.microtask(() async{
       postUserData = await userServices.getUserData(widget.data?.userId??"");
       shareUserData = await userServices.getUserData(widget.data?.shareUID??"");
-      setState(() {
+      mounted ? setState(() {
 
-      });
+      }) : null;
     });
   }
   RxBool isVisible = false.obs;
@@ -589,32 +589,19 @@ class _SharedPostCompState extends State<SharedPostComp> {
                                     value;
                               },
                               onEditingCompleted: () async {
-                                if (addCommentController.text.isNotEmpty) {
-                                  final comment = await newsFeedController
-                                      .addCommentOnPost(widget.data!.shareID!,
-                                      newsFeedController.commentModel.value);
-                                  if (comment) {
-                                    await newsFeedController.updateCollection(
-                                        Collections.NEWSFEED,
-                                        widget.data!.shareID!,
-                                        {
-                                          NewsFeed.NO_OF_COMMENT: widget.data!
-                                              .noOfComment! + 1,
-                                        });
-                                    await newsFeedController.sendNotificationMethod('newsFeed', '${userController.userModel.value.userName} commented on your post', 'New comment', widget.data?.shareID ?? '', [
-                                      FirebaseAuth.instance.currentUser!.uid,
-                                      widget.data!.shareUID
-                                    ]);
-                                  }
-                                  (comment)
-                                      ? addCommentController.clear()
-                                      : null;
-                                  print("The comment has added $comment");
-                                }else{
-                                  primaryFocus!.unfocus();
-                                }
+                                  primaryFocus?.unfocus();
+
                               },
-                              suffixIcon: GestureDetector(
+                              suffixIcon: newsFeedController.commentLoader.value ?  SizedBox(
+                                    height: 1.5.h,width: 1.5.h,
+                                    child:Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                      children: [
+                                        CircularProgressIndicator(strokeWidth: 2.sp,),
+                                      ],
+                                    ),
+                              ) : GestureDetector(
                                 onTap: () async {
                                   if (addCommentController.text.isEmptyOrNull) {
                                     toast('The field is empty');
@@ -635,6 +622,7 @@ class _SharedPostCompState extends State<SharedPostComp> {
                                         widget.data!.shareUID
                                       ]);
                                     }
+
                                     (comment)
                                         ? addCommentController.clear()
                                         : null;
@@ -656,16 +644,12 @@ class _SharedPostCompState extends State<SharedPostComp> {
                             stream: newsFeedController.getPostComments(
                                 widget.data!.shareID!),
                             builder: (context, snapshot) {
-                              if (snapshot.connectionState ==
-                                  ConnectionState.waiting) {
-                                return const Center(
-                                  child: CircularProgressIndicator(),);
-                              } else if (snapshot.hasError) {
+                              if (snapshot.hasError) {
                                 return Center(
                                   child: Text(snapshot.error.toString()),);
                               } else if (!snapshot.hasData) {
                                 return const Center(
-                                  child: Text('No data found'),);
+                                  child: SizedBox.shrink(),);
                               } else {
                                 return Column(
                                   children: [
