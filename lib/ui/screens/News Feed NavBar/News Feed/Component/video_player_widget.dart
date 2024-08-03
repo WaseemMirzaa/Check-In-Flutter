@@ -2,6 +2,7 @@ import 'package:check_in/utils/colors.dart';
 import 'package:chewie/chewie.dart';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
+import 'package:visibility_detector/visibility_detector.dart';
 
 class VideoPlayerWidget extends StatefulWidget {
   final String videoUrl;
@@ -27,7 +28,7 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
     await _videoPlayerController!.initialize();
     _chewieController = ChewieController(
       videoPlayerController: _videoPlayerController!,
-      autoPlay: false,  // Set this to false to prevent auto play
+      autoPlay: true,  // Set this to false to prevent auto play
       looping: false,
       // Add these options for a more modern look (optional)
       placeholder: Container(
@@ -55,26 +56,32 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return
-      _chewieController != null
-          &&
-        _chewieController!.videoPlayerController.value.isInitialized ?
-      AspectRatio(
-      aspectRatio: 3 / 2,
-      child: Chewie(
-        controller: _chewieController!,
+    return VisibilityDetector(
+      key: Key(widget.videoUrl),
+      onVisibilityChanged: (visibilityInfo) {
+        if (visibilityInfo.visibleFraction == 0) {
+          _videoPlayerController?.pause();
+        }
+      },
+      child: _chewieController != null &&
+          _chewieController!.videoPlayerController.value.isInitialized
+          ? AspectRatio(
+        aspectRatio: 3 / 2,
+        child: Chewie(
+          controller: _chewieController!,
 
+        ),
+      )
+          : AspectRatio(
+        aspectRatio: 3 / 2, // Adjust as needed for your video
+        child: Container(color: appBlackColor,child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            CircularProgressIndicator(color: appWhiteColor,),
+          ],
+        )),
       ),
-    )
-        : AspectRatio(
-          aspectRatio: 3 / 2, // Adjust as needed for your video
-          child: Container(color: appBlackColor,child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              CircularProgressIndicator(color: appWhiteColor,),
-            ],
-          )),
     );
   }
 }

@@ -76,6 +76,9 @@ Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
           )));
 }
 
+final newsFeedController = Get.put(NewsFeedController(NewsFeedService()));
+
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   MobileAds.instance.initialize();
@@ -109,7 +112,6 @@ void main() async {
 
   // SharedPreferences prefs = await SharedPreferences.getInstance();
   // var email = prefs.getString('email');
-  final newsFeedController = Get.put(NewsFeedController(NewsFeedService()));
 
   FirebaseAuth.instance.authStateChanges().listen((User? user) {
     if (user != null) {

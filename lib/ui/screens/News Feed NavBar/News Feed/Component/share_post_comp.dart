@@ -25,18 +25,26 @@ import 'package:nb_utils/nb_utils.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
 import 'package:video_player/video_player.dart';
 
-class SharePostComp extends GetView<NewsFeedController> {
+class SharePostComp extends StatefulWidget {
   NewsFeedModel? data;
   SharePostComp({super.key, this.data});
 
+  @override
+  State<SharePostComp> createState() => _SharePostCompState();
+}
+
+class _SharePostCompState extends State<SharePostComp> {
   NewsFeedController newsFeedController = Get.put(NewsFeedController(NewsFeedService()));
+
   final addCommentController = TextEditingController();
+
   final userServices = UserServices();
+  bool? playing;
 
   @override
   Widget build(BuildContext context) {
-    newsFeedController.commentModel.value.userId = data!.userId;
-    return FutureBuilder(future: userServices.getUserData(data!.userId!),
+    newsFeedController.commentModel.value.userId = widget.data!.userId;
+    return FutureBuilder(future: userServices.getUserData(widget.data!.userId!),
         builder: (context, snapshot) {
       if(snapshot.connectionState == ConnectionState.waiting){
         return const SizedBox();
@@ -53,11 +61,11 @@ class SharePostComp extends GetView<NewsFeedController> {
                     children: [
                       GestureDetector(
                         onTap:  (){
-                          if(userController.userModel.value.uid == data!.userId){
+                          if(userController.userModel.value.uid == widget.data!.userId){
                             pushNewScreen(context, screen: ProfileScreen(isNavBar: false,));
                           }else{
                             pushNewScreen(context,
-                                            screen: OtherProfileView(uid: data!.shareUID!));
+                                            screen: OtherProfileView(uid: widget.data!.shareUID!));
                           }
 
                         },
@@ -74,10 +82,10 @@ class SharePostComp extends GetView<NewsFeedController> {
                       Expanded(
                         child:  GestureDetector(
                         onTap: (){
-                          if(userController.userModel.value.uid == data!.userId){
+                          if(userController.userModel.value.uid == widget.data!.userId){
                             pushNewScreen(context, screen: ProfileScreen(isNavBar: false,));
                           }else{
-                            pushNewScreen(context, screen: OtherProfileView(uid: data!.userId!));
+                            pushNewScreen(context, screen: OtherProfileView(uid: widget.data!.userId!));
                           }
 
                         },
@@ -93,15 +101,15 @@ class SharePostComp extends GetView<NewsFeedController> {
                 verticalGap(8),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                  child: poppinsText(data!.description ?? "", 12, medium,
+                  child: poppinsText(widget.data!.description ?? "", 12, medium,
                       appDarkBlue.withOpacity(0.8),
                       maxlines: 3),
                 ),
                 verticalGap(8),
-                data!.isType == 'image' && data!.postUrl!.isNotEmpty
+                widget.data!.isType == 'image' && widget.data!.postUrl!.isNotEmpty
                     ? GestureDetector(
                         onTap: () {
-                          pushNewScreen(context, screen: FullScreenImage(newsFeedModel: data!,));
+                          pushNewScreen(context, screen: FullScreenImage(newsFeedModel: widget.data!,));
                         },
                         child: SizedBox(
                           height: 200,
@@ -109,15 +117,55 @@ class SharePostComp extends GetView<NewsFeedController> {
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(8),
                             child: Image.network(
-                              data!.postUrl ?? '',
+                              widget.data!.postUrl ?? '',
                               fit: BoxFit.cover,
                             ),
                           ),
                         ),
                       )
-                    : data!.isType == 'video' ? newsFeedController.videoLoad.value
+                    : widget.data!.isType == 'video' ? newsFeedController.videoLoad.value
                     ? loaderView()
-                    : VideoPlayerWidget(videoUrl: data!.postUrl!,) : SizedBox(),
+                    : playing ?? false ? VideoPlayerWidget(videoUrl: widget.data!.postUrl!) : GestureDetector(
+                  onTap: () {
+                    //initializePlayer(widget.data!.postUrl!);
+                    setState(() {
+                      //_playingIndex = widget.index;
+                      playing = true;
+                    });
+                  },
+                  child: SizedBox(
+                    height: 200,
+                    width: double.infinity,
+                    child: Stack(
+                      fit: StackFit.expand,
+                      children: [
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(8),
+                          child: widget.data!.thumbnail == null
+                              ? Container(color: Colors.black,)
+                              : Image.network(
+                            widget.data!.thumbnail!,
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                        Center(
+                          child: Container(
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: Colors.black.withOpacity(0.5),
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(
+                              Icons.play_arrow,
+                              color: Colors.white,
+                              size: 40,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ) : SizedBox(),
                 verticalGap(10),
         ],
             ),

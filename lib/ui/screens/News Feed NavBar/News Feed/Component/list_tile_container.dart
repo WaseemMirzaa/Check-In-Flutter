@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:typed_data';
 import 'package:check_in/Services/message_service.dart';
 import 'package:check_in/Services/user_services.dart';
 import 'package:check_in/controllers/Messages/chat_controller.dart';
@@ -67,6 +68,7 @@ class _ListTileContainerState extends State<ListTileContainer> {
 
   UserModel? userData;
 
+  bool? playing;
 
   @override
   void initState() {
@@ -320,11 +322,48 @@ class _ListTileContainerState extends State<ListTileContainer> {
                           ),
                         )
                             : widget.data!.isType == 'video'
-                            // ? newsFeedController.videoLoad.value
-                            // ? loaderView()
-                            ? VideoPlayerWidget(videoUrl: widget.data!
-                            .postUrl!,)
-                            : const SizedBox(),
+                              ? playing ?? false ? VideoPlayerWidget(videoUrl: widget.data!.postUrl!) : GestureDetector(
+                          onTap: () {
+                            //initializePlayer(widget.data!.postUrl!);
+                            setState(() {
+                              //_playingIndex = widget.index;
+                              playing = true;
+                            });
+                          },
+                          child: SizedBox(
+                            height: 200,
+                            width: double.infinity,
+                            child: Stack(
+                              fit: StackFit.expand,
+                              children: [
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(8),
+                                  child: widget.data!.thumbnail == null
+                                      ? Container(color: Colors.black,)
+                                      : Image.network(
+                                    widget.data!.thumbnail!,
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
+                                Center(
+                                  child: Container(
+                                    padding: const EdgeInsets.all(12),
+                                    decoration: BoxDecoration(
+                                      color: Colors.black.withOpacity(0.5),
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: const Icon(
+                                      Icons.play_arrow,
+                                      color: Colors.white,
+                                      size: 40,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        )
+                              : const SizedBox(),
                         verticalGap(10),
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 10),

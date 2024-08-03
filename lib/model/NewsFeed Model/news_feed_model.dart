@@ -8,6 +8,7 @@ class NewsFeedModel {
   String? description;
   String? userImage;
   String? postUrl;
+  String? thumbnail;
   String? isType;
   List<String>? likedBy;
   int noOfLike;
@@ -32,6 +33,7 @@ class NewsFeedModel {
       this.userImage,
       this.postUrl,
       this.isType,
+        this.thumbnail,
         this.likedBy,
       this.noOfLike = 0,
       this.noOfComment,
@@ -69,6 +71,7 @@ class NewsFeedModel {
         shareID: json[NewsFeed.SHARE_ID],
         shareText: json[NewsFeed.SHARE_TEXT],
         sharePostID: json[NewsFeed.SHARE_POSTID],
+      thumbnail: json[NewsFeed.THUMBNAIL]
     );
   }
   Map<String, dynamic> toJson() {
@@ -93,6 +96,7 @@ class NewsFeedModel {
     data[NewsFeed.SHARE_NAME] = shareName ?? '';
     data[NewsFeed.SHARE_IMAGE] = shareImage ?? '';
     data[NewsFeed.SHARE_TEXT] = shareText ?? '';
+    data[NewsFeed.THUMBNAIL] = thumbnail ?? '';
     return data;
   }
 }

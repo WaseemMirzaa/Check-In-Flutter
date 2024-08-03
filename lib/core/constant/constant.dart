@@ -100,6 +100,7 @@ class NewsFeed {
   static const String SHARE_POSTID = 'sharePostID';
   static const String SHARE_TIMESTAMP = 'shareTimestamp';
   static const String SHARE_TEXT = 'shareText';
+  static const String THUMBNAIL = 'thumbnail';
 }
 
 class SharedPreferenceKey {

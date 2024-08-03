@@ -12,6 +12,7 @@ import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:nb_utils/nb_utils.dart';
 import 'package:rxdart/rxdart.dart' as RES;
+import 'package:video_compress_v2/video_compress_v2.dart';
 
 import '../model/NewsFeed Model/report_posts_model.dart';
 
@@ -125,12 +126,25 @@ class NewsFeedService {
   Future<bool> createPost(NewsFeedModel newsFeedModel,String compress) async{
     try{
       if(compress.isNotEmpty){
+        String? thumbnail;
+        if (newsFeedModel.isType != 'image') {
+          final uint8list = await VideoCompressV2.getByteThumbnail(
+              compress,
+              quality: 50, // default(100)
+              position: -1 // default(-1)
+          );
+          thumbnail = await uploadUint8ListToFirebaseStorage(uint8list!, Timestamp.now().toString());
+        }
+
+
         final url = await uploadChatImageToFirebase(compress, userController.userModel.value.uid!, DateTime.now().toString(),newsFeedModel.isType == 'image' ? 'jpg' : 'mp4');
         newsFeedModel.postUrl = url;
+        newsFeedModel.thumbnail = thumbnail;
         if(newsFeedModel.postUrl!.isNotEmpty) {
           DocumentReference docReff = FirebaseFirestore.instance.collection(
               Collections.NEWSFEED).doc();
           newsFeedModel.id = docReff.id;
+
           await docReff.set(newsFeedModel.toJson());
           return true;
         }
@@ -145,6 +159,27 @@ class NewsFeedService {
     }catch (e){
       print(e.toString());
       return false;
+    }
+  }
+
+  Future<String?> uploadUint8ListToFirebaseStorage(Uint8List imageData, String fileName) async {
+    try {
+      // Get a reference to the location where we'll store our file
+      final Reference storageRef = FirebaseStorage.instance.ref().child('thumbnail/$fileName');
+
+      // Upload raw data
+      final UploadTask uploadTask = storageRef.putData(
+        imageData,
+        SettableMetadata(contentType: 'image/jpeg'), // Adjust this if you're not using JPEG
+      );
+
+      // Wait until the file is uploaded then fetch the download URL
+      final TaskSnapshot taskSnapshot = await uploadTask;
+      final String downloadUrl = await taskSnapshot.ref.getDownloadURL();
+
+      return downloadUrl;
+    } catch (e) {
+      return null;
     }
   }
 
