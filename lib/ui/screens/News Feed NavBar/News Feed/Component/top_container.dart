@@ -22,8 +22,13 @@ import 'package:sizer/sizer.dart';
 import 'package:check_in/Services/user_services.dart';
 
 class TopContainer extends GetView<NewsFeedController> {
-  Function()? ontap;
-  TopContainer({super.key, this.ontap});
+
+  TopContainer({super.key, this.onWriteSomethingTap, this.onPhotoTap, this.onVideoTap});
+  final Function()? onWriteSomethingTap;
+  final Function(String)? onPhotoTap;
+  final Function(String)? onVideoTap;
+
+
   UserController userController = Get.put(UserController(UserServices()));
   NewsFeedController newsFeedController = Get.put(NewsFeedController(NewsFeedService()));
 
@@ -97,7 +102,8 @@ class TopContainer extends GetView<NewsFeedController> {
                     hintText: 'Write something...',
                     onTap: () {
                       newsFeedController.type.value = 'text';
-                      pushNewScreen(context, screen: CreatePost());
+                      //pushNewScreen(context, screen: CreatePost());
+                      onWriteSomethingTap?.call();
                     },
                     onTapOutside: (_) {
                       controller.postFocusNode.unfocus();
@@ -117,9 +123,10 @@ class TopContainer extends GetView<NewsFeedController> {
                       onTap: () async {
                         String? checkNavigate = await newsFeedController.filePicker('image');
                         // newsFeedController.newsFeedModel.value.postUrl = checkNavigate;
-                        checkNavigate!.isNotEmpty
-                            ? pushNewScreen(context, screen:  CreatePost())
-                            : null;
+                        // checkNavigate!.isNotEmpty
+                        //     ? pushNewScreen(context, screen:  CreatePost())
+                        //     : null;
+                        onPhotoTap?.call(checkNavigate!);
                       },
                       child: poppinsText('Photo', 12, regular, greyColor)),
                   horizontalGap(10.w),
@@ -130,9 +137,10 @@ class TopContainer extends GetView<NewsFeedController> {
                         String? checkNavigate =
                             await newsFeedController.filePicker('video');
                         // newsFeedController.newsFeedModel.value.postUrl = checkNavigate;
-                        checkNavigate!.isNotEmpty
-                            ? pushNewScreen(context, screen:  CreatePost())
-                            : null;
+                        // checkNavigate!.isNotEmpty
+                        //     ? pushNewScreen(context, screen:  CreatePost())
+                        //     : null;
+                        onVideoTap?.call(checkNavigate!);
                       },
                       child: poppinsText('Video', 12, regular, greyColor))
                 ],

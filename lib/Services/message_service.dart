@@ -13,10 +13,14 @@ import 'package:check_in/model/user_modal.dart';
 import 'package:check_in/utils/Constants/enums.dart';
 import 'package:check_in/utils/common.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 
 import '../controllers/Messages/firestore_pagination.dart';
+import '../firebase_options.dart';
 import '../model/Message and Group Message Model/message_model.dart';
 
 // List<dynamic> mem = [];
@@ -379,7 +383,7 @@ class MessageService {
       if (snapshot.get(MessageField.IS_GROUP) == true && mem.isNotEmpty) {
         for (int i = 0; i < mem.length; i++) {
           if (mem[i][MessageField.MEMBER_UID] == uId) {
-            print("------------>><${mem[i][MessageField.MEMBER_UID]}");
+            //print("------------>><${mem[i][MessageField.MEMBER_UID]}");
             mem[i][MessageField.MEMBER_UNREAD_COUNT] = 0;
             break;
           }
@@ -421,6 +425,10 @@ class MessageService {
   // ................ READ RECEIPTS
   Future<bool> readReceipts(String messageDoc, String uid) async {
     try {
+      if (Firebase.apps.isEmpty) {
+        print("🟢🟢🟢🟢🟢🟢🟢🟢🟢🟢No firebase app exist:🟢🟢🟢🟢🟢🟢🟢🟢🟢🟢");
+        return false;
+      }
       final querySnapshot = await _messagesCollection
           .doc(messageDoc)
           .collection(Collections.CHAT)
@@ -453,31 +461,63 @@ class MessageService {
   }
 
 //............ Send message
-  Future<DocumentSnapshot?> sendMessage(String docId, Chatmodel chatmodel, List mem) async {
-    final batch = FirebaseFirestore.instance.batch();
+//   Future<DocumentSnapshot?> sendMessage(String docId, Chatmodel chatmodel, List mem) async {
+//     final batch = FirebaseFirestore.instance.batch();
+//
+//     print("member$mem");
+//     final docRef = _messagesCollection.doc(docId);
+//     DocumentSnapshot messageSnapshot = await docRef.get();
+//     if (chatmodel.type == 'image') {
+//       var image = await uploadChatImageToFirebase(
+//           docId, chatmodel.message!, chatmodel.id!, chatmodel.time!.microsecondsSinceEpoch.toString(), messageSnapshot, chatmodel.thumbnail!);
+//       chatmodel.message = image['original'];
+//       chatmodel.thumbnail = image['thumbnail'];
+//     }
+//
+//     CollectionReference chatCollection = _messagesCollection.doc(docId).collection(Collections.CHAT);
+//
+//     // Get a reference to the newly added document
+//     DocumentReference newDocumentRef = chatCollection.doc();
+//     batch.set(newDocumentRef, chatmodel.toJson());
+//
+//     CollectionReference messageCollection = _messagesCollection;
+//     //   update lastseen and timestamp
+//     batch.update(messageCollection.doc(docId), {
+//       MessageField.LAST_MESSAGE: chatmodel.type == 'image' ? 'Photo' : chatmodel.message,
+//       MessageField.TIME_STAMP: chatmodel.time,
+//     });
+//
+//     if (messageSnapshot.get(MessageField.IS_GROUP) == true) {
+//       for (int i = 0; i < mem.length; i++) {
+//         if (mem[i][MessageField.MEMBER_UID] != chatmodel.id) {
+//           int current = mem[i][MessageField.MEMBER_UNREAD_COUNT];
+//           mem[i][MessageField.MEMBER_UNREAD_COUNT] = current + 1;
+//         }
+//       }
+//       batch.update(docRef, {MessageField.MEMBERS: mem});
+//     } else {
+//       if (messageSnapshot.get(MessageField.SENDER_ID) == chatmodel.id) {
+//         batch.update(docRef, {MessageField.RECIEVER_UNREAD: FieldValue.increment(1)});
+//       } else {
+//         batch.update(docRef, {MessageField.SENDER_UNREAD: FieldValue.increment(1)});
+//       }
+//     }
+//     await batch.commit();
+//
+//     // Fetch and return the snapshot of the newly added document
+//     DocumentSnapshot newDocumentSnapshot = await newDocumentRef.get();
+//     return newDocumentSnapshot;
+//   }
 
-    print("member$mem");
-    final docRef = _messagesCollection.doc(docId);
-    DocumentSnapshot messageSnapshot = await docRef.get();
-    if (chatmodel.type == 'image') {
-      var image = await uploadChatImageToFirebase(
-          docId, chatmodel.message!, chatmodel.id!, chatmodel.time!.microsecondsSinceEpoch.toString(), messageSnapshot, chatmodel.thumbnail!);
-      chatmodel.message = image['original'];
-      chatmodel.thumbnail = image['thumbnail'];
-    }
+  Future<void> _isolateGetTheMostLikes(List<Object> args,) async {
+    final rootIsolateToken = args[0] as RootIsolateToken;
+    final messageSnapshot = args[1] as DocumentSnapshot;
+    final mem = args[2] as List;
+    final chatmodel = args[3] as Chatmodel;
+    final docRef = args[4] as DocumentReference;
 
-    CollectionReference chatCollection = _messagesCollection.doc(docId).collection(Collections.CHAT);
-
-    // Get a reference to the newly added document
-    DocumentReference newDocumentRef = chatCollection.doc();
-    batch.set(newDocumentRef, chatmodel.toJson());
-
-    CollectionReference messageCollection = _messagesCollection;
-    //   update lastseen and timestamp
-    batch.update(messageCollection.doc(docId), {
-      MessageField.LAST_MESSAGE: chatmodel.type == 'image' ? 'Photo' : chatmodel.message,
-      MessageField.TIME_STAMP: chatmodel.time,
-    });
+    BackgroundIsolateBinaryMessenger.ensureInitialized(rootIsolateToken);
+    await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
     if (messageSnapshot.get(MessageField.IS_GROUP) == true) {
       for (int i = 0; i < mem.length; i++) {
@@ -486,24 +526,67 @@ class MessageService {
           mem[i][MessageField.MEMBER_UNREAD_COUNT] = current + 1;
         }
       }
-      batch.update(docRef, {MessageField.MEMBERS: mem});
+      await docRef.update({MessageField.MEMBERS: mem});
     } else {
       if (messageSnapshot.get(MessageField.SENDER_ID) == chatmodel.id) {
-        batch.update(docRef, {MessageField.RECIEVER_UNREAD: FieldValue.increment(1)});
+        await docRef.update({MessageField.RECIEVER_UNREAD: FieldValue.increment(1)});
       } else {
-        batch.update(docRef, {MessageField.SENDER_UNREAD: FieldValue.increment(1)});
+        await docRef.update({MessageField.SENDER_UNREAD: FieldValue.increment(1)});
       }
     }
-    await batch.commit();
 
-    // Fetch and return the snapshot of the newly added document
+  }
+
+  Future<DocumentSnapshot?> sendMessage(String docId, Chatmodel chatmodel, List mem) async {
+    print("member$mem");
+
+    final docRef = _messagesCollection.doc(docId);
+    DocumentSnapshot messageSnapshot = await docRef.get();
+
+    if (chatmodel.type == 'image') {
+      var image = await uploadChatImageToFirebase(
+          docId, chatmodel.message!, chatmodel.id!, chatmodel.time!.microsecondsSinceEpoch.toString(), messageSnapshot, chatmodel.thumbnail!);
+      chatmodel.message = image['original'];
+      chatmodel.thumbnail = image['thumbnail'];
+    }
+
+    CollectionReference chatCollection = _messagesCollection.doc(docId).collection(Collections.CHAT);
+    DocumentReference newDocumentRef = chatCollection.doc();
+
+    await newDocumentRef.set(chatmodel.toJson());
+
+    await _messagesCollection.doc(docId).update({
+      MessageField.LAST_MESSAGE: chatmodel.type == 'image' ? 'Photo' : chatmodel.message,
+      MessageField.TIME_STAMP: chatmodel.time,
+    });
+
+    // RootIsolateToken? rootIsolateToken = RootIsolateToken.instance;
+    // await Isolate.spawn(_isolateGetTheMostLikes, [rootIsolateToken!, messageSnapshot, mem, chatmodel, docRef]);
+
+    if (messageSnapshot.get(MessageField.IS_GROUP) == true) {
+      for (int i = 0; i < mem.length; i++) {
+        if (mem[i][MessageField.MEMBER_UID] != chatmodel.id) {
+          int current = mem[i][MessageField.MEMBER_UNREAD_COUNT];
+          mem[i][MessageField.MEMBER_UNREAD_COUNT] = current + 1;
+        }
+      }
+      await docRef.update({MessageField.MEMBERS: mem});
+    } else {
+      if (messageSnapshot.get(MessageField.SENDER_ID) == chatmodel.id) {
+        await docRef.update({MessageField.RECIEVER_UNREAD: FieldValue.increment(1)});
+      } else {
+        await docRef.update({MessageField.SENDER_UNREAD: FieldValue.increment(1)});
+      }
+    }
+
     DocumentSnapshot newDocumentSnapshot = await newDocumentRef.get();
     return newDocumentSnapshot;
   }
 
+
 //............ Upload chat images
   Future<Map<String, String>> uploadChatImageToFirebase(
-      String docId, String imagePath, String uId, String time, DocumentSnapshot snapshot, String thumnail) async {
+       String docId, String imagePath, String uId, String time, DocumentSnapshot snapshot, String thumnail) async {
     try {
       Reference storageReference;
       Reference thumbnailStorageReference;

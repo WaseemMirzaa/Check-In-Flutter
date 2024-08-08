@@ -174,7 +174,7 @@ android {
 
     defaultConfig {
         applicationId "com.developlogix.checkinapp"
-        minSdkVersion 21
+        minSdkVersion 24
         targetSdkVersion flutter.targetSdkVersion
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
@@ -220,4 +220,5 @@ dependencies {
     implementation 'com.google.android.gms:play-services-ads:21.0.0'
     implementation platform('com.google.firebase:firebase-bom:31.1.1')
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation 'com.google.android.material:material:1.12.0'
 }

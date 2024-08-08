@@ -45,7 +45,9 @@ class CreatePost extends StatelessWidget {
                     newsFeedController.newsFeedModel.value.postUrl = null;
                     newsFeedController.originalPath = '';
                     context.loaderOverlay.hide();
-                    isOnboard ? Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>Home()), (route) => false) : Navigator.pop(context);
+                    isOnboard
+                        ? Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>Home()), (route) => false)
+                        : Get.back(result: true);
                   } );
                 }
               },

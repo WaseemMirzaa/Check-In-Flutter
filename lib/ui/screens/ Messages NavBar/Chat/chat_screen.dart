@@ -334,6 +334,8 @@ class _ChatScreenState extends State<ChatScreen> {
                             //  _chats.isNotEmpty ?
                             loaderView();
                         //  : const SizedBox();
+                      } else if (snapshot.hasError) {
+                        return Center(child: Text('${snapshot.error}'),);
                       } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
                         return Center(child: Text(TempLanguage.noConversation));
                       } else {

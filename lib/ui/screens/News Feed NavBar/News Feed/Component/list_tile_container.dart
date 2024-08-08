@@ -85,9 +85,7 @@ class _ListTileContainerState extends State<ListTileContainer> {
 
   @override
   Widget build(BuildContext context) {
-    print("Before ${newsFeedController.commentModel.value.userId}");
     newsFeedController.commentModel.value.userId = userController.userModel.value.uid ?? FirebaseAuth.instance.currentUser!.uid;
-    print("After ${newsFeedController.commentModel.value.userId}");
         return userData == null ? const SizedBox() : LoaderOverlay(
           child: CustomContainer1(
                   child: Padding(
