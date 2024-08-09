@@ -273,9 +273,9 @@ class _FirestorePaginationState extends State<CustomFirestorePagination> {
   void dispose() {
     _streamSub?.cancel();
     _liveStreamSub?.cancel();
-    // _controller
-    //   ..removeListener(_scrollListener)
-    //   ..dispose();
+    _controller
+      ..removeListener(_scrollListener)
+      ..dispose();
     super.dispose();
   }
 
@@ -505,20 +505,21 @@ class BuildPagination<T> extends StatelessWidget {
   Widget build(BuildContext context) {
     switch (viewType) {
       case ViewType.list:
-        return ListView.separated(
+        return ListView.builder(
           scrollDirection: scrollDirection,
           reverse: reverse,
           controller: controller,
           physics: physics,
           shrinkWrap: shrinkWrap,
           padding: padding,
+          cacheExtent: 5000,
           itemCount: items.length + (isLoading ? 1 : 0),
           itemBuilder: (BuildContext context, int index) {
             if (index >= items.length) return bottomLoader;
 
             return itemBuilder(context, items[index], index);
           },
-          separatorBuilder: separatorBuilder,
+         // separatorBuilder: separatorBuilder,
         );
 
       case ViewType.grid:
