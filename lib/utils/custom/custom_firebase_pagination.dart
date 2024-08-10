@@ -505,21 +505,24 @@ class BuildPagination<T> extends StatelessWidget {
   Widget build(BuildContext context) {
     switch (viewType) {
       case ViewType.list:
-        return ListView.builder(
+        return ListView.separated(
           scrollDirection: scrollDirection,
           reverse: reverse,
           controller: controller,
           physics: physics,
           shrinkWrap: shrinkWrap,
           padding: padding,
-          cacheExtent: 5000,
-          itemCount: items.length + (isLoading ? 1 : 0),
+          cacheExtent: 100000,
+          itemCount: items.length + 1 + (isLoading ? 1 : 0),
           itemBuilder: (BuildContext context, int index) {
-            if (index >= items.length) return bottomLoader;
-
-            return itemBuilder(context, items[index], index);
+            if (index - 1 >= items.length) return bottomLoader;
+            if (index == 0) {
+              return itemBuilder(context, items[index], index);
+            } else {
+              return itemBuilder(context, items[index - 1], index);
+            }
           },
-         // separatorBuilder: separatorBuilder,
+          separatorBuilder: separatorBuilder,
         );
 
       case ViewType.grid:

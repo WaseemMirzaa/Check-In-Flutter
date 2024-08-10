@@ -19,6 +19,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:nb_utils/nb_utils.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
@@ -51,23 +52,23 @@ class _NewsFeedScreenState extends State<NewsFeedScreen> {
 
     Future.microtask(() async => await setValue('first', 'no'));
 
-    _scrollController.addListener(_onScroll); // Add scroll listener
+    //_scrollController.addListener(_onScroll); // Add scroll listener
   }
 
   void _onScroll() {
     double offset = _scrollController.offset;
 
-    if (_scrollController.position.userScrollDirection == ScrollDirection.reverse && _isTopContainerVisible.value && offset > 10) {
-
-      //setState(() {
-        _isTopContainerVisible.value = false;
-      //});
-    } else if (_scrollController.position.userScrollDirection == ScrollDirection.forward && !_isTopContainerVisible.value && offset <= 50) {
-      // Scroll up
-      //setState(() {
-        _isTopContainerVisible.value = true;
-      //});
-    }
+    // if (_scrollController.position.userScrollDirection == ScrollDirection.reverse && _isTopContainerVisible.value && offset > 10) {
+    //
+    //   //setState(() {
+    //     _isTopContainerVisible.value = false;
+    //   //});
+    // } else if (_scrollController.position.userScrollDirection == ScrollDirection.forward && !_isTopContainerVisible.value && offset <= 50) {
+    //   // Scroll up
+    //   //setState(() {
+    //     _isTopContainerVisible.value = true;
+    //   //});
+    // }
 
   }
 
@@ -80,7 +81,7 @@ class _NewsFeedScreenState extends State<NewsFeedScreen> {
   }
 
   Future<void> _handleRefresh() async {
-    //Future.delayed(Duration(seconds: 3));
+    Future.delayed(Duration(seconds: 3));
        setState(() {});
   }
 
@@ -94,98 +95,120 @@ class _NewsFeedScreenState extends State<NewsFeedScreen> {
       ),
       body: Column(
           children: [
-            Obx((){
-              return AnimatedContainer(
-                height: _isTopContainerVisible.value ? 17.5.h : 0.0,
-                duration: const Duration(milliseconds: 10),
-                curve: Curves.easeInOut,
-                child: TopContainer(
-                  onWriteSomethingTap: () async {
-                    final result = await Get.to(CreatePost());
-                    if (result ?? false) {
-                      setState(() {});
-                    }
-                  },
-                  onPhotoTap: (String? val) async {
-                    if (!val.isEmptyOrNull) {
-                      final result = await Get.to(CreatePost());
-                      if (result ?? false) {
-                        setState(() {});
-                      }
-                    }
-                  },
-                  onVideoTap: (String? val) async {
-                    if (!val.isEmptyOrNull) {
-                      final result = await Get.to(CreatePost());
-                      if (result ?? false) {
-                        setState(() {});
-                      }
-                    }
-                  },
-                ),
-              );
-            }),
             Expanded(
-              child: CustomFirestorePagination(
-                key: UniqueKey(),
-                controller: _scrollController,
-                limit: 20,
-                viewType: ViewType.list,
-                isLive: true,
-                shrinkWrap: true,
-                onEmpty: const Center(
-                  child: Text('Cart is empty'),
-                ),
-                bottomLoader: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Center(
-                      child: Container(
-                        width: 25,
-                        height: 25,
-                        margin: const EdgeInsets.all(10),
-                        child: const CircularProgressIndicator.adaptive(
-                          strokeWidth: 2.5,
+              child: RefreshIndicator(
+                onRefresh: _handleRefresh,
+                child: CustomFirestorePagination(
+                  key: UniqueKey(),
+                  //controller: _scrollController,
+                  limit: 20,
+                  viewType: ViewType.list,
+                  isLive: true,
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  //shrinkWrap: true,
+                  onEmpty: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      AnimatedContainer(
+                        height:  17.5.h,
+                        duration: const Duration(milliseconds: 10),
+                        curve: Curves.easeInOut,
+                        child: TopContainer(
+                          onWriteSomethingTap: () async {
+                            final result = await Get.to(CreatePost());
+                            if (result ?? false) {
+                              setState(() {});
+                            }
+                          },
+                          onPhotoTap: (String? val) async {
+                            if (!val.isEmptyOrNull) {
+                              final result = await Get.to(CreatePost());
+                              if (result ?? false) {
+                                setState(() {});
+                              }
+                            }
+                          },
+                          onVideoTap: (String? val) async {
+                            if (!val.isEmptyOrNull) {
+                              final result = await Get.to(CreatePost());
+                              if (result ?? false) {
+                                setState(() {});
+                              }
+                            }
+                          },
                         ),
                       ),
-                    )
-                  ],
+                      const Center(
+                        child: Text('No data found'),
+                      ),
+                    ],
+                  ),
+                  query: FirebaseFirestore.instance
+                      .collection(Collections.NEWSFEED)
+                      .orderBy(NewsFeed.TIME_STAMP, descending: true),
+                  itemBuilder: (context, documentSnapshot, index) {
+                    // Add a custom container as the first item
+                    if (index == 0) {
+                      return AnimatedContainer(
+                        height:  17.5.h,
+                        duration: const Duration(milliseconds: 10),
+                        curve: Curves.easeInOut,
+                        child: TopContainer(
+                          onWriteSomethingTap: () async {
+                            final result = await Get.to(CreatePost());
+                            if (result ?? false) {
+                              setState(() {});
+                            }
+                          },
+                          onPhotoTap: (String? val) async {
+                            if (!val.isEmptyOrNull) {
+                              final result = await Get.to(CreatePost());
+                              if (result ?? false) {
+                                setState(() {});
+                              }
+                            }
+                          },
+                          onVideoTap: (String? val) async {
+                            if (!val.isEmptyOrNull) {
+                              final result = await Get.to(CreatePost());
+                              if (result ?? false) {
+                                setState(() {});
+                              }
+                            }
+                          },
+                        ),
+                      );
+                    }
+
+                    if (index % 5 == 4) {
+                      return NavtiveAdsComp(
+                        key: ValueKey('Ad_$index'),
+                      );
+                    }
+                    final itemIndex = index - (index ~/ 5);
+
+                    final doc = documentSnapshot;
+                    final data = doc.data() as Map<String, Object?>;
+
+                    if (data[NewsFeed.HIDE_USER] is List &&
+                        !(data[NewsFeed.HIDE_USER] as List)
+                            .contains(userController.userModel.value.uid)) {
+                      final newsFeedModel = NewsFeedModel.fromJson(data);
+                      if (data == null) return Container();
+                      return newsFeedModel.isOriginal!
+                          ? ListTileContainer(
+                        key: ValueKey(newsFeedModel.id),
+                        data: newsFeedModel,
+                      )
+                          : SharedPostComp(
+                          key: ValueKey(newsFeedModel.shareID),
+                          data: newsFeedModel);
+                    } else {
+                      return const SizedBox.shrink();
+                    }
+                  },
                 ),
-                query: FirebaseFirestore.instance
-                    .collection(Collections.NEWSFEED)
-                    .orderBy(NewsFeed.TIME_STAMP, descending: true),
-                itemBuilder: (context, documentSnapshot, index) {
-                  // Add a custom container as the first item
-
-
-                  if (index % 5 == 4) {
-                    return NavtiveAdsComp(
-                      key: ValueKey('Ad_$index'),
-                    );
-                  }
-                  final itemIndex = index - (index ~/ 5);
-
-                  final doc = documentSnapshot;
-                  final data = doc.data() as Map<String, Object?>;
-
-                  if (data[NewsFeed.HIDE_USER] is List &&
-                      !(data[NewsFeed.HIDE_USER] as List)
-                          .contains(userController.userModel.value.uid)) {
-                    final newsFeedModel = NewsFeedModel.fromJson(data);
-                    if (data == null) return Container();
-                    return newsFeedModel.isOriginal!
-                        ? ListTileContainer(
-                      key: ValueKey(newsFeedModel.id),
-                      data: newsFeedModel,
-                    )
-                        : SharedPostComp(
-                        key: ValueKey(newsFeedModel.shareID),
-                        data: newsFeedModel);
-                  } else {
-                    return const SizedBox.shrink();
-                  }
-                },
               ),
             )
           ],
