@@ -53,22 +53,22 @@ class _CommentContainerState extends State<CommentContainer> {
 
   Rx<bool> isLiked = false.obs;
 
-  UserModel? userModel;
+  //UserModel? userModel;
 
   final userServices = UserServices();
 
-  getUserData() async {
-    userModel = await userServices.getUserData(widget.commentModel.userId ??"");
-    print("THE USER MODEL IS: ${userModel!.userName}");
-    mounted ? setState(() {
-
-    }) : null;
-  }
+  // getUserData() async {
+  //   userModel = await userServices.getUserData(widget.commentModel.userId ??"");
+  //   print("THE USER MODEL IS: ${userModel!.userName}");
+  //   mounted ? setState(() {
+  //
+  //   }) : null;
+  // }
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    Future.microtask(() async=> await getUserData());
+    //Future.microtask(() async=> await getUserData());
     // getUserData();
   }
 
@@ -84,7 +84,7 @@ class _CommentContainerState extends State<CommentContainer> {
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-               userModel?.photoUrl != null && userModel?.photoUrl != '' ?  GestureDetector(
+               widget.commentModel.userImage != null && widget.commentModel.userImage != '' ?  GestureDetector(
                 onTap: (){
                   if(widget.commentModel.userId == FirebaseAuth.instance.currentUser!.uid){
                     if(widget.isFromProfile) {
@@ -107,7 +107,7 @@ class _CommentContainerState extends State<CommentContainer> {
                 },
                 child: CircleAvatar(
                   backgroundImage: NetworkImage(
-                      userModel?.photoUrl ?? ''),
+                      widget.commentModel.userImage ?? ''),
                   radius: 17,
                 ),
               ) : GestureDetector(
@@ -145,7 +145,7 @@ class _CommentContainerState extends State<CommentContainer> {
               Expanded(
                 child:  Builder(
                     builder: (context) {
-                      bool containsEmojis = hasEmojis(widget.commentModel.content!); // Function to check emojis
+                      //bool containsEmojis = hasEmojis(widget.commentModel.content!); // Function to check emojis
 
                     return Container(
                       width: MediaQuery.sizeOf(context).width * 0.65,
@@ -319,12 +319,12 @@ class _CommentContainerState extends State<CommentContainer> {
     );
   }
 
-  bool hasEmojis(String text) {
-    RegExp regex = RegExp(
-      r"(\p{Emoji_Presentation}|\p{Emoji}\uFE0F)",
-      unicode: true,
-      caseSensitive: false,
-    );
-    return regex.hasMatch(text);
-  }
+  // bool hasEmojis(String text) {
+  //   RegExp regex = RegExp(
+  //     r"(\p{Emoji_Presentation}|\p{Emoji}\uFE0F)",
+  //     unicode: true,
+  //     caseSensitive: false,
+  //   );
+  //   return regex.hasMatch(text);
+  // }
 }
