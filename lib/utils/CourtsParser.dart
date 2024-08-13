@@ -57,30 +57,36 @@ class CourtsParser {
     try {
       await snap.collection('AdditionalLocations').get().then((querySnapshot) {
         for (var doc in querySnapshot.docs) {
-          final location = CourtModel(
-            city: doc.data()['city'],
-            street: doc.data()['street'],
-            placeId: doc.data()['placeId']??'',
-            latitude: doc.data()['latitude'],
-            longitude: doc.data()['longitude'],
-            url: doc.data()['url'],
-            state: doc.data()['state'],
-            address: doc.data()['address'],
-            title: doc.data()['title'],
-          );
+          try {
+            final location = CourtModel(
+                        city: doc.data()['city'],
+                        street: doc.data()['street'],
+                        placeId: doc.data()['placeId']??'',
+                        latitude: doc.data()['latitude'],
+                        longitude: doc.data()['longitude'],
+                        url: doc.data()['url'],
+                        state: doc.data()['state'],
+                        address: doc.data()['address'],
+                        title: doc.data()['title'],
+                      );
 
-          additionalLocations.add(location);
+            additionalLocations.add(location);
 
-          final court = LatLng(location.latitude, location.longitude);
-          var isInRadius = checkIfWithinRadius(currentLocation, court);
+            final court = LatLng(location.latitude, location.longitude);
+            var isInRadius = checkIfWithinRadius(currentLocation, court);
 
-          if (isInRadius) {
-            // Distance in meters (50km = 50000m)
-            filteredLocations.add(location);
+            if (isInRadius) {
+                        // Distance in meters (50km = 50000m)
+                        filteredLocations.add(location);
+                      }
+          } catch (e) {
+            print(doc.toString());
+            print(e);
           }
         }
       });
     } catch (e) {
+
       print(e);
     }
 
