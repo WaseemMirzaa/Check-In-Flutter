@@ -18,7 +18,7 @@ Container fullWidthButton(String label, VoidCallback onTap) {
       ],
     ),
     child: Material(
-      color: transparentColor,
+      color: appTransparentColor,
       child: InkWell(
         borderRadius: BorderRadius.circular(11.0),
         onTap: onTap,

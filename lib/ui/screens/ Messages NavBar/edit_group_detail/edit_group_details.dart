@@ -67,6 +67,13 @@ class _EditGroupDetailsState extends State<EditGroupDetails> {
   }
 
   @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    controller.fileImage.value = null;
+  }
+
+  @override
   Widget build(BuildContext context) {
     GlobalVariable.docId = '';
 

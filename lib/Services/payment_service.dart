@@ -83,6 +83,7 @@ class PaymentService {
           title: 'You are now officially verified, enjoy the blue check!',
           dialogType: DialogType.ACCEPT,
           positiveText: 'Ok',
+          negativeText: '',
           onAccept: (ctx){
             Navigator.pop(ctx);
             Navigator.pop(context);

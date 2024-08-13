@@ -62,5 +62,18 @@
     <string>This app uses bluetooth only for the working of the internal library. We don't have any functionality dependent on bluetooth.</string>
     <key>NSBluetoothAlwaysUsageDescription</key>
     <string>This app uses bluetooth only for the working of the internal library. We don't have any functionality dependent on bluetooth.</string>
+    <key>io.flutter.embedded_views_preview</key>
+    <true/>
+
+    <key>GADApplicationIdentifier</key>
+    <string>ca-app-pub-7171017916477454~2139743178</string>
+
+    <key>FirebaseDynamicLinksCustomDomains</key>
+    <array>
+        <string>https://developlogix.page.link</string>
+        <string>https://yourapp.com/post?postId=$postId</string>
+    </array>
+
+
 </dict>
 </plist>

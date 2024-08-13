@@ -1,6 +1,9 @@
 import 'package:check_in/Services/dio_config.dart';
+import 'package:check_in/Services/newfeed_service.dart';
 import 'package:check_in/Services/payment_service.dart';
 import 'package:check_in/Services/push_notification_service.dart';
+import 'package:check_in/Services/user_services.dart';
+import 'package:check_in/controllers/News%20Feed/news_feed_controller.dart';
 import 'package:check_in/controllers/user_controller.dart';
 import 'package:check_in/core/constant/constant.dart';
 import 'package:check_in/model/user_modal.dart';
@@ -14,9 +17,10 @@ import 'package:get/get.dart';
 import 'package:nb_utils/nb_utils.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
 
-UserController userController = Get.put(UserController());
+UserController userController = Get.put(UserController(UserServices()));
 final auth = FirebaseAuth.instance;
 final snap = FirebaseFirestore.instance;
+NewsFeedController newsFeedController = Get.put(NewsFeedController(NewsFeedService()));
 
 Future<bool> signUp(
   email,
@@ -71,7 +75,6 @@ Future<void> login(email, password, context) async {
         snap.collection(Collections.USER).doc(value.user!.uid).update(
           {
             UserKey.DEVICE_TOKEN: FieldValue.arrayUnion(tokens)
-            // UserKey.DEVICE_TOKEN: [token]
           },
         );
       }
@@ -80,7 +83,7 @@ Future<void> login(email, password, context) async {
       await toModal(context);
       SharedPreferences prefs = await SharedPreferences.getInstance();
       prefs.setString('email', 'useremail@gmail.com');
-      pushNewScreen(context, screen: const Home());
+      userController.userModel.value.uid.isEmptyOrNull ? null : pushNewScreen(context, screen: const Home());
     });
   } on FirebaseAuthException catch (e) {
     print('error message ${e.message}');
@@ -96,7 +99,9 @@ Future<void> logout(context) async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
   prefs.remove('email');
   final token = await FCMManager.getFCMToken();
-
+  newsFeedController.clearNewsFeeds();
+  newsFeedController.clearMyPosts();
+  newsFeedController.clearUserPosts();
   //Checkout
   print('-----------token-----------$token');
   snap.collection(Collections.USER).doc(auth.currentUser!.uid).update({
@@ -106,6 +111,7 @@ Future<void> logout(context) async {
     CourtKey.COURT_LNG: FieldValue.delete(),
     // UserKey.DEVICE_TOKEN: []
   });
+
   auth.signOut().then(
         (value) =>
             // pushNewScreen(context, screen: const StartView(), withNavBar: false)
@@ -218,7 +224,8 @@ toModal(BuildContext context) async {
   DocumentSnapshot snap =
       await FirebaseFirestore.instance.collection(Collections.USER).doc(auth.currentUser?.uid ?? "").get();
   UserModel userModel = UserModel.fromMap(snap.data() as Map<String, dynamic>);
-  print("user model:.. ${userModel.uid}");
+  userController.userModel.value =userModel;
+  print("user model:.. ${userController.userModel.value.uid}");
 }
 
 Future<void> resetPassword({required String emailText}) async {

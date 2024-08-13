@@ -2,8 +2,10 @@
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:check_in/auth_service.dart';
+import 'package:check_in/model/user_modal.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:nb_utils/nb_utils.dart';
 import 'package:sizer/sizer.dart';
 import 'package:get/get.dart';
 import '../../../../../controllers/Messages/messages_controller.dart';
@@ -16,8 +18,9 @@ import '../../../../../utils/styles.dart';
 
 class MessageListTile extends StatefulWidget {
   Messagemodel? message;
+  UserModel? userModel;
   Function()? ontap;
-  MessageListTile({super.key, this.message, this.ontap});
+  MessageListTile({super.key, this.message, this.ontap, this.userModel});
 
   @override
   State<MessageListTile> createState() => _MessageListTileState();
@@ -65,9 +68,9 @@ class _MessageListTileState extends State<MessageListTile> {
               children: [
                 CircleAvatar(
                   backgroundColor: appGreenColor.withOpacity(0.6),
-                  backgroundImage: widget.message!.image! == ''
+                  backgroundImage: widget.userModel!.photoUrl.isEmptyOrNull && widget.message!.image.isEmptyOrNull
                       ? AssetImage(AppImage.user) as ImageProvider
-                      : CachedNetworkImageProvider(widget.message!.image!),
+                      : CachedNetworkImageProvider(widget.userModel?.photoUrl ?? widget.message!.image!),
                   radius: 30,
                 ),
                 Padding(
@@ -87,7 +90,7 @@ class _MessageListTileState extends State<MessageListTile> {
                           SizedBox(
                             width: 45.w,
                             child:
-                                poppinsText(widget.message!.name!, 15, medium, appBlackColor, overflow: TextOverflow.ellipsis),
+                                poppinsText(widget.userModel?.userName ?? widget.message!.name!, 15, medium, appBlackColor, overflow: TextOverflow.ellipsis),
                           ),
                         ],
                       ),

@@ -29,5 +29,6 @@ class AppAssets {
   static const PLAYSTORE_ICON = 'assets/images/playstore-icon.png';
   static const USER_ICON = 'assets/images/user_icon.png';
   static const DOUBLE_TICK = 'assets/images/double-tick.png';
+  static const NEWS_FEED = 'assets/images/newsFeed.png';
   ////
 }

@@ -1,5 +1,7 @@
 // ignore_for_file: avoid_print
 import 'package:check_in/core/constant/temp_language.dart';
+import 'package:check_in/ui/screens/News%20Feed%20NavBar/news_feed_onboarding/news_feed_onboarding.dart';
+import 'package:check_in/ui/screens/News%20Feed%20NavBar/open_post/open_post.dart';
 import 'package:check_in/ui/screens/check_in.dart';
 import 'package:check_in/ui/screens/profile_screen.dart';
 import 'package:check_in/ui/screens/start.dart';
@@ -7,16 +9,22 @@ import 'package:check_in/utils/colors.dart';
 import 'package:check_in/utils/common.dart';
 import 'package:check_in/utils/styles.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
+import 'package:nb_utils/nb_utils.dart';
 
 import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
 
 import ' Messages NavBar/Messages/messages.dart';
 import 'History.dart';
 import '../../controllers/nav_bar_controller.dart';
+import 'News Feed NavBar/News Feed/news_feed_screen.dart';
+import 'dart:developer' as developer;
 
+import 'News Feed NavBar/deep_link_screen/deep_link_view.dart';
 class BottomNav {
   String icon;
   Color iconColor;
@@ -147,16 +155,76 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> with AutomaticKeepAliveClientMixin {
   final NavBarController navBarController = Get.put(NavBarController());
+@override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    Future.microtask(() async{
+      FirebaseAuth.instance.currentUser != null && getStringAsync('first') != 'no' ?  Navigator.pushReplacement(
+          context, MaterialPageRoute(builder: (context) => const NewsFeedOnboarding())) : null;
+    });
+    initDynamicLinks(context);
 
+
+}
   final List<Widget> _buildScreens = [
     const CheckIn(),
     MessageScreen(),
     //................ News Feed
-    // const NewsFeedScreen(),
+    NewsFeedScreen(),
     const HistoryView(),
-    const ProfileScreen()
+    ProfileScreen()
     //KeyedSubtree(key: UniqueKey(), child: const ProfileScreen()),
   ];
+  /// The deep link
+  Future<void> initDynamicLinks(BuildContext context) async {
+    print("\n\n\n\n\n First Call \n\n\n");
+    await Firebase.initializeApp();
+
+    // Handle initial link when the app is first opened
+    final PendingDynamicLinkData? initialLinkData = await FirebaseDynamicLinks.instance.getInitialLink();
+    _handleDeepLink(context, initialLinkData?.link);
+
+    FirebaseDynamicLinks.instance.onLink.listen(
+          (PendingDynamicLinkData dynamicLinkData) {
+        _handleDeepLink(context, dynamicLinkData?.link);
+      },
+      onError: (error) async {
+        developer.log('Dynamic Link Failed: ${error.toString()}');
+      },
+    );
+  }
+
+  void _handleDeepLink(BuildContext context, Uri? deepLink) {
+    print("\n\n\n\n\n 2nd Call \n\n\n");
+
+    if (deepLink != null) {
+      print("Deep Link URL: ${deepLink.toString()}");
+      var isPost = deepLink.pathSegments.contains('post');
+      print("The collection contains---> $isPost");
+      if (isPost) {
+        var postId = deepLink.queryParameters['postId'];
+        print("Post ID: $postId"); // Added debug statement
+        if (postId != null) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => OpenPost(postId: postId),
+            ),
+          );
+        } else {
+          print("Post ID is null");
+        }
+      } else {
+        print("Deep Link does not contain 'post' in path segments");
+      }
+    } else {
+      print("Deep Link is null");
+    }
+  }
+
+
+
 
   List<BottomNavigationBarItem> _navBarsItems() {
     return [
@@ -178,29 +246,29 @@ class _HomeState extends State<Home> with AutomaticKeepAliveClientMixin {
       ).getBottomNavItem(),
 
       //.......................... News Feed
-      // BottomNav(
-      //   label: 'NewsFeed',
-      //   boxColor:
-      //       navBarController.controller.index == 2 ? greenColor : whiteColor,
-      //   icon: "calendar",
-      //   iconColor:
-      //       navBarController.controller.index == 2 ? whiteColor : blackColor,
-      // ).getBottomNavItem(),
       BottomNav(
-        label: 'History',
+        label: 'NewsFeed',
         boxColor:
             navBarController.controller.index == 2 ? appGreenColor : appWhiteColor,
-        icon: "Icon awesome-history",
+        icon: "calendar",
         iconColor:
             navBarController.controller.index == 2 ? appWhiteColor : appBlackColor,
       ).getBottomNavItem(),
       BottomNav(
-        label: 'Profile',
+        label: 'History',
         boxColor:
             navBarController.controller.index == 3 ? appGreenColor : appWhiteColor,
-        icon: "Icon material-person",
+        icon: "Icon awesome-history",
         iconColor:
             navBarController.controller.index == 3 ? appWhiteColor : appBlackColor,
+      ).getBottomNavItem(),
+      BottomNav(
+        label: 'Profile',
+        boxColor:
+            navBarController.controller.index == 4 ? appGreenColor : appWhiteColor,
+        icon: "Icon material-person",
+        iconColor:
+            navBarController.controller.index == 4 ? appWhiteColor : appBlackColor,
       ).getBottomNavItem(),
     ];
   }
@@ -214,6 +282,12 @@ class _HomeState extends State<Home> with AutomaticKeepAliveClientMixin {
       // Allow navigating back on other screens
       return true;
     }
+  }
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    navBarController.currentIndex.value = 0;
   }
 
   @override
