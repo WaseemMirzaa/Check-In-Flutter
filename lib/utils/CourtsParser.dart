@@ -59,16 +59,16 @@ class CourtsParser {
         for (var doc in querySnapshot.docs) {
           try {
             final location = CourtModel(
-                        city: doc.data()['city'],
-                        street: doc.data()['street'],
-                        placeId: doc.data()['placeId']??'',
-                        latitude: doc.data()['latitude'],
-                        longitude: doc.data()['longitude'],
-                        url: doc.data()['url'],
-                        state: doc.data()['state'],
-                        address: doc.data()['address'],
-                        title: doc.data()['title'],
-                      );
+              city: doc.data()['city'],
+              street: doc.data()['street'],
+              placeId: doc.data()['placeId'] ?? '',
+              latitude: doc.data()['latitude'],
+              longitude: doc.data()['longitude'],
+              url: doc.data()['url'],
+              state: doc.data()['state'],
+              address: doc.data()['address'],
+              title: doc.data()['title'],
+            );
 
             additionalLocations.add(location);
 
@@ -76,9 +76,9 @@ class CourtsParser {
             var isInRadius = checkIfWithinRadius(currentLocation, court);
 
             if (isInRadius) {
-                        // Distance in meters (50km = 50000m)
-                        filteredLocations.add(location);
-                      }
+              // Distance in meters (50km = 50000m)
+              filteredLocations.add(location);
+            }
           } catch (e) {
             print(doc.toString());
             print(e);
@@ -86,15 +86,13 @@ class CourtsParser {
         }
       });
     } catch (e) {
-
       print(e);
     }
 
     return filteredLocations;
   }
 
-  Future<List<CourtModel>> getCourtsByNameOrAddressFromCSVFile(
-      String search) async {
+  Future<List<CourtModel>> getCourtsByNameOrAddressFromCSVFile(String search) async {
     final List<CourtModel> filteredLocations = [];
 
     try {
@@ -106,7 +104,7 @@ class CourtsParser {
 
       var csvString = await loadAsset();
 
-      var csvData = const CsvToListConverter().convert(csvString,eol: "\n");
+      var csvData = const CsvToListConverter().convert(csvString, eol: "\n");
 
       for (var i = 1; i < csvData.length; i++) {
         final location = CourtModel(
@@ -124,7 +122,6 @@ class CourtsParser {
         // Filter courts based on address
         if (location.title.toLowerCase().contains(search.toLowerCase()) ||
             location.address.toLowerCase().contains(search.toLowerCase())) {
-
           final court = LatLng(location.latitude, location.longitude);
           var isInRadius = checkIfWithinRadius(currentLocation, court);
           if (isInRadius) {
@@ -134,12 +131,10 @@ class CourtsParser {
         }
       }
 
-
       for (var location in additionalLocations) {
         // Filter courts based on address
         if (location.title.toLowerCase().contains(search.toLowerCase()) ||
             location.address.toLowerCase().contains(search.toLowerCase())) {
-
           final court = LatLng(location.latitude, location.longitude);
           var isInRadius = checkIfWithinRadius(currentLocation, court);
           if (isInRadius) {
@@ -156,8 +151,8 @@ class CourtsParser {
   }
 
   bool checkIfWithinRadius(Position userPos, LatLng court) {
-    double distanceInMeters = Geolocator.distanceBetween(
-        userPos.latitude, userPos.longitude, court.latitude, court.longitude);
+    double distanceInMeters =
+        Geolocator.distanceBetween(userPos.latitude, userPos.longitude, court.latitude, court.longitude);
     if (distanceInMeters <= 50000) {
       print("user in radius");
       return true;
@@ -175,8 +170,7 @@ class CourtsParser {
     );
 
     final permission = await Geolocator.requestPermission();
-    if (permission != LocationPermission.whileInUse &&
-        permission != LocationPermission.always) {
+    if (permission != LocationPermission.whileInUse && permission != LocationPermission.always) {
       throw Exception('Location permission denied');
     }
 
