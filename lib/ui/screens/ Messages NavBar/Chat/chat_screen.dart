@@ -38,9 +38,11 @@ final chatQuery = FirebaseFirestore.instance.collection(Collections.MESSAGES).wi
     );
 
 class ChatScreen extends StatefulWidget {
-  const ChatScreen({
+  ChatScreen({
     super.key,
+    this.image = '',
   });
+  String? image;
 
   // bool isFirstTime;
 
@@ -234,12 +236,17 @@ class _ChatScreenState extends State<ChatScreen> {
                     pushNewScreen(context, screen: OtherProfileView(uid: controller.otherUserId.value));
                   },
             child: Row(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.center, children: [
-              Obx(() => CircleAvatar(
-                    backgroundImage: controller.image.value == ''
+            controller.isgroup ?  Obx(() => CircleAvatar(
+                    backgroundImage: widget.image.isEmptyOrNull && controller.image.value.isEmptyOrNull
                         ? AssetImage(AppImage.user) as ImageProvider
-                        : CachedNetworkImageProvider(controller.image.value),
+                        : CachedNetworkImageProvider(controller.isgroup  ? controller.image.value : widget.image?? ''),
                     radius: 20,
-                  )),
+                  )) : CircleAvatar(
+    backgroundImage: widget.image.isEmptyOrNull && controller.image.value.isEmptyOrNull
+    ? AssetImage(AppImage.user) as ImageProvider
+        : CachedNetworkImageProvider(controller.isgroup  ? controller.image.value : widget.image?? ''),
+    radius: 20,
+    ),
               horizontalGap(10),
               controller.isgroup ? SvgPicture.asset(AppImage.chatgroupicon) : const SizedBox(),
               horizontalGap(2),
@@ -327,6 +334,8 @@ class _ChatScreenState extends State<ChatScreen> {
                             //  _chats.isNotEmpty ?
                             loaderView();
                         //  : const SizedBox();
+                      } else if (snapshot.hasError) {
+                        return Center(child: Text('${snapshot.error}'),);
                       } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
                         return Center(child: Text(TempLanguage.noConversation));
                       } else {

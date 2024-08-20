@@ -147,7 +147,7 @@ class _StartViewState extends State<StartView> {
                         ],
                       ),
                       child: Material(
-                        color: transparentColor,
+                        color: appTransparentColor,
                         child: InkWell(
                           borderRadius: BorderRadius.circular(11),
                           onTap: () {

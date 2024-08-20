@@ -52,7 +52,7 @@ void getUsersOnLocation(LatLng courtLocation) async {
   final double upperLng = longitude +
       (radius / earthRadius) * (180 / pi) / cos(latitude * pi / 180);
 
-  final collectionReference = FirebaseFirestore.instance.collection('users');
+  final collectionReference = FirebaseFirestore.instance.collection(Collections.USER);
 
   final QuerySnapshot querySnapshot = await collectionReference
       .where('latitude', isGreaterThan: lowerLat)

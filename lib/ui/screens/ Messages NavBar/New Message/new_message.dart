@@ -8,7 +8,6 @@ import 'package:check_in/model/user_modal.dart';
 import 'package:check_in/ui/screens/%20Messages%20NavBar/add_group_details/add_group_details.dart';
 import 'package:check_in/ui/widgets/custom_appbar.dart';
 import 'package:check_in/ui/widgets/text_field.dart';
-import 'package:check_in/utils/Constants/app_toast.dart';
 import 'package:check_in/utils/Constants/images.dart';
 import 'package:check_in/utils/colors.dart';
 import 'package:check_in/utils/gaps.dart';
@@ -120,7 +119,7 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
                         // clear map mydata
                         controller.mydata.clear();
                         pushNewScreen(context,
-                                screen: const ChatScreen(
+                                screen: ChatScreen(
                                     // name: model.userName!.obs,
                                     // isGroup: false,
                                     // image: model.photoUrl!.obs,

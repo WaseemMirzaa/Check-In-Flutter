@@ -51,7 +51,7 @@ class _MyNavigationBarState extends State<MyNavigationBar> {
             BottomNavigationBarItem(
               label: "f",
               icon: Icon(Icons.person),
-              backgroundColor: blueColor,
+              backgroundColor: appBlueColor,
             ),
           ],
           type: BottomNavigationBarType.shifting,

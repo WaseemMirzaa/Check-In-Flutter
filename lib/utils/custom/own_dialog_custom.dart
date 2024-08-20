@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:nb_utils/nb_utils.dart';
+import 'package:sizer/sizer.dart';
 
 
 /// dialog primary color
@@ -129,7 +130,7 @@ Widget? getCenteredImage(
           color: getDialogPrimaryColor(context, dialogType, primaryColor),
           size: 40,
         ),
-        padding: EdgeInsets.all(16),
+        padding: const EdgeInsets.all(16),
       );
       break;
     case DialogType.DELETE:
@@ -144,7 +145,7 @@ Widget? getCenteredImage(
           color: getDialogPrimaryColor(context, dialogType, primaryColor),
           size: 40,
         ),
-        padding: EdgeInsets.all(16),
+        padding: const EdgeInsets.all(16),
       );
       break;
     case DialogType.UPDATE:
@@ -159,7 +160,7 @@ Widget? getCenteredImage(
           color: getDialogPrimaryColor(context, dialogType, primaryColor),
           size: 40,
         ),
-        padding: EdgeInsets.all(16),
+        padding: const EdgeInsets.all(16),
       );
       break;
     case DialogType.ADD:
@@ -175,7 +176,7 @@ Widget? getCenteredImage(
           color: getDialogPrimaryColor(context, dialogType, primaryColor),
           size: 40,
         ),
-        padding: EdgeInsets.all(16),
+        padding: const EdgeInsets.all(16),
       );
       break;
     case DialogType.RETRY:
@@ -195,7 +196,7 @@ Widget? getCenteredImage(
               primaryColor,
             ),
             size: 40),
-        padding: EdgeInsets.all(16),
+        padding: const EdgeInsets.all(16),
       );
       break;
   }
@@ -368,8 +369,11 @@ Future<bool?> ownShowConfirmDialogCustom(
                 ).visible(subTitle.validate().isNotEmpty),
                 16.height,
                 Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     AppButton(
+                      width: 40.w,
                       elevation: 0,
                       color: getDialogPrimaryColor(_, dialogType, primaryColor),
                       shapeBorder: RoundedRectangleBorder(
@@ -377,6 +381,7 @@ Future<bool?> ownShowConfirmDialogCustom(
                       ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           getIcon(dialogType),
                           6.width,
@@ -385,6 +390,7 @@ Future<bool?> ownShowConfirmDialogCustom(
                             style: boldTextStyle(
                                 color: positiveTextColor ?? Colors.white),
                           ),
+                          const SizedBox(width: 10),
                         ],
                       ).fit(),
                       onTap: () {
@@ -392,7 +398,7 @@ Future<bool?> ownShowConfirmDialogCustom(
 
                         if (cancelable) finish(_, true);
                       },
-                    ).expand(),
+                    ),
                   ],
                 ),
               ],

@@ -73,9 +73,11 @@ class TempLanguage {
       'Additionally, we use your location to provide you with the nearest basketball courts in your area. '
       'Can we continue to use your data to provide you with the best user experience? \n\nYou can change this decision anytime in the apps settings. ';
   static String get newsFeed => "News Feed";
+  static String get myPosts => "My Posts";
   static String get checkOutHot => "Check out what's Hot";
   static String get contentThatTrendingAndPopular => "Check out what's Hot";
   static String get noMessageFound => "No messages found.";
+  static String get noPostFound => "No posts found.";
   static String get typeSomething => "Type something";
   static String get noRecent => "No Recents";
   static String get noConversation => "No Conversation.";
