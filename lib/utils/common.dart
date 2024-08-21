@@ -2,6 +2,7 @@
 
 import 'dart:io';
 
+import 'package:check_in/ui/screens/%20Messages%20NavBar/Chat/chat_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -142,4 +143,14 @@ Future<File> compressImage(XFile fileImage, {int quality = 50, int height = 500,
 
   return File(originalPath);
 
+}
+
+void calculateTimeDifference(String fn) {
+  Duration diff = StaticTime.startTime.difference(DateTime.now());
+  //StaticTime.startTime = DateTime.now();
+  print('iii Function Name: $fn -- ${diff.inSeconds}');
+}
+
+class StaticTime {
+  static DateTime startTime = DateTime.now();
 }

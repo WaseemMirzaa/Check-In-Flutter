@@ -2,10 +2,12 @@ import 'package:check_in/Services/push_notification_service.dart';
 import 'package:check_in/controllers/user_controller.dart';
 import 'package:check_in/model/Message%20and%20Group%20Message%20Model/chat_model.dart';
 import 'package:check_in/model/Message%20and%20Group%20Message%20Model/message_model.dart';
+import 'package:check_in/utils/common.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:get/get.dart';
+import 'package:get/get_rx/get_rx.dart';
 
 import '../../Services/message_service.dart';
 
@@ -27,6 +29,7 @@ class ChatController extends GetxController {
   late FocusNode chatFieldFocusNode;
 
   RxBool sendMsgLoader = false.obs;
+  RxBool sendMessageCall = false.obs;
 
   ChatController(this.chatService);
   var userController = Get.find<UserController>();
@@ -59,10 +62,11 @@ class ChatController extends GetxController {
   //............. get all conversation
   Stream<List<Chatmodel>> getConversation() async* {
     print('././././././../. $members');
+    calculateTimeDifference('GetConversation Start');
     Timestamp? timeStamp = await chatService.getDeleteTimeStamp(docId.value, userController.userModel.value.uid!);
     // chatService.updateUnreadCount(docId.value, userController.userModel.value.uid!, 0, members);
     // chatService.readReceipts(docId.value, userController.userModel.value.uid!);
-
+    calculateTimeDifference('GetConversation End');
     yield* chatService.getConversation(docId.value, userController.userModel.value.uid!, members, timeStamp);
   }
 
@@ -101,10 +105,20 @@ class ChatController extends GetxController {
     // try {
     DocumentSnapshot? newMessageDoc = await chatService.sendMessage(docId.value, chatmodel, members);
     sendMsgLoader.value = false;
-    if (newMessageDoc != null) {
+
+    /// Purpose of this code is to make deleted user undeleted
+    /// (It means they can again send and receive messages)
+    ///
+    /// [updateDelete] method was called again and again on every message send
+    /// that was adding unnecessary overload
+    /// That's why when a user first time come to chat screen and send a first message
+    /// this method will call only once and for other messages it will no call.
+
+    if (newMessageDoc != null && !sendMessageCall.value) {
+      sendMessageCall.value = true;
       await chatService.updateDelete(docId.value, uid);
     }
-    await chatService.readReceipts(chatcontroller.docId.value, userController.userModel.value.uid.toString());
+    //await chatService.readReceipts(chatcontroller.docId.value, userController.userModel.value.uid.toString());
 
     return newMessageDoc;
     // } catch (e) {
@@ -120,9 +134,9 @@ class ChatController extends GetxController {
   }
 
   //.........Receipts chat
-  Future<bool> readReceipts(String messageDoc, String uid) async {
-    return await chatService.readReceipts(messageDoc, uid);
-  }
+  // Future<bool> readReceipts(String messageDoc, String uid) async {
+  //   return await chatService.readReceipts(messageDoc, uid);
+  // }
 
 //........... Compress images
   Future<void> compressImage() async {
@@ -168,7 +182,8 @@ class ChatController extends GetxController {
             isGroup: isgroup,
             image: image ?? '',
             name: senderName.value,
-            memberIds: memberId);
+            memberIds: memberId,
+            uid: element);
       }
     }
   }

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:check_in/Services/message_service.dart';
 import 'package:check_in/ui/screens/News%20Feed%20NavBar/News%20Feed/news_feed_screen.dart';
 import 'package:check_in/ui/screens/News%20Feed%20NavBar/open_post/open_post.dart';
 import 'package:flutter/material.dart';
@@ -288,7 +289,8 @@ Future<void> sendNotification(
     required bool isGroup,
     required String name,
     required String image,
-    required List memberIds}) async {
+    required List memberIds,
+    required String uid}) async {
   var completeUrl = 'https://us-central1-check-in-7ecd7.cloudfunctions.net/sendNotification';
   final headers = {'Content-Type': 'application/json'};
   // Loop through each token and send individual notifications
@@ -311,6 +313,7 @@ Future<void> sendNotification(
         print('🟡🟡🟡Notification sent');
       } else {
         print('🔴🔴🔴Error sending notification: ${response.statusCode}');
+        MessageService.removeDeviceToken(uid, userToken);
       }
     } catch (e) {
       print('🔴🔴🔴Error sending notification: $e');

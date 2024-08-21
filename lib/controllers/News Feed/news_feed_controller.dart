@@ -397,7 +397,8 @@ class NewsFeedController extends GetxController {
             docId: docId,
             image: image ?? '',
             name: userController.userModel.value.userName ?? '',
-            memberIds: memberId, isGroup: false);
+            memberIds: memberId, isGroup: false,
+            uid: element);
       }
     }
   }

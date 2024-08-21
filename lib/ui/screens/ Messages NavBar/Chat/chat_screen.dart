@@ -25,6 +25,7 @@ import 'package:sizer/sizer.dart';
 
 import '../../../../model/Message and Group Message Model/message_model.dart';
 import '../../../../utils/Constants/enums.dart';
+import '../../../../utils/common.dart';
 import '../../../../utils/styles.dart';
 import 'Component/button.dart';
 import 'Component/image_date_container.dart';
@@ -36,6 +37,7 @@ final chatQuery = FirebaseFirestore.instance.collection(Collections.MESSAGES).wi
       fromFirestore: (snapshot, options) => Chatmodel.fromJson(snapshot.data()!),
       toFirestore: (value, options) => value.toJson(),
     );
+
 
 class ChatScreen extends StatefulWidget {
   ChatScreen({
@@ -125,6 +127,7 @@ class _ChatScreenState extends State<ChatScreen> {
     // chatcontroller.docId.value == userController.userModel ? chatcontroller.readReceipts(chatcontroller.docId.value) : null;
     // print("---------DOC ID IS: ${chatcontroller.docId.value}");
     // print("---------NOTIFY ID IS: ${NotificationModel.docId}");
+    controller.sendMessageCall.value = false;
     controller.getSingleMessage();
     controller.issticker.value = true;
     controller.chatfieldController.addListener(() {
@@ -647,7 +650,6 @@ class _ChatScreenState extends State<ChatScreen> {
                             controller.sendMsgField.value = '';
                             controller.sendNotificationMethod('', controller.chatfieldController.text);
                             controller.chatfieldController.clear();
-
                             // if (newMessageDoc != null) {
                             //   _chats.insert(0, newMessageDoc);
                             //   _streamController.add(_chats);

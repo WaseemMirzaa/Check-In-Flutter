@@ -64,7 +64,8 @@ class MessageScreen extends GetView<MessageController> {
                           itemBuilder: (context, index) {
                             var message = snapshot.data?[index];
                             if (message!.showMessageTile!) {
-                              return (snapshot.data![index].isgroup == false) ? FutureBuilder(
+                              return (snapshot.data![index].isgroup == false)
+                                  ? FutureBuilder(
                               future: userServices.getUserData(
                                   snapshot.data![index].recieverId == FirebaseAuth.instance.currentUser!.uid ? snapshot.data![index].senderId! : snapshot.data![index].recieverId!),
                                   builder: (context, userSnap) {
@@ -130,7 +131,8 @@ class MessageScreen extends GetView<MessageController> {
         }
       });
     }
-                              ) : Obx(() {
+                              )
+                                  : Obx(() {
                                 if (snapshot.data![index].name!.toLowerCase().contains(controller.searchQuery.toLowerCase())) {
                                   return Padding(
                                       padding: const EdgeInsets.symmetric(vertical: 6),
@@ -183,7 +185,8 @@ class MessageScreen extends GetView<MessageController> {
                                 } else {
                                   return Container();
                                 }
-                              });
+                              }
+                              );
                             } else {
                               return const SizedBox.shrink();
                             }

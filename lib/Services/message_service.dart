@@ -151,6 +151,9 @@ class MessageService {
   }
 
 //............ Get conversations
+  /// [GetConversation]
+  ///
+  /// This method is fetching all the messages between users.
   Stream<List<Chatmodel>> getConversation(String docId, String uId, List mem, Timestamp? messageTimeStamp) {
     return _messagesCollection
         .doc(docId)
@@ -164,9 +167,15 @@ class MessageService {
                       : doc.data()[ChatField.TIME_STAMP].compareTo(messageTimeStamp) > 0;
                }) // Filter messages by timestamp
                 .map<Chatmodel>((doc) {
+      calculateTimeDifference('GetConversation Stream Start');
               // updateLastSeen(docId, uId);
-              updateUnreadCount(docId, uId, mem);
-              readReceipts(docId, uId);
+
+               updateUnreadCount(docId, uId, mem);
+
+              if (doc.data()['isRead'] == null && doc.data()['id'] != uId) {
+                readReceipts(docId, doc.id);
+              }
+              calculateTimeDifference('GetConversation Stream End');
               return Chatmodel.fromJson(doc.data(), docID: doc.id);
             }).toList());
   }
@@ -286,7 +295,11 @@ class MessageService {
   }
 
 //............ Update delete data array
+  ///Purpose of this code is to make deleted user undeleted
+  /// (It means they can again send and receive messages)
   Future<void> updateDelete(String docId, String userId) async {
+    calculateTimeDifference('Start Update Delete');
+
     try {
       DocumentReference docRef = _messagesCollection.doc(docId);
       DocumentSnapshot snapshot = await docRef.get();
@@ -308,6 +321,8 @@ class MessageService {
     } catch (error) {
       print("Error updating deleteIds: $error");
     }
+    calculateTimeDifference('End Update Delete');
+
   }
 
   Future<void> updateUserDelete(String docId, String userId) async {
@@ -376,7 +391,12 @@ class MessageService {
   }
 
 //............ Update Unread Count
+  /// [UpdateUnreadCount]
+  ///
+  /// This method update the unread messages of the users in group and one-to-one chat.
   Future<void> updateUnreadCount(String docId, String uId, List mem) async {
+    calculateTimeDifference('updateUnReadCount');
+    final start = DateTime.now();
     final docRef = _messagesCollection.doc(docId);
     FirebaseFirestore.instance.runTransaction((transaction) async {
       final snapshot = await transaction.get(docRef);
@@ -423,34 +443,49 @@ class MessageService {
   }
 
   // ................ READ RECEIPTS
-  Future<bool> readRecDeipts(String messageDoc, String uid) async {
-    try {
-      if (Firebase.apps.isEmpty) {
-        print("🟢🟢🟢🟢🟢🟢🟢🟢🟢🟢No firebase app exist:🟢🟢🟢🟢🟢🟢🟢🟢🟢🟢");
-        return false;
-      }
-      final querySnapshot = await _messagesCollection
-          .doc(messageDoc)
-          .collection(Collections.CHAT)
-          .where('id', isNotEqualTo: uid)
-          .where('isRead', isEqualTo: null)
-          .get();
-
-      if (querySnapshot.docs.isNotEmpty) {
-        for (final doc in querySnapshot.docs) {
-          final chatModel = Chatmodel.fromJson(doc.data());
-          chatModel.isRead = true;
-          await doc.reference.update(chatModel.toJson());
-        }
-        return true;
-      } else {
-        log("🟢🟢🟢🟢🟢DOCS ARE NULL🟢🟢🟢🟢🟢");
-        return false; // No documents found where isRead is false
-      }
-    } catch (error) {
-      print("🟢🟢🟢🟢🟢🟢🟢🟢🟢🟢Error updating chat document models:🟢🟢🟢🟢🟢🟢🟢🟢🟢🟢 $error");
-      return false;
-    }
+  ///[ReadReceipts]
+  ///
+  /// This method is use to update the unread message status to true
+  void readReceipts(String docId, String messageId) async {
+    calculateTimeDifference('Start Read Receipts');
+    await _messagesCollection
+        .doc(docId)
+        .collection(Collections.CHAT)
+        .doc(messageId)
+        .update({
+      'isRead': true
+    });
+    calculateTimeDifference('End Read Receipts');
+    // try {
+    //   if (Firebase.apps.isEmpty) {
+    //     print("🟢🟢🟢🟢🟢🟢🟢🟢🟢🟢No firebase app exist:🟢🟢🟢🟢🟢🟢🟢🟢🟢🟢");
+    //     return false;
+    //   }
+    //   final querySnapshot = await _messagesCollection
+    //       .doc(messageDoc)
+    //       .collection(Collections.CHAT)
+    //       .where('id', isNotEqualTo: uid)
+    //       .where('isRead', isEqualTo: null)
+    //       .get();
+    //
+    //   if (querySnapshot.docs.isNotEmpty) {
+    //     for (final doc in querySnapshot.docs) {
+    //       final chatModel = Chatmodel.fromJson(doc.data());
+    //       chatModel.isRead = true;
+    //       await doc.reference.update(chatModel.toJson());
+    //     }
+    //     calculateTimeDifference('End Read Receipts');
+    //     return true;
+    //   } else {
+    //     log("🟢🟢🟢🟢🟢DOCS ARE NULL🟢🟢🟢🟢🟢");
+    //     calculateTimeDifference('End Read Receipts');
+    //     return false; // No documents found where isRead is false
+    //   }
+    // } catch (error) {
+    //   calculateTimeDifference('End Read Receipts');
+    //   print("🟢🟢🟢🟢🟢🟢🟢🟢🟢🟢Error updating chat document models:🟢🟢🟢🟢🟢🟢🟢🟢🟢🟢 $error");
+    //   return false;
+    // }
   }
 
 //............ Get message request status
@@ -540,6 +575,7 @@ class MessageService {
   Future<DocumentSnapshot?> sendMessage(String docId, Chatmodel chatmodel, List mem) async {
     print("member$mem");
 
+    calculateTimeDifference('Start Send Message');
     final docRef = _messagesCollection.doc(docId);
     DocumentSnapshot messageSnapshot = await docRef.get();
 
@@ -580,6 +616,7 @@ class MessageService {
     }
 
     DocumentSnapshot newDocumentSnapshot = await newDocumentRef.get();
+    calculateTimeDifference('End Send Message');
     return newDocumentSnapshot;
   }
 
@@ -998,12 +1035,20 @@ class MessageService {
 
     DocumentSnapshot userSnapshot = await userRef.get();
     Map<String, dynamic>? userData = userSnapshot.data() as Map<String, dynamic>;
-    // print(userData[UserKey.DEVICE_TOKEN]);
-    //
-    // print(userData[UserKey.DEVICE_TOKEN].runtimeType);
-    // print(userData[UserKey.DEVICE_TOKEN]);
-
     List<dynamic>? deviceTokens = userData[UserKey.DEVICE_TOKEN];
     return deviceTokens ?? [];
+  }
+
+  static void removeDeviceToken(String id, String token) async {
+    try {
+      DocumentReference userRef = FirebaseFirestore.instance.collection('USER').doc(id);
+      await userRef.update(
+        {
+          'deviceToken': FieldValue.arrayRemove([token])
+        }
+      );
+    } catch (e) {
+      print(e);
+    }
   }
 }
