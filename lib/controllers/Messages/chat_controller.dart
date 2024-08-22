@@ -61,11 +61,8 @@ class ChatController extends GetxController {
 
   //............. get all conversation
   Stream<List<Chatmodel>> getConversation() async* {
-    print('././././././../. $members');
     calculateTimeDifference('GetConversation Start');
     Timestamp? timeStamp = await chatService.getDeleteTimeStamp(docId.value, userController.userModel.value.uid!);
-    // chatService.updateUnreadCount(docId.value, userController.userModel.value.uid!, 0, members);
-    // chatService.readReceipts(docId.value, userController.userModel.value.uid!);
     calculateTimeDifference('GetConversation End');
     yield* chatService.getConversation(docId.value, userController.userModel.value.uid!, members, timeStamp);
   }
