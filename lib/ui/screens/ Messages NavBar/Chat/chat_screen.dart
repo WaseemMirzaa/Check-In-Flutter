@@ -179,7 +179,7 @@ class _ChatScreenState extends State<ChatScreen> {
             Expanded(
               child: CustomFirebaseChatPagination(
                 key: UniqueKey(),
-                limit: 10,
+                limit: 20,
                 viewType: ViewType.list,
                 isLive: true,
                 reverse: true,
