@@ -505,10 +505,11 @@ packages:
   flutter_app_badger:
     dependency: "direct main"
     description:
-      name: flutter_app_badger
-      sha256: "64d4a279bab862ed28850431b9b446b9820aaae0bf363322d51077419f930fa8"
-      url: "https://pub.dev"
-    source: hosted
+      path: "."
+      ref: "33cbee6"
+      resolved-ref: "33cbee625e279b77ad80c6486f93fc154f1bb04a"
+      url: "https://github.com/g123k/flutter_app_badger.git"
+    source: git
     version: "1.5.0"
   flutter_cache_manager:
     dependency: transitive
@@ -821,14 +822,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.6.6"
-  go_router:
-    dependency: transitive
-    description:
-      name: go_router
-      sha256: ddc16d34b0d74cb313986918c0f0885a7ba2fc24d8fb8419de75f0015144ccfe
-      url: "https://pub.dev"
-    source: hosted
-    version: "14.2.3"
   google_api_headers:
     dependency: transitive
     description:
@@ -848,28 +841,28 @@ packages:
   google_maps_flutter:
     dependency: "direct main"
     description:
-      path: "D:/StudioProjects/Check-In-Flutter/google_maps_flutter/google_maps_flutter"
+      path: "C:/Users/Asjad/Desktop/Flutter Projects Developlogix/check_in_hoops/google_maps_flutter/google_maps_flutter"
       relative: false
     source: path
     version: "2.3.0"
   google_maps_flutter_android:
     dependency: transitive
     description:
-      path: "D:/StudioProjects/Check-In-Flutter/google_maps_flutter/google_maps_flutter_android"
+      path: "C:/Users/Asjad/Desktop/Flutter Projects Developlogix/check_in_hoops/google_maps_flutter/google_maps_flutter_android"
       relative: false
     source: path
     version: "2.5.0"
   google_maps_flutter_ios:
     dependency: transitive
     description:
-      path: "D:/StudioProjects/Check-In-Flutter/google_maps_flutter/google_maps_flutter_ios"
+      path: "C:/Users/Asjad/Desktop/Flutter Projects Developlogix/check_in_hoops/google_maps_flutter/google_maps_flutter_ios"
       relative: false
     source: path
     version: "2.3.0"
   google_maps_flutter_platform_interface:
     dependency: transitive
     description:
-      path: "D:/StudioProjects/Check-In-Flutter/google_maps_flutter/google_maps_flutter_platform_interface"
+      path: "C:/Users/Asjad/Desktop/Flutter Projects Developlogix/check_in_hoops/google_maps_flutter/google_maps_flutter_platform_interface"
       relative: false
     source: path
     version: "2.3.0"
@@ -1089,14 +1082,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.1.1"
-  logging:
-    dependency: transitive
-    description:
-      name: logging
-      sha256: "623a88c9594aa774443aa3eb2d41807a48486b5613e67599fb4c41c0ad47c340"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.2.0"
   matcher:
     dependency: transitive
     description:
@@ -1309,10 +1294,10 @@ packages:
     dependency: "direct main"
     description:
       name: persistent_bottom_nav_bar_v2
-      sha256: f5cc01ed36d6f93ecb3b8b64eaaa5b41618c6ac75c54e8beb1d3486cfc6d8547
+      sha256: "2fbaf1e8b18108d8a303304a306d68bcfb78abfd553295f489a8a315dff479e2"
       url: "https://pub.dev"
     source: hosted
-    version: "5.3.0"
+    version: "4.2.8"
   petitparser:
     dependency: transitive
     description:
@@ -1429,10 +1414,10 @@ packages:
     dependency: "direct main"
     description:
       name: sizer
-      sha256: "50bf5f2ea676d1509532ccb2196b45cfb3921d80c71620e9e7cb61dc0b501b88"
+      sha256: d2b3cb6cbc4a637f508dacd786bae55df31e5fc088044248a43e4fd1e050c117
       url: "https://pub.dev"
     source: hosted
-    version: "3.0.0"
+    version: "2.0.15"
   sky_engine:
     dependency: transitive
     description: flutter
@@ -1574,6 +1559,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.3.2"
+  universal_io:
+    dependency: transitive
+    description:
+      name: universal_io
+      sha256: "1722b2dcc462b4b2f3ee7d188dad008b6eb4c40bbd03a3de451d82c78bba9aad"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.2.2"
   url_launcher:
     dependency: "direct main"
     description:

@@ -24,7 +24,7 @@ dependencies:
   google_maps: ^6.1.0
 #  google_maps_flutter_platform_interface: ^2.2.2
   google_maps_flutter_platform_interface:
-    path: /Users/user/Documents/Projects/Check-In-Flutter/google_maps_flutter/google_maps_flutter_platform_interface
+    path: C:/Users/Asjad/Desktop/Flutter Projects Developlogix/check_in_hoops/google_maps_flutter/google_maps_flutter_platform_interface
 
   sanitize_html: ^2.0.0
   stream_transform: ^2.0.0

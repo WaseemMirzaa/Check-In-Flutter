@@ -78,7 +78,6 @@ Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 
 final newsFeedController = Get.put(NewsFeedController(NewsFeedService()));
 
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   MobileAds.instance.initialize();
@@ -98,13 +97,15 @@ void main() async {
   if (Platform.isIOS) {
     await _messaging.requestPermission();
   }
-  final PushNotificationServices pushNotificationService = PushNotificationServices();
+  final PushNotificationServices pushNotificationService =
+      PushNotificationServices();
   FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
   pushNotificationService.init();
   FCMManager.getFCMToken();
 
   //Stripe.publishableKey = 'pk_test_51P9IBQRwQJgokiPYdbWlcZnEpVC6ZDb0B7ZMVPFSJzi0LzPWCSG1kzwnrSscPCH1ZZBzWKoLeapYlZX5QLHBBNKR00HKEkqjkJ';
-  Stripe.publishableKey = 'pk_live_51P9IBQRwQJgokiPYvyLG23TCbtFARynKi5dFHmmxmx69GkHZxQm15cmLz8EkHaCAhIpzK9ma2Prr0yQbyF1l6ZpW006am35MWF';
+  Stripe.publishableKey =
+      'pk_live_51P9IBQRwQJgokiPYvyLG23TCbtFARynKi5dFHmmxmx69GkHZxQm15cmLz8EkHaCAhIpzK9ma2Prr0yQbyF1l6ZpW006am35MWF';
   Stripe.merchantIdentifier = 'merchant.flutter.stripe.test';
   Stripe.urlScheme = 'flutterstripe';
   await Stripe.instance.applySettings();
@@ -115,11 +116,13 @@ void main() async {
 
   FirebaseAuth.instance.authStateChanges().listen((User? user) {
     if (user != null) {
-       newsFeedController.getMyPosts(); // Fetch posts for the logged-in user
+      newsFeedController.getMyPosts(); // Fetch posts for the logged-in user
       // newsFeedController.fetchInitialNewsFeed(); // Fetch posts for the logged-in user
     } else {
-      newsFeedController.clearMyPosts(); // Clear posts when no user is logged in
-      newsFeedController.clearNewsFeeds(); // Clear posts when no user is logged in
+      newsFeedController
+          .clearMyPosts(); // Clear posts when no user is logged in
+      newsFeedController
+          .clearNewsFeeds(); // Clear posts when no user is logged in
     }
   });
   runApp(
@@ -146,7 +149,7 @@ class MyApp extends StatelessWidget {
     return Sizer(
       builder: (context, orientation, deviceType) {
         return GestureDetector(
-          onTap: (){
+          onTap: () {
             try {
               FocusManager.instance.primaryFocus?.unfocus();
             } catch (e, stacktrace) {

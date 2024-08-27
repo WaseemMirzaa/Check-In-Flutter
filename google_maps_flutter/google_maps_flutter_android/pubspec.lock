@@ -70,7 +70,7 @@ packages:
   google_maps_flutter_platform_interface:
     dependency: "direct main"
     description:
-      path: "D:/StudioProjects/Check-In-Flutter/google_maps_flutter/google_maps_flutter_platform_interface"
+      path: "C:/Users/Asjad/Desktop/Flutter Projects Developlogix/check_in_hoops/google_maps_flutter/google_maps_flutter_platform_interface"
       relative: false
     source: path
     version: "2.3.0"
