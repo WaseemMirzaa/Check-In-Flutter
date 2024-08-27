@@ -243,7 +243,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   //String mail = FirebaseAuth.instance.currentUser?.email ?? '';
   // String mail = FirebaseAuth.instance.currentUser?.email ?? "";
 
-  final FollowerAndFollowingService _service = FollowerAndFollowingService();
+  late FollowerCountingController followerCountController;
 
   @override
   void initState() {
@@ -256,6 +256,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
     super.initState();
     _scrollController.addListener(_onScroll);
     controller.getMyPosts();
+
+    // Retrieve current user UID
+    String? currentUserUid = FirebaseAuth.instance.currentUser?.uid;
+
+    // Initialize controller with current user UID
+    if (currentUserUid != null) {
+      followerCountController = Get.put(FollowerCountingController());
+      followerCountController.setUserId(currentUserUid);
+    }
   }
 
   sendEmail(String name, String email, String homeCourt) async {
@@ -315,13 +324,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
     controller.clearMyPosts();
   }
 
-  final FollowerCountingController followerCountController =
-      Get.put(FollowerCountingController());
-
   @override
   Widget build(BuildContext context) {
     aboutMeController.text = userController.userModel.value.aboutMe ?? '';
     // return GetBuilder<UserController>(builder: (userController) {
+
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
@@ -358,7 +365,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         Column(
                           children: [
                             SizedBox(
-                              width: 32.9.w,
+                              width: 30.9.w,
                               //   padding: EdgeInsets.all(10),
                               child: GestureDetector(
                                 onTap: _selectImage,
@@ -449,7 +456,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 // FirebaseAuth.instance.currentUser?.displayName
                                 //     as String,
                                 userController.userModel.value.userName ?? "",
-                                32,
+                                24,
                                 FontWeight.bold,
                                 appBlackColor),
                             // poppinsText(
@@ -471,7 +478,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             //     FontWeight.normal,
                             //     blackColor),
                             const SizedBox(
-                              height: 10,
+                              height: 15,
                             ),
 
                             //added by asjad
@@ -486,32 +493,40 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                       MaterialPageRoute(
                                         builder: (context) =>
                                             FollowersAndFollowingScreen(
-                                                showFollowers: true),
+                                          showFollowers: true,
+                                        ),
                                       ),
                                     );
                                   },
                                   child: Column(
                                     children: [
                                       poppinsText(
-                                          followerCountController
-                                              .followersCount.value
-                                              .toString(),
-                                          12,
-                                          FontWeight.bold,
-                                          appBlackColor),
+                                        followerCountController
+                                            .followersCount.value
+                                            .toString(),
+                                        16,
+                                        underline: true,
+                                        bold,
+                                        appBlackColor,
+                                      ),
                                       SizedBox(height: 4),
-                                      poppinsText('Followers', 12,
-                                          FontWeight.normal, appBlackColor),
+                                      poppinsText('Followers', 16, medium,
+                                          appBlackColor),
                                     ],
                                   ),
                                 ),
-                                const SizedBox(width: 25),
-                                VerticalDivider(
-                                  width: 20, // Adjust width as needed
-                                  thickness: 10, // Adjust thickness as needed
-                                  color: Colors.black, // Adjust color as needed
+                                SizedBox(width: 20), // Space before the divider
+                                Container(
+                                  height:
+                                      38, // Adjust to fit the height of your text
+                                  child: VerticalDivider(
+                                    width: 20, // Adjust width if needed
+                                    thickness: 2, // Adjust thickness if needed
+                                    color:
+                                        Colors.grey, // Adjust color if needed
+                                  ),
                                 ),
-                                const SizedBox(width: 25),
+                                SizedBox(width: 20), // Space after the divider
                                 GestureDetector(
                                   onTap: () {
                                     Navigator.push(
@@ -519,22 +534,25 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                       MaterialPageRoute(
                                         builder: (context) =>
                                             FollowersAndFollowingScreen(
-                                                showFollowers: false),
+                                          showFollowers: false,
+                                        ),
                                       ),
                                     );
                                   },
                                   child: Column(
                                     children: [
                                       poppinsText(
-                                          followerCountController
-                                              .followingCount.value
-                                              .toString(),
-                                          12,
-                                          FontWeight.bold,
-                                          appBlackColor),
+                                        followerCountController
+                                            .followingCount.value
+                                            .toString(),
+                                        16,
+                                        underline: true,
+                                        bold,
+                                        appBlackColor,
+                                      ),
                                       SizedBox(height: 4),
-                                      poppinsText('Following', 12,
-                                          FontWeight.normal, appBlackColor),
+                                      poppinsText('Following', 16, medium,
+                                          appBlackColor),
                                     ],
                                   ),
                                 ),
@@ -612,7 +630,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                         const UniqueCourtsScreen()));
                                           },
                                           child: CircularPercentIndicator(
-                                            radius: 55.0,
+                                            radius: 50.0,
                                             lineWidth: 8.0,
                                             animation: true,
                                             percent: (0 / (totalCount ?? 10))
@@ -622,7 +640,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                               textAlign: TextAlign.center,
                                               style: TextStyle(
                                                 fontWeight: FontWeight.bold,
-                                                fontSize: 18.0,
+                                                fontSize: 14.0,
                                               ),
                                             ),
                                             circularStrokeCap:

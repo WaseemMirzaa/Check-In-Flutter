@@ -5,28 +5,51 @@ import 'package:sizer/sizer.dart';
 
 Text poppinsText(
     String label, double fontSize, FontWeight fontWeight, Color color,
-    {TextAlign? align, TextOverflow? overflow, int maxlines = 1}) {
+    {TextAlign? align,
+    TextOverflow? overflow,
+    int maxlines = 1,
+    bool underline = false}) {
   return Text(
     label,
     textAlign: align,
     overflow: overflow,
     maxLines: maxlines,
-    
     style: GoogleFonts.poppins(
       fontWeight: fontWeight,
       fontSize: fontSize,
       color: color,
-    
+      decoration: underline
+          ? TextDecoration.underline
+          : TextDecoration.none, // Apply underline if needed
     ),
   );
 }
 
-RichText richText(
-    String boldText,String normalText,{FontStyle fontStyle = FontStyle.italic}) {
-  return RichText(text: TextSpan(children: [
-    TextSpan(text: boldText,style: GoogleFonts.poppins(fontSize: 12.sp,fontWeight: FontWeight.w600,color: appDarkBlue)),
-    TextSpan(text: " $normalText",style: GoogleFonts.poppins(fontSize: 9.sp,fontStyle: fontStyle,fontWeight: FontWeight.w400,color: appBlackColor))
-  ]));
+RichText richText(String boldText, String normalText,
+    {FontStyle fontStyle = FontStyle.italic}) {
+  return RichText(
+    text: TextSpan(
+      children: [
+        TextSpan(
+          text: boldText,
+          style: GoogleFonts.poppins(
+            fontSize: 12.sp,
+            fontWeight: FontWeight.w600,
+            color: appDarkBlue,
+          ),
+        ),
+        TextSpan(
+          text: " $normalText",
+          style: GoogleFonts.poppins(
+            fontSize: 9.sp,
+            fontStyle: fontStyle,
+            fontWeight: FontWeight.w400,
+            color: appBlackColor,
+          ),
+        ),
+      ],
+    ),
+  );
 }
 
 FontWeight semiBold = FontWeight.w600;

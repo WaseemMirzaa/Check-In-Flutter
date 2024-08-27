@@ -6,6 +6,7 @@ import 'package:check_in/core/constant/constant.dart';
 import 'package:check_in/core/constant/temp_language.dart';
 import 'package:check_in/model/user_modal.dart';
 import 'package:check_in/ui/screens/News%20Feed%20NavBar/News%20Feed/Component/list_tile_container.dart';
+import 'package:check_in/ui/screens/News%20Feed%20NavBar/followers_and_following/controller/followers_and_following_controller.dart';
 import 'package:check_in/ui/screens/News%20Feed%20NavBar/followers_and_following/followers_and_following.dart';
 import 'package:check_in/ui/screens/add_home_court.dart';
 import 'package:check_in/ui/screens/persistent_nav_bar.dart';
@@ -29,8 +30,13 @@ import '../../News Feed NavBar/News Feed/Component/shared_post_comp.dart';
 class OtherProfileView extends StatefulWidget {
   final String uid;
   bool toHome;
+  final bool isMyProfile; // Parameter with default value
 
-  OtherProfileView({super.key, required this.uid, this.toHome = false});
+  OtherProfileView(
+      {super.key,
+      required this.uid,
+      this.toHome = false,
+      this.isMyProfile = false});
 
   @override
   State<OtherProfileView> createState() => _OtherProfileViewState();
@@ -77,8 +83,6 @@ class _OtherProfileViewState extends State<OtherProfileView> {
   bool isFollowing = false;
   final FollowerAndFollowingService _firestoreService =
       FollowerAndFollowingService();
-  int _followersCount = 0;
-  int _followingCount = 0;
 
   void _listenToFollowStatus() {
     print("Listening to follow status");
@@ -96,7 +100,9 @@ class _OtherProfileViewState extends State<OtherProfileView> {
 
       if (isFollowing) {
         print("Unfollowing user ${widget.uid}");
+        followerCountController.setUserId(widget.uid);
         await _firestoreService.removeFollower(currentUserId, widget.uid);
+
         setState(() {
           isFollowing = false;
         });
@@ -105,7 +111,9 @@ class _OtherProfileViewState extends State<OtherProfileView> {
         );
       } else {
         print("Following user ${widget.uid}");
+        followerCountController.setUserId(widget.uid);
         await _firestoreService.addFollower(currentUserId, widget.uid);
+
         setState(() {
           isFollowing = true;
         });
@@ -121,7 +129,7 @@ class _OtherProfileViewState extends State<OtherProfileView> {
     }
   }
 
- 
+  late FollowerCountingController followerCountController;
 
   @override
   void initState() {
@@ -129,29 +137,17 @@ class _OtherProfileViewState extends State<OtherProfileView> {
     super.initState();
     _scrollController.addListener(_onScroll);
     controller.getUserPosts(widget.uid);
+    followerCountController = Get.put(FollowerCountingController());
+    followerCountController.setUserId(widget.uid);
 
     // Check follow status
     _listenToFollowStatus(); // Set up real-time listener
- 
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        //changes by asjad for adding followers and followings
-        actions: [
-          IconButton(
-            onPressed: () {
-              print("Toggling follow status");
-              _toggleFollow();
-            },
-            icon: Icon(
-              isFollowing ? Icons.remove : Icons.add,
-            ),
-          ),
-        ],
-
         leading: InkWell(
           onTap: () {
             if (widget.toHome) {
@@ -212,7 +208,7 @@ class _OtherProfileViewState extends State<OtherProfileView> {
                     Column(
                       children: [
                         SizedBox(
-                          width: 32.9.w,
+                          width: 30.9.w,
                           //   padding: EdgeInsets.all(10),
                           child: Stack(
                             //  clipBehavior: Clip.antiAliasWithSaveLayer,
@@ -264,7 +260,7 @@ class _OtherProfileViewState extends State<OtherProfileView> {
                             // FirebaseAuth.instance.currentUser?.displayName
                             //     as String,
                             snapshot.data!.userName ?? "",
-                            32,
+                            24,
                             FontWeight.bold,
                             appBlackColor),
                         // poppinsText(
@@ -301,27 +297,38 @@ class _OtherProfileViewState extends State<OtherProfileView> {
                                   MaterialPageRoute(
                                     builder: (context) =>
                                         FollowersAndFollowingScreen(
+                                            otherUserId: widget.uid,
                                             showFollowers: true),
                                   ),
                                 );
                               },
                               child: Column(
                                 children: [
-                                  poppinsText("$_followersCount", 12,
-                                      FontWeight.bold, appBlackColor),
+                                  poppinsText(
+                                      followerCountController
+                                          .followersCount.value
+                                          .toString(),
+                                      underline: true,
+                                      16,
+                                      bold,
+                                      appBlackColor),
                                   SizedBox(height: 4),
-                                  poppinsText('Followers', 12,
-                                      FontWeight.normal, appBlackColor),
+                                  poppinsText(
+                                      'Followers', 16, medium, appBlackColor),
                                 ],
                               ),
                             ),
-                            const SizedBox(width: 25),
-                            VerticalDivider(
-                              width: 20, // Adjust width as needed
-                              thickness: 10, // Adjust thickness as needed
-                              color: Colors.black, // Adjust color as needed
+                            SizedBox(width: 20), // Space before the divider
+                            Container(
+                              height:
+                                  38, // Adjust to fit the height of your text
+                              child: VerticalDivider(
+                                width: 20, // Adjust width if needed
+                                thickness: 2, // Adjust thickness if needed
+                                color: Colors.grey, // Adjust color if needed
+                              ),
                             ),
-                            const SizedBox(width: 25),
+                            SizedBox(width: 20), // Space after the divider
                             GestureDetector(
                               onTap: () {
                                 Navigator.push(
@@ -329,17 +336,24 @@ class _OtherProfileViewState extends State<OtherProfileView> {
                                   MaterialPageRoute(
                                     builder: (context) =>
                                         FollowersAndFollowingScreen(
+                                            otherUserId: widget.uid,
                                             showFollowers: false),
                                   ),
                                 );
                               },
                               child: Column(
                                 children: [
-                                  poppinsText("$_followingCount", 12,
-                                      FontWeight.bold, appBlackColor),
+                                  poppinsText(
+                                      followerCountController
+                                          .followingCount.value
+                                          .toString(),
+                                      16,
+                                      underline: true,
+                                      medium,
+                                      appBlackColor),
                                   SizedBox(height: 4),
-                                  poppinsText('Following', 12,
-                                      FontWeight.normal, appBlackColor),
+                                  poppinsText(
+                                      'Following', 16, medium, appBlackColor),
                                 ],
                               ),
                             ),
@@ -349,6 +363,33 @@ class _OtherProfileViewState extends State<OtherProfileView> {
                         const SizedBox(
                           height: 25,
                         ),
+
+                        if (widget.isMyProfile == false)
+                          Container(
+                            height: 50,
+                            width: 150,
+                            decoration: BoxDecoration(
+                              color: offWhiteColor,
+                              borderRadius: BorderRadius.circular(
+                                  12), // Adjust the radius as needed
+                            ),
+                            child: GestureDetector(
+                              onTap: () {
+                                _toggleFollow();
+                              },
+                              child: Center(
+                                  child: isFollowing
+                                      ? poppinsText('Unfollow', 16,
+                                          FontWeight.w600, Colors.black)
+                                      : poppinsText('Follow', 16,
+                                          FontWeight.w600, Colors.black)),
+                            ),
+                          ),
+
+                        if (widget.isMyProfile == false)
+                          const SizedBox(
+                            height: 25,
+                          ),
 
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -401,7 +442,7 @@ class _OtherProfileViewState extends State<OtherProfileView> {
                                     );
                                   } else {
                                     return CircularPercentIndicator(
-                                      radius: 55.0,
+                                      radius: 50.0,
                                       lineWidth: 8.0,
                                       animation: true,
                                       percent: (0 / (totalCount ?? 10))
@@ -411,7 +452,7 @@ class _OtherProfileViewState extends State<OtherProfileView> {
                                         textAlign: TextAlign.center,
                                         style: TextStyle(
                                           fontWeight: FontWeight.bold,
-                                          fontSize: 18.0,
+                                          fontSize: 14.0,
                                         ),
                                       ),
                                       circularStrokeCap:
