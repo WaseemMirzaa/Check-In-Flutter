@@ -349,7 +349,7 @@ class _OtherProfileViewState extends State<OtherProfileView> {
                                           .toString(),
                                       16,
                                       underline: true,
-                                      medium,
+                                      bold,
                                       appBlackColor),
                                   SizedBox(height: 4),
                                   poppinsText(
@@ -365,25 +365,48 @@ class _OtherProfileViewState extends State<OtherProfileView> {
                         ),
 
                         if (widget.isMyProfile == false)
-                          Container(
-                            height: 50,
-                            width: 150,
-                            decoration: BoxDecoration(
-                              color: offWhiteColor,
-                              borderRadius: BorderRadius.circular(
-                                  12), // Adjust the radius as needed
-                            ),
-                            child: GestureDetector(
-                              onTap: () {
-                                _toggleFollow();
-                              },
-                              child: Center(
-                                  child: isFollowing
-                                      ? poppinsText('Unfollow', 16,
-                                          FontWeight.w600, Colors.black)
-                                      : poppinsText('Follow', 16,
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Container(
+                                height: 50,
+                                width: 150,
+                                decoration: BoxDecoration(
+                                  color: offWhiteColor,
+                                  borderRadius: BorderRadius.circular(
+                                      12), // Adjust the radius as needed
+                                ),
+                                child: GestureDetector(
+                                  onTap: () {
+                                    _toggleFollow();
+                                  },
+                                  child: Center(
+                                      child: isFollowing
+                                          ? poppinsText('Unfollow', 16,
+                                              FontWeight.w600, Colors.black)
+                                          : poppinsText('Follow', 16,
+                                              FontWeight.w600, Colors.black)),
+                                ),
+                              ),
+                              SizedBox(
+                                width: 10,
+                              ),
+                              Container(
+                                height: 50,
+                                width: 150,
+                                decoration: BoxDecoration(
+                                  color: offWhiteColor,
+                                  borderRadius: BorderRadius.circular(
+                                      12), // Adjust the radius as needed
+                                ),
+                                child: GestureDetector(
+                                  onTap: () {},
+                                  child: Center(
+                                      child: poppinsText('Message', 16,
                                           FontWeight.w600, Colors.black)),
-                            ),
+                                ),
+                              ),
+                            ],
                           ),
 
                         if (widget.isMyProfile == false)
