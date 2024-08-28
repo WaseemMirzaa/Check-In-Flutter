@@ -562,7 +562,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             ),
 
                             const SizedBox(
-                              height: 25,
+                              height: 15,
                             ),
 
                             Row(
@@ -712,7 +712,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           ],
                         ),
                         const SizedBox(
-                          height: 20,
+                          height: 25,
                         ),
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -894,7 +894,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ),
                         Center(
                           child: Container(
-                            width: 80,
+                            width: 90,
                             padding: const EdgeInsets.symmetric(
                               horizontal: 10,
                               vertical: 4,

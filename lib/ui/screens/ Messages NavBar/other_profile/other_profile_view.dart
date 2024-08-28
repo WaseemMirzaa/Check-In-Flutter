@@ -415,7 +415,7 @@ class _OtherProfileViewState extends State<OtherProfileView> {
                         ),
 
                         const SizedBox(
-                          height: 25,
+                          height: 15,
                         ),
 
                         if (widget.isMyProfile == false)
@@ -423,7 +423,7 @@ class _OtherProfileViewState extends State<OtherProfileView> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Container(
-                                height: 50,
+                                height: 35,
                                 width: 150,
                                 decoration: BoxDecoration(
                                   color: offWhiteColor,
@@ -437,16 +437,16 @@ class _OtherProfileViewState extends State<OtherProfileView> {
                                   child: Center(
                                       child: isFollowing
                                           ? poppinsText('Unfollow', 16,
-                                              FontWeight.w600, Colors.black)
+                                              FontWeight.w400, Colors.black)
                                           : poppinsText('Follow', 16,
-                                              FontWeight.w600, Colors.black)),
+                                              FontWeight.w400, Colors.black)),
                                 ),
                               ),
                               SizedBox(
                                 width: 10,
                               ),
                               Container(
-                                height: 50,
+                                height: 35,
                                 width: 150,
                                 decoration: BoxDecoration(
                                   color: offWhiteColor,
@@ -525,7 +525,7 @@ class _OtherProfileViewState extends State<OtherProfileView> {
                                   },
                                   child: Center(
                                     child: poppinsText('Message', 16,
-                                        FontWeight.w600, Colors.black),
+                                        FontWeight.w400, Colors.black),
                                   ),
                                 ),
                               )
@@ -534,7 +534,7 @@ class _OtherProfileViewState extends State<OtherProfileView> {
 
                         if (widget.isMyProfile == false)
                           const SizedBox(
-                            height: 25,
+                            height: 15,
                           ),
 
                         Row(
@@ -653,7 +653,7 @@ class _OtherProfileViewState extends State<OtherProfileView> {
                       ],
                     ),
                     const SizedBox(
-                      height: 15,
+                      height: 25,
                     ),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 12),
