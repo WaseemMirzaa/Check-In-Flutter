@@ -500,15 +500,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   },
                                   child: Column(
                                     children: [
-                                      poppinsText(
-                                        followerCountController
-                                            .profilefollowersCount.value
-                                            .toString(),
-                                        16,
-                                        underline: true,
-                                        bold,
-                                        appBlackColor,
-                                      ),
+                                      Obx(() {
+                                        return poppinsText(
+                                          followerCountController
+                                              .profilefollowersCount.value
+                                              .toString(),
+                                          16,
+                                          underline: true,
+                                          bold,
+                                          appBlackColor,
+                                        );
+                                      }),
                                       const SizedBox(height: 4),
                                       poppinsText('Followers', 16, medium,
                                           appBlackColor),
@@ -543,15 +545,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   },
                                   child: Column(
                                     children: [
-                                      poppinsText(
-                                        followerCountController
-                                            .profilefollowingCount.value
-                                            .toString(),
-                                        16,
-                                        underline: true,
-                                        bold,
-                                        appBlackColor,
-                                      ),
+                                      Obx(() {
+                                        return poppinsText(
+                                          followerCountController
+                                              .profilefollowingCount.value
+                                              .toString(),
+                                          16,
+                                          underline: true,
+                                          bold,
+                                          appBlackColor,
+                                        );
+                                      }),
                                       const SizedBox(height: 4),
                                       poppinsText('Following', 16, medium,
                                           appBlackColor),
@@ -598,7 +602,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                         const UniqueCourtsScreen()));
                                           },
                                           child: CircularPercentIndicator(
-                                            radius: 55.0,
+                                            radius: 50.0,
                                             lineWidth: 8.0,
                                             animation: true,
                                             percent:
@@ -610,7 +614,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                               textAlign: TextAlign.center,
                                               style: const TextStyle(
                                                 fontWeight: FontWeight.bold,
-                                                fontSize: 18.0,
+                                                fontSize: 14.0,
                                               ),
                                             ),
                                             circularStrokeCap:

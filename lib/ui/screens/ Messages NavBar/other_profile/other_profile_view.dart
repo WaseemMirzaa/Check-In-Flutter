@@ -571,7 +571,7 @@ class _OtherProfileViewState extends State<OtherProfileView> {
                                   } else if (courtsSnapshot.hasData &&
                                       courtsSnapshot.data != null) {
                                     return CircularPercentIndicator(
-                                      radius: 55.0,
+                                      radius: 50.0,
                                       lineWidth: 8.0,
                                       animation: true,
                                       percent:
@@ -583,7 +583,7 @@ class _OtherProfileViewState extends State<OtherProfileView> {
                                         textAlign: TextAlign.center,
                                         style: const TextStyle(
                                           fontWeight: FontWeight.bold,
-                                          fontSize: 18.0,
+                                          fontSize: 14.0,
                                         ),
                                       ),
                                       circularStrokeCap:
