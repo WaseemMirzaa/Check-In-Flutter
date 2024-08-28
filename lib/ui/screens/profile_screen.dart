@@ -263,7 +263,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     // Initialize controller with current user UID
     if (currentUserUid != null) {
       followerCountController = Get.put(FollowerCountingController());
-      followerCountController.setUserId(currentUserUid);
+      followerCountController.setUserIdforProfile(currentUserUid);
     }
   }
 
@@ -341,7 +341,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 onPressed: () {
                   if (widget.toHome) {
                     Navigator.pushReplacement(context,
-                        MaterialPageRoute(builder: (context) => Home()));
+                        MaterialPageRoute(builder: (context) => const Home()));
                   } else {
                     Navigator.pop(context);
                   }
@@ -492,7 +492,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                       context,
                                       MaterialPageRoute(
                                         builder: (context) =>
-                                            FollowersAndFollowingScreen(
+                                            const FollowersAndFollowingScreen(
                                           showFollowers: true,
                                         ),
                                       ),
@@ -502,38 +502,40 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     children: [
                                       poppinsText(
                                         followerCountController
-                                            .followersCount.value
+                                            .profilefollowersCount.value
                                             .toString(),
                                         16,
                                         underline: true,
                                         bold,
                                         appBlackColor,
                                       ),
-                                      SizedBox(height: 4),
+                                      const SizedBox(height: 4),
                                       poppinsText('Followers', 16, medium,
                                           appBlackColor),
                                     ],
                                   ),
                                 ),
-                                SizedBox(width: 20), // Space before the divider
+                                const SizedBox(
+                                    width: 20), // Space before the divider
                                 Container(
                                   height:
                                       38, // Adjust to fit the height of your text
-                                  child: VerticalDivider(
+                                  child: const VerticalDivider(
                                     width: 20, // Adjust width if needed
                                     thickness: 2, // Adjust thickness if needed
                                     color:
                                         Colors.grey, // Adjust color if needed
                                   ),
                                 ),
-                                SizedBox(width: 20), // Space after the divider
+                                const SizedBox(
+                                    width: 20), // Space after the divider
                                 GestureDetector(
                                   onTap: () {
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
                                         builder: (context) =>
-                                            FollowersAndFollowingScreen(
+                                            const FollowersAndFollowingScreen(
                                           showFollowers: false,
                                         ),
                                       ),
@@ -543,14 +545,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     children: [
                                       poppinsText(
                                         followerCountController
-                                            .followingCount.value
+                                            .profilefollowingCount.value
                                             .toString(),
                                         16,
                                         underline: true,
                                         bold,
                                         appBlackColor,
                                       ),
-                                      SizedBox(height: 4),
+                                      const SizedBox(height: 4),
                                       poppinsText('Following', 16, medium,
                                           appBlackColor),
                                     ],

@@ -77,7 +77,7 @@ class NewMessageController extends GetxController {
     }
   }
 
-//............ start new chat
+//............ start new chat  //copy this method only
   Future<Map<String, dynamic>> startNewChat(
       String myUid, String uNAme, String UImage) async {
     //....... matching ids to check whether chat already exist or not

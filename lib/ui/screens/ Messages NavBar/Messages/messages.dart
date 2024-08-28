@@ -31,7 +31,7 @@ class MessageScreen extends GetView<MessageController> {
     //   for making null docid
 
     GlobalVariable.docId = '';
-    return Scaffold(
+    return Scaffold(  
       // floatingActionButton: FloatingactionButton(
       //   ontap: () {},
       // ),

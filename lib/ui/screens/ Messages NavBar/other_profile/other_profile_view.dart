@@ -1,10 +1,14 @@
 import 'package:check_in/Services/follower_and_following_service.dart';
 import 'package:check_in/Services/newfeed_service.dart';
+import 'package:check_in/controllers/Messages/chat_controller.dart';
 import 'package:check_in/controllers/News%20Feed/news_feed_controller.dart';
 import 'package:check_in/core/constant/app_assets.dart';
 import 'package:check_in/core/constant/constant.dart';
 import 'package:check_in/core/constant/temp_language.dart';
 import 'package:check_in/model/user_modal.dart';
+import 'package:check_in/ui/screens/%20Messages%20NavBar/Chat/Component/send_message_container.dart';
+import 'package:check_in/ui/screens/%20Messages%20NavBar/Chat/chat_screen.dart';
+import 'package:check_in/ui/screens/%20Messages%20NavBar/other_profile/other_profile_messages.dart';
 import 'package:check_in/ui/screens/News%20Feed%20NavBar/News%20Feed/Component/list_tile_container.dart';
 import 'package:check_in/ui/screens/News%20Feed%20NavBar/followers_and_following/controller/followers_and_following_controller.dart';
 import 'package:check_in/ui/screens/News%20Feed%20NavBar/followers_and_following/followers_and_following.dart';
@@ -69,6 +73,8 @@ class _OtherProfileViewState extends State<OtherProfileView> {
     }
   }
 
+  final sendMessageController = Get.put(OtherProfileMessages());
+
   final controller = Get.put(NewsFeedController(NewsFeedService()));
 
   @override
@@ -131,6 +137,10 @@ class _OtherProfileViewState extends State<OtherProfileView> {
 
   late FollowerCountingController followerCountController;
 
+  late String currentUid;
+  late String senderName;
+  late String senderPhotoUrl;
+
   @override
   void initState() {
     // TODO: implement initState
@@ -142,6 +152,50 @@ class _OtherProfileViewState extends State<OtherProfileView> {
 
     // Check follow status
     _listenToFollowStatus(); // Set up real-time listener
+
+    // Fetch current user's profile once and store the data
+    fetchCurrentUserProfile();
+  }
+
+  Future<UserModel> getCurrentUserProfile() async {
+    final currentUser = FirebaseAuth.instance.currentUser;
+
+    if (currentUser == null) {
+      // Handle the case where no user is signed in
+      throw Exception("No user is currently signed in");
+    }
+
+    final uid = currentUser.uid;
+
+    final snapshot = await FirebaseFirestore.instance
+        .collection(Collections.USER)
+        .doc(uid)
+        .get();
+
+    final data = snapshot.data();
+    if (data != null) {
+      return UserModel.fromMap(data);
+    } else {
+      // Handle the case when user data is not available
+      throw Exception("Current user data not available");
+    }
+  }
+
+  final ChatController chatcontroller =
+      Get.find<ChatController>(); //find can be problematic
+
+  Future<void> fetchCurrentUserProfile() async {
+    try {
+      final currentUser = await getCurrentUserProfile();
+      setState(() {
+        currentUid = currentUser.uid!;
+        senderName = currentUser.userName!;
+        senderPhotoUrl = currentUser.photoUrl!;
+      });
+    } catch (e) {
+      // Handle the error, e.g., show a message to the user
+      print("Error fetching current user profile: $e");
+    }
   }
 
   @override
@@ -400,12 +454,81 @@ class _OtherProfileViewState extends State<OtherProfileView> {
                                       12), // Adjust the radius as needed
                                 ),
                                 child: GestureDetector(
-                                  onTap: () {},
+                                  onTap: () async {
+                                    var value = await sendMessageController
+                                        .startNewChat(
+                                      currentUid,
+                                      senderName,
+                                      senderPhotoUrl,
+                                      userItems.uid!,
+                                      userItems.userName!,
+                                      userItems.photoUrl!,
+                                    );
+
+                                    if (value['isNewChat'] == true) {
+                                      // Send notification
+                                      await sendMessageController
+                                          .sendNotificationMethod(
+                                        '',
+                                        '$senderName sent a message request',
+                                        senderName,
+                                        value['docId'],
+                                        [currentUid, userItems.uid],
+                                        currentUid,
+                                        image: senderPhotoUrl,
+                                      );
+                                    } else {
+                                      // Update delete chat status
+                                      await sendMessageController
+                                          .updateDeleteChatStatus(
+                                        value['docId'],
+                                        currentUid,
+                                      );
+                                      // Uncomment if you want to show a success message
+                                      // successMessage('Chat already exists');
+                                    }
+
+                                    log('doc id $value');
+                                    // UserModel model =
+                                    //     controller.mydata.values.first;
+
+                                    chatcontroller.docId.value = value['docId'];
+                                    chatcontroller.name.value =
+                                        userItems.userName!;
+                                    //..... sender name for sending notification, show name on notification
+                                    chatcontroller.senderName.value =
+                                        senderName;
+                                    chatcontroller.isgroup = false;
+                                    chatcontroller.image.value =
+                                        userItems.photoUrl!;
+                                    chatcontroller.memberId.value = [
+                                      currentUid,
+                                      userItems.uid
+                                    ];
+
+                                    // Navigate to ChatScreen
+                                    pushNewScreen(
+                                      // ignore: use_build_context_synchronously
+                                      context,
+                                      screen: ChatScreen(
+                                        // docId: value['docId'],
+
+                                        image: userItems.photoUrl,
+
+                                        // name: model.userName!.obs,
+                                        // isGroup: false,
+                                        // image: model.photoUrl!.obs,
+                                        // memberId: controller.mydata.keys.toList().obs,
+                                        // senderName: userController.userModel.value.userName!.obs,
+                                      ),
+                                    ).then((_) => Get.back());
+                                  },
                                   child: Center(
-                                      child: poppinsText('Message', 16,
-                                          FontWeight.w600, Colors.black)),
+                                    child: poppinsText('Message', 16,
+                                        FontWeight.w600, Colors.black),
+                                  ),
                                 ),
-                              ),
+                              )
                             ],
                           ),
 

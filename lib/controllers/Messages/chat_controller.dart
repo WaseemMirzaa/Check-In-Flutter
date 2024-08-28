@@ -59,12 +59,53 @@ class ChatController extends GetxController {
     image.value = model.image!;
   }
 
+//this method is added by asjad
+  // Future<void> getSingleMessage(String? docID) async {
+  //   try {
+  //     // Use docID if provided, otherwise fallback to docId.value
+  //     final currentDocId = docID ?? docId.value;
+
+  //     if (currentDocId.isEmpty) {
+  //       print("Document ID is empty. Cannot fetch message.");
+  //       return;
+  //     }
+
+  //     final userId = userController.userModel.value.uid;
+  //     if (userId == null || userId.isEmpty) {
+  //       print("User ID is null or empty. Cannot fetch message.");
+  //       return;
+  //     }
+
+  //     // Fetch the message
+  //     var res = await chatService.getSingleMessage(currentDocId, userId);
+
+  //     Messagemodel model = res;
+
+  //     // Update members or other user IDs based on whether it's a group message
+  //     if (isgroup) {
+  //       members.value = model.members ?? [];
+  //     } else {
+  //       otherUserId.value =
+  //           (userController.userModel.value.uid == model.senderId)
+  //               ? model.recieverId ?? ""
+  //               : model.senderId ?? "";
+  //     }
+
+  //     // Update image URL
+  //     image.value = model.image ?? "";
+  //   } catch (e) {
+  //     print('Error fetching single message: $e');
+  //   }
+  // }
+
   //............. get all conversation
   Stream<List<Chatmodel>> getConversation() async* {
     calculateTimeDifference('GetConversation Start');
-    Timestamp? timeStamp = await chatService.getDeleteTimeStamp(docId.value, userController.userModel.value.uid!);
+    Timestamp? timeStamp = await chatService.getDeleteTimeStamp(
+        docId.value, userController.userModel.value.uid!);
     calculateTimeDifference('GetConversation End');
-    yield* chatService.getConversation(docId.value, userController.userModel.value.uid!, members, timeStamp);
+    yield* chatService.getConversation(
+        docId.value, userController.userModel.value.uid!, members, timeStamp);
   }
 
   //............. get message request status
@@ -74,7 +115,8 @@ class ChatController extends GetxController {
 
   //............. update request status
   void updateRequestStatus(String status, String msg, int unread) {
-    chatService.updateRequestStatus(docId.value, status, msg, unread, userController.userModel.value.uid!);
+    chatService.updateRequestStatus(
+        docId.value, status, msg, unread, userController.userModel.value.uid!);
   }
 
   String thumbnailPath = '';
@@ -97,10 +139,16 @@ class ChatController extends GetxController {
       type = 'image';
     }
 
-    Chatmodel? chatmodel =
-        Chatmodel(id: uid, message: message, time: Timestamp.now(), type: type, thumbnail: thumbnailPath, seenTimeStamp: null);
+    Chatmodel? chatmodel = Chatmodel(
+        id: uid,
+        message: message,
+        time: Timestamp.now(),
+        type: type,
+        thumbnail: thumbnailPath,
+        seenTimeStamp: null);
     // try {
-    DocumentSnapshot? newMessageDoc = await chatService.sendMessage(docId.value, chatmodel, members);
+    DocumentSnapshot? newMessageDoc =
+        await chatService.sendMessage(docId.value, chatmodel, members);
     sendMsgLoader.value = false;
 
     /// Purpose of this code is to make deleted user undeleted
@@ -162,7 +210,8 @@ class ChatController extends GetxController {
   }
 
 //.............. get device token
-  Future<void> sendNotificationMethod(String notificationType, String msg, {String? image}) async {
+  Future<void> sendNotificationMethod(String notificationType, String msg,
+      {String? image}) async {
     // print(senderName);
     // print(memberId);
     for (var element in memberId) {
