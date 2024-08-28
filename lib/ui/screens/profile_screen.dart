@@ -263,7 +263,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     // Initialize controller with current user UID
     if (currentUserUid != null) {
       followerCountController = Get.put(FollowerCountingController());
-      followerCountController.setUserIdforProfile(currentUserUid);
+      followerCountController.setUserIdForProfile(currentUserUid);
     }
   }
 
@@ -503,7 +503,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                       Obx(() {
                                         return poppinsText(
                                           followerCountController
-                                              .profilefollowersCount.value
+                                              .profileFollowersCount.value
                                               .toString(),
                                           16,
                                           underline: true,
@@ -548,7 +548,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                       Obx(() {
                                         return poppinsText(
                                           followerCountController
-                                              .profilefollowingCount.value
+                                              .profileFollowingCount.value
                                               .toString(),
                                           16,
                                           underline: true,

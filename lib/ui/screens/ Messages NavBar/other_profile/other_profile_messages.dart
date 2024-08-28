@@ -9,6 +9,12 @@ import 'package:get/get.dart';
 class OtherProfileMessages extends GetxController {
   final MessageService chatService = MessageService();
 
+  var isLoading = false.obs;
+
+  void setLoading(bool value) {
+    isLoading.value = value;
+  }
+
   Future<Map<String, dynamic>> startNewChat(
       String senderUid,
       String senderName,

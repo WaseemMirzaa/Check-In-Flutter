@@ -148,10 +148,12 @@ class _OtherProfileViewState extends State<OtherProfileView> {
     // Initialize the FollowerCountingController and set the userId
     followerCountController = Get.put(FollowerCountingController());
 
-    // Set the userId after the controller is initialized
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      followerCountController.setUserId(widget.uid);
-    });
+    followerCountController.setUserId(widget.uid);
+
+    // // Set the userId after the controller is initialized
+    // WidgetsBinding.instance.addPostFrameCallback((_) {
+    //   followerCountController.setUserId(widget.uid);
+    // });
 
     // Check follow status
     sendMessageController
@@ -454,89 +456,119 @@ class _OtherProfileViewState extends State<OtherProfileView> {
                               SizedBox(
                                 width: 10,
                               ),
-                              InkWell(
-                                onTap: () async {
-                                  var value =
-                                      await sendMessageController.startNewChat(
-                                    currentUid,
-                                    senderName,
-                                    senderPhotoUrl,
-                                    userItems.uid!,
-                                    userItems.userName!,
-                                    userItems.photoUrl!,
-                                  );
+                              Obx(() {
+                                return Stack(
+                                  children: [
+                                    InkWell(
+                                      onTap: sendMessageController
+                                              .isLoading.value
+                                          ? null
+                                          : () async {
+                                              sendMessageController.setLoading(
+                                                  true); // Start loading
 
-                                  if (value['isNewChat'] == true) {
-                                    // Send notification
-                                    await sendMessageController
-                                        .sendNotificationMethod(
-                                      '',
-                                      '$senderName sent a message request',
-                                      senderName,
-                                      value['docId'],
-                                      [currentUid, userItems.uid],
-                                      currentUid,
-                                      image: senderPhotoUrl,
-                                    );
-                                  } else {
-                                    // Update delete chat status
-                                    await sendMessageController
-                                        .updateDeleteChatStatus(
-                                      value['docId'],
-                                      currentUid,
-                                    );
-                                    // Uncomment if you want to show a success message
-                                    // successMessage('Chat already exists');
-                                  }
+                                              try {
+                                                var value =
+                                                    await sendMessageController
+                                                        .startNewChat(
+                                                  currentUid,
+                                                  senderName,
+                                                  senderPhotoUrl,
+                                                  userItems.uid!,
+                                                  userItems.userName!,
+                                                  userItems.photoUrl!,
+                                                );
 
-                                  log('doc id $value');
-                                  // UserModel model =
-                                  //     controller.mydata.values.first;
+                                                if (value['isNewChat'] ==
+                                                    true) {
+                                                  // Send notification
+                                                  await sendMessageController
+                                                      .sendNotificationMethod(
+                                                    '',
+                                                    '$senderName sent a message request',
+                                                    senderName,
+                                                    value['docId'],
+                                                    [currentUid, userItems.uid],
+                                                    currentUid,
+                                                    image: senderPhotoUrl,
+                                                  );
+                                                } else {
+                                                  // Update delete chat status
+                                                  await sendMessageController
+                                                      .updateDeleteChatStatus(
+                                                    value['docId'],
+                                                    currentUid,
+                                                  );
+                                                  // Uncomment if you want to show a success message
+                                                  // successMessage('Chat already exists');
+                                                }
 
-                                  chatcontroller.docId.value = value['docId'];
-                                  chatcontroller.name.value =
-                                      userItems.userName!;
-                                  //..... sender name for sending notification, show name on notification
-                                  chatcontroller.senderName.value = senderName;
-                                  chatcontroller.isgroup = false;
-                                  chatcontroller.image.value =
-                                      userItems.photoUrl!;
-                                  chatcontroller.memberId.value = [
-                                    currentUid,
-                                    userItems.uid
-                                  ];
+                                                log('doc id $value');
+                                                chatcontroller.docId.value =
+                                                    value['docId'];
+                                                chatcontroller.name.value =
+                                                    userItems.userName!;
+                                                chatcontroller.senderName
+                                                    .value = senderName;
+                                                chatcontroller.isgroup = false;
+                                                chatcontroller.image.value =
+                                                    userItems.photoUrl!;
+                                                chatcontroller.memberId.value =
+                                                    [currentUid, userItems.uid];
 
-                                  // Navigate to ChatScreen
-                                  pushNewScreen(
-                                    // ignore: use_build_context_synchronously
-                                    context,
-                                    screen: ChatScreen(
-                                      // docId: value['docId'],
-
-                                      image: userItems.photoUrl,
-
-                                      // name: model.userName!.obs,
-                                      // isGroup: false,
-                                      // image: model.photoUrl!.obs,
-                                      // memberId: controller.mydata.keys.toList().obs,
-                                      // senderName: userController.userModel.value.userName!.obs,
+                                                // Navigate to ChatScreen
+                                                pushNewScreen(
+                                                  context,
+                                                  screen: ChatScreen(
+                                                    image: userItems.photoUrl,
+                                                  ),
+                                                );
+                                              } catch (e) {
+                                                // Handle errors if necessary
+                                                print("Error: $e");
+                                              } finally {
+                                                sendMessageController
+                                                    .setLoading(
+                                                        false); // End loading
+                                              }
+                                            },
+                                      child: Container(
+                                        height: 35,
+                                        width: 150,
+                                        decoration: BoxDecoration(
+                                          color: offWhiteColor,
+                                          borderRadius: BorderRadius.circular(
+                                              12), // Adjust the radius as needed
+                                        ),
+                                        child: Center(
+                                          child: sendMessageController
+                                                  .isLoading.value
+                                              ? Container(
+                                                  height: 15,
+                                                  width: 15,
+                                                  child:
+                                                      CircularProgressIndicator(
+                                                    backgroundColor:
+                                                        Colors.white,
+                                                  ),
+                                                ) // Show progress indicator when loading
+                                              : poppinsText(
+                                                  'Message',
+                                                  16,
+                                                  FontWeight.w400,
+                                                  Colors.black),
+                                        ),
+                                      ),
                                     ),
-                                  ); //.then((_) => Get.back())
-                                },
-                                child: Container(
-                                  height: 35,
-                                  width: 150,
-                                  decoration: BoxDecoration(
-                                    color: offWhiteColor,
-                                    borderRadius: BorderRadius.circular(
-                                        12), // Adjust the radius as needed
-                                  ),
-                                  child: Center(
-                                    child: poppinsText('Message', 16,
-                                        FontWeight.w400, Colors.black),
-                                  ),
-                                ),
-                              )
+                                    if (sendMessageController.isLoading.value)
+                                      Positioned.fill(
+                                        child: Container(
+                                          color: Colors.transparent,
+                                        ),
+                                      ),
+                                  ],
+                                );
+                              }),
                             ],
                           ),
 
