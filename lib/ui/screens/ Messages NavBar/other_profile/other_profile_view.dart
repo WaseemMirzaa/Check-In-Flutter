@@ -81,59 +81,56 @@ class _OtherProfileViewState extends State<OtherProfileView> {
   void dispose() {
     super.dispose();
     _scrollController.dispose();
+    followerCountController.dispose();
     controller.clearUserPosts();
   }
 
   //methods to check for followers and following
 
-  bool isFollowing = false;
-  final FollowerAndFollowingService _firestoreService =
-      FollowerAndFollowingService();
+  // void _listenToFollowStatus() {
+  //   print("Listening to follow status");
+  //   _firestoreService.getFollowStatus(widget.uid).listen((status) {
+  //     print("Received follow status update: $status");
+  //     setState(() {
+  //       isFollowing = status;
+  //     });
+  //   });
+  // }
 
-  void _listenToFollowStatus() {
-    print("Listening to follow status");
-    _firestoreService.getFollowStatus(widget.uid).listen((status) {
-      print("Received follow status update: $status");
-      setState(() {
-        isFollowing = status;
-      });
-    });
-  }
+  // Future<void> _toggleFollow() async {
+  //   try {
+  //     String currentUserId = FirebaseAuth.instance.currentUser!.uid;
 
-  Future<void> _toggleFollow() async {
-    try {
-      String currentUserId = FirebaseAuth.instance.currentUser!.uid;
+  //     if (isFollowing) {
+  //       print("Unfollowing user ${widget.uid}");
+  //       followerCountController.setUserId(widget.uid);
+  //       await _firestoreService.removeFollower(currentUserId, widget.uid);
 
-      if (isFollowing) {
-        print("Unfollowing user ${widget.uid}");
-        followerCountController.setUserId(widget.uid);
-        await _firestoreService.removeFollower(currentUserId, widget.uid);
+  //       setState(() {
+  //         isFollowing = false;
+  //       });
+  //       ScaffoldMessenger.of(context).showSnackBar(
+  //         SnackBar(content: Text('Unfollowed successfully!')),
+  //       );
+  //     } else {
+  //       print("Following user ${widget.uid}");
+  //       followerCountController.setUserId(widget.uid);
+  //       await _firestoreService.addFollower(currentUserId, widget.uid);
 
-        setState(() {
-          isFollowing = false;
-        });
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Unfollowed successfully!')),
-        );
-      } else {
-        print("Following user ${widget.uid}");
-        followerCountController.setUserId(widget.uid);
-        await _firestoreService.addFollower(currentUserId, widget.uid);
-
-        setState(() {
-          isFollowing = true;
-        });
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Followed successfully!')),
-        );
-      }
-    } catch (e) {
-      print("Error toggling follow: $e");
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to toggle follow: $e')),
-      );
-    }
-  }
+  //       setState(() {
+  //         isFollowing = true;
+  //       });
+  //       ScaffoldMessenger.of(context).showSnackBar(
+  //         SnackBar(content: Text('Followed successfully!')),
+  //       );
+  //     }
+  //   } catch (e) {
+  //     print("Error toggling follow: $e");
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       SnackBar(content: Text('Failed to toggle follow: $e')),
+  //     );
+  //   }
+  // }
 
   late FollowerCountingController followerCountController;
 
@@ -147,11 +144,18 @@ class _OtherProfileViewState extends State<OtherProfileView> {
     super.initState();
     _scrollController.addListener(_onScroll);
     controller.getUserPosts(widget.uid);
+
+    // Initialize the FollowerCountingController and set the userId
     followerCountController = Get.put(FollowerCountingController());
-    followerCountController.setUserId(widget.uid);
+
+    // Set the userId after the controller is initialized
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      followerCountController.setUserId(widget.uid);
+    });
 
     // Check follow status
-    _listenToFollowStatus(); // Set up real-time listener
+    sendMessageController
+        .listenToFollowStatus(widget.uid); // Set up real-time listener
 
     // Fetch current user's profile once and store the data
     fetchCurrentUserProfile();
@@ -340,7 +344,6 @@ class _OtherProfileViewState extends State<OtherProfileView> {
                         ),
 
                         //added by asjad
-
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
@@ -351,38 +354,39 @@ class _OtherProfileViewState extends State<OtherProfileView> {
                                   MaterialPageRoute(
                                     builder: (context) =>
                                         FollowersAndFollowingScreen(
-                                            otherUserId: widget.uid,
-                                            showFollowers: true),
+                                      otherUserId: widget.uid,
+                                      showFollowers: true,
+                                    ),
                                   ),
                                 );
                               },
                               child: Column(
                                 children: [
-                                  poppinsText(
-                                      followerCountController
-                                          .followersCount.value
-                                          .toString(),
-                                      underline: true,
-                                      16,
-                                      bold,
-                                      appBlackColor),
+                                  Obx(() => poppinsText(
+                                        followerCountController
+                                            .followersCount.value
+                                            .toString(),
+                                        16,
+                                        underline: true,
+                                        bold,
+                                        appBlackColor,
+                                      )),
                                   SizedBox(height: 4),
                                   poppinsText(
                                       'Followers', 16, medium, appBlackColor),
                                 ],
                               ),
                             ),
-                            SizedBox(width: 20), // Space before the divider
+                            SizedBox(width: 20),
                             Container(
-                              height:
-                                  38, // Adjust to fit the height of your text
+                              height: 38,
                               child: VerticalDivider(
-                                width: 20, // Adjust width if needed
-                                thickness: 2, // Adjust thickness if needed
-                                color: Colors.grey, // Adjust color if needed
+                                width: 20,
+                                thickness: 2,
+                                color: Colors.grey,
                               ),
                             ),
-                            SizedBox(width: 20), // Space after the divider
+                            SizedBox(width: 20),
                             GestureDetector(
                               onTap: () {
                                 Navigator.push(
@@ -390,21 +394,23 @@ class _OtherProfileViewState extends State<OtherProfileView> {
                                   MaterialPageRoute(
                                     builder: (context) =>
                                         FollowersAndFollowingScreen(
-                                            otherUserId: widget.uid,
-                                            showFollowers: false),
+                                      otherUserId: widget.uid,
+                                      showFollowers: false,
+                                    ),
                                   ),
                                 );
                               },
                               child: Column(
                                 children: [
-                                  poppinsText(
-                                      followerCountController
-                                          .followingCount.value
-                                          .toString(),
-                                      16,
-                                      underline: true,
-                                      bold,
-                                      appBlackColor),
+                                  Obx(() => poppinsText(
+                                        followerCountController
+                                            .followingCount.value
+                                            .toString(),
+                                        16,
+                                        underline: true,
+                                        bold,
+                                        appBlackColor,
+                                      )),
                                   SizedBox(height: 4),
                                   poppinsText(
                                       'Following', 16, medium, appBlackColor),
@@ -422,107 +428,109 @@ class _OtherProfileViewState extends State<OtherProfileView> {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Container(
-                                height: 35,
-                                width: 150,
-                                decoration: BoxDecoration(
-                                  color: offWhiteColor,
-                                  borderRadius: BorderRadius.circular(
-                                      12), // Adjust the radius as needed
-                                ),
-                                child: GestureDetector(
-                                  onTap: () {
-                                    _toggleFollow();
-                                  },
-                                  child: Center(
-                                      child: isFollowing
-                                          ? poppinsText('Unfollow', 16,
-                                              FontWeight.w400, Colors.black)
-                                          : poppinsText('Follow', 16,
-                                              FontWeight.w400, Colors.black)),
-                                ),
-                              ),
+                              Obx(() => InkWell(
+                                    onTap: () {
+                                      sendMessageController
+                                          .toggleFollow(widget.uid);
+                                    },
+                                    child: Container(
+                                      height: 35,
+                                      width: 150,
+                                      decoration: BoxDecoration(
+                                        color: offWhiteColor,
+                                        borderRadius: BorderRadius.circular(
+                                            12), // Adjust the radius as needed
+                                      ),
+                                      child: Center(
+                                        child: sendMessageController
+                                                .isFollowing.value
+                                            ? poppinsText('Unfollow', 16,
+                                                FontWeight.w400, Colors.black)
+                                            : poppinsText('Follow', 16,
+                                                FontWeight.w400, Colors.black),
+                                      ),
+                                    ),
+                                  )),
                               SizedBox(
                                 width: 10,
                               ),
-                              Container(
-                                height: 35,
-                                width: 150,
-                                decoration: BoxDecoration(
-                                  color: offWhiteColor,
-                                  borderRadius: BorderRadius.circular(
-                                      12), // Adjust the radius as needed
-                                ),
-                                child: GestureDetector(
-                                  onTap: () async {
-                                    var value = await sendMessageController
-                                        .startNewChat(
-                                      currentUid,
+                              InkWell(
+                                onTap: () async {
+                                  var value =
+                                      await sendMessageController.startNewChat(
+                                    currentUid,
+                                    senderName,
+                                    senderPhotoUrl,
+                                    userItems.uid!,
+                                    userItems.userName!,
+                                    userItems.photoUrl!,
+                                  );
+
+                                  if (value['isNewChat'] == true) {
+                                    // Send notification
+                                    await sendMessageController
+                                        .sendNotificationMethod(
+                                      '',
+                                      '$senderName sent a message request',
                                       senderName,
-                                      senderPhotoUrl,
-                                      userItems.uid!,
-                                      userItems.userName!,
-                                      userItems.photoUrl!,
-                                    );
-
-                                    if (value['isNewChat'] == true) {
-                                      // Send notification
-                                      await sendMessageController
-                                          .sendNotificationMethod(
-                                        '',
-                                        '$senderName sent a message request',
-                                        senderName,
-                                        value['docId'],
-                                        [currentUid, userItems.uid],
-                                        currentUid,
-                                        image: senderPhotoUrl,
-                                      );
-                                    } else {
-                                      // Update delete chat status
-                                      await sendMessageController
-                                          .updateDeleteChatStatus(
-                                        value['docId'],
-                                        currentUid,
-                                      );
-                                      // Uncomment if you want to show a success message
-                                      // successMessage('Chat already exists');
-                                    }
-
-                                    log('doc id $value');
-                                    // UserModel model =
-                                    //     controller.mydata.values.first;
-
-                                    chatcontroller.docId.value = value['docId'];
-                                    chatcontroller.name.value =
-                                        userItems.userName!;
-                                    //..... sender name for sending notification, show name on notification
-                                    chatcontroller.senderName.value =
-                                        senderName;
-                                    chatcontroller.isgroup = false;
-                                    chatcontroller.image.value =
-                                        userItems.photoUrl!;
-                                    chatcontroller.memberId.value = [
+                                      value['docId'],
+                                      [currentUid, userItems.uid],
                                       currentUid,
-                                      userItems.uid
-                                    ];
+                                      image: senderPhotoUrl,
+                                    );
+                                  } else {
+                                    // Update delete chat status
+                                    await sendMessageController
+                                        .updateDeleteChatStatus(
+                                      value['docId'],
+                                      currentUid,
+                                    );
+                                    // Uncomment if you want to show a success message
+                                    // successMessage('Chat already exists');
+                                  }
 
-                                    // Navigate to ChatScreen
-                                    pushNewScreen(
-                                      // ignore: use_build_context_synchronously
-                                      context,
-                                      screen: ChatScreen(
-                                        // docId: value['docId'],
+                                  log('doc id $value');
+                                  // UserModel model =
+                                  //     controller.mydata.values.first;
 
-                                        image: userItems.photoUrl,
+                                  chatcontroller.docId.value = value['docId'];
+                                  chatcontroller.name.value =
+                                      userItems.userName!;
+                                  //..... sender name for sending notification, show name on notification
+                                  chatcontroller.senderName.value = senderName;
+                                  chatcontroller.isgroup = false;
+                                  chatcontroller.image.value =
+                                      userItems.photoUrl!;
+                                  chatcontroller.memberId.value = [
+                                    currentUid,
+                                    userItems.uid
+                                  ];
 
-                                        // name: model.userName!.obs,
-                                        // isGroup: false,
-                                        // image: model.photoUrl!.obs,
-                                        // memberId: controller.mydata.keys.toList().obs,
-                                        // senderName: userController.userModel.value.userName!.obs,
-                                      ),
-                                    ).then((_) => Get.back());
-                                  },
+                                  // Navigate to ChatScreen
+                                  pushNewScreen(
+                                    // ignore: use_build_context_synchronously
+                                    context,
+                                    screen: ChatScreen(
+                                      // docId: value['docId'],
+
+                                      image: userItems.photoUrl,
+
+                                      // name: model.userName!.obs,
+                                      // isGroup: false,
+                                      // image: model.photoUrl!.obs,
+                                      // memberId: controller.mydata.keys.toList().obs,
+                                      // senderName: userController.userModel.value.userName!.obs,
+                                    ),
+                                  ); //.then((_) => Get.back())
+                                },
+                                child: Container(
+                                  height: 35,
+                                  width: 150,
+                                  decoration: BoxDecoration(
+                                    color: offWhiteColor,
+                                    borderRadius: BorderRadius.circular(
+                                        12), // Adjust the radius as needed
+                                  ),
                                   child: Center(
                                     child: poppinsText('Message', 16,
                                         FontWeight.w400, Colors.black),

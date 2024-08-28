@@ -1,5 +1,9 @@
+import 'package:check_in/Services/follower_and_following_service.dart';
 import 'package:check_in/Services/message_service.dart';
 import 'package:check_in/Services/push_notification_service.dart';
+import 'package:check_in/ui/screens/News%20Feed%20NavBar/followers_and_following/controller/followers_and_following_controller.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
 import 'package:get/get.dart';
 
 class OtherProfileMessages extends GetxController {
@@ -90,6 +94,44 @@ class OtherProfileMessages extends GetxController {
       print("Successfully Update delete chat status response");
     } catch (e) {
       print("Error updating delete chat status: $e");
+    }
+  }
+
+  //listen to followers
+  var isFollowing = false.obs;
+
+  void listenToFollowStatus(uid) {
+    print("Listening to follow status");
+    _firestoreService.getFollowStatus(uid).listen((status) {
+      print("Received follow status update: $status");
+
+      isFollowing.value = status;
+    });
+  }
+
+  //for toggle followers
+
+  final followerCountController = Get.put(FollowerCountingController());
+  final FollowerAndFollowingService _firestoreService =
+      FollowerAndFollowingService();
+
+  Future<void> toggleFollow(String otherUserId) async {
+    try {
+      String currentUserId = FirebaseAuth.instance.currentUser!.uid;
+
+      if (isFollowing.value) {
+        print("Unfollowing user $otherUserId");
+        await _firestoreService.removeFollower(currentUserId, otherUserId);
+
+        isFollowing.value = false;
+      } else {
+        print("Following user $otherUserId");
+        await _firestoreService.addFollower(currentUserId, otherUserId);
+
+        isFollowing.value = true;
+      }
+    } catch (e) {
+      print("Error toggling follow: $e");
     }
   }
 }
