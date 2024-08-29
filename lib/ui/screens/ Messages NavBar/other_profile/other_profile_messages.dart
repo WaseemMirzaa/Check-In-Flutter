@@ -1,7 +1,6 @@
 import 'package:check_in/Services/follower_and_following_service.dart';
 import 'package:check_in/Services/message_service.dart';
 import 'package:check_in/Services/push_notification_service.dart';
-import 'package:check_in/controllers/News%20Feed/news_feed_controller.dart';
 import 'package:check_in/ui/screens/News%20Feed%20NavBar/followers_and_following/controller/followers_and_following_controller.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -129,13 +128,11 @@ class OtherProfileMessages extends GetxController {
       if (isFollowing.value) {
         print("Unfollowing user $otherUserId");
         await _firestoreService.removeFollower(currentUserId, otherUserId);
-     
 
         isFollowing.value = false;
       } else {
         print("Following user $otherUserId");
         await _firestoreService.addFollower(currentUserId, otherUserId);
-  
 
         isFollowing.value = true;
       }
@@ -143,6 +140,4 @@ class OtherProfileMessages extends GetxController {
       print("Error toggling follow: $e");
     }
   }
-
-
 }
