@@ -1,3 +1,5 @@
+// ignore_for_file: sdk_version_since
+
 import 'dart:convert';
 import 'dart:io';
 import 'package:check_in/Services/newfeed_service.dart';

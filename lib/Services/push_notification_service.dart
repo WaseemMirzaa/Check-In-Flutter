@@ -1,6 +1,7 @@
+// ignore_for_file: sdk_version_since
+
 import 'dart:convert';
 import 'package:check_in/Services/message_service.dart';
-import 'package:check_in/ui/screens/News%20Feed%20NavBar/News%20Feed/news_feed_screen.dart';
 import 'package:check_in/ui/screens/News%20Feed%20NavBar/open_post/open_post.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -23,12 +24,15 @@ class FCMManager {
   }
 }
 
-FlutterLocalNotificationsPlugin notificationsPlugin = FlutterLocalNotificationsPlugin();
+FlutterLocalNotificationsPlugin notificationsPlugin =
+    FlutterLocalNotificationsPlugin();
 
 late AndroidNotificationChannel channel;
 
-const AndroidInitializationSettings initializationSettingsAndroid = AndroidInitializationSettings('appicon');
-DarwinInitializationSettings iosInitializationSettings = const DarwinInitializationSettings();
+const AndroidInitializationSettings initializationSettingsAndroid =
+    AndroidInitializationSettings('appicon');
+DarwinInitializationSettings iosInitializationSettings =
+    const DarwinInitializationSettings();
 
 final InitializationSettings initializationSettings = InitializationSettings(
   android: initializationSettingsAndroid,
@@ -42,7 +46,8 @@ class PushNotificationServices {
     print('🟢🟢🟢🟢🟢 init');
 
     await notificationsPlugin
-        .resolvePlatformSpecificImplementation<IOSFlutterLocalNotificationsPlugin>()
+        .resolvePlatformSpecificImplementation<
+            IOSFlutterLocalNotificationsPlugin>()
         ?.requestPermissions(
           alert: true,
           badge: true,
@@ -50,7 +55,8 @@ class PushNotificationServices {
         );
 
     print('🟢🟢🟢🟢🟢 plugin resolved');
-    await FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
+    await FirebaseMessaging.instance
+        .setForegroundNotificationPresentationOptions(
       alert: true,
       badge: true,
       sound: true,
@@ -61,7 +67,8 @@ class PushNotificationServices {
     channel = const AndroidNotificationChannel(
       'high_importance_channel', // id
       'High Importance Notifications', // title
-      description: 'This channel is used for important notifications.', // description
+      description:
+          'This channel is used for important notifications.', // description
       importance: Importance.max,
     );
 
@@ -199,7 +206,8 @@ class PushNotificationServices {
       // FirebaseMessaging.onBackgroundMessage((message) => null)
 
       // handle notification messages when the app is in the background or terminated
-      FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) async {
+      FirebaseMessaging.onMessageOpenedApp
+          .listen((RemoteMessage message) async {
         print('🟢🟢🟢🟢🟢 onMessageOpenedApp');
 
         //.............................
@@ -210,7 +218,11 @@ class PushNotificationServices {
         chatcontroller.memberId.value = NotificationModel.memberIds;
         //.............................
 
-        NotificationModel.type == 'newsFeed' ? Get.to(()=>OpenPost(postId: NotificationModel.docId,))  : Get.to(() => ChatScreen());
+        NotificationModel.type == 'newsFeed'
+            ? Get.to(() => OpenPost(
+                  postId: NotificationModel.docId,
+                ))
+            : Get.to(() => ChatScreen());
 
         // print('Opened message: ${message.notification?.title}');
         // handle the opened message here, for example by navigating to a specific screen
@@ -244,7 +256,8 @@ class PushNotificationServices {
       //
 
       // print('Step 6');
-      await notificationsPlugin.initialize(initializationSettings, onDidReceiveNotificationResponse: (payload) async {
+      await notificationsPlugin.initialize(initializationSettings,
+          onDidReceiveNotificationResponse: (payload) async {
         print('🟢🟢🟢🟢🟢 onDidReceiveNotificationResponse');
 
         // print("notification type is");
@@ -257,7 +270,11 @@ class PushNotificationServices {
         chatcontroller.memberId.value = NotificationModel.memberIds;
         //.............................
 
-        NotificationModel.type == 'newsFeed' ? Get.to(()=>OpenPost(postId: NotificationModel.docId,)) : Get.to(() => ChatScreen());
+        NotificationModel.type == 'newsFeed'
+            ? Get.to(() => OpenPost(
+                  postId: NotificationModel.docId,
+                ))
+            : Get.to(() => ChatScreen());
 
         // if (NotificationModel.type == PushNotificationType.msg) {
         //   print('Step 7');
@@ -291,7 +308,8 @@ Future<void> sendNotification(
     required String image,
     required List memberIds,
     required String uid}) async {
-  var completeUrl = 'https://us-central1-check-in-7ecd7.cloudfunctions.net/sendNotification';
+  var completeUrl =
+      'https://us-central1-check-in-7ecd7.cloudfunctions.net/sendNotification';
   final headers = {'Content-Type': 'application/json'};
   // Loop through each token and send individual notifications
   for (final userToken in token) {
@@ -308,7 +326,8 @@ Future<void> sendNotification(
     });
 
     try {
-      final response = await http.post(Uri.parse(completeUrl), headers: headers, body: body);
+      final response =
+          await http.post(Uri.parse(completeUrl), headers: headers, body: body);
       if (response.statusCode == 200) {
         print('🟡🟡🟡Notification sent');
       } else {
