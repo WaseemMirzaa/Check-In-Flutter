@@ -129,11 +129,13 @@ class OtherProfileMessages extends GetxController {
       if (isFollowing.value) {
         print("Unfollowing user $otherUserId");
         await _firestoreService.removeFollower(currentUserId, otherUserId);
+     
 
         isFollowing.value = false;
       } else {
         print("Following user $otherUserId");
         await _firestoreService.addFollower(currentUserId, otherUserId);
+  
 
         isFollowing.value = true;
       }
@@ -142,5 +144,5 @@ class OtherProfileMessages extends GetxController {
     }
   }
 
-  //for updating posts
+
 }

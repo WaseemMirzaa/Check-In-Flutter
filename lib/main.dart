@@ -77,6 +77,7 @@ final newsFeedController = Get.put(NewsFeedController(NewsFeedService()));
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   MobileAds.instance.initialize();
+
   await init;
   await initialize();
 
@@ -121,6 +122,9 @@ void main() async {
           .clearNewsFeeds(); // Clear posts when no user is logged in
     }
   });
+
+
+
   runApp(
       // DevicePreview(
       // enabled: !kReleaseMode,
