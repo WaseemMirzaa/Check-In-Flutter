@@ -1,12 +1,10 @@
 import 'dart:convert';
 import 'dart:io';
-
 import 'package:check_in/Services/newfeed_service.dart';
 import 'package:check_in/Services/push_notification_service.dart';
 import 'package:check_in/binding.dart';
 import 'package:check_in/controllers/News%20Feed/news_feed_controller.dart';
 import 'package:check_in/model/notification_model.dart';
-
 import 'package:check_in/ui/screens/splash.dart';
 import 'package:device_preview/device_preview.dart';
 import 'package:firebase_auth/firebase_auth.dart';
