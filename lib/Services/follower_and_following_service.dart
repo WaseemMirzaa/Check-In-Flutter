@@ -96,4 +96,35 @@ class FollowerAndFollowingService {
       }
     });
   }
+
+// Method to get the list of user IDs the current user is following
+  // Method to get the list of user IDs the current user is following
+  Future<List<String>> getFollowingList(String userId) async {
+    print("getFollowingList called with userId: $userId");
+
+    // Fetch the following list from Firestore
+    try {
+      DocumentSnapshot snapshot = await FirebaseFirestore.instance
+          .collection('following') // Corrected the collection name
+          .doc(userId)
+          .get();
+
+      print("Firestore document fetched for userId: $userId");
+
+      if (snapshot.exists) {
+        print("Document exists. Parsing data...");
+        Map<String, dynamic> data = snapshot.data() as Map<String, dynamic>;
+        List<String> following = List<String>.from(data['following'] ?? []);
+        print("Following list: $following");
+        return following;
+      } else {
+        print(
+            "Document does not exist for userId: $userId. Returning empty list.");
+        return [];
+      }
+    } catch (e) {
+      print("Error fetching following list for userId: $userId. Error: $e");
+      return [];
+    }
+  }
 }
