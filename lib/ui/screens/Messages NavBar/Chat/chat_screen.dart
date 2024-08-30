@@ -12,7 +12,6 @@ import 'package:check_in/ui/screens/%20Messages%20NavBar/other_profile/other_pro
 import 'package:check_in/ui/widgets/custom_appbar.dart';
 import 'package:check_in/utils/Constants/images.dart';
 import 'package:check_in/utils/colors.dart';
-import 'package:check_in/utils/custom/custom_firebase_chat_pagination.dart';
 import 'package:check_in/utils/gaps.dart';
 import 'package:check_in/utils/loader.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -26,13 +25,17 @@ import 'package:sizer/sizer.dart';
 
 import '../../../../model/Message and Group Message Model/message_model.dart';
 import '../../../../utils/Constants/enums.dart';
-import '../../../../utils/common.dart';
 import '../../../../utils/styles.dart';
 import 'Component/button.dart';
 import 'Component/image_date_container.dart';
 import 'Component/message_date_container.dart';
 import 'Component/send_message_container.dart';
 import 'Component/sticker_keyboard.dart';
+
+final chatQuery = FirebaseFirestore.instance.collection(Collections.MESSAGES).withConverter<Chatmodel>(
+      fromFirestore: (snapshot, options) => Chatmodel.fromJson(snapshot.data()!),
+      toFirestore: (value, options) => value.toJson(),
+    );
 
 class ChatScreen extends StatefulWidget {
   ChatScreen({
@@ -50,14 +53,78 @@ class ChatScreen extends StatefulWidget {
 class _ChatScreenState extends State<ChatScreen> {
   var controller = Get.find<ChatController>();
   var userController = Get.find<UserController>();
-  String onlineStatus = '';
+  Timer? timer;
+  StreamSubscription<QuerySnapshot>? _subscription;
 
+  // final StreamController<List<DocumentSnapshot>> _streamController = StreamController<List<DocumentSnapshot>>();
+  // final List<DocumentSnapshot> _chats = [];
+
+  String onlineStatus = '';
+  // bool _isRequesting = false;
+  // bool _isFinish = false;
+  // void onChangeData(List<DocumentChange> documentChanges) {
+  //   try {
+  //     controller.chatService
+  //         .updateUnreadCount(controller.docId.value, userController.userModel.value.uid!, 0, controller.memberId);
+  //     var isChange = false;
+  //     for (var productChange in documentChanges) {
+  //       if (productChange.type == DocumentChangeType.removed) {
+  //         _chats.removeWhere((product) {
+  //           return productChange.doc.id == product.id;
+  //         });
+  //         isChange = true;
+  //       } else if (productChange.type == DocumentChangeType.added) {
+  //         String timestamp = productChange.doc.get('timeStamp');
+  //         // Check if the timestamp is a String and convert it to a Timestamp
+  //         Timestamp convertedTimestamp = Timestamp.fromDate(DateTime.parse(timestamp));
+  //         int timeDifference = DateTime.now().difference(convertedTimestamp.toDate()).inSeconds;
+  //         if (timeDifference < 2) {
+  //           // Add the document to the beginning of the list
+  //           _chats.insert(0, productChange.doc);
+  //           isChange = true;
+  //         }
+  //       } else {
+  //         if (productChange.type == DocumentChangeType.modified) {
+  //           int indexWhere = _chats.indexWhere((product) {
+  //             return productChange.doc.id == product.id;
+  //           });
+  //           if (indexWhere >= 0) {
+  //             _chats[indexWhere] = productChange.doc;
+  //           }
+  //           isChange = true;
+  //         }
+  //       }
+  //     }
+  //     if (isChange) {
+  //       _streamController.add(_chats);
+  //     }
+  //   } catch (e) {
+  //     print(e);
+  //   }
+  // }
+
+  // void startTimer() {
+  //   timer = Timer.periodic(const Duration(minutes: 1), (Timer t) {
+  //     controller.updateLastSeenMethod();
+  //   });
+  // }
+
+  // void stopTimer() {
+  //   if (timer != null) {
+  //     timer!.cancel();
+  //   }
+  // }
 
   @override
   void initState() {
     super.initState();
 
-    controller.sendMessageCall.value = false;
+    //   if (widget.isFirstTime) {
+    //     null;
+    //   } else {
+    // chatcontroller.docId.value == userController.userModel ? chatcontroller.readReceipts(chatcontroller.docId.value) : null;
+    // print("---------DOC ID IS: ${chatcontroller.docId.value}");
+    // print("---------NOTIFY ID IS: ${NotificationModel.docId}");
     controller.getSingleMessage();
     controller.issticker.value = true;
     controller.chatfieldController.addListener(() {
@@ -65,6 +132,28 @@ class _ChatScreenState extends State<ChatScreen> {
     });
 
     !controller.isgroup ? fetchOnlineStatus(userController.userModel.value.uid!) : null;
+
+    //     _subscription = FirebaseFirestore.instance
+    //         .collection(Collections.MESSAGES)
+    //         .doc(controller.docId.value)
+    //         .collection(Collections.CHAT)
+    //         .orderBy(ChatField.TIME_STAMP, descending: true)
+    //         .snapshots()
+    //         .listen((data) => onChangeData(data.docChanges));
+    //     // requestNextPage();
+    //     startTimer();
+    //   }
+  }
+
+  @override
+  void dispose() {
+    controller.docId.value = '';
+    //   stopTimer();
+    //   _subscription?.cancel();
+    //   _streamController.close();
+    //   // controller.chatService
+    //   //     .updateOnlineStatus(controller.docId.value, DateTime.now().toString(), userController.userModel.value.uid!);
+    super.dispose();
   }
 
   fetchOnlineStatus(String userId) async {
@@ -74,10 +163,49 @@ class _ChatScreenState extends State<ChatScreen> {
       // MessageService messageService = MessageService(); // Create an instance
       String status = await controller.chatService.getOnlineStatus(controller.docId.value); // Call the method
       controller.chatService.updateOnlineStatus(controller.docId.value, DateTime.now().toString(), userId);
-      if(mounted) setState(() {});
+      setState(() {});
       onlineStatus = status;
     } catch (e) {
       print('Error fetching online status: $e');
+    }
+  }
+
+  // Stream<String> getOnlineStatus(String docId) async* {
+  //   final messageCollection = FirebaseFirestore.instance.collection(Collections.MESSAGES);
+  //   DocumentSnapshot snapshot = await messageCollection.doc(controller.docId.value).get();
+  //   if (snapshot.exists) {
+  //     final Map<String, dynamic>? data = snapshot.data() as Map<String, dynamic>?;
+  //     if (data != null && data.containsKey('senderStatus')) {
+  //       final status = data['senderStatus'];
+  //       if (status == 'Online') {
+  //         yield 'Online';
+  //       } else if (status.isNotEmpty) {
+  //         final lastSeen = DateTime.parse(status);
+  //         yield 'Last Seen ${DateFormat('hh:mm a').format(lastSeen)}';
+  //       }
+  //     }
+  //   }
+  //   // Move the updateOnlineStatus call here, outside the if block
+  //   updateOnlineStatus(controller.docId.value, 'Online', docId);
+  // }
+
+  void updateOnlineStatus(String docId, String status, String uId) async {
+    try {
+      final docRef = FirebaseFirestore.instance.collection(Collections.MESSAGES).doc(docId);
+      await FirebaseFirestore.instance.runTransaction((transaction) async {
+        final snapshot = await transaction.get(docRef);
+        if (snapshot.get(MessageField.SENDER_ID) == uId) {
+          docRef.update({'senderStatus': status});
+          onlineStatus = status;
+        } else {
+          docRef.update({'receiverStatus': status});
+          onlineStatus = status;
+        }
+      });
+      print('Online status updated successfully for user $docId');
+    } catch (e) {
+      print('Error updating online status: $e');
+      // You can yield an error message or an empty string here if needed
     }
   }
 
@@ -143,71 +271,147 @@ class _ChatScreenState extends State<ChatScreen> {
                   )),
             ]),
           )),
+
+          // ChatAppbar(
+          //     name: controller.name,
+          //     isgroup: controller.isgroup,
+          //     image: controller.image,
+          //     // onlineStatus: getOnlineStatus(),
+          //     widget: controller.isgroup
+          //         ? null
+          //         : StreamBuilder(
+          //             stream: getOnlineStatus(userController.userModel.value.uid!),
+          //             builder: (context, snapshot) {
+          //               if (snapshot.connectionState == ConnectionState.waiting) {
+          //                 // Handle loading state
+          //                 return const CircularProgressIndicator();
+          //               } else {
+          //                 // Handle active state
+          //                 if (snapshot.hasError) {
+          //                   // Handle error state
+          //                   return Text('Error: ${snapshot.error}');
+          //                 } else {
+          //                   print("888888 ${snapshot.data}");
+          //                   onlineStatus = snapshot.data!;
+          //                   print("status online is $onlineStatus");
+          //                   // Handle data state
+          //                   return Text(
+          //                     onlineStatus ?? 'Unknown Status',
+          //                     style: const TextStyle(
+          //                       fontSize: 10,
+          //                       fontWeight: FontWeight.normal,
+          //                       color: Colors.black,
+          //                     ),
+          //                   );
+          //                 }
+          //               }
+          //             },
+          //           ),
+          //     ontap: controller.isgroup
+          //         ? () {
+          //             pushNewScreen(context, screen: EditGroupDetails(docId: controller.docId.value)).then((_) => null);
+          //           }
+          //         : () {
+          //             // controller.updateLastSeenMethod();
+          //           }),
+
           body: Column(children: [
+            // Container(child: Text(onlineStatus),),
             Expanded(
-              child: CustomFirebaseChatPagination(
-                key: UniqueKey(),
-                limit: 20,
-                viewType: ViewType.list,
-                isLive: true,
-                reverse: true,
-                onEmpty: const Center(
-                  child: Text('No message found'),
-                ),
-                query: FirebaseFirestore.instance
-                    .collection(Collections.MESSAGES)
-                    .doc(controller.docId.value)
-                    .collection(Collections.CHAT)
-                    .orderBy(ChatField.TIME_STAMP, descending: true),
-                itemBuilder: (BuildContext context , List<Chatmodel> list, int index) {
-                  final chat = list[index];
-                  bool mymsg = chat.id == userController.userModel.value.uid ? true : false;
+                // child: NotificationListener<ScrollNotification>(
+                //     onNotification: (ScrollNotification scrollInfo) {
+                //       if (scrollInfo.metrics.maxScrollExtent == scrollInfo.metrics.pixels) {
+                //         requestNextPage();
+                //       }
+                //       return true;
+                //     },
+                child: StreamBuilder<List<Chatmodel>>(
+                    stream: controller.getConversation(),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        // Display loading indicator only if there are messages
+                        return
+                            //  _chats.isNotEmpty ?
+                            loaderView();
+                        //  : const SizedBox();
+                      } else if (snapshot.hasError) {
+                        return Center(child: Text('${snapshot.error}'),);
+                      } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                        return Center(child: Text(TempLanguage.noConversation));
+                      } else {
+                        // List<Chatmodel> chats = snapshot.data
+                        //         ?.map((snapshot) => Chatmodel.fromJson(snapshot.data() as Map<String, dynamic>))
+                        //         .toList() ??
+                        //     [];
+                        // Find the last seen message
+                        // var lastSeenMessage = chats.firstWhere(
+                        //     (message) =>
+                        //         message.seenTimeStamp != "" &&
+                        //         message.id == userController.userModel.value.uid,
+                        //     orElse: () => Chatmodel());
 
-                  return Padding(
-                    padding: EdgeInsets.only(
-                      left: mymsg ? 0 : 14,
-                      right: mymsg ? 14 : 0,
-                      top: 12,
-                    ),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      mainAxisAlignment: mymsg ? MainAxisAlignment.end : MainAxisAlignment.start,
-                      children: [
-                        mymsg
-                            ? const SizedBox()
-                            : Padding(
-                          padding: const EdgeInsets.only(bottom: 22.0),
-                          child: CircleAvatar(
-                            backgroundColor: appGreenColor.withOpacity(0.6),
-                            backgroundImage: !controller.isgroup
-                                ? controller.image.value.isEmptyOrNull
-                                ? const NetworkImage(AppAssets.defaulImg)
-                                : NetworkImage(controller.image.value)
-                                : _showGroupImage(chat.id!),
-                            radius: 17,
-                          ),
-                        ),
-                        horizontalGap(8),
-                        chat.type == 'message'
-                            ? MessageDateContainer(
-                          // index: index,
-                            chat: chat,
-                            mymsg: mymsg,
-                            // showLastSeen: showLastSeen,
+                        return ListView.builder(
+                            padding: const EdgeInsets.only(bottom: 10),
+                            reverse: true,
+                            itemCount: snapshot.data!.length,
+                            itemBuilder: (context, index) {
+                              var chat = snapshot.data![index];
 
-                            isGroup: controller.isgroup)
-                            : ImageDateContainer(chat: chat, mymsg: mymsg, isGroup: controller.isgroup
-                          // showLastSeen: showLastSeen,
-                        )
-                      ],
-                    ),
-                  );
-                },
-                docId: controller.docId.value,
-                uId: userController.userModel.value.uid!,
-                mem: controller.members,
-              ),
-            ),
+                              // Check if the current message is the last seen message
+                              // bool showLastSeen = chats[index] == lastSeenMessage;
+                              // String seenTime = '';
+                              // var chat = snapshot.data![index];
+                              // if (chat.seenTimeStamp != '') {
+                              //   DateTime dateTime =
+                              //       DateTime.parse(chat.seenTimeStamp!);
+                              //   seenTime =
+                              //       DateFormat('d MMM hh:mm a').format(dateTime);
+                              // }
+                              bool mymsg = chat.id == userController.userModel.value.uid ? true : false;
+
+                              return Padding(
+                                padding: EdgeInsets.only(
+                                  left: mymsg ? 0 : 14,
+                                  right: mymsg ? 14 : 0,
+                                  top: 12,
+                                ),
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                  mainAxisAlignment: mymsg ? MainAxisAlignment.end : MainAxisAlignment.start,
+                                  children: [
+                                    mymsg
+                                        ? const SizedBox()
+                                        : Padding(
+                                            padding: const EdgeInsets.only(bottom: 22.0),
+                                            child: CircleAvatar(
+                                              backgroundColor: appGreenColor.withOpacity(0.6),
+                                              backgroundImage: !controller.isgroup
+                                                  ? controller.image.value.isEmptyOrNull
+                                                    ? const NetworkImage(AppAssets.defaulImg)
+                                                    : NetworkImage(controller.image.value)
+                                                  : _showGroupImage(chat.id!),
+                                              radius: 17,
+                                            ),
+                                          ),
+                                    horizontalGap(8),
+                                    chat.type == 'message'
+                                        ? MessageDateContainer(
+                                            // index: index,
+                                            chat: chat,
+                                            mymsg: mymsg,
+                                            // showLastSeen: showLastSeen,
+
+                                            isGroup: controller.isgroup)
+                                        : ImageDateContainer(chat: chat, mymsg: mymsg, isGroup: controller.isgroup
+                                            // showLastSeen: showLastSeen,
+                                            )
+                                  ],
+                                ),
+                              );
+                            });
+                      }
+                    })),
+            // ),
 
             // for show request status dialog
             StreamBuilder<Messagemodel>(
@@ -443,6 +647,7 @@ class _ChatScreenState extends State<ChatScreen> {
                             controller.sendMsgField.value = '';
                             controller.sendNotificationMethod('', controller.chatfieldController.text);
                             controller.chatfieldController.clear();
+
                             // if (newMessageDoc != null) {
                             //   _chats.insert(0, newMessageDoc);
                             //   _streamController.add(_chats);
@@ -464,6 +669,43 @@ class _ChatScreenState extends State<ChatScreen> {
     );
   }
 
+  // void requestNextPage() async {
+  //   if (!_isRequesting && !_isFinish) {
+  //     QuerySnapshot querySnapshot;
+  //     _isRequesting = true;
+  //     if (_chats.isEmpty) {
+  //       querySnapshot = await FirebaseFirestore.instance
+  //           .collection(Collections.MESSAGES)
+  //           .doc(controller.docId.value)
+  //           .collection(Collections.CHAT)
+  //           .orderBy(ChatField.TIME_STAMP, descending: true)
+  //           .limit(20)
+  //           .get();
+  //     } else {
+  //       querySnapshot = await FirebaseFirestore.instance
+  //           .collection(Collections.MESSAGES)
+  //           .doc(controller.docId.value)
+  //           .collection(Collections.CHAT)
+  //           .startAfterDocument(_chats[_chats.length - 1])
+  //           .limit(20)
+  //           .get();
+  //     }
+  //     List<DocumentSnapshot> newMessages = querySnapshot.docs;
+  //     // Filter out messages that already exist in _chats
+  //     newMessages.removeWhere((newMessage) => _chats.any((existingMessage) => newMessage.id == existingMessage.id));
+  //     // Insert the new messages at the end of the list
+  //     _chats.addAll(newMessages);
+  //     if (querySnapshot.docs.isNotEmpty) {
+  //       // Notify the StreamController with the updated _chats list
+  //       _streamController.add(_chats);
+  //     } else {
+  //       // If there are no new messages, finish pagination
+  //       _isFinish = true;
+  //     }
+  //     _isRequesting = false;
+  //   }
+  // }
+// Define this method in your class
   NetworkImage? _showGroupImage(String chatId) {
     // Iterate through the members list to find the user with matching ID
     for (var member in controller.members) {
