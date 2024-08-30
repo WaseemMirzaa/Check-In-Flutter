@@ -39,83 +39,94 @@ class _NewsFeedScreenState extends State<NewsFeedScreen> {
       appBar: CustomAppbar(
         showicon: widget.isBack,
         title: poppinsText(
-            TempLanguage.newsFeed, 15, FontWeight.bold, appBlackColor),
+          TempLanguage.newsFeed,
+          15,
+          FontWeight.bold,
+          appBlackColor,
+        ),
       ),
       body: Column(
         children: [
-          // Top Container
           Expanded(
-            child: (controller.selectedOption == 1 &&
-                    controller.followingList.isEmpty)
-                ? _buildSecondTopContainer()
-                : RefreshIndicator(
-                    onRefresh: controller.handleRefresh,
-                    child: CustomFirestorePagination(
-                      key: UniqueKey(),
-                      limit: 20,
-                      viewType: ViewType.list,
-                      isLive: true,
-                      initialLoader: _buildTopContainer(),
-                      bottomLoader: Container(),
-                      physics: const AlwaysScrollableScrollPhysics(),
-                      onEmpty:
-                          _buildEmptyState(), // Handled by the conditional check above
-                      query: controller.getNewsFeedQuery(),
-                      itemBuilder: (context, documentSnapshot, index) {
-                        final data =
-                            documentSnapshot.data() as Map<String, Object?>;
+            child: Obx(() {
+              // Check if loading state is active
+              if (controller.isLoading.value) {
+                return _buildSecondTopContainer(true);
+              }
 
-                        // Debugging log to check the data
-                        print('Document data: $data');
+              // Check if the following list is empty when selectedOption is 1
+              if (controller.selectedOption == 1 &&
+                  controller.followingList.isEmpty) {
+                return _buildSecondTopContainer(false);
+              }
 
-                        if (index == 0) {
-                          return _buildTopContainer();
-                        }
+              // If not loading and following list is not empty, show the content
+              return RefreshIndicator(
+                onRefresh: controller.handleRefresh,
+                child: CustomFirestorePagination(
+                  key: UniqueKey(),
+                  limit: 20,
+                  viewType: ViewType.list,
+                  isLive: true,
+                  initialLoader: _buildTopContainer(),
+                  bottomLoader: Container(),
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  onEmpty: _buildEmptyState(),
+                  query: controller.getNewsFeedQuery(),
+                  itemBuilder: (context, documentSnapshot, index) {
+                    final data =
+                        documentSnapshot.data() as Map<String, Object?>;
 
-                        if (index % 5 == 4) {
-                          return NavtiveAdsComp(key: ValueKey('Ad_$index'));
-                        }
+                    // Debugging log to check the data
+                    print('Document data: $data');
 
-                        if (controller.shouldShowPost(data)) {
+                    if (index == 0) {
+                      return _buildTopContainer();
+                    }
+
+                    if (index % 5 == 4) {
+                      return NavtiveAdsComp(key: ValueKey('Ad_$index'));
+                    }
+
+                    if (controller.shouldShowPost(data)) {
+                      print(
+                          "Post should be shown: ${data[NewsFeed.HIDE_USER]}");
+
+                      if (data[NewsFeed.HIDE_USER] is List) {
+                        final hideUserList = data[NewsFeed.HIDE_USER] as List;
+                        print("Hide user list: $hideUserList");
+
+                        if (!hideUserList
+                            .contains(userController.userModel.value.uid)) {
+                          final newsFeedModel = NewsFeedModel.fromJson(data);
+                          print("Displaying post: $newsFeedModel");
                           print(
-                              "Post should be shown: ${data[NewsFeed.HIDE_USER]}");
+                              "Post ID: ${newsFeedModel.id}, Share ID: ${newsFeedModel.shareID}, Is Original: ${newsFeedModel.isOriginal}");
 
-                          if (data[NewsFeed.HIDE_USER] is List) {
-                            final hideUserList =
-                                data[NewsFeed.HIDE_USER] as List;
-                            print("Hide user list: $hideUserList");
-
-                            if (!(hideUserList.contains(
-                                userController.userModel.value.uid))) {
-                              final newsFeedModel =
-                                  NewsFeedModel.fromJson(data);
-                              print("Displaying post: $newsFeedModel");
-                              print(
-                                  "Post ID: ${newsFeedModel.id}, Share ID: ${newsFeedModel.shareID}, Is Original: ${newsFeedModel.isOriginal}");
-
-                              return newsFeedModel.isOriginal!
-                                  ? ListTileContainer(
-                                      key: ValueKey(newsFeedModel.id),
-                                      data: newsFeedModel,
-                                    )
-                                  : SharedPostComp(
-                                      key: ValueKey(newsFeedModel.shareID),
-                                      data: newsFeedModel,
-                                    );
-                            } else {
-                              print("User is hidden for this post.");
-                            }
-                          } else {
-                            print("HIDE_USER is not a List.");
-                          }
+                          return newsFeedModel.isOriginal!
+                              ? ListTileContainer(
+                                  key: ValueKey(newsFeedModel.id),
+                                  data: newsFeedModel,
+                                )
+                              : SharedPostComp(
+                                  key: ValueKey(newsFeedModel.shareID),
+                                  data: newsFeedModel,
+                                );
                         } else {
-                          print("Post filtered out by shouldShowPost.");
+                          print("User is hidden for this post.");
                         }
-                        return const SizedBox.shrink();
-                      },
-                    ),
-                  ),
-          )
+                      } else {
+                        print("HIDE_USER is not a List.");
+                      }
+                    } else {
+                      print("Post filtered out by shouldShowPost.");
+                    }
+                    return const SizedBox.shrink();
+                  },
+                ),
+              );
+            }),
+          ),
         ],
       ),
     );
@@ -160,7 +171,7 @@ class _NewsFeedScreenState extends State<NewsFeedScreen> {
   }
 
   // Builds the second top container
-  Widget _buildSecondTopContainer() {
+  Widget _buildSecondTopContainer(bool isload) {
     var screenSize = MediaQuery.of(context).size;
     return Stack(
       children: [
@@ -208,7 +219,9 @@ class _NewsFeedScreenState extends State<NewsFeedScreen> {
           left: screenSize.width * 0.6 -
               100, // Adjust the value to center it horizontally
           child: Center(
-              child: poppinsText('No Posts Found', 16, medium, appBlackColor)),
+              child: isload
+                  ? const Text('')
+                  : poppinsText('No Posts Found', 16, medium, appBlackColor)),
         )
       ],
     );

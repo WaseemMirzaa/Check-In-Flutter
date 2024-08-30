@@ -465,6 +465,8 @@ class NewsFeedController extends GetxController {
   int selectedOption = 0; // 0 for Community, 1 for Following
   List<String> followingList = [];
 
+   final RxBool isLoading = true.obs; // Add this line
+
   Future<void> handleRefresh() async {
     await Future.delayed(const Duration(seconds: 3));
     update();
@@ -484,6 +486,7 @@ class NewsFeedController extends GetxController {
 
   // Load the list of users the current user is following
   void loadFollowingList() async {
+    isLoading.value = true; // Set loading to true
     String currentUserId = FirebaseAuth.instance.currentUser!.uid;
     print("Loading following list for user: $currentUserId");
 
@@ -491,6 +494,7 @@ class NewsFeedController extends GetxController {
     followingList = await service.getFollowingList(currentUserId);
 
     print("Following list loaded: $followingList");
+    isLoading.value = false; // Set loading to true
     update(); // Update the controller only after the list is fetched
     print("Controller updated after loading following list.");
   }
@@ -527,6 +531,7 @@ class NewsFeedController extends GetxController {
     postController = TextEditingController();
     postFocusNode = FocusNode();
     // fetchInitialNewsFeed();
+    loadFollowingList();
     getMyPosts();
     Future.microtask(() async => await setValue('first', 'no'));
   }

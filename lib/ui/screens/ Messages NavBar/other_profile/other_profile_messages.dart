@@ -1,6 +1,8 @@
 import 'package:check_in/Services/follower_and_following_service.dart';
 import 'package:check_in/Services/message_service.dart';
 import 'package:check_in/Services/push_notification_service.dart';
+import 'package:check_in/controllers/News%20Feed/news_feed_controller.dart';
+import 'package:check_in/core/constant/constant.dart';
 import 'package:check_in/ui/screens/News%20Feed%20NavBar/followers_and_following/controller/followers_and_following_controller.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -121,6 +123,8 @@ class OtherProfileMessages extends GetxController {
   final FollowerAndFollowingService _firestoreService =
       FollowerAndFollowingService();
 
+  final NewsFeedCounter = Get.find<NewsFeedController>();
+
   Future<void> toggleFollow(String otherUserId) async {
     try {
       String currentUserId = FirebaseAuth.instance.currentUser!.uid;
@@ -128,16 +132,21 @@ class OtherProfileMessages extends GetxController {
       if (isFollowing.value) {
         print("Unfollowing user $otherUserId");
         await _firestoreService.removeFollower(currentUserId, otherUserId);
+        updateFollowingList();
 
         isFollowing.value = false;
       } else {
         print("Following user $otherUserId");
         await _firestoreService.addFollower(currentUserId, otherUserId);
-
+        updateFollowingList();
         isFollowing.value = true;
       }
     } catch (e) {
       print("Error toggling follow: $e");
     }
+  }
+
+  void updateFollowingList() {
+    NewsFeedCounter.loadFollowingList();
   }
 }
