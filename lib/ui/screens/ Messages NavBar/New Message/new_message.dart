@@ -112,22 +112,23 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
                           chatcontroller.sendNotificationMethod('',
                               '${userController.userModel.value.userName!} sent a message request');
                         } else {
-                         await controller.updateDeleteChatStatus(value['docId'], userController.userModel.value.uid ?? '');
+                          await controller.updateDeleteChatStatus(
+                              value['docId'],
+                              userController.userModel.value.uid ?? '');
                           //successMessage('Chat already exist');
                         }
 
                         // clear map mydata
                         controller.mydata.clear();
                         pushNewScreen(context,
-                                screen: ChatScreen(
-                                    // name: model.userName!.obs,
-                                    // isGroup: false,
-                                    // image: model.photoUrl!.obs,
-                                    // memberId: controller.mydata.keys.toList().obs,
-                                    // senderName:
-                                    //     userController.userModel.value.userName!.obs,
-                                    ))
-                            .then((value) => Get.back());
+                            screen: ChatScreen(
+                              // name: model.userName!.obs,
+                              // isGroup: false,
+                              image: model.photoUrl!,
+                              // memberId: controller.mydata.keys.toList().obs,
+                              // senderName:
+                              //     userController.userModel.value.userName!.obs,
+                            )).then((value) => Get.back());
                       });
                     }
                   },

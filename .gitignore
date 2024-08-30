@@ -46,3 +46,6 @@ app.*.map.json
 /ios/Runner.xcworkspace/xcshareddata/swiftpm/Package.resolved
 /.fvm/
 /functions/node_modules/
+
+# FVM Version Cache
+.fvm/

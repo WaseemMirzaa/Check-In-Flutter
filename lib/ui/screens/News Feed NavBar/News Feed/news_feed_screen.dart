@@ -1,12 +1,8 @@
-import 'dart:async';
-import 'dart:math';
-
 import 'package:check_in/Services/newfeed_service.dart';
 import 'package:check_in/auth_service.dart' hide newsFeedController;
 import 'package:check_in/controllers/News%20Feed/news_feed_controller.dart';
 import 'package:check_in/core/constant/constant.dart';
 import 'package:check_in/core/constant/temp_language.dart';
-import 'package:check_in/main.dart';
 import 'package:check_in/model/NewsFeed%20Model/news_feed_model.dart';
 import 'package:check_in/ui/screens/News%20Feed%20NavBar/Create%20Post/create_post_screen.dart';
 import 'package:check_in/ui/screens/News%20Feed%20NavBar/News%20Feed/Component/list_tile_container.dart';
@@ -15,75 +11,26 @@ import 'package:check_in/ui/screens/News%20Feed%20NavBar/News%20Feed/Component/t
 import 'package:check_in/ui/screens/News%20Feed%20NavBar/test_aid_comp/test_aid_comp.dart';
 import 'package:check_in/utils/colors.dart';
 import 'package:check_in/utils/styles.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
-import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:nb_utils/nb_utils.dart';
-import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
 import 'package:sizer/sizer.dart';
 import '../../../../utils/custom/custom_firebase_pagination.dart';
 import '../../../widgets/custom_appbar.dart';
-import 'package:chewie/chewie.dart';
-import 'package:video_player/video_player.dart';
 
 class NewsFeedScreen extends StatefulWidget {
   NewsFeedScreen({super.key, this.postId = '', this.isBack = false});
-  String postId;
-  bool isBack;
+  final String postId;
+  final bool isBack;
 
   @override
   State<NewsFeedScreen> createState() => _NewsFeedScreenState();
 }
 
 class _NewsFeedScreenState extends State<NewsFeedScreen> {
-  final controller = Get.put(NewsFeedController(NewsFeedService()));
-
-  final ScrollController _scrollController = ScrollController();
-  double _topContainerHeight = 0.0; // Variable to control the animation height
-  RxBool _isTopContainerVisible = true.obs; // Variable to track visibility
-
-
-  @override
-  void initState() {
-    super.initState();
-
-    Future.microtask(() async => await setValue('first', 'no'));
-
-    //_scrollController.addListener(_onScroll); // Add scroll listener
-  }
-
-  void _onScroll() {
-    double offset = _scrollController.offset;
-
-    // if (_scrollController.position.userScrollDirection == ScrollDirection.reverse && _isTopContainerVisible.value && offset > 10) {
-    //
-    //   //setState(() {
-    //     _isTopContainerVisible.value = false;
-    //   //});
-    // } else if (_scrollController.position.userScrollDirection == ScrollDirection.forward && !_isTopContainerVisible.value && offset <= 50) {
-    //   // Scroll up
-    //   //setState(() {
-    //     _isTopContainerVisible.value = true;
-    //   //});
-    // }
-
-  }
-
-  @override
-  void dispose() {
-   //_scrollController.removeListener(_onScroll); // Remove listener
-   //_scrollController.dispose();
-    //controller.clearNewsFeeds();
-    super.dispose();
-  }
-
-  Future<void> _handleRefresh() async {
-    Future.delayed(Duration(seconds: 3));
-       setState(() {});
-  }
+  final NewsFeedController controller =
+      Get.put(NewsFeedController(NewsFeedService()));
 
   @override
   Widget build(BuildContext context) {
@@ -91,129 +38,241 @@ class _NewsFeedScreenState extends State<NewsFeedScreen> {
       appBar: CustomAppbar(
         showicon: widget.isBack,
         title: poppinsText(
-            TempLanguage.newsFeed, 15, FontWeight.bold, appBlackColor),
+          TempLanguage.newsFeed,
+          15,
+          FontWeight.bold,
+          appBlackColor,
+        ),
       ),
       body: Column(
-          children: [
-            Expanded(
-              child: RefreshIndicator(
-                onRefresh: _handleRefresh,
+        children: [
+          Expanded(
+            child: Obx(() {
+              // Check if loading state is active
+              if (controller.isLoading.value) {
+                return _buildSecondTopContainer(true);
+              }
+
+              // Check if the following list is empty when selectedOption is 1
+              if (controller.selectedOption == 1 &&
+                  controller.followingList.isEmpty) {
+                return _buildSecondTopContainer(false);
+              }
+
+              // If not loading and following list is not empty, show the content
+              return RefreshIndicator(
+                onRefresh: controller.handleRefresh,
                 child: CustomFirestorePagination(
                   key: UniqueKey(),
-                  //controller: _scrollController,
                   limit: 20,
                   viewType: ViewType.list,
                   isLive: true,
+                  initialLoader: _buildTopContainer(),
+                  bottomLoader: Container(),
                   physics: const AlwaysScrollableScrollPhysics(),
-                  //shrinkWrap: true,
-                  onEmpty: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      AnimatedContainer(
-                        height:  17.5.h,
-                        duration: const Duration(milliseconds: 10),
-                        curve: Curves.easeInOut,
-                        child: TopContainer(
-                          onWriteSomethingTap: () async {
-                            final result = await Get.to(CreatePost());
-                            if (result ?? false) {
-                              setState(() {});
-                            }
-                          },
-                          onPhotoTap: (String? val) async {
-                            if (!val.isEmptyOrNull) {
-                              final result = await Get.to(CreatePost());
-                              if (result ?? false) {
-                                setState(() {});
-                              }
-                            }
-                          },
-                          onVideoTap: (String? val) async {
-                            if (!val.isEmptyOrNull) {
-                              final result = await Get.to(CreatePost());
-                              if (result ?? false) {
-                                setState(() {});
-                              }
-                            }
-                          },
-                        ),
-                      ),
-                      const Center(
-                        child: Text('No data found'),
-                      ),
-                    ],
-                  ),
-                  query: FirebaseFirestore.instance
-                      .collection(Collections.NEWSFEED)
-                      .orderBy(NewsFeed.TIME_STAMP, descending: true),
+                  onEmpty: _buildEmptyState(),
+                  query: controller.getNewsFeedQuery(),
                   itemBuilder: (context, documentSnapshot, index) {
-                    // Add a custom container as the first item
+                    final data =
+                        documentSnapshot.data() as Map<String, Object?>;
+
                     if (index == 0) {
-                      return AnimatedContainer(
-                        height:  17.5.h,
-                        duration: const Duration(milliseconds: 10),
-                        curve: Curves.easeInOut,
-                        child: TopContainer(
-                          onWriteSomethingTap: () async {
-                            final result = await Get.to(CreatePost());
-                            if (result ?? false) {
-                              setState(() {});
-                            }
-                          },
-                          onPhotoTap: (String? val) async {
-                            if (!val.isEmptyOrNull) {
-                              final result = await Get.to(CreatePost());
-                              if (result ?? false) {
-                                setState(() {});
-                              }
-                            }
-                          },
-                          onVideoTap: (String? val) async {
-                            if (!val.isEmptyOrNull) {
-                              final result = await Get.to(CreatePost());
-                              if (result ?? false) {
-                                setState(() {});
-                              }
-                            }
-                          },
-                        ),
-                      );
+                      return _buildTopContainer();
                     }
 
                     if (index % 5 == 4) {
-                      return NavtiveAdsComp(
-                        key: ValueKey('Ad_$index'),
-                      );
+                      return NavtiveAdsComp(key: ValueKey('Ad_$index'));
                     }
-                    final itemIndex = index - (index ~/ 5);
 
-                    final doc = documentSnapshot;
-                    final data = doc.data() as Map<String, Object?>;
+                    if (controller.shouldShowPost(data)) {
+                      if (data[NewsFeed.HIDE_USER] is List) {
+                        final hideUserList = data[NewsFeed.HIDE_USER] as List;
 
-                    if (data[NewsFeed.HIDE_USER] is List &&
-                        !(data[NewsFeed.HIDE_USER] as List)
+                        if (!hideUserList
                             .contains(userController.userModel.value.uid)) {
-                      final newsFeedModel = NewsFeedModel.fromJson(data);
-                      if (data == null) return Container();
-                      return newsFeedModel.isOriginal!
-                          ? ListTileContainer(
-                        key: ValueKey(newsFeedModel.id),
-                        data: newsFeedModel,
-                      )
-                          : SharedPostComp(
-                          key: ValueKey(newsFeedModel.shareID),
-                          data: newsFeedModel);
-                    } else {
-                      return const SizedBox.shrink();
+                          final newsFeedModel = NewsFeedModel.fromJson(data);
+
+                          return newsFeedModel.isOriginal!
+                              ? ListTileContainer(
+                                  key: ValueKey(newsFeedModel.id),
+                                  data: newsFeedModel,
+                                )
+                              : SharedPostComp(
+                                  key: ValueKey(newsFeedModel.shareID),
+                                  data: newsFeedModel,
+                                );
+                        }
+                      }
                     }
+                    return const SizedBox.shrink();
                   },
                 ),
-              ),
-            )
-          ],
-        )
+              );
+            }),
+          ),
+        ],
+      ),
     );
   }
 
+  Widget _buildContentofContainer() {
+    return AnimatedContainer(
+      height: 17.5.h,
+      duration: const Duration(milliseconds: 10),
+      curve: Curves.easeInOut,
+      child: TopContainer(
+        onWriteSomethingTap: () async {
+          final result = await Get.to(CreatePost());
+          if (result ?? false) {
+            setState(() {});
+          }
+        },
+        onPhotoTap: (String? val) async {
+          if (!val.isEmptyOrNull) {
+            final result = await Get.to(CreatePost());
+            if (result ?? false) {
+              setState(() {});
+            }
+          }
+        },
+        onVideoTap: (String? val) async {
+          if (!val.isEmptyOrNull) {
+            final result = await Get.to(CreatePost());
+            if (result ?? false) {
+              setState(() {});
+            }
+          }
+        },
+      ),
+    );
+  }
+
+  // Builds the top container
+  Widget _buildTopContainer() {
+    return Column(
+      children: [
+        _buildContentofContainer(),
+        _buildOptionsContainer(),
+      ],
+    );
+  }
+
+  // Builds the second top container
+  Widget _buildSecondTopContainer(bool isload) {
+    var screenSize = MediaQuery.of(context).size;
+    return Stack(
+      children: [
+        // Original content
+        Column(
+          children: [
+            _buildContentofContainer(),
+            _buildOptionsContainer(),
+          ],
+        ),
+
+        // Centering the "No Posts Found" text
+        Positioned(
+          top: screenSize.height * 0.5 -
+              20, // Adjust the value to center it vertically
+          left: screenSize.width * 0.6 -
+              100, // Adjust the value to center it horizontally
+          child: Center(
+              child: isload
+                  ? const Text('')
+                  : poppinsText('No Posts Found', 16, medium, appBlackColor)),
+        )
+      ],
+    );
+  }
+
+  // Builds the options container
+  Widget _buildOptionsContainer() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 20),
+      child: Align(
+        alignment: Alignment.centerLeft,
+        child: Container(
+          height: 50,
+          width: 200,
+          decoration: BoxDecoration(
+            color: Colors.grey[200],
+            borderRadius: BorderRadius.circular(10),
+            // Add drop shadow here
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.2), // Shadow color
+                spreadRadius: 1, // Spread radius
+                blurRadius: 5, // Blur radius
+                offset: Offset(0, 3), // Shadow position
+              ),
+            ],
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              _buildOptionButton('Community', 0),
+              _buildOptionButton('Following', 1),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  // Builds the option button
+  Widget _buildOptionButton(String title, int option) {
+    return Expanded(
+      child: GestureDetector(
+        onTap: () {
+          setState(() {
+            controller.setSelectedOption(option);
+          });
+        },
+        child: Container(
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            color: controller.selectedOption == option
+                ? appPrimaryColor
+                : Colors.transparent,
+            borderRadius: option == 0
+                ? const BorderRadius.horizontal(left: Radius.circular(10))
+                : const BorderRadius.horizontal(right: Radius.circular(10)),
+          ),
+          child: Text(
+            title,
+            style: GoogleFonts.poppins(
+              color: controller.selectedOption == option
+                  ? Colors.white
+                  : greyColor,
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+// Builds the empty state widget
+  Widget _buildEmptyState() {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildTopContainer(),
+        Expanded(
+          child: Center(
+            child: Text(
+              'No posts available',
+              style: GoogleFonts.poppins(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: greyColor,
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
 }

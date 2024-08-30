@@ -19,13 +19,12 @@ flutter:
 dependencies:
   flutter:
     sdk: flutter
-
   google_maps_flutter_android:
-    path: D:/StudioProjects/Check-In-Flutter/google_maps_flutter/google_maps_flutter_android
+    path: C:/Users/Asjad/Desktop/Flutter Projects Developlogix/check_in_hoops/google_maps_flutter/google_maps_flutter_android
   google_maps_flutter_ios:
-    path: D:/StudioProjects/Check-In-Flutter/google_maps_flutter/google_maps_flutter_ios
+    path: C:/Users/Asjad/Desktop/Flutter Projects Developlogix/check_in_hoops/google_maps_flutter/google_maps_flutter_ios
   google_maps_flutter_platform_interface:
-    path: D:/StudioProjects/Check-In-Flutter/google_maps_flutter/google_maps_flutter_platform_interface
+    path: C:/Users/Asjad/Desktop/Flutter Projects Developlogix/check_in_hoops/google_maps_flutter/google_maps_flutter_platform_interface
 
 
 dev_dependencies:
