@@ -81,11 +81,7 @@ class FollowersAndFollowingScreen extends StatelessWidget {
         centerTitle: true,
         leading: IconButton(
             onPressed: () {
-              if (origin == 'ProfilePage') {
-                Navigator.popUntil(context, (route) => route.isFirst);
-              } else {
-                Navigator.pop(context);
-              }
+              Navigator.pop(context);
             },
             icon: Icon(Icons.arrow_back_ios)),
       ),
