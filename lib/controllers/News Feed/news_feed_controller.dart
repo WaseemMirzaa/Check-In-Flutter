@@ -1,6 +1,6 @@
-import 'dart:developer';
 import 'dart:io';
 import 'package:check_in/Services/newfeed_service.dart';
+import 'package:check_in/auth_service.dart';
 import 'package:check_in/controllers/user_controller.dart';
 import 'package:check_in/core/constant/constant.dart';
 import 'package:check_in/model/NewsFeed%20Model/comment_model.dart';
@@ -130,11 +130,28 @@ class NewsFeedController extends GetxController {
     });
   }
 
-  void clearUserPosts() {
-    _userPosts.clear();
-    userLastDoc = null;
-    userPostLoader.value = false;
+  //these two methods are added if any issue comment them and uncomment 2nd clearUserPosts
+
+  @override
+  void dispose() {
+    newsFeedController.clearUserPosts(isDisposing: true);
+    super.dispose();
   }
+
+  void clearUserPosts({bool isDisposing = false}) {
+    if (!isDisposing) {
+      _userPosts.clear(); // Trigger UI updates only if not disposing
+      userLastDoc = null;
+      userPostLoader.value = false;
+    }
+  }
+
+  //uncomment this one if this issues
+  // void clearUserPosts() {
+  //   _userPosts.clear();
+  //   userLastDoc = null;
+  //   userPostLoader.value = false;
+  // }
 
 // /// get news feed (posts) controller
 //   Stream<List<NewsFeedModel>> getNewsFeed() {
@@ -459,13 +476,12 @@ class NewsFeedController extends GetxController {
   }
 
   //edit by asjad
-
   final ScrollController scrollController = ScrollController();
   RxBool isTopContainerVisible = true.obs;
   int selectedOption = 0; // 0 for Community, 1 for Following
   List<String> followingList = [];
 
-   final RxBool isLoading = true.obs; // Add this line
+  final RxBool isLoading = true.obs; // Add this line
 
   Future<void> handleRefresh() async {
     await Future.delayed(const Duration(seconds: 3));
@@ -488,35 +504,25 @@ class NewsFeedController extends GetxController {
   void loadFollowingList() async {
     isLoading.value = true; // Set loading to true
     String currentUserId = FirebaseAuth.instance.currentUser!.uid;
-    print("Loading following list for user: $currentUserId");
 
     final FollowerAndFollowingService service = FollowerAndFollowingService();
     followingList = await service.getFollowingList(currentUserId);
 
-    print("Following list loaded: $followingList");
     isLoading.value = false; // Set loading to true
     update(); // Update the controller only after the list is fetched
-    print("Controller updated after loading following list.");
   }
 
   Query getNewsFeedQuery() {
-    print("getNewsFeedQuery called with selectedOption: $selectedOption");
-
     if (selectedOption == 0) {
-      print("Returning query for Community tab.");
       return FirebaseFirestore.instance
           .collection(Collections.NEWSFEED)
           .orderBy(NewsFeed.TIME_STAMP, descending: true);
     } else {
       if (followingList.isEmpty) {
-        print(
-            "Following list is empty, returning a query that won't match any documents.");
         return FirebaseFirestore.instance
             .collection(Collections.NEWSFEED)
             .where('userId', isEqualTo: null);
       } else {
-        print(
-            "Returning query for Following tab with userId filter: $followingList");
         return FirebaseFirestore.instance
             .collection(Collections.NEWSFEED)
             .where('userId', whereIn: followingList)
@@ -539,8 +545,7 @@ class NewsFeedController extends GetxController {
   bool shouldShowPost(Map<String, Object?> data) {
     final showPost = selectedOption == 0 ||
         (selectedOption == 1 && followingList.contains(data['userId']));
-    print(
-        " LOGGING NUMBER 123 Should show post with data: $data, result: $showPost");
+
     return showPost;
   }
 }

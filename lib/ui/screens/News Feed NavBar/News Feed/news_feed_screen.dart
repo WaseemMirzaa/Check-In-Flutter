@@ -11,7 +11,6 @@ import 'package:check_in/ui/screens/News%20Feed%20NavBar/News%20Feed/Component/t
 import 'package:check_in/ui/screens/News%20Feed%20NavBar/test_aid_comp/test_aid_comp.dart';
 import 'package:check_in/utils/colors.dart';
 import 'package:check_in/utils/styles.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -77,9 +76,6 @@ class _NewsFeedScreenState extends State<NewsFeedScreen> {
                     final data =
                         documentSnapshot.data() as Map<String, Object?>;
 
-                    // Debugging log to check the data
-                    print('Document data: $data');
-
                     if (index == 0) {
                       return _buildTopContainer();
                     }
@@ -89,19 +85,12 @@ class _NewsFeedScreenState extends State<NewsFeedScreen> {
                     }
 
                     if (controller.shouldShowPost(data)) {
-                      print(
-                          "Post should be shown: ${data[NewsFeed.HIDE_USER]}");
-
                       if (data[NewsFeed.HIDE_USER] is List) {
                         final hideUserList = data[NewsFeed.HIDE_USER] as List;
-                        print("Hide user list: $hideUserList");
 
                         if (!hideUserList
                             .contains(userController.userModel.value.uid)) {
                           final newsFeedModel = NewsFeedModel.fromJson(data);
-                          print("Displaying post: $newsFeedModel");
-                          print(
-                              "Post ID: ${newsFeedModel.id}, Share ID: ${newsFeedModel.shareID}, Is Original: ${newsFeedModel.isOriginal}");
 
                           return newsFeedModel.isOriginal!
                               ? ListTileContainer(
@@ -112,14 +101,8 @@ class _NewsFeedScreenState extends State<NewsFeedScreen> {
                                   key: ValueKey(newsFeedModel.shareID),
                                   data: newsFeedModel,
                                 );
-                        } else {
-                          print("User is hidden for this post.");
                         }
-                      } else {
-                        print("HIDE_USER is not a List.");
                       }
-                    } else {
-                      print("Post filtered out by shouldShowPost.");
                     }
                     return const SizedBox.shrink();
                   },
@@ -132,39 +115,43 @@ class _NewsFeedScreenState extends State<NewsFeedScreen> {
     );
   }
 
+  Widget _buildContentofContainer() {
+    return AnimatedContainer(
+      height: 17.5.h,
+      duration: const Duration(milliseconds: 10),
+      curve: Curves.easeInOut,
+      child: TopContainer(
+        onWriteSomethingTap: () async {
+          final result = await Get.to(CreatePost());
+          if (result ?? false) {
+            setState(() {});
+          }
+        },
+        onPhotoTap: (String? val) async {
+          if (!val.isEmptyOrNull) {
+            final result = await Get.to(CreatePost());
+            if (result ?? false) {
+              setState(() {});
+            }
+          }
+        },
+        onVideoTap: (String? val) async {
+          if (!val.isEmptyOrNull) {
+            final result = await Get.to(CreatePost());
+            if (result ?? false) {
+              setState(() {});
+            }
+          }
+        },
+      ),
+    );
+  }
+
   // Builds the top container
   Widget _buildTopContainer() {
     return Column(
       children: [
-        AnimatedContainer(
-          height: 17.5.h,
-          duration: const Duration(milliseconds: 10),
-          curve: Curves.easeInOut,
-          child: TopContainer(
-            onWriteSomethingTap: () async {
-              final result = await Get.to(CreatePost());
-              if (result ?? false) {
-                setState(() {});
-              }
-            },
-            onPhotoTap: (String? val) async {
-              if (!val.isEmptyOrNull) {
-                final result = await Get.to(CreatePost());
-                if (result ?? false) {
-                  setState(() {});
-                }
-              }
-            },
-            onVideoTap: (String? val) async {
-              if (!val.isEmptyOrNull) {
-                final result = await Get.to(CreatePost());
-                if (result ?? false) {
-                  setState(() {});
-                }
-              }
-            },
-          ),
-        ),
+        _buildContentofContainer(),
         _buildOptionsContainer(),
       ],
     );
@@ -178,41 +165,12 @@ class _NewsFeedScreenState extends State<NewsFeedScreen> {
         // Original content
         Column(
           children: [
-            AnimatedContainer(
-              height: 17.5.h,
-              duration: const Duration(milliseconds: 10),
-              curve: Curves.easeInOut,
-              child: TopContainer(
-                onWriteSomethingTap: () async {
-                  final result = await Get.to(CreatePost());
-                  if (result ?? false) {
-                    setState(() {});
-                  }
-                },
-                onPhotoTap: (String? val) async {
-                  if (!val.isEmptyOrNull) {
-                    final result = await Get.to(CreatePost());
-                    if (result ?? false) {
-                      setState(() {});
-                    }
-                  }
-                },
-                onVideoTap: (String? val) async {
-                  if (!val.isEmptyOrNull) {
-                    final result = await Get.to(CreatePost());
-                    if (result ?? false) {
-                      setState(() {});
-                    }
-                  }
-                },
-              ),
-            ),
+            _buildContentofContainer(),
             _buildOptionsContainer(),
           ],
         ),
 
         // Centering the "No Posts Found" text
-
         Positioned(
           top: screenSize.height * 0.5 -
               20, // Adjust the value to center it vertically
