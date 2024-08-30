@@ -81,7 +81,7 @@ class _OtherProfileViewState extends State<OtherProfileView> {
   void dispose() {
     super.dispose();
     _scrollController.dispose();
-    followerCountController.dispose();
+
     controller.clearUserPosts();
   }
 
