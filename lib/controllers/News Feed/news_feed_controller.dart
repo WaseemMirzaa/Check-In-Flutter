@@ -1,6 +1,6 @@
 import 'dart:io';
 import 'package:check_in/Services/newfeed_service.dart';
-import 'package:check_in/auth_service.dart';
+
 import 'package:check_in/controllers/user_controller.dart';
 import 'package:check_in/core/constant/constant.dart';
 import 'package:check_in/model/NewsFeed%20Model/comment_model.dart';
@@ -130,28 +130,28 @@ class NewsFeedController extends GetxController {
     });
   }
 
-  //these two methods are added if any issue comment them and uncomment 2nd clearUserPosts
+  // //these two methods are added if any issue comment them and uncomment 2nd clearUserPosts
 
-  @override
-  void dispose() {
-    newsFeedController.clearUserPosts(isDisposing: true);
-    super.dispose();
-  }
+  // @override
+  // void dispose() {
+  //   newsFeedController.clearUserPosts(isDisposing: true);
+  //   super.dispose();
+  // }
 
-  void clearUserPosts({bool isDisposing = false}) {
-    if (!isDisposing) {
-      _userPosts.clear(); // Trigger UI updates only if not disposing
-      userLastDoc = null;
-      userPostLoader.value = false;
-    }
-  }
+  // void clearUserPosts({bool isDisposing = false}) {
+  //   if (!isDisposing) {
+  //     _userPosts.clear(); // Trigger UI updates only if not disposing
+  //     userLastDoc = null;
+  //     userPostLoader.value = false;
+  //   }
+  // }
 
   //uncomment this one if this issues
-  // void clearUserPosts() {
-  //   _userPosts.clear();
-  //   userLastDoc = null;
-  //   userPostLoader.value = false;
-  // }
+  void clearUserPosts() {
+    _userPosts.clear();
+    userLastDoc = null;
+    userPostLoader.value = false;
+  }
 
 // /// get news feed (posts) controller
 //   Stream<List<NewsFeedModel>> getNewsFeed() {
