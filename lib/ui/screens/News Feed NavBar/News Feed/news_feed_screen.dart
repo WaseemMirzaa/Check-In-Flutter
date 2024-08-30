@@ -43,67 +43,78 @@ class _NewsFeedScreenState extends State<NewsFeedScreen> {
       ),
       body: Column(
         children: [
+          // Top Container
           Expanded(
-            child: RefreshIndicator(
-              onRefresh: controller.handleRefresh,
-              child: CustomFirestorePagination(
-                key: UniqueKey(),
-                limit: 20,
-                viewType: ViewType.list,
-                isLive: true,
-                physics: const AlwaysScrollableScrollPhysics(),
-                onEmpty: _buildEmptyState(),
-                query: controller.getNewsFeedQuery(), // Use dynamic query here
-                itemBuilder: (context, documentSnapshot, index) {
-                  final data = documentSnapshot.data() as Map<String, Object?>;
+            child: (controller.selectedOption == 1 &&
+                    controller.followingList.isEmpty)
+                ? _buildSecondTopContainer()
+                : RefreshIndicator(
+                    onRefresh: controller.handleRefresh,
+                    child: CustomFirestorePagination(
+                      key: UniqueKey(),
+                      limit: 20,
+                      viewType: ViewType.list,
+                      isLive: true,
+                      initialLoader: _buildTopContainer(),
+                      bottomLoader: Container(),
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      onEmpty:
+                          _buildEmptyState(), // Handled by the conditional check above
+                      query: controller.getNewsFeedQuery(),
+                      itemBuilder: (context, documentSnapshot, index) {
+                        final data =
+                            documentSnapshot.data() as Map<String, Object?>;
 
-                  // Debugging log to check the data
-                  print('Document data: $data');
+                        // Debugging log to check the data
+                        print('Document data: $data');
 
-                  if (index == 0) {
-                    return _buildTopContainer();
-                  }
+                        if (index == 0) {
+                          return _buildTopContainer();
+                        }
 
-                  if (index % 5 == 4) {
-                    return NavtiveAdsComp(key: ValueKey('Ad_$index'));
-                  }
+                        if (index % 5 == 4) {
+                          return NavtiveAdsComp(key: ValueKey('Ad_$index'));
+                        }
 
-                  if (controller.shouldShowPost(data)) {
-                    print("Post should be shown: ${data[NewsFeed.HIDE_USER]}");
+                        if (controller.shouldShowPost(data)) {
+                          print(
+                              "Post should be shown: ${data[NewsFeed.HIDE_USER]}");
 
-                    if (data[NewsFeed.HIDE_USER] is List) {
-                      final hideUserList = data[NewsFeed.HIDE_USER] as List;
-                      print("Hide user list: $hideUserList");
+                          if (data[NewsFeed.HIDE_USER] is List) {
+                            final hideUserList =
+                                data[NewsFeed.HIDE_USER] as List;
+                            print("Hide user list: $hideUserList");
 
-                      if (!(hideUserList
-                          .contains(userController.userModel.value.uid))) {
-                        final newsFeedModel = NewsFeedModel.fromJson(data);
-                        print("Displaying post: $newsFeedModel");
-                        print(
-                            "Post ID: ${newsFeedModel.id}, Share ID: ${newsFeedModel.shareID}, Is Original: ${newsFeedModel.isOriginal}");
+                            if (!(hideUserList.contains(
+                                userController.userModel.value.uid))) {
+                              final newsFeedModel =
+                                  NewsFeedModel.fromJson(data);
+                              print("Displaying post: $newsFeedModel");
+                              print(
+                                  "Post ID: ${newsFeedModel.id}, Share ID: ${newsFeedModel.shareID}, Is Original: ${newsFeedModel.isOriginal}");
 
-                        return newsFeedModel.isOriginal!
-                            ? ListTileContainer(
-                                key: ValueKey(newsFeedModel.id),
-                                data: newsFeedModel,
-                              )
-                            : SharedPostComp(
-                                key: ValueKey(newsFeedModel.shareID),
-                                data: newsFeedModel,
-                              );
-                      } else {
-                        print("User is hidden for this post.");
-                      }
-                    } else {
-                      print("HIDE_USER is not a List.");
-                    }
-                  } else {
-                    print("Post filtered out by shouldShowPost.");
-                  }
-                  return const SizedBox.shrink();
-                },
-              ),
-            ),
+                              return newsFeedModel.isOriginal!
+                                  ? ListTileContainer(
+                                      key: ValueKey(newsFeedModel.id),
+                                      data: newsFeedModel,
+                                    )
+                                  : SharedPostComp(
+                                      key: ValueKey(newsFeedModel.shareID),
+                                      data: newsFeedModel,
+                                    );
+                            } else {
+                              print("User is hidden for this post.");
+                            }
+                          } else {
+                            print("HIDE_USER is not a List.");
+                          }
+                        } else {
+                          print("Post filtered out by shouldShowPost.");
+                        }
+                        return const SizedBox.shrink();
+                      },
+                    ),
+                  ),
           )
         ],
       ),
@@ -148,6 +159,61 @@ class _NewsFeedScreenState extends State<NewsFeedScreen> {
     );
   }
 
+  // Builds the second top container
+  Widget _buildSecondTopContainer() {
+    var screenSize = MediaQuery.of(context).size;
+    return Stack(
+      children: [
+        // Original content
+        Column(
+          children: [
+            AnimatedContainer(
+              height: 17.5.h,
+              duration: const Duration(milliseconds: 10),
+              curve: Curves.easeInOut,
+              child: TopContainer(
+                onWriteSomethingTap: () async {
+                  final result = await Get.to(CreatePost());
+                  if (result ?? false) {
+                    setState(() {});
+                  }
+                },
+                onPhotoTap: (String? val) async {
+                  if (!val.isEmptyOrNull) {
+                    final result = await Get.to(CreatePost());
+                    if (result ?? false) {
+                      setState(() {});
+                    }
+                  }
+                },
+                onVideoTap: (String? val) async {
+                  if (!val.isEmptyOrNull) {
+                    final result = await Get.to(CreatePost());
+                    if (result ?? false) {
+                      setState(() {});
+                    }
+                  }
+                },
+              ),
+            ),
+            _buildOptionsContainer(),
+          ],
+        ),
+
+        // Centering the "No Posts Found" text
+
+        Positioned(
+          top: screenSize.height * 0.5 -
+              20, // Adjust the value to center it vertically
+          left: screenSize.width * 0.6 -
+              100, // Adjust the value to center it horizontally
+          child: Center(
+              child: poppinsText('No Posts Found', 16, medium, appBlackColor)),
+        )
+      ],
+    );
+  }
+
   // Builds the options container
   Widget _buildOptionsContainer() {
     return Padding(
@@ -160,6 +226,15 @@ class _NewsFeedScreenState extends State<NewsFeedScreen> {
           decoration: BoxDecoration(
             color: Colors.grey[200],
             borderRadius: BorderRadius.circular(10),
+            // Add drop shadow here
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.2), // Shadow color
+                spreadRadius: 1, // Spread radius
+                blurRadius: 5, // Blur radius
+                offset: Offset(0, 3), // Shadow position
+              ),
+            ],
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -207,14 +282,25 @@ class _NewsFeedScreenState extends State<NewsFeedScreen> {
     );
   }
 
-  // Builds the empty state widget
+// Builds the empty state widget
   Widget _buildEmptyState() {
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _buildTopContainer(),
-        const Center(child: Text('No data found')),
+        Expanded(
+          child: Center(
+            child: Text(
+              'No posts available',
+              style: GoogleFonts.poppins(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: greyColor,
+              ),
+            ),
+          ),
+        ),
       ],
     );
   }
