@@ -494,6 +494,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                         builder: (context) =>
                                             const FollowersAndFollowingScreen(
                                           showFollowers: true,
+                                          origin: 'ProfilePage',
                                         ),
                                       ),
                                     );
@@ -539,6 +540,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                         builder: (context) =>
                                             const FollowersAndFollowingScreen(
                                           showFollowers: false,
+                                          origin: 'ProfilePage',
                                         ),
                                       ),
                                     );

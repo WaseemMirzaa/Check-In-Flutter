@@ -1,4 +1,5 @@
 import 'package:check_in/ui/screens/%20Messages%20NavBar/other_profile/other_profile_view.dart';
+import 'package:check_in/ui/screens/profile_screen.dart';
 import 'package:check_in/utils/colors.dart';
 import 'package:check_in/utils/styles.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -9,11 +10,13 @@ import 'package:get/get.dart';
 class FollowersAndFollowingScreen extends StatelessWidget {
   final bool showFollowers; // true for followers, false for following
   final String? otherUserId; // Optional parameter for other user's ID
+  final String? origin;
 
   const FollowersAndFollowingScreen({
     Key? key,
     required this.showFollowers,
     this.otherUserId,
+    this.origin,
   }) : super(key: key);
 
   Future<List<Map<String, String>>> _getUserDetails() async {
@@ -78,7 +81,11 @@ class FollowersAndFollowingScreen extends StatelessWidget {
         centerTitle: true,
         leading: IconButton(
             onPressed: () {
-              Get.back();
+              if (origin == 'ProfilePage') {
+                Navigator.popUntil(context, (route) => route.isFirst);
+              } else {
+                Navigator.pop(context);
+              }
             },
             icon: Icon(Icons.arrow_back_ios)),
       ),
