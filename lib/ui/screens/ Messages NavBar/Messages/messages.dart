@@ -35,6 +35,12 @@ class MessageScreen extends GetView<MessageController> {
       // floatingActionButton: FloatingactionButton(
       //   ontap: () {},
       // ),
+
+        // userServices.getUserData(
+        //     snapshot.data![index].recieverId == FirebaseAuth.instance.currentUser!.uid
+        //         ? snapshot.data![index].senderId!
+        //         : snapshot.data![index].recieverId!)
+
       appBar: const MessageAppBar(),
       body: Column(
         children: [
@@ -65,73 +71,78 @@ class MessageScreen extends GetView<MessageController> {
                             var message = snapshot.data?[index];
                             if (message!.showMessageTile!) {
                               return (snapshot.data![index].isgroup == false)
-                                  ? FutureBuilder(
-                              future: userServices.getUserData(
-                                  snapshot.data![index].recieverId == FirebaseAuth.instance.currentUser!.uid ? snapshot.data![index].senderId! : snapshot.data![index].recieverId!),
-                                  builder: (context, userSnap) {
-                                if(userSnap.connectionState == ConnectionState.waiting){
-                                  return SizedBox();
-                                }else if(!userSnap.hasData){
-                                  return SizedBox();
-                                }
-                                return Obx(() {
-                                  if (snapshot.data![index].name!
-                                      .toLowerCase().contains(controller.searchQuery.toLowerCase())) {
-                                    return Padding(
-                                        padding: const EdgeInsets.symmetric(vertical: 6),
-                                        child: Slidable(
-                                          endActionPane: ActionPane(
-                                            extentRatio: 0.27,
-                                            motion: const ScrollMotion(),
-                                            children: [
-                                              SlidableAction(
-                                                onPressed: (_) {
-                                                  messageDeleteDialog(onTap: () {
-                                                    controller.deleteMessage(
-                                                        message.id!, userController.userModel.value.uid!).then((_) => Get.back());});
-                                                  },
-                                                backgroundColor: appRedColor,
-                                                foregroundColor: appWhiteColor,
-                                                borderRadius: BorderRadius.only(
-                                                    topLeft: const Radius.circular(5),
-                                                    bottomLeft: radiusCircular(5)),
-                                                icon: Icons.delete,
-                                                label: 'Delete',
+                                  ? Obx(() {
+                                if (snapshot.data![index].name!.toLowerCase().contains(controller.searchQuery.toLowerCase())) {
+
+                                  String image = '';
+                                  String name = '';
+                                  if (snapshot.data![index].recieverId == FirebaseAuth.instance.currentUser!.uid) {
+                                    image = snapshot.data![index].senderImg ?? '';
+                                    name = snapshot.data![index].senderName ?? '';
+                                  } else {
+                                    image = snapshot.data![index].recieverImg ?? '';
+                                    name = snapshot.data![index].recieverName ?? '';
+                                  }
+
+                                  final userModel = UserModel(
+                                    photoUrl: image,
+                                    userName: name
+                                  );
+
+                                  return Padding(
+                                      padding: const EdgeInsets.symmetric(vertical: 6),
+                                      child: Slidable(
+                                        endActionPane: ActionPane(
+                                          extentRatio: 0.27,
+                                          motion: const ScrollMotion(),
+                                          children: [
+                                            SlidableAction(
+                                              onPressed: (_) {
+                                                messageDeleteDialog(onTap: () {
+                                                  controller.deleteMessage(
+                                                      message.id!, userController.userModel.value.uid!).then((_) => Get.back());});
+                                              },
+                                              backgroundColor: appRedColor,
+                                              foregroundColor: appWhiteColor,
+                                              borderRadius: BorderRadius.only(
+                                                  topLeft: const Radius.circular(5),
+                                                  bottomLeft: radiusCircular(5)),
+                                              icon: Icons.delete,
+                                              label: 'Delete',
+                                            ),
+                                          ],
+                                        ),
+                                        child: MessageListTile(
+                                          message: snapshot.data![index],
+                                          ontap: () {
+                                            GlobalVariable.docId  = message.id!;
+                                            //.........................
+                                            chatcontroller.docId.value = message.id!;
+                                            chatcontroller.name.value = message.name ?? '';
+                                            chatcontroller.isgroup = message.isgroup ?? false;
+                                            //chatcontroller.image.value = userSnap.data?.photoUrl ?? '';
+                                            chatcontroller.image.value = image;
+                                            chatcontroller.memberId.value = message.memberIds ?? [];
+                                            chatcontroller.senderName.value = message.yourname ?? '';
+                                            chatcontroller.members.value = message.members ?? [];
+
+                                            //...............
+                                            // chatcontroller.updateLastSeenMethod();
+                                            pushNewScreen(
+                                              context,
+                                              screen: ChatScreen(
+                                                //image: userSnap.data?.photoUrl ?? '',
+                                                image: image,
                                               ),
-                                            ],
-                                          ),
-                                          child: MessageListTile(
-                                            message: snapshot.data![index],
-                                            ontap: () {
-                                              GlobalVariable.docId = chatcontroller.docId.value =
-                                              message.id!;
-                    //.........................
-                    chatcontroller.name.value = message.name ?? '';
-                    chatcontroller.isgroup = message.isgroup ?? false;
-                    chatcontroller.image.value = userSnap.data?.photoUrl ?? '';
-                    chatcontroller.memberId.value = message.memberIds ?? [];
-                    chatcontroller.senderName.value = message.yourname ?? '';
-                    chatcontroller.members.value = message.members ?? [];
-                    //...............
-                    // chatcontroller.updateLastSeenMethod();
-                    pushNewScreen(
-                      context,
-                      screen: ChatScreen(
-                        image: userSnap.data?.photoUrl ?? '',
-                        //   name: message.name!.obs,isGroup: message.isgroup,
-                        // image:message.image!.obs,memberId: message.memberIds!.obs,senderName: message.senderName!.obs,
-                      ),
-                    );
-                  },
-                  userModel: userSnap.data,
-                ),
-              ));
-        } else {
-          return Container();
-        }
-      });
-    }
-                              )
+                                            );
+                                          },
+                                          userModel: userModel,
+                                        ),
+                                      ));
+                                } else {
+                                  return Container();
+                                }
+                              })
                                   : Obx(() {
                                 if (snapshot.data![index].name!.toLowerCase().contains(controller.searchQuery.toLowerCase())) {
                                   return Padding(
@@ -160,8 +171,8 @@ class MessageScreen extends GetView<MessageController> {
                                         child: MessageListTile(
                                           message: snapshot.data![index],
                                           ontap: () {
-                                            GlobalVariable.docId = chatcontroller.docId.value =
-                                            message.id!;
+                                            GlobalVariable.docId  = message.id!;
+                                            chatcontroller.docId.value = message.id!;
                                             //.........................
                                             chatcontroller.name.value = message.name ?? '';
                                             chatcontroller.isgroup = message.isgroup ?? false;
@@ -169,6 +180,7 @@ class MessageScreen extends GetView<MessageController> {
                                             chatcontroller.memberId.value = message.memberIds ?? [];
                                             chatcontroller.senderName.value = message.yourname ?? '';
                                             chatcontroller.members.value = message.members ?? [];
+
                                             //...............
                                             // chatcontroller.updateLastSeenMethod();
                                             pushNewScreen(

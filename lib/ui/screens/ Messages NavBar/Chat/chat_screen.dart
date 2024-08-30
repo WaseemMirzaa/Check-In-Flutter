@@ -34,14 +34,6 @@ import 'Component/message_date_container.dart';
 import 'Component/send_message_container.dart';
 import 'Component/sticker_keyboard.dart';
 
-final chatQuery = FirebaseFirestore.instance
-    .collection(Collections.MESSAGES)
-    .withConverter<Chatmodel>(
-      fromFirestore: (snapshot, options) =>
-          Chatmodel.fromJson(snapshot.data()!),
-      toFirestore: (value, options) => value.toJson(),
-    );
-
 class ChatScreen extends StatefulWidget {
   ChatScreen({
     super.key,
@@ -78,112 +70,17 @@ class _ChatScreenState extends State<ChatScreen> {
         : null;
   }
 
-  @override
-  void dispose() {
-    controller.docId.value = '';
-    super.dispose();
-  }
-
   fetchOnlineStatus(String userId) async {
     // print('in method:$userId');
     // print(userId);
     try {
       // MessageService messageService = MessageService(); // Create an instance
-      String status = await controller.chatService
-          .getOnlineStatus(controller.docId.value); // Call the method
-      controller.chatService.updateOnlineStatus(
-          controller.docId.value, DateTime.now().toString(), userId);
-      setState(() {});
+      String status = await controller.chatService.getOnlineStatus(controller.docId.value); // Call the method
+      controller.chatService.updateOnlineStatus(controller.docId.value, DateTime.now().toString(), userId);
+      if(mounted) setState(() {});
       onlineStatus = status;
     } catch (e) {
       print('Error fetching online status: $e');
-    }
-  }
-
-  //added by asjad
-  // Future<void> fetchOnlineStatus(String userId) async {
-  //   try {
-  //     // Check if the controller's docId is empty
-  //     if (controller.docId.value.isEmpty) {
-  //       print("Controller docId is empty. Using widget.docId for update.");
-
-  //       // Use widget.docId if available
-  //       if (widget.docId != null && widget.docId!.isNotEmpty) {
-  //         // Fetch online status using widget.docId
-  //         String status =
-  //             await controller.chatService.getOnlineStatus(widget.docId!);
-  //         print("Using widget.docId: $widget.docId for fetching status.");
-
-  //         // Ensure status is handled if empty
-  //         if (status.isEmpty) {
-  //           status = "Unknown"; // Set a default value if status is empty
-  //         }
-
-  //         // Update the online status
-  //         await controller.chatService.updateOnlineStatus(
-  //             widget.docId!, DateTime.now().toString(), userId);
-
-  //         // Update the UI
-  //         setState(() {
-  //           onlineStatus = status;
-  //         });
-  //       } else {
-  //         print("No valid widget.docId available.");
-  //       }
-  //     } else {
-  //       // Fetch online status using the controller's docId
-  //       String status = await controller.chatService
-  //           .getOnlineStatus(controller.docId.value);
-
-  //       // Check if the status is empty
-  //       if (status.isEmpty) {
-  //         print("Status was empty. Using fallback widget.docId.");
-
-  //         // If status is empty, use widget.docId as a fallback
-  //         if (widget.docId != null && widget.docId!.isNotEmpty) {
-  //           status =
-  //               await controller.chatService.getOnlineStatus(widget.docId!);
-  //           print("Fallback status using widget.docId: $status");
-  //         } else {
-  //           print("No fallback docId available.");
-  //           status =
-  //               "Unknown"; // Set a default value if fallback status is empty
-  //         }
-  //       }
-
-  //       // Update the online status using controller.docId
-  //       await controller.chatService.updateOnlineStatus(
-  //           controller.docId.value, DateTime.now().toString(), userId);
-
-  //       // Update the UI
-  //       setState(() {
-  //         onlineStatus = status;
-  //       });
-  //     }
-  //   } catch (e) {
-  //     print('Error fetching online status: $e');
-  //   }
-  // }
-
-  void updateOnlineStatus(String docId, String status, String uId) async {
-    try {
-      final docRef = FirebaseFirestore.instance
-          .collection(Collections.MESSAGES)
-          .doc(docId);
-      await FirebaseFirestore.instance.runTransaction((transaction) async {
-        final snapshot = await transaction.get(docRef);
-        if (snapshot.get(MessageField.SENDER_ID) == uId) {
-          docRef.update({'senderStatus': status});
-          onlineStatus = status;
-        } else {
-          docRef.update({'receiverStatus': status});
-          onlineStatus = status;
-        }
-      });
-      print('Online status updated successfully for user $docId');
-    } catch (e) {
-      print('Error updating online status: $e');
-      // You can yield an error message or an empty string here if needed
     }
   }
 

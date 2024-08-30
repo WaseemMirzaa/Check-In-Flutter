@@ -13,7 +13,7 @@ import '../../Services/message_service.dart';
 
 class ChatController extends GetxController {
   final MessageService chatService;
-  final RxString docId = ''.obs;
+  RxString docId = ''.obs;
   RxString name = ''.obs;
   RxList memberId = [].obs;
   RxList members = [].obs;
@@ -50,13 +50,13 @@ class ChatController extends GetxController {
     var res = await chatService.getSingleMessage(docId.value, userController.userModel.value.uid!);
     Messagemodel model = res;
     if (isgroup) {
-      members.value = model.members!;
+      members.value = model.members ?? [];
     } else {
       userController.userModel.value.uid == model.senderId
-          ? otherUserId.value = model.recieverId!
-          : otherUserId.value = model.senderId!;
+          ? otherUserId.value = model.recieverId ?? ''
+          : otherUserId.value = model.senderId ?? '';
     }
-    image.value = model.image!;
+    image.value = model.image ?? '';
   }
 
 //this method is added by asjad
@@ -100,12 +100,8 @@ class ChatController extends GetxController {
 
   //............. get all conversation
   Stream<List<Chatmodel>> getConversation() async* {
-    calculateTimeDifference('GetConversation Start');
-    Timestamp? timeStamp = await chatService.getDeleteTimeStamp(
-        docId.value, userController.userModel.value.uid!);
-    calculateTimeDifference('GetConversation End');
-    yield* chatService.getConversation(
-        docId.value, userController.userModel.value.uid!, members, timeStamp);
+    Timestamp? timeStamp = await chatService.getDeleteTimeStamp(docId.value, userController.userModel.value.uid!);
+    yield* chatService.getConversation(docId.value, userController.userModel.value.uid!, members, timeStamp);
   }
 
   //............. get message request status
