@@ -1,36 +1,72 @@
-import 'package:check_in/Services/newfeed_service.dart';
-import 'package:check_in/controllers/News%20Feed/news_feed_controller.dart';
+import 'package:check_in/auth_service.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:nb_utils/nb_utils.dart';
 
-void showReportDialog(BuildContext context, String postId, String reportedBy) {
-  TextEditingController reasonController = TextEditingController();
-  NewsFeedController newsFeedController = NewsFeedController(NewsFeedService());
+class Report extends StatelessWidget {
+  const Report({
+    super.key,
+    this.postId = '',
+    required this.reportedBy,
+    required this.isProfile,
+    this.profileId = ''
+  });
 
-  showDialog(
-    context: context,
-    builder: (context) => AlertDialog(
-      title: const Text('Report Post'),
-      content: TextField(
-        controller: reasonController,
-        decoration: const InputDecoration(hintText: "Reason for reporting"),
+  final String postId;
+  final String reportedBy;
+  final bool isProfile;
+  final String profileId;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Report Content'),
+        centerTitle: true,
       ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: const Text('Cancel'),
-        ),
-        TextButton(
-          onPressed: () async {
-            String reason = reasonController.text.trim();
-            if (reason.isNotEmpty) {
-              await newsFeedController.reportPost(postId, reportedBy, reason);
-              Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Post reported successfully')));
-            }
-          },
-          child: const Text('Report'),
-        ),
-      ],
-    ),
-  );
+      body: FutureBuilder<List<String>>(
+        future: newsFeedController.getReportArray(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return const Center(child: Text('Error in fetching data'));
+          } else if (snapshot.hasData && snapshot.data != null) {
+
+            return ListView.builder(
+              itemCount: snapshot.data?.length ?? 0,
+              itemBuilder: (context, index) {
+                return InkWell(
+                  onTap: () async {
+                    if (isProfile) {
+                      final res = await newsFeedController.reportProfile(profileId, reportedBy, snapshot.data![index]);
+                      Get.back(result: res);
+                      toast('Profile reported successfully');
+                    } else {
+                      final res = await newsFeedController.reportPost(postId, reportedBy, snapshot.data![index]);
+                      Get.back(result: res);
+                      toast('Post reported successfully');
+                    }
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4),
+                    child: Card(
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Text(
+                          snapshot.data![index]
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+              },
+            );
+          } else {
+            return const Center(child: Text('Something went wrong'));
+          }
+        },
+      ),
+    );
+  }
 }

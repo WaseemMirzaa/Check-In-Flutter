@@ -29,6 +29,8 @@ import 'package:percent_indicator/percent_indicator.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
 import 'package:sizer/sizer.dart';
 
+import '../../../../auth_service.dart';
+import '../../News Feed NavBar/News Feed/Component/report_on_post_comp.dart';
 import '../../News Feed NavBar/News Feed/Component/shared_post_comp.dart';
 
 class OtherProfileView extends StatefulWidget {
@@ -239,6 +241,58 @@ class _OtherProfileViewState extends State<OtherProfileView> {
         backgroundColor: appWhiteColor,
         title: poppinsText(
             TempLanguage.profile, 20, FontWeight.bold, appBlackColor),
+        actions: [
+          PopupMenuButton<String>(
+            icon: Container(
+              padding: const EdgeInsets.all(4),
+              decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: appGreyColor1),
+              child: Icon(
+                Icons.more_horiz,
+                color: greyColor,
+              ),
+            ),
+            onSelected: (String result) async {
+              switch (result) {
+                case 'Block Profile':
+                  final res = await userController.blockProfile(widget.uid, userController.userModel.value.uid!);
+                  if (res) {
+                    toast('Profile is successfully blocked for you');
+                  } else {
+                    toast('Something went wrong. Try again later');
+                  }
+                  break;
+                case 'Profile Report':
+                  final res = await Get.to(Report(profileId: widget.uid, reportedBy: userController.userModel.value.uid!, isProfile: true,));
+                  if (res ?? false) {} else {
+                    toast('Something went wrong. Try again later');
+                  }
+                  break;
+              }
+            },
+            itemBuilder: (BuildContext context) {
+              List<PopupMenuEntry<String>> items = [
+                const PopupMenuItem<String>(
+                  value: 'Profile Report',
+                  child: ListTile(
+                    leading: Icon(Icons.report),
+                    title: Text('Profile Report'),
+                  ),
+                ),
+                const PopupMenuItem<String>(
+                  value: 'Block Profile',
+                  child: ListTile(
+                    leading: Icon(Icons.block),
+                    title: Text('Block Profile'),
+                  ),
+                ),
+              ];
+
+              return items;
+            },
+          )
+        ],
       ),
       body: SingleChildScrollView(
         controller: _scrollController,

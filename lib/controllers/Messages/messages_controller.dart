@@ -34,4 +34,8 @@ class MessageController extends GetxController {
   Future deleteMessage(String docID, String userID) async {
     await chatService.deleteMessage(docID, userID);
   }
+
+  Future<bool> blockContact(String docID, String userID) async {
+    return await chatService.blockContact(docID, userID);
+  }
 }

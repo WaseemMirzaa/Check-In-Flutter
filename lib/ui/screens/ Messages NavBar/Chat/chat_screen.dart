@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:check_in/controllers/Messages/chat_controller.dart';
+import 'package:check_in/controllers/Messages/messages_controller.dart';
 import 'package:check_in/controllers/user_controller.dart';
 import 'package:check_in/core/constant/app_assets.dart';
 import 'package:check_in/core/constant/constant.dart';
@@ -38,9 +39,11 @@ class ChatScreen extends StatefulWidget {
   ChatScreen({
     super.key,
     this.image = '',
+    this.isBlocked = false
     // this.docId,
   });
   String? image;
+  bool isBlocked;
   // final String? docId;
 
   // bool isFirstTime;
@@ -51,13 +54,17 @@ class ChatScreen extends StatefulWidget {
 
 class _ChatScreenState extends State<ChatScreen> {
   var controller = Get.find<ChatController>();
+  var messageController = Get.find<MessageController>();
   var userController = Get.find<UserController>();
   String onlineStatus = '';
+
+  bool isBlocked = false;
 
   @override
   void initState() {
     super.initState();
 
+    isBlocked = widget.isBlocked;
     controller.sendMessageCall.value = false;
     controller.getSingleMessage();
     controller.issticker.value = true;
@@ -488,6 +495,92 @@ class _ChatScreenState extends State<ChatScreen> {
                           ],
                         ),
                       );
+                    } else if (isBlocked) {
+                      if (snapshot.data?.blockId == controller.userController.userModel.value.uid) {
+                        String name = '';
+                        if (snapshot.data?.blockId == snapshot.data?.senderId) {
+                          name = snapshot.data?.senderName ?? '';
+                        } else {
+                          name = snapshot.data?.recieverName ?? '';
+                        }
+                        return Container(
+                          // height: 160,
+                          // width: 50.w,
+                          padding: const EdgeInsets.all(13),
+                          decoration: BoxDecoration(
+                            color: appWhiteColor,
+                            borderRadius: BorderRadius.circular(10),
+                            boxShadow: [
+                              BoxShadow(
+                                color: blackTranslucentColor,
+                                offset: const Offset(0, 1),
+                                blurRadius: 6,
+                              ),
+                            ],
+                          ),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: poppinsText(
+                                    " ${name} ${TempLanguage.blockedYou}",
+                                    15,
+                                    medium,
+                                    appBlackColor,
+                                    align: TextAlign.center),
+                              ),
+                            ],
+                          ),
+                        );
+                      } else {
+                        return Container(
+                          // height: 160,
+                          width: double.infinity,
+                          padding: const EdgeInsets.all(13),
+                          decoration: BoxDecoration(
+                            color: appWhiteColor,
+                            borderRadius: BorderRadius.circular(10),
+                            boxShadow: [
+                              BoxShadow(
+                                color: blackTranslucentColor,
+                                offset: const Offset(0, 1),
+                                blurRadius: 6,
+                              ),
+                            ],
+                          ),
+                          child: Column(
+                            children: [
+                              poppinsText(TempLanguage.youBlockThisAccount, 15,
+                                  medium, appBlackColor),
+                              verticalGap(10),
+                              ChatButton(
+                                width: 35.w,
+                                onTap: () async {
+                                  final res = await messageController.blockContact(
+                                      snapshot.data?.id! ?? '',
+                                      ''
+                                  );
+                                 if (res) {
+                                   setState(() {
+                                     isBlocked = false;
+                                   });
+                                 } else {
+                                   toast('Something went wrong. Try again later');
+                                 }
+                                  // controller.updateRequestStatus(
+                                  //     RequestStatusEnum.accept.name,
+                                  //     'Unblocked',
+                                  //     0);
+                                  // controller.sendNotificationMethod(
+                                  //     '', "${userController.userModel.value.userName!} unblock you");
+                                },
+                                text: "${TempLanguage.unblock} ",
+                                buttonColor: appGreenColor,
+                                textColor: appWhiteColor,
+                              )
+                            ],
+                          ),
+                        );
+                      }
                     } else {
                       return SendMessageContainer(
                         textFieldController: controller.chatfieldController,

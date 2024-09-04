@@ -208,6 +208,16 @@ class MessageService {
     }
   }
 
+  Future<bool> blockContact(String docID, String userID) async {
+    try {
+      /// id of the person that is blocked User
+      await _messagesCollection.doc(docID).update({MessageField.BLOCK_ID: userID});
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
 //.............. Delete message
   Future deleteMessage(String docID, String userID) async {
     DocumentReference docRef = _messagesCollection.doc(docID);

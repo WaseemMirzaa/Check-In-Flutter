@@ -32,6 +32,11 @@ class _NewsFeedScreenState extends State<NewsFeedScreen> {
   final NewsFeedController controller =
       Get.put(NewsFeedController(NewsFeedService()));
 
+  Future<void> _handleRefresh() async {
+    Future.delayed(const Duration(seconds: 3));
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -61,7 +66,7 @@ class _NewsFeedScreenState extends State<NewsFeedScreen> {
 
               // If not loading and following list is not empty, show the content
               return RefreshIndicator(
-                onRefresh: controller.handleRefresh,
+                onRefresh: _handleRefresh,
                 child: CustomFirestorePagination(
                   key: UniqueKey(),
                   limit: 20,
@@ -88,19 +93,23 @@ class _NewsFeedScreenState extends State<NewsFeedScreen> {
                       if (data[NewsFeed.HIDE_USER] is List) {
                         final hideUserList = data[NewsFeed.HIDE_USER] as List;
 
-                        if (!hideUserList
-                            .contains(userController.userModel.value.uid)) {
+                        if (!hideUserList.contains(userController.userModel.value.uid)) {
                           final newsFeedModel = NewsFeedModel.fromJson(data);
 
-                          return newsFeedModel.isOriginal!
-                              ? ListTileContainer(
-                                  key: ValueKey(newsFeedModel.id),
-                                  data: newsFeedModel,
-                                )
-                              : SharedPostComp(
-                                  key: ValueKey(newsFeedModel.shareID),
-                                  data: newsFeedModel,
-                                );
+                          if (userController.blockProfiles.contains(newsFeedModel.userId)
+                              || userController.blockProfiles.contains(newsFeedModel.shareUID)) {
+                            return const SizedBox.shrink();
+                          } else {
+                            return newsFeedModel.isOriginal!
+                                ? ListTileContainer(
+                              key: ValueKey(newsFeedModel.id),
+                              data: newsFeedModel,
+                            )
+                                : SharedPostComp(
+                              key: ValueKey(newsFeedModel.shareID),
+                              data: newsFeedModel,
+                            );
+                          }
                         }
                       }
                     }
@@ -178,7 +187,7 @@ class _NewsFeedScreenState extends State<NewsFeedScreen> {
               100, // Adjust the value to center it horizontally
           child: Center(
               child: isload
-                  ? const Text('')
+                  ? const Center(child: CircularProgressIndicator(),)
                   : poppinsText('No Posts Found', 16, medium, appBlackColor)),
         )
       ],
@@ -192,7 +201,7 @@ class _NewsFeedScreenState extends State<NewsFeedScreen> {
       child: Align(
         alignment: Alignment.centerLeft,
         child: Container(
-          height: 50,
+          height: 30,
           width: 200,
           decoration: BoxDecoration(
             color: Colors.grey[200],

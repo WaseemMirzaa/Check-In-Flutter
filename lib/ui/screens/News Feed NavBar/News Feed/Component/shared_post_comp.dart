@@ -39,6 +39,7 @@ import 'package:share_plus/share_plus.dart';
 import 'package:sizer/sizer.dart';
 import 'package:video_player/video_player.dart';
 
+import 'list_tile_container.dart';
 import 'report_on_post_comp.dart';
 
 
@@ -194,9 +195,20 @@ class _SharedPostCompState extends State<SharedPostComp> {
                           ),
                           onSelected: (String result) async {
                             switch (result) {
-                              case 'Hide':
+                              case 'Hide Content':
                                 newsFeedController.hidePost(
                                     widget.data!.shareID!);
+                                break;
+                              case 'Block Profile':
+                              // newsFeedController.hidePost(
+                              //     widget.data!.id!);
+                                if (widget.data != null && !widget.data!.shareUID.isEmptyOrNull) {
+                                  final res = await userController.blockProfile(widget.data!.shareUID!, userController.userModel.value.uid!);
+                                  newsFeedController.hidePost(widget.data!.shareID!);
+                                } else {
+                                  final res = await userController.blockProfile(widget.data!.userId!, userController.userModel.value.uid!);
+                                  newsFeedController.hidePost(widget.data!.shareID!);
+                                }
                                 break;
                               case 'Delete':
                                 newsFeedController.deletePost(
@@ -212,12 +224,11 @@ class _SharedPostCompState extends State<SharedPostComp> {
                                   Share.share('Check out this post: $link');
                                 }
                                 break;
-                              case 'Report':
-                                showReportDialog(
-                                    context,
-                                    widget.data!.shareID!,
-                                    userController.userModel.value.uid!
-                                );
+                              case 'Report Content':
+                                final res = await Get.to(Report(postId: widget.data!.id!, reportedBy: userController.userModel.value.uid!, isProfile: false));
+                                if (res ?? false) {
+                                  showHidePostDialog(context);
+                                }
                                 break;
                             }
                           },
@@ -227,7 +238,7 @@ class _SharedPostCompState extends State<SharedPostComp> {
                                 value: widget.data!.shareUID ==
                                     userController.userModel.value.uid
                                     ? 'Delete'
-                                    : 'Hide',
+                                    : 'Hide Content',
                                 child: ListTile(
                                   leading: Icon(widget.data!.shareUID ==
                                       userController.userModel.value.uid ? Icons
@@ -235,9 +246,19 @@ class _SharedPostCompState extends State<SharedPostComp> {
                                   title: Text(widget.data!.shareUID ==
                                       userController.userModel.value.uid
                                       ? 'Delete'
-                                      : 'Hide'),
+                                      : 'Hide Content'),
                                 ),
                               ),
+
+                              if (widget.data!.userId != userController.userModel.value.uid)
+                                const PopupMenuItem<String>(
+                                  value: 'Block Profile',
+                                  child: ListTile(
+                                    leading: Icon(Icons.block),
+                                    title: Text('Block Profile'),
+                                  ),
+                                ),
+
                               const PopupMenuItem<String>(
                                 value: 'Share',
                                 child: ListTile(
@@ -251,14 +272,15 @@ class _SharedPostCompState extends State<SharedPostComp> {
                                 userController.userModel.value.uid) {
                               items.add(
                                 const PopupMenuItem<String>(
-                                  value: 'Report',
+                                  value: 'Report Content',
                                   child: ListTile(
                                     leading: Icon(Icons.report),
-                                    title: Text('Report'),
+                                    title: Text('Report Content'),
                                   ),
                                 ),
                               );
                             }
+
 
                             return items;
                           },
@@ -747,6 +769,33 @@ class _SharedPostCompState extends State<SharedPostComp> {
         );
 
   }
+
+  void showHidePostDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Hide Post'),
+        content: const Text('Are you want to hide this post?'),
+        actions: [
+          TextButton(
+            onPressed: () {
+              //newsFeedController.hidePost(widget.data!.id!);
+              Navigator.pop(context);
+            },
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () async {
+              newsFeedController.hidePost(widget.data!.id!);
+              Navigator.pop(context);
+            },
+            child: const Text('Yes'),
+          ),
+        ],
+      ),
+    );
+  }
+
 }
 
 Widget rowComp()=>Row(

@@ -3,11 +3,12 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class ReportModel {
   String? reportId;
   String? postId;
+  String? profileId;
   String? reportedBy;
   String? reason;
   Timestamp? timestamp;
 
-  ReportModel({this.reportId, this.postId, this.reportedBy, this.reason, this.timestamp});
+  ReportModel({this.reportId, this.postId, this.reportedBy, this.reason, this.timestamp, this.profileId});
 
   factory ReportModel.fromJson(Map<String, dynamic> json) {
     return ReportModel(
@@ -15,6 +16,7 @@ class ReportModel {
       postId: json['postId'],
       reportedBy: json['reportedBy'],
       reason: json['reason'],
+      profileId: json['profileId'],
       timestamp: json['timestamp'],
     );
   }
@@ -26,6 +28,7 @@ class ReportModel {
       'reportedBy': reportedBy,
       'reason': reason,
       'timestamp': timestamp,
+      'profileId': profileId
     };
   }
 }

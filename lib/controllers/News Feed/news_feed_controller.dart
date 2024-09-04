@@ -322,9 +322,14 @@ class NewsFeedController extends GetxController {
     return newsFeedService.getNumOfComments(newsFeedId);
   }
 
-  Future<void> reportPost(
+  Future<bool> reportPost(
       String postId, String reportedBy, String reason) async {
     return newsFeedService.reportPost(postId, reportedBy, reason);
+  }
+
+  Future<bool> reportProfile(
+      String profileId, String reportedBy, String reason) async {
+    return newsFeedService.reportProfile(profileId, reportedBy, reason);
   }
 
   /// like on comments controller
@@ -547,5 +552,9 @@ class NewsFeedController extends GetxController {
         (selectedOption == 1 && followingList.contains(data['userId']));
 
     return showPost;
+  }
+
+  Future<List<String>> getReportArray() async {
+    return newsFeedService.getReportArray();
   }
 }

@@ -68,20 +68,29 @@ class MessageScreen extends GetView<MessageController> {
                       return ListView.builder(
                           itemCount: snapshot.data!.length,
                           itemBuilder: (context, index) {
-                            var message = snapshot.data?[index];
-                            if (message!.showMessageTile!) {
-                              return (snapshot.data![index].isgroup == false)
+                            var message = snapshot.data![index];
+                            if (message.showMessageTile!) {
+                              return (message.isgroup == false)
                                   ? Obx(() {
-                                if (snapshot.data![index].name!.toLowerCase().contains(controller.searchQuery.toLowerCase())) {
+                                if (message.name!.toLowerCase().contains(controller.searchQuery.toLowerCase())) {
 
                                   String image = '';
                                   String name = '';
-                                  if (snapshot.data![index].recieverId == FirebaseAuth.instance.currentUser!.uid) {
-                                    image = snapshot.data![index].senderImg ?? '';
-                                    name = snapshot.data![index].senderName ?? '';
+                                  bool isBlocked = false;
+                                  if (message.recieverId == FirebaseAuth.instance.currentUser!.uid) {
+                                    image = message.senderImg ?? '';
+                                    name = message.senderName ?? '';
                                   } else {
-                                    image = snapshot.data![index].recieverImg ?? '';
-                                    name = snapshot.data![index].recieverName ?? '';
+                                    image = message.recieverImg ?? '';
+                                    name = message.recieverName ?? '';
+                                  }
+
+                                  if (!message.blockId.isEmptyOrNull) {
+                                    if (message.blockId == FirebaseAuth.instance.currentUser!.uid) {
+                                      isBlocked = false;
+                                    } else {
+                                      isBlocked = true;
+                                    }
                                   }
 
                                   final userModel = UserModel(
@@ -92,6 +101,44 @@ class MessageScreen extends GetView<MessageController> {
                                   return Padding(
                                       padding: const EdgeInsets.symmetric(vertical: 6),
                                       child: Slidable(
+                                        startActionPane: ActionPane(
+                                          extentRatio: 0.27,
+                                          motion: const ScrollMotion(),
+                                          children: [
+                                            SlidableAction(
+                                              onPressed: (_) {
+                                                if (isBlocked) {
+                                                  unblockContact(onTap: () async {
+                                                    final res = await controller.blockContact(
+                                                        message.id!,
+                                                        ''
+                                                    );
+                                                    Get.back();
+                                                  }
+                                                  );
+                                                } else {
+                                                  blockContact(onTap: () async {
+                                                    final res = await controller.blockContact(
+                                                        message.id!,
+                                                        message.recieverId == FirebaseAuth.instance.currentUser!.uid
+                                                            ? message.senderId ?? ''
+                                                            : message.recieverId ?? ''
+                                                    );
+                                                    Get.back();
+                                                    }
+                                                  );
+                                                }
+                                              },
+                                              backgroundColor: appRedColor,
+                                              foregroundColor: appWhiteColor,
+                                              borderRadius: BorderRadius.only(
+                                                  topRight: const Radius.circular(5),
+                                                  bottomRight: radiusCircular(5)),
+                                              icon: isBlocked ? Icons.lock : Icons.lock_open,
+                                              label: isBlocked ? 'Unblock' : 'Block',
+                                            ),
+                                          ],
+                                        ),
                                         endActionPane: ActionPane(
                                           extentRatio: 0.27,
                                           motion: const ScrollMotion(),
@@ -133,6 +180,7 @@ class MessageScreen extends GetView<MessageController> {
                                               screen: ChatScreen(
                                                 //image: userSnap.data?.photoUrl ?? '',
                                                 image: image,
+                                                isBlocked: !message.blockId.isEmptyOrNull,
                                               ),
                                             );
                                           },

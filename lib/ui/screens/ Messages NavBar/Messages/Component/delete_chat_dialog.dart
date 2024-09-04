@@ -20,3 +20,42 @@ Future messageDeleteDialog({Function()? onTap}) {
     ],
   ));
 }
+
+Future blockContact({Function()? onTap}) {
+  return Get.dialog(AlertDialog(
+    title: Text(
+      'Block Chat',
+      style: TextStyle(fontWeight: FontWeight.w600, color: appBlackColor),
+    ),
+    content: Text('Are you sure you want to block chat?',
+        style: TextStyle(fontWeight: FontWeight.w400, color: appBlackColor, fontSize: 14)),
+    actions: [
+      TextButton(
+          onPressed: () {
+            Get.back();
+          },
+          child: const Text('No')),
+      TextButton(onPressed: onTap, child: const Text('Yes'))
+    ],
+  ));
+}
+
+
+Future unblockContact({Function()? onTap}) {
+  return Get.dialog(AlertDialog(
+    title: Text(
+      'Unblock Chat',
+      style: TextStyle(fontWeight: FontWeight.w600, color: appBlackColor),
+    ),
+    content: Text('Are you sure you want to unblock chat?',
+        style: TextStyle(fontWeight: FontWeight.w400, color: appBlackColor, fontSize: 14)),
+    actions: [
+      TextButton(
+          onPressed: () {
+            Get.back();
+          },
+          child: const Text('No')),
+      TextButton(onPressed: onTap, child: const Text('Yes'))
+    ],
+  ));
+}

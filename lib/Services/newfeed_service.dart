@@ -468,7 +468,7 @@ class NewsFeedService {
   }
 
   /// Hide post for me
-  Future<bool> hidePost(String docId)async{
+  Future<bool> hidePost(String docId) async {
     try{
        _newsFeedCollection.doc(docId).update({
       NewsFeed.HIDE_USER: FieldValue.arrayUnion([userController.userModel.value.uid])
@@ -480,7 +480,7 @@ class NewsFeedService {
    
   }
 
-  Future<void> reportPost(String postId, String reportedBy, String reason) async {
+  Future<bool> reportPost(String postId, String reportedBy, String reason) async {
     try {
       String reportId = firebaseRef.collection(Collections.REPORTPOSTS).doc().id;
       ReportModel report = ReportModel(
@@ -491,10 +491,26 @@ class NewsFeedService {
         timestamp: Timestamp.now(),
       );
       await firebaseRef.collection(Collections.REPORTPOSTS).doc(reportId).set(report.toJson());
+      return true;
     } catch (e) {
-      if (kDebugMode) {
-        print("Failed to report post: $e");
-      }
+      return false;
+    }
+  }
+
+  Future<bool> reportProfile(String profileId, String reportedBy, String reason) async {
+    try {
+      String reportId = firebaseRef.collection(Collections.REPORTPROFILES).doc().id;
+      ReportModel report = ReportModel(
+        reportId: reportId,
+        profileId: profileId,
+        reportedBy: reportedBy,
+        reason: reason,
+        timestamp: Timestamp.now(),
+      );
+      await firebaseRef.collection(Collections.REPORTPROFILES).doc(reportId).set(report.toJson());
+      return true;
+    } catch (e) {
+      return false;
     }
   }
 
@@ -627,5 +643,25 @@ class NewsFeedService {
 //     }
 //     return posts;
 //   }
+
+  Future<List<String>> getReportArray() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      if (prefs.containsKey('reportPosts')) {
+            return prefs.getStringList('reportPosts')!;
+          } else {
+            DocumentSnapshot documentSnapshot = await FirebaseFirestore.instance.collection('configuration').doc('report').get();
+            if (documentSnapshot.exists) {
+              List<String> reportArray = List<String>.from(documentSnapshot['report']);
+              await prefs.setStringList('reportPosts', reportArray);
+              return reportArray;
+            } else {
+              return [];
+            }
+          }
+    } catch (e) {
+      return [];
+    }
+  }
 
 }

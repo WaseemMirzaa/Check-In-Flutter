@@ -1,5 +1,7 @@
 const functions = require("firebase-functions");
 const admin = require("firebase-admin");
+const nodemailer = require("nodemailer");
+
 admin.initializeApp();
 
 const firestore = admin.firestore();
@@ -174,3 +176,61 @@ exports.createStripeCustomer = functions.https.onRequest(async (data, res) => {
   }
 });
 
+
+
+var host = "smtp.gmail.com";
+var port = 587;
+var secure = false;
+var user = "developlogix.dev@gmail.com";
+var password = 'plwvrfjgullvjtgx';
+var senderEmail = 'info@bookbuilder.com';
+
+// Configure the SMTP server (example with Gmail)
+const transporter = nodemailer.createTransport({
+  host: host,
+  port: port,
+  secure: secure, // true for 465, false for other ports
+  auth: {
+    user: user,
+    pass: password,
+  },
+});
+
+// Cloud Function to trigger on new report
+exports.sendReportEmail = functions.firestore
+    .document("reportPosts/{reportId}")
+    .onCreate((snapshot, context) => {
+        const reportData = snapshot.data();
+        const reportId = context.params.reportId;
+
+        const mailOptions = {
+            from: "developlogix.dev@gmail.com",
+            to: "shehzadraheem.sr38@gmail.com",  // Recipient email
+            subject: `New Report Received - ID: ${reportId}`,
+            text: `A new report has been filed.\n\nDetails:\nReport ID: ${reportId}\nPost ID: ${reportData.postId}\nReported By: ${reportData.reportedBy}\nReason: ${reportData.reason}\nTimestamp: ${reportData.timestamp.toDate()}`,
+        };
+
+        return transporter.sendMail(mailOptions)
+            .then(() => console.log(`Email sent for report: ${reportId}`))
+            .catch(error => console.error("Error sending email:", error));
+    });
+
+
+    // Cloud Function to trigger on new profile report
+exports.sendReportEmail = functions.firestore
+.document("reportProfiles/{reportId}")
+.onCreate((snapshot, context) => {
+    const reportData = snapshot.data();
+    const reportId = context.params.reportId;
+
+    const mailOptions = {
+        from: "developlogix.dev@gmail.com",
+        to: "shehzadraheem.sr38@gmail.com",  // Recipient email
+        subject: `New Report Received - ID: ${reportId}`,
+        text: `A new report has been filed.\n\nDetails:\nReport ID: ${reportId}\nProfile ID: ${reportData.profileId}\nReported By: ${reportData.reportedBy}\nReason: ${reportData.reason}\nTimestamp: ${reportData.timestamp.toDate()}`,
+    };
+
+    return transporter.sendMail(mailOptions)
+        .then(() => console.log(`Email sent for report: ${reportId}`))
+        .catch(error => console.error("Error sending email:", error));
+});
