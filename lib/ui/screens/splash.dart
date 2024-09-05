@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:check_in/Services/user_services.dart';
 import 'package:check_in/controllers/user_controller.dart';
 import 'package:check_in/core/constant/app_assets.dart';
@@ -7,10 +9,17 @@ import 'package:check_in/ui/screens/persistent_nav_bar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:nb_utils/nb_utils.dart';
+import ' Messages NavBar/Chat/chat_screen.dart';
+import '../../controllers/Messages/chat_controller.dart';
+import '../../model/notification_model.dart';
 import '../../utils/colors.dart';
 import 'dart:developer' as developer;
+
+import 'News Feed NavBar/open_post/open_post.dart';
 
 class Splash extends StatefulWidget {
   const Splash({super.key});
@@ -22,6 +31,7 @@ class Splash extends StatefulWidget {
 class _SplashState extends State<Splash> {
 
   UserController userController = Get.put(UserController(UserServices()));
+  final ChatController chatcontroller = Get.find<ChatController>();
 
   @override
   void initState() {
@@ -36,10 +46,36 @@ class _SplashState extends State<Splash> {
 
   _navigatetohome() async {
     await userController.getUserData();
-    await Future.delayed(const Duration(milliseconds: 1500), () {
-      Navigator.pushReplacement(
-          context, MaterialPageRoute(builder: (context) => const Home()));
-    });
+    // Get any messages which caused the application to open from
+    // a terminated state.
+    RemoteMessage? initialMessage = await FirebaseMessaging.instance.getInitialMessage();
+    if (initialMessage != null) {
+      _handleMessage(initialMessage);
+    } else {
+      await Future.delayed(const Duration(milliseconds: 1500), () {
+        Navigator.pushReplacement(
+            context, MaterialPageRoute(builder: (context) => const Home()));
+      });
+    }
+  }
+
+
+  void _handleMessage(RemoteMessage message) {
+    /// Navigate to detail
+    chatcontroller.docId.value = message.data['docId'];
+    chatcontroller.name.value = message.data['name'];
+    chatcontroller.isgroup = bool.parse(message.data['isGroup']);
+    chatcontroller.image.value = message.data['image'];
+    List<dynamic> memberIdsList = jsonDecode(message.data['memberIds']);
+    chatcontroller.memberId.value = memberIdsList;
+    
+    message.data['notificationType'] == 'newsFeed'
+        ? Get.to(() => OpenPost(postId: message.data['docId'],))
+        : Get.to(() => ChatScreen());
+
+    String notificationType = message.data['notificationType'];
+    NotificationModel notificationModel = NotificationModel();
+    notificationModel.type = notificationType;
   }
 
   @override

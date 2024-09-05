@@ -32,24 +32,18 @@ final init = Firebase.initializeApp(
 Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   print('🔴🔴🔴🔴🔴firebaseMessagingBackgroundHandler');
   await init;
-  // await Firebase.initializeApp();
   await initialize();
-  print("notification received in BACKGROUND");
-  print(message.data);
 
   if (message.data.isNotEmpty) {
-    print('message is not empty');
     String notificationType = message.data['notificationType'];
-    NotificationModel.type = notificationType;
-    NotificationModel.docId = message.data['docId'];
-    NotificationModel.name = message.data['name'];
-    NotificationModel.image = message.data['image'];
-    NotificationModel.isGroup = bool.parse(message.data['isGroup']);
-    NotificationModel.memberIds = json.decode(message.data['memberIds']);
+    NotificationModel notificationModel = NotificationModel();
+    notificationModel.type = notificationType;
+    notificationModel.docId = message.data['docId'];
+    notificationModel.name = message.data['name'];
+    notificationModel.image = message.data['image'];
+    notificationModel.isGroup = bool.parse(message.data['isGroup']);
+    notificationModel.memberIds = json.decode(message.data['memberIds']);
 
-    // int notificationBadge = getIntAsync(SharedPreferenceKey.NOTIFICATION_BADGE);
-    // await setValue(SharedPreferenceKey.NOTIFICATION_BADGE, notificationBadge++);
-    // FlutterAppBadger.updateBadgeCount(notificationBadge++);
   }
   notificationsPlugin.show(
       1,

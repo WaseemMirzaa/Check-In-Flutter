@@ -222,7 +222,7 @@ class ChatController extends GetxController {
             msg: msg,
             docId: docId.value,
             isGroup: isgroup,
-            image: image ?? '',
+            image: image ?? userController.userModel.value.photoUrl ?? '',
             name: senderName.value,
             memberIds: memberId,
             uid: element);
