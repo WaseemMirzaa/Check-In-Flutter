@@ -15,6 +15,7 @@ class UserModel {
   int? goldenCheckin;
   List? deviceTokes;
   List? blockProfiles;
+  bool? isTermsVerified;
 
   UserModel(
       {this.userName,
@@ -29,6 +30,7 @@ class UserModel {
       this.homeCourt,
       this.goldenCheckin,
       this.deviceTokes,
+        this.isTermsVerified,
       this.blockProfiles});
 
   Map<String, dynamic> toMap() {
@@ -46,6 +48,7 @@ class UserModel {
       UserKey.GOLDEN_CHECK_IN: goldenCheckin,
       UserKey.DEVICE_TOKEN: deviceTokes,
       UserKey.BLOCK_PROFILES: blockProfiles,
+      UserKey.IS_TERMS_VERIFIED: isTermsVerified
     };
   }
 
@@ -63,6 +66,7 @@ class UserModel {
         customerId: map[UserKey.CUSTOMER_ID] ?? '',
         goldenCheckin: map[UserKey.GOLDEN_CHECK_IN] ?? 0,
         deviceTokes: map[UserKey.DEVICE_TOKEN],
+        isTermsVerified: map[UserKey.IS_TERMS_VERIFIED],
         blockProfiles: map[UserKey.BLOCK_PROFILES]);
   }
 
@@ -79,6 +83,7 @@ class UserModel {
     String? homeCourt,
     int? goldenCheckin,
     String? customerId,
+    bool? isTermsVerified,
     List? blockProfiles
   }) {
     return UserModel(
@@ -93,7 +98,8 @@ class UserModel {
       homeCourt: homeCourt ?? this.homeCourt,
       goldenCheckin: goldenCheckin ?? this.goldenCheckin,
       customerId: customerId ?? this.customerId,
-      blockProfiles: blockProfiles ?? this.blockProfiles
+      blockProfiles: blockProfiles ?? this.blockProfiles,
+      isTermsVerified: isTermsVerified ?? this.isTermsVerified
     );
   }
 }

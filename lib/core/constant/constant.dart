@@ -26,6 +26,7 @@ class UserKey {
   static const DEVICE_TOKEN = "deviceToken";
   static const BLOCK_PROFILES = "blockProfiles";
   static const PARAMS = "params";
+  static const IS_TERMS_VERIFIED = "isTermsVerified";
 }
 
 class CourtKey {

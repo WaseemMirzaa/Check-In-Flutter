@@ -171,15 +171,17 @@ class NewsFeedController extends GetxController {
   bool get isLoadingMore => myPostLoader.value;
 
   void getMyPosts() {
-    newsFeedService
-        .getMyPosts(FirebaseAuth.instance.currentUser?.uid ?? '')
-        .listen((postList) {
-      if (postList.isNotEmpty) {
-        userLastDoc = postList.last['snapshot'] as DocumentSnapshot;
-      }
-      _myPosts
-          .assignAll(postList.map((e) => e['model'] as NewsFeedModel).toList());
-    });
+    if(FirebaseAuth.instance.currentUser != null) {
+      newsFeedService
+          .getMyPosts(FirebaseAuth.instance.currentUser?.uid ?? '')
+          .listen((postList) {
+        if (postList.isNotEmpty) {
+          userLastDoc = postList.last['snapshot'] as DocumentSnapshot;
+        }
+        _myPosts
+            .assignAll(postList.map((e) => e['model'] as NewsFeedModel).toList());
+      });
+    }
   }
 
   void fetchMoreMyPosts() async {
@@ -507,14 +509,16 @@ class NewsFeedController extends GetxController {
 
   // Load the list of users the current user is following
   void loadFollowingList() async {
-    isLoading.value = true; // Set loading to true
-    String currentUserId = FirebaseAuth.instance.currentUser!.uid;
+   if (FirebaseAuth.instance.currentUser != null) {
+     isLoading.value = true; // Set loading to true
+     String currentUserId = FirebaseAuth.instance.currentUser!.uid;
 
-    final FollowerAndFollowingService service = FollowerAndFollowingService();
-    followingList = await service.getFollowingList(currentUserId);
+     final FollowerAndFollowingService service = FollowerAndFollowingService();
+     followingList = await service.getFollowingList(currentUserId);
 
-    isLoading.value = false; // Set loading to true
-    update(); // Update the controller only after the list is fetched
+     isLoading.value = false; // Set loading to true
+     update();
+   } // Update the controller only after the list is fetched
   }
 
   Query getNewsFeedQuery() {

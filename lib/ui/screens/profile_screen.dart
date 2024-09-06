@@ -16,6 +16,7 @@ import 'package:check_in/ui/screens/News%20Feed%20NavBar/followers_and_following
 import 'package:check_in/ui/screens/News%20Feed%20NavBar/followers_and_following/followers_and_following.dart';
 import 'package:check_in/ui/screens/add_home_court.dart';
 import 'package:check_in/ui/screens/persistent_nav_bar.dart';
+import 'package:check_in/ui/screens/terms_conditions.dart';
 import 'package:check_in/ui/screens/unique_courts_screen.dart';
 import 'package:check_in/ui/widgets/about_section.dart';
 import 'package:check_in/utils/colors.dart';
@@ -265,6 +266,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
       followerCountController = Get.put(FollowerCountingController());
       followerCountController.setUserIdForProfile(currentUserUid);
     }
+
+    WidgetsFlutterBinding.ensureInitialized().addPostFrameCallback((timeStamp) {
+      if (FirebaseAuth.instance.currentUser != null && userController.userModel.value.isTermsVerified == null) {
+        Get.to(const TermsAndConditions(showButtons: true,));
+      }
+    });
   }
 
   sendEmail(String name, String email, String homeCourt) async {

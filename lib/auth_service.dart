@@ -46,6 +46,7 @@ Future<bool> signUp(
         UserKey.IS_VERIFIED: false,
         UserKey.CUSTOMER_ID: customerId,
         UserKey.PARAMS: FieldValue.arrayUnion(nameSearchParams),
+        UserKey.IS_TERMS_VERIFIED: true,
         //TODO: Change it to arrayUnion
         // UserKey.DEVICE_TOKEN:
         // FieldValue.arrayUnion([token])

@@ -603,6 +603,11 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
     // _checkIfWithinRadius();
     super.initState();
     // initDynamicLinks(context);
+    WidgetsFlutterBinding.ensureInitialized().addPostFrameCallback((timeStamp) {
+      if (FirebaseAuth.instance.currentUser != null && userController.userModel.value.isTermsVerified == null) {
+        Get.to(const TermsAndConditions(showButtons: true,));
+      }
+    });
   }
 
 

@@ -207,11 +207,14 @@ class _SignupViewState extends State<SignupView> {
                       children: [
                         Checkbox(
                           value: agreeToTerms,
-                          onChanged: (value) {
-                            setState(() {
-                              agreeToTerms = value ?? false;
-                              isSignUpButtonEnabled = agreeToTerms;
-                            });
+                          onChanged: (value) async {
+                            final res = await Get.to(const TermsAndConditions(fromSignup: true, showButtons: true,));
+                            if (res ?? false) {
+                              setState(() {
+                                agreeToTerms = value ?? false;
+                                isSignUpButtonEnabled = agreeToTerms;
+                              });
+                            }
                           },
                         ),
                         // Expanded(
@@ -253,11 +256,18 @@ class _SignupViewState extends State<SignupView> {
                           ),
                         ),
                         GestureDetector(
-                          onTap: () {
-                            pushNewScreen(context,
-                                screen: const TermsAndConditions(),
-                                withNavBar:
-                                    false); // Handle the action to open the Terms & Conditions screen
+                          onTap: () async {
+                            // pushNewScreen(context,
+                            //     screen: const TermsAndConditions(),
+                            //     withNavBar:
+                            //         false); // Handle the action to open the Terms & Conditions screen
+                            final res = await Get.to(const TermsAndConditions(fromSignup: true, showButtons: true,));
+                            if (res ?? false) {
+                              setState(() {
+                                agreeToTerms = true;
+                                isSignUpButtonEnabled = agreeToTerms;
+                              });
+                            }
                           },
                           child: Text(
                             TempLanguage.termsAndConditions,

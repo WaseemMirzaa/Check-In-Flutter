@@ -1,10 +1,14 @@
 import 'package:check_in/core/constant/temp_language.dart';
+import 'package:check_in/ui/screens/terms_conditions.dart';
 import 'package:check_in/utils/gaps.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 import 'package:sizer/sizer.dart';
 
+import '../../auth_service.dart';
 import '../../core/constant/constant.dart';
 import '../../utils/DateTimeUtils.dart';
 import '../../utils/colors.dart';
@@ -47,6 +51,11 @@ class _HistoryViewState extends State<HistoryView> {
     // TODO: implement initState
     // fetchData();
     super.initState();
+    WidgetsFlutterBinding.ensureInitialized().addPostFrameCallback((timeStamp) {
+      if (FirebaseAuth.instance.currentUser != null && userController.userModel.value.isTermsVerified == null) {
+        Get.to(const TermsAndConditions(showButtons: true,));
+      }
+    });
   }
 
   @override

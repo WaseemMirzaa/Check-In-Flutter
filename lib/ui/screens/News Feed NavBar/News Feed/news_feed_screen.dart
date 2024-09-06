@@ -11,6 +11,7 @@ import 'package:check_in/ui/screens/News%20Feed%20NavBar/News%20Feed/Component/t
 import 'package:check_in/ui/screens/News%20Feed%20NavBar/test_aid_comp/test_aid_comp.dart';
 import 'package:check_in/utils/colors.dart';
 import 'package:check_in/utils/styles.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -18,6 +19,7 @@ import 'package:nb_utils/nb_utils.dart';
 import 'package:sizer/sizer.dart';
 import '../../../../utils/custom/custom_firebase_pagination.dart';
 import '../../../widgets/custom_appbar.dart';
+import '../../terms_conditions.dart';
 
 class NewsFeedScreen extends StatefulWidget {
   NewsFeedScreen({super.key, this.postId = '', this.isBack = false});
@@ -35,6 +37,16 @@ class _NewsFeedScreenState extends State<NewsFeedScreen> {
   Future<void> _handleRefresh() async {
     Future.delayed(const Duration(seconds: 3));
     setState(() {});
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsFlutterBinding.ensureInitialized().addPostFrameCallback((timeStamp) {
+      if (FirebaseAuth.instance.currentUser != null && userController.userModel.value.isTermsVerified == null) {
+        Get.to(const TermsAndConditions(showButtons: true,));
+      }
+    });
   }
 
   @override
