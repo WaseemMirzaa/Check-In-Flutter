@@ -259,15 +259,10 @@ class _OtherProfileViewState extends State<OtherProfileView> {
                   final res = await userController.blockProfile(widget.uid, userController.userModel.value.uid!);
                   if (res) {
                     toast('Profile is successfully blocked for you');
-                  } else {
-                    toast('Something went wrong. Try again later');
                   }
                   break;
                 case 'Profile Report':
                   final res = await Get.to(Report(profileId: widget.uid, reportedBy: userController.userModel.value.uid!, isProfile: true,));
-                  if (res ?? false) {} else {
-                    toast('Something went wrong. Try again later');
-                  }
                   break;
               }
             },

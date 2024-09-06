@@ -41,11 +41,19 @@ class Report extends StatelessWidget {
                     if (isProfile) {
                       final res = await newsFeedController.reportProfile(profileId, reportedBy, snapshot.data![index]);
                       Get.back(result: res);
-                      toast('Profile reported successfully');
+                      if (res) {
+                        toast('Profile reported successfully');
+                      } else {
+                        toast('Error occurred');
+                      }
                     } else {
                       final res = await newsFeedController.reportPost(postId, reportedBy, snapshot.data![index]);
                       Get.back(result: res);
-                      toast('Post reported successfully');
+                      if (res) {
+                        toast('Post reported successfully');
+                      } else {
+                        toast('Error occurred');
+                      }
                     }
                   },
                   child: Padding(
