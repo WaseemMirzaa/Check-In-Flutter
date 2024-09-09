@@ -1,6 +1,7 @@
 import 'package:check_in/controllers/Messages/chat_controller.dart';
 import 'package:check_in/core/constant/app_assets.dart';
 import 'package:check_in/core/constant/temp_language.dart';
+import 'package:check_in/ui/screens/%20Messages%20NavBar/Chat/Component/report_message.dart';
 import 'package:check_in/utils/DateTimeUtils.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -8,6 +9,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:nb_utils/nb_utils.dart';
 import 'package:sizer/sizer.dart';
 
+import '../../../../../auth_service.dart';
 import '../../../../../model/Message and Group Message Model/chat_model.dart';
 import 'chat_customshape.dart';
 import '../../../../../utils/colors.dart';
@@ -21,13 +23,16 @@ class MessageDateContainer extends StatelessWidget {
   bool? mymsg;
   bool? showLastSeen;
   bool? isGroup;
+  String? docId;
   MessageDateContainer(
       {super.key,
       // this.index,
       this.chat,
       this.mymsg,
       this.showLastSeen,
-      this.isGroup});
+      this.isGroup,
+      this.docId
+      });
 
   final chatController = Get.find<ChatController>();
 
@@ -92,7 +97,9 @@ class MessageDateContainer extends StatelessWidget {
                                 ],
                               ));
                     }
-                  : null,
+                  : () {
+                showOptionDialog(context, chat);
+              },
               child: chat!.isDelete == true
                   ? Container(
                       constraints: BoxConstraints(maxWidth: 65.w),
@@ -176,31 +183,13 @@ class MessageDateContainer extends StatelessWidget {
           children: [
             poppinsText(time, 10, medium, greyColor.withOpacity(1)),
             horizontalGap(5),
-            chat!.isDelete !=true && mymsg! && chat!.isRead != true && isGroup != true ? Icon(Icons.check,size: 15,color: greyColor,) : chat!.isDelete !=true && isGroup != true && mymsg! && chat!.isRead == true ? const ImageIcon(AssetImage(AppAssets.DOUBLE_TICK),size: 15,color: greenColor) : const SizedBox(),
-
-            // mymsg!
-            //     ? poppinsText('✓', 10, medium, greyColor.withOpacity(1))
-            //     : const SizedBox(),
-            // horizontalGap(5),
-            // mymsg!
-            //     ? const CircleAvatar(
-            //         backgroundImage: NetworkImage(
-            //             'https://wac-cdn.atlassian.com/dam/jcr:ba03a215-2f45-40f5-8540-b2015223c918/Max-R_Headshot%20(1).jpg?cdnVersion=1365'),
-            //         radius: 8,
-            //       )
-            //     : const SizedBox()
+            chat!.isDelete != true && mymsg! && chat!.isRead != true && isGroup != true
+                ? Icon(Icons.check,size: 15,color: greyColor,)
+                : chat!.isDelete !=true && isGroup != true && mymsg! && chat!.isRead == true
+                ? const ImageIcon(AssetImage(AppAssets.DOUBLE_TICK),size: 15,color: greenColor)
+                : const SizedBox(),
           ],
         ),
-        // chat!.seenTimeStamp != '' && showLastSeen == true && isGroup == false
-        //     ? Container(
-        //         padding: const EdgeInsets.all(5),
-        //         decoration: BoxDecoration(
-        //           border: Border.all(),
-        //           borderRadius: BorderRadius.circular(15),
-        //         ),
-        //         child: poppinsText("Seen $seenTime", 9, medium, greyColor),
-        //       )
-        //     : const SizedBox()
       ],
     );
   }
@@ -231,4 +220,41 @@ class MessageDateContainer extends StatelessWidget {
         (codePoint >= 0x2600 && codePoint <= 0x26FF) ||
         (codePoint >= 0x2700 && codePoint <= 0x27BF);
   }
+
+  void showOptionDialog(BuildContext context, Chatmodel? chat) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Select an Option'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                ListTile(
+                  leading: const Icon(Icons.report),
+                  title: const Text('Report Message'),
+                  onTap: () {
+                    Navigator.pop(context);
+                    Get.to(ReportMessage(docId: docId ?? '', messageId: chat?.docID ?? '', reportedBy: userController.userModel.value.uid!));
+                  },
+                ),
+                ListTile(
+                  leading: const Icon(Icons.visibility_off),
+                  title: const Text('Hide Message'),
+                  onTap: () async {
+                    Navigator.pop(context);
+                    final res = await chatController.hideMessage(docId ?? '', chat?.docID ?? '', userController.userModel.value.uid!);
+                    if (!res) {
+                      toast('Error occurred');
+                    }
+                  },
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
 }

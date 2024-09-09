@@ -193,6 +193,13 @@ class _ChatScreenState extends State<ChatScreen> {
                       ? true
                       : false;
 
+                  var hiddenBy = List<String>.from(chat.hiddenBy ?? []);
+
+                  // If current user has hidden the message, don't display it
+                  if (hiddenBy.contains(userController.userModel.value.uid)) {
+                    return const SizedBox.shrink();
+                  }
+
                   return Padding(
                     padding: EdgeInsets.only(
                       left: mymsg ? 0 : 14,
@@ -228,11 +235,12 @@ class _ChatScreenState extends State<ChatScreen> {
                                 chat: chat,
                                 mymsg: mymsg,
                                 // showLastSeen: showLastSeen,
-
+                                docId: controller.docId.value,
                                 isGroup: controller.isgroup)
                             : ImageDateContainer(
                                 chat: chat,
                                 mymsg: mymsg,
+                                docId: controller.docId.value,
                                 isGroup: controller.isgroup
                                 // showLastSeen: showLastSeen,
                                 )

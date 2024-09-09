@@ -206,8 +206,8 @@ exports.sendReportEmail = functions.firestore
         const mailOptions = {
             from: "developlogix.dev@gmail.com",
             to: "shehzadraheem.sr38@gmail.com",  // Recipient email
-            subject: `New Report Received - ID: ${reportId}`,
-            text: `A new report has been filed.\n\nDetails:\nReport ID: ${reportId}\nPost ID: ${reportData.postId}\nReported By: ${reportData.reportedBy}\nReason: ${reportData.reason}\nTimestamp: ${reportData.timestamp.toDate()}`,
+            subject: `New Post Report Received - ID: ${reportId}`,
+            text: `A new post report has been filed.\n\nDetails:\nReport ID: ${reportId}\nPost ID: ${reportData.postId}\nReported By: ${reportData.reportedBy}\nReason: ${reportData.reason}\nTimestamp: ${reportData.timestamp.toDate()}`,
         };
 
         return transporter.sendMail(mailOptions)
@@ -226,11 +226,31 @@ exports.sendReportEmail = functions.firestore
     const mailOptions = {
         from: "developlogix.dev@gmail.com",
         to: "shehzadraheem.sr38@gmail.com",  // Recipient email
-        subject: `New Report Received - ID: ${reportId}`,
-        text: `A new report has been filed.\n\nDetails:\nReport ID: ${reportId}\nProfile ID: ${reportData.profileId}\nReported By: ${reportData.reportedBy}\nReason: ${reportData.reason}\nTimestamp: ${reportData.timestamp.toDate()}`,
+        subject: `New Profile Report Received - ID: ${reportId}`,
+        text: `A new profile report has been filed.\n\nDetails:\nReport ID: ${reportId}\nProfile ID: ${reportData.profileId}\nReported By: ${reportData.reportedBy}\nReason: ${reportData.reason}\nTimestamp: ${reportData.timestamp.toDate()}`,
     };
 
     return transporter.sendMail(mailOptions)
         .then(() => console.log(`Email sent for report: ${reportId}`))
         .catch(error => console.error("Error sending email:", error));
 });
+
+
+    // Cloud Function to trigger on new profile report
+    exports.sendReportEmail = functions.firestore
+    .document("reportMessage/{reportId}")
+    .onCreate((snapshot, context) => {
+        const reportData = snapshot.data();
+        const reportId = context.params.reportId;
+    
+        const mailOptions = {
+            from: "developlogix.dev@gmail.com",
+            to: "shehzadraheem.sr38@gmail.com",  // Recipient email
+            subject: `New Message Report Received - ID: ${reportId}`,
+            text: `A new message report has been filed.\n\nDetails:\nReport ID: ${reportId}\nChat ID: ${reportData.docId}\nMessage ID: ${reportData.messageId}\nReported By: ${reportData.reportedBy}\nReason: ${reportData.reason}\nTimestamp: ${reportData.timestamp.toDate()}`,
+        };
+    
+        return transporter.sendMail(mailOptions)
+            .then(() => console.log(`Email sent for report: ${reportId}`))
+            .catch(error => console.error("Error sending email:", error));
+    });

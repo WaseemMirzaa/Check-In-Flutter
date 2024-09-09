@@ -6,9 +6,20 @@ class ReportModel {
   String? profileId;
   String? reportedBy;
   String? reason;
+  String? docId;
+  String? messageId;
   Timestamp? timestamp;
 
-  ReportModel({this.reportId, this.postId, this.reportedBy, this.reason, this.timestamp, this.profileId});
+  ReportModel({
+    this.reportId,
+    this.postId,
+    this.reportedBy,
+    this.reason,
+    this.timestamp,
+    this.profileId,
+    this.docId,
+    this.messageId
+  });
 
   factory ReportModel.fromJson(Map<String, dynamic> json) {
     return ReportModel(
@@ -18,6 +29,8 @@ class ReportModel {
       reason: json['reason'],
       profileId: json['profileId'],
       timestamp: json['timestamp'],
+      docId: json['docId'],
+      messageId: json['messageId']
     );
   }
 
@@ -28,7 +41,9 @@ class ReportModel {
       'reportedBy': reportedBy,
       'reason': reason,
       'timestamp': timestamp,
-      'profileId': profileId
+      'profileId': profileId,
+      'messageId': messageId,
+      'docId': docId
     };
   }
 }

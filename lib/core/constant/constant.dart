@@ -7,6 +7,7 @@ class Collections {
   static const String COMMENTS = 'comments';
   static const String REPORTPOSTS = 'reportPosts';
   static const String REPORTPROFILES = 'reportProfiles';
+  static const String REPORT_MESSAGE = 'reportMessage';
 
   ///
 }

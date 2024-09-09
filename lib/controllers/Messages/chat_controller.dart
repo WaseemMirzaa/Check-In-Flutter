@@ -41,9 +41,6 @@ class ChatController extends GetxController {
     chatFieldFocusNode = FocusNode();
   }
 
-  // Future<void> updateLastSeenMethod() async {
-  //   chatService.updateLastSeen(docId.value, userController.userModel.value.uid!);
-  // }
 
   //............. get message with docID
   Future<void> getSingleMessage() async {
@@ -59,46 +56,6 @@ class ChatController extends GetxController {
     image.value = model.image ?? '';
   }
 
-//this method is added by asjad
-  // Future<void> getSingleMessage(String? docID) async {
-  //   try {
-  //     // Use docID if provided, otherwise fallback to docId.value
-  //     final currentDocId = docID ?? docId.value;
-
-  //     if (currentDocId.isEmpty) {
-  //       print("Document ID is empty. Cannot fetch message.");
-  //       return;
-  //     }
-
-  //     final userId = userController.userModel.value.uid;
-  //     if (userId == null || userId.isEmpty) {
-  //       print("User ID is null or empty. Cannot fetch message.");
-  //       return;
-  //     }
-
-  //     // Fetch the message
-  //     var res = await chatService.getSingleMessage(currentDocId, userId);
-
-  //     Messagemodel model = res;
-
-  //     // Update members or other user IDs based on whether it's a group message
-  //     if (isgroup) {
-  //       members.value = model.members ?? [];
-  //     } else {
-  //       otherUserId.value =
-  //           (userController.userModel.value.uid == model.senderId)
-  //               ? model.recieverId ?? ""
-  //               : model.senderId ?? "";
-  //     }
-
-  //     // Update image URL
-  //     image.value = model.image ?? "";
-  //   } catch (e) {
-  //     print('Error fetching single message: $e');
-  //   }
-  // }
-
-  //............. get all conversation
   Stream<List<Chatmodel>> getConversation() async* {
     Timestamp? timeStamp = await chatService.getDeleteTimeStamp(docId.value, userController.userModel.value.uid!);
     yield* chatService.getConversation(docId.value, userController.userModel.value.uid!, members, timeStamp);
@@ -174,10 +131,6 @@ class ChatController extends GetxController {
     return await chatService.deleteChatAndUpdateModel(messageDoc, docID);
   }
 
-  //.........Receipts chat
-  // Future<bool> readReceipts(String messageDoc, String uid) async {
-  //   return await chatService.readReceipts(messageDoc, uid);
-  // }
 
 //........... Compress images
   Future<void> compressImage() async {
@@ -228,6 +181,15 @@ class ChatController extends GetxController {
             uid: element);
       }
     }
+  }
+
+
+  Future<bool> reportMessage(String docId, String messageId, String reportedBy, String reason) async {
+    return chatService.reportMessage(docId, messageId, reportedBy, reason);
+  }
+
+  Future<bool> hideMessage(String docId, String messageId, String userId) async {
+    return chatService.hideMessage(docId, messageId, userId);
   }
 
   @override

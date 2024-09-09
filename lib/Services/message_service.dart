@@ -18,6 +18,7 @@ import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import '../firebase_options.dart';
 import '../model/Message and Group Message Model/message_model.dart';
+import '../model/NewsFeed Model/report_posts_model.dart';
 
 // List<dynamic> mem = [];
 
@@ -847,6 +848,40 @@ class MessageService {
       );
     } catch (e) {
       print(e);
+    }
+  }
+
+  Future<bool> reportMessage(String docId, String messageId, String reportedBy, String reason) async {
+    try {
+      String reportId = FirebaseFirestore.instance.collection(Collections.REPORT_MESSAGE).doc().id;
+      ReportModel report = ReportModel(
+        reportId: reportId,
+        docId: docId,
+        messageId: messageId,
+        reportedBy: reportedBy,
+        reason: reason,
+        timestamp: Timestamp.now(),
+      );
+      await FirebaseFirestore.instance.collection(Collections.REPORT_MESSAGE).doc(reportId).set(report.toJson());
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  Future<bool> hideMessage(String docId, String messageId, String userId) async {
+    try {
+      await FirebaseFirestore.instance
+          .collection(Collections.MESSAGES)
+          .doc(docId)
+          .collection(Collections.CHAT)
+          .doc(messageId)
+          .update({
+        'hiddenBy': FieldValue.arrayUnion([userId])
+      });
+      return true;
+    } catch (e) {
+      return false;
     }
   }
 }

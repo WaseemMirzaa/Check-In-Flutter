@@ -9,12 +9,24 @@ class Chatmodel {
   bool? isRead;
   String? message;
   String? type;
+  List? hiddenBy;
   //String? time;
   Timestamp? time;
   String? thumbnail;
   //String? seenTimeStamp;
   Timestamp? seenTimeStamp;
-  Chatmodel({this.message, this.id, this.docID,this.isDelete,this.isRead, this.time, this.type, this.thumbnail, this.seenTimeStamp});
+  Chatmodel({
+    this.message,
+    this.id,
+    this.docID,
+    this.isDelete,
+    this.isRead,
+    this.time,
+    this.type,
+    this.thumbnail,
+    this.seenTimeStamp,
+    this.hiddenBy
+  });
 
   factory Chatmodel.fromJson(Map<String, dynamic> json, {String? docID}) {
     return Chatmodel(
@@ -25,6 +37,7 @@ class Chatmodel {
         message: json['message'],
         time: json['timeStamp'] is !Timestamp ? convertDateToTimeStamp(json['timeStamp']) : json['timeStamp'],
         type: json['type'],
+        hiddenBy: json['hiddenBy'],
         seenTimeStamp: json['seenTimeStamp'] == null ? null : json['seenTimeStamp'] is !Timestamp ? convertDateToTimeStamp(json['seenTimeStamp']) : json['seenTimeStamp'],
         thumbnail: json['thumbnail']);
   }
@@ -38,6 +51,7 @@ class Chatmodel {
     data['type'] = type;
     data['seenTimeStamp'] = seenTimeStamp;
     data['thumbnail'] = thumbnail;
+    data['hiddenBy'] = hiddenBy;
 
     return data;
   }
