@@ -13,6 +13,7 @@ import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
 import 'package:sizer/sizer.dart';
 import 'package:app_tracking_transparency/app_tracking_transparency.dart';
 
+import '../../tracking_status_service.dart';
 import '../../utils/colors.dart';
 
 class StartView extends StatefulWidget {
@@ -32,18 +33,18 @@ class _StartViewState extends State<StartView> {
     // It is safer to call native code using addPostFrameCallback after the widget has been fully built and initialized.
     // Directly calling native code from initState may result in errors due to the widget tree not being fully built at that point.
     WidgetsFlutterBinding.ensureInitialized()
-        .addPostFrameCallback((_) => initPlugin());
+        .addPostFrameCallback((_) => initTracking());
   }
 
   // Platform messages are asynchronous, so we initialize in an async method.
-  Future<void> initPlugin() async {
+  Future<void> initTracking() async {
     final TrackingStatus status =
         await AppTrackingTransparency.trackingAuthorizationStatus;
     setState(() => _authStatus = '$status');
     // If the system can show an authorization request dialog
     if (status == TrackingStatus.notDetermined) {
       // Show a custom explainer dialog before the system dialog
-      await showCustomTrackingDialog(context);
+      await TrackingStatusService.showCustomTrackingDialog(context);
       // Wait for dialog popping animation
       await Future.delayed(const Duration(milliseconds: 200));
       // Request system's tracking authorization dialog
@@ -55,23 +56,6 @@ class _StartViewState extends State<StartView> {
     final uuid = await AppTrackingTransparency.getAdvertisingIdentifier();
     print("UUID: $uuid");
   }
-
-  Future<void> showCustomTrackingDialog(BuildContext context) async =>
-      await showDialog<void>(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: Text(TempLanguage.dearUser),
-          content: Text(
-           TempLanguage.alertContentText,
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text(TempLanguage.continueButton),
-            ),
-          ],
-        ),
-      );
 
   @override
   Widget build(BuildContext context) {

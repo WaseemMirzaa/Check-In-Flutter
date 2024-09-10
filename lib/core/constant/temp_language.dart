@@ -69,9 +69,9 @@ class TempLanguage {
 
   static String get dearUser => "Dear User";
   static String get alertContentText =>
-      'We care about your privacy and data security. We use your email to maintain your profile inside our catalog database. '
-      'Additionally, we use your location to provide you with the nearest basketball courts in your area. '
-      'Can we continue to use your data to provide you with the best user experience? \n\nYou can change this decision anytime in the apps settings. ';
+      'We care about your privacy and data security. We use your email to maintain your profile in our catalog database. Additionally, we use your location to provide you with the nearest basketball courts in your area.'
+          '\nTo enhance your experience, this app also collects tracking data to deliver personalized ads that are more relevant to you.'
+          '\nCan we continue to use your data to provide you with the best user experience? You can change this decision anytime in the app’s settings.';
   static String get newsFeed => "News Feed";
   static String get myPosts => "My Posts";
   static String get checkOutHot => "Check out what's Hot";
@@ -79,7 +79,7 @@ class TempLanguage {
   static String get noMessageFound => "No messages found.";
   static String get noPostFound => "No posts found.";
   static String get typeSomething => "Type something";
-  static String get noRecent => "No Recents";
+  static String get noRecent => "No Recent";
   static String get noConversation => "No Conversation.";
   static String get groupDetail => "Group Details";
   static String get aboutGroup => "About Group";
