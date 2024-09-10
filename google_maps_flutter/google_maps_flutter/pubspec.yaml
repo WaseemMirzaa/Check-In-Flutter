@@ -20,11 +20,11 @@ dependencies:
   flutter:
     sdk: flutter
   google_maps_flutter_android:
-    path: D:/StudioProjects/Check-In-Flutter/google_maps_flutter/google_maps_flutter_android
+    path: /Users/macuser/sabir_dev/check_in_hoops/google_maps_flutter/google_maps_flutter_android
   google_maps_flutter_ios:
-    path: D:/StudioProjects/Check-In-Flutter/google_maps_flutter/google_maps_flutter_ios
+    path: /Users/macuser/sabir_dev/check_in_hoops/google_maps_flutter/google_maps_flutter_ios
   google_maps_flutter_platform_interface:
-    path: D:/StudioProjects/Check-In-Flutter/google_maps_flutter/google_maps_flutter_platform_interface
+    path: /Users/macuser/sabir_dev/check_in_hoops/google_maps_flutter/google_maps_flutter_platform_interface
 
 
 dev_dependencies:

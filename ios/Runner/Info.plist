@@ -29,15 +29,15 @@
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSCameraUsageDescription</key>
-	<string>To capture profile photo please grant camera access</string>
+	<string>We need camera access so you can send photos, post newsfeeds and upload your profile pictures.</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
 	<string>This app needs access to your location to provide location-based services and find nearby basketball courts</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>Your location is required to show courts</string>
+	<string>Your location is required to show you the nearby basketball courts</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>This app requires access to your photo library to upload images for user profile</string>
+	<string>We need camera access so you can send photos, post newsfeeds and upload your profile pictures.</string>
 	<key>NSUserTrackingUsageDescription</key>
-	<string>This app will use your email to maintain your profile and location will be used to show relevant courts in your area.</string>
+	<string>This app collects tracking data to deliver personalized ads that are more relevant to you, enhancing your overall experience.</string>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	<key>UIBackgroundModes</key>
