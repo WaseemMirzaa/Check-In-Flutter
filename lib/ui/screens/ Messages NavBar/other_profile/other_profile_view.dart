@@ -407,6 +407,8 @@ class _OtherProfileViewState extends State<OtherProfileView> {
                                         FollowersAndFollowingScreen(
                                       otherUserId: widget.uid,
                                       showFollowers: true,
+                                          count: followerCountController
+                                              .followersCount.value.toString(),
                                     ),
                                   ),
                                 );
@@ -428,16 +430,16 @@ class _OtherProfileViewState extends State<OtherProfileView> {
                                 ],
                               ),
                             ),
-                            SizedBox(width: 20),
+                            const SizedBox(width: 20),
                             Container(
                               height: 38,
-                              child: VerticalDivider(
+                              child: const VerticalDivider(
                                 width: 20,
                                 thickness: 2,
                                 color: Colors.grey,
                               ),
                             ),
-                            SizedBox(width: 20),
+                            const SizedBox(width: 20),
                             GestureDetector(
                               onTap: () {
                                 Navigator.push(
@@ -447,6 +449,9 @@ class _OtherProfileViewState extends State<OtherProfileView> {
                                         FollowersAndFollowingScreen(
                                       otherUserId: widget.uid,
                                       showFollowers: false,
+                                          count: followerCountController
+                                              .followingCount.value
+                                              .toString(),
                                     ),
                                   ),
                                 );

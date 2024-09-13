@@ -499,8 +499,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                       context,
                                       MaterialPageRoute(
                                         builder: (context) =>
-                                            const FollowersAndFollowingScreen(
+                                            FollowersAndFollowingScreen(
                                           showFollowers: true,
+                                              count: followerCountController
+                                                  .profileFollowersCount.value
+                                                  .toString(),
                                         ),
                                       ),
                                     );
@@ -544,8 +547,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                       context,
                                       MaterialPageRoute(
                                         builder: (context) =>
-                                            const FollowersAndFollowingScreen(
+                                            FollowersAndFollowingScreen(
                                           showFollowers: false,
+                                              count: followerCountController
+                                                  .profileFollowingCount.value
+                                                  .toString(),
                                         ),
                                       ),
                                     );

@@ -1,5 +1,6 @@
 import 'package:check_in/ui/screens/%20Messages%20NavBar/other_profile/other_profile_view.dart';
 import 'package:check_in/utils/colors.dart';
+import 'package:check_in/utils/common.dart';
 import 'package:check_in/utils/styles.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -9,11 +10,13 @@ import 'package:get/get.dart';
 class FollowersAndFollowingScreen extends StatefulWidget {
   final bool showFollowers; // true for followers, false for following
   final String? otherUserId; // Optional parameter for other user's ID
+  final String count;
 
   const FollowersAndFollowingScreen({
     Key? key,
     required this.showFollowers,
     this.otherUserId,
+    required this.count,
   }) : super(key: key);
 
   @override
@@ -28,13 +31,11 @@ class _FollowersAndFollowingScreenState
   bool hasMoreData = true;
   DocumentSnapshot? lastDocument; // To keep track of the last document
   final ScrollController _scrollController = ScrollController();
-  int totalCount = 0;
   int FETCH_LIMIT = 15;
 
   @override
   void initState() {
     super.initState();
-    _getTotalCount(); // Fetch total count first
     _getUserDetails(); // Fetch initial data
 
     // Add scroll listener to load more data when scrolled to bottom
@@ -47,23 +48,6 @@ class _FollowersAndFollowingScreenState
     });
   }
 
-  // Method to get the total count of followers or following
-  Future<void> _getTotalCount() async {
-    String currentUserId =
-        widget.otherUserId ?? FirebaseAuth.instance.currentUser!.uid;
-    String collection = widget.showFollowers ? 'followers' : 'following';
-
-    // Get the total count of documents in the collection
-    QuerySnapshot countSnapshot = await FirebaseFirestore.instance
-        .collection(collection)
-        .doc(currentUserId)
-        .collection(collection)
-        .get();
-
-    setState(() {
-      totalCount = countSnapshot.docs.length; // Total count of documents
-    });
-  }
 
   @override
   void dispose() {
@@ -106,27 +90,27 @@ class _FollowersAndFollowingScreenState
     if (querySnapshot.docs.isNotEmpty) {
       lastDocument = querySnapshot.docs.last; // Save last document for pagination
 
-      for (var doc in querySnapshot.docs) {
-        String userId = doc.id;
-        DocumentSnapshot userDoc = await FirebaseFirestore.instance
-            .collection('USER')
-            .doc(userId)
-            .get();
+      // Fetch all user IDs in one call
+      List<String> userIds = querySnapshot.docs.map((doc) => doc.id).toList();
 
-        if (userDoc.exists) {
-          Map<String, dynamic>? userData =
-          userDoc.data() as Map<String, dynamic>?;
-          if (userData != null) {
-            String userName = userData['user name'] ?? 'Unknown User';
-            String photoUrl = userData['photoUrl'] ?? '';
-            userDetails.add({
-              'user name': userName,
-              'photoUrl': photoUrl,
-              'uid': userId // Add UID here
-            });
-          }
-        }
-      }
+      // Fetch all user details in one query using Firestore 'in' query
+      QuerySnapshot userDocsSnapshot = await FirebaseFirestore.instance
+          .collection('USER')
+          .where(FieldPath.documentId, whereIn: userIds)
+          .get();
+
+      // Add user details to the list
+      userDetails.addAll(
+        userDocsSnapshot.docs.map((userDoc) {
+          Map<String, dynamic>? userData = userDoc.data() as Map<String, dynamic>?;
+          return {
+            'user name': (userData?['user name'] ?? 'Unknown User').toString(),
+            'photoUrl': (userData?['photoUrl'] ?? '').toString(),
+            'uid': userDoc.id.toString(),
+          };
+        }).toList(),
+      );
+
     }
 
     setState(() {
@@ -160,7 +144,7 @@ class _FollowersAndFollowingScreenState
             padding: const EdgeInsets.only(
                 bottom: 16, top: 16, left: 30), // Add some padding around heading
             child: poppinsText(
-              '${totalCount} ${widget.showFollowers ? 'Followers' : 'Following'}',
+              '${widget.count} ${widget.showFollowers ? 'Followers' : 'Following'}',
               15,
               bold,
               Colors.green,
