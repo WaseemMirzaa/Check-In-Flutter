@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
 
-class FollowersAndFollowingScreen extends StatelessWidget {
+class FollowersAndFollowingScreen extends StatefulWidget {
   final bool showFollowers; // true for followers, false for following
   final String? otherUserId; // Optional parameter for other user's ID
 
@@ -16,41 +16,106 @@ class FollowersAndFollowingScreen extends StatelessWidget {
     this.otherUserId,
   }) : super(key: key);
 
-  Future<List<Map<String, String>>> _getUserDetails() async {
-    // Use provided user ID or current user's ID if not provided
-    String currentUserId =
-        otherUserId ?? FirebaseAuth.instance.currentUser!.uid;
-    String collection = showFollowers ? 'followers' : 'following';
+  @override
+  _FollowersAndFollowingScreenState createState() =>
+      _FollowersAndFollowingScreenState();
+}
 
-    // Get the document containing the list of user IDs
-    DocumentSnapshot doc = await FirebaseFirestore.instance
+class _FollowersAndFollowingScreenState
+    extends State<FollowersAndFollowingScreen> {
+  List<Map<String, String>> userDetails = [];
+  bool isLoading = false;
+  bool hasMoreData = true;
+  DocumentSnapshot? lastDocument; // To keep track of the last document
+  final ScrollController _scrollController = ScrollController();
+  int totalCount = 0;
+  int FETCH_LIMIT = 15;
+
+  @override
+  void initState() {
+    super.initState();
+    _getTotalCount(); // Fetch total count first
+    _getUserDetails(); // Fetch initial data
+
+    // Add scroll listener to load more data when scrolled to bottom
+    _scrollController.addListener(() {
+      if (_scrollController.position.pixels ==
+          _scrollController.position.maxScrollExtent &&
+          hasMoreData && !isLoading) {
+        _getUserDetails();
+      }
+    });
+  }
+
+  // Method to get the total count of followers or following
+  Future<void> _getTotalCount() async {
+    String currentUserId =
+        widget.otherUserId ?? FirebaseAuth.instance.currentUser!.uid;
+    String collection = widget.showFollowers ? 'followers' : 'following';
+
+    // Get the total count of documents in the collection
+    QuerySnapshot countSnapshot = await FirebaseFirestore.instance
         .collection(collection)
         .doc(currentUserId)
+        .collection(collection)
         .get();
 
-    // Check if the document exists
-    if (!doc.exists) {
-      return [];
+    setState(() {
+      totalCount = countSnapshot.docs.length; // Total count of documents
+    });
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _getUserDetails() async {
+    if (isLoading) return;
+
+    setState(() {
+      isLoading = true;
+    });
+
+    String currentUserId =
+        widget.otherUserId ?? FirebaseAuth.instance.currentUser!.uid;
+    String collection = widget.showFollowers ? 'followers' : 'following';
+
+    // Access the appropriate subcollection
+    CollectionReference userSubCollection = FirebaseFirestore.instance
+        .collection(collection)
+        .doc(currentUserId)
+        .collection(collection);
+
+    // Add pagination: limit to FETCH_LIMIT documents at a time
+    Query query = userSubCollection.limit(FETCH_LIMIT);
+    if (lastDocument != null) {
+      query = query.startAfterDocument(lastDocument!); // Continue after last fetched doc
     }
 
-    // Safely cast the document data to a Map<String, dynamic>
-    Map<String, dynamic>? data = doc.data() as Map<String, dynamic>?;
+    QuerySnapshot querySnapshot = await query.get();
 
-    // Check if data is not null and contains the required key
-    if (data != null) {
-      List<dynamic> userIds =
-          data[showFollowers ? 'followers' : 'following'] ?? [];
+    if (querySnapshot.docs.isEmpty || querySnapshot.docs.length < FETCH_LIMIT) {
+      // If no more data or fewer than FETCH_LIMIT docs are returned, stop loading more
+      setState(() {
+        hasMoreData = false; // No more data to load
+      });
+    }
 
-      // Fetch user details for all user IDs
-      List<Map<String, String>> userDetails = [];
-      for (String userId in userIds.cast<String>()) {
+    if (querySnapshot.docs.isNotEmpty) {
+      lastDocument = querySnapshot.docs.last; // Save last document for pagination
+
+      for (var doc in querySnapshot.docs) {
+        String userId = doc.id;
         DocumentSnapshot userDoc = await FirebaseFirestore.instance
             .collection('USER')
             .doc(userId)
             .get();
+
         if (userDoc.exists) {
           Map<String, dynamic>? userData =
-              userDoc.data() as Map<String, dynamic>?;
+          userDoc.data() as Map<String, dynamic>?;
           if (userData != null) {
             String userName = userData['user name'] ?? 'Unknown User';
             String photoUrl = userData['photoUrl'] ?? '';
@@ -62,102 +127,102 @@ class FollowersAndFollowingScreen extends StatelessWidget {
           }
         }
       }
-      return userDetails;
-    } else {
-      return [];
     }
+
+    setState(() {
+      isLoading = false;
+    });
   }
+
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: poppinsText(
-            showFollowers ? 'Followers' : 'Following', 20, bold, appBlackColor),
+            widget.showFollowers ? 'Followers' : 'Following',
+            20,
+            bold,
+            appBlackColor),
         automaticallyImplyLeading: false,
         centerTitle: true,
         leading: IconButton(
-            onPressed: () {
-              Get.back();
-            },
-            icon: Icon(Icons.arrow_back_ios)),
+          onPressed: () {
+            Get.back();
+          },
+          icon: Icon(Icons.arrow_back_ios),
+        ),
       ),
-      body: FutureBuilder<List<Map<String, String>>>(
-        future: _getUserDetails(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
-          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return Center(
-                child: Text(
-                    'No ${showFollowers ? 'Followers' : 'Following'} found.'));
-          }
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(
+                bottom: 16, top: 16, left: 30), // Add some padding around heading
+            child: poppinsText(
+              '${totalCount} ${widget.showFollowers ? 'Followers' : 'Following'}',
+              15,
+              bold,
+              Colors.green,
+            ),
+          ),
+          Expanded(
+            child: ListView.builder(
+              controller: _scrollController, // Attach scroll controller
+              itemCount: userDetails.length + 1, // Add 1 for loading indicator
+              itemBuilder: (context, index) {
+                if (index == userDetails.length) {
+                  // Show loading indicator at the end
+                  return hasMoreData
+                      ? Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Center(child: CircularProgressIndicator()),
+                  )
+                      : SizedBox(); // No more data to load
+                }
 
-          List<Map<String, String>> userDetails = snapshot.data!;
-          String currentUserUid = FirebaseAuth.instance.currentUser!.uid;
+                final user = userDetails[index];
+                bool isMyProfile =
+                    user['uid'] == FirebaseAuth.instance.currentUser!.uid;
 
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Padding(
-                  padding: const EdgeInsets.only(
-                      bottom: 16,
-                      top: 16,
-                      left: 30), // Add some padding around the heading
-                  child: poppinsText(
-                      '${userDetails.length} ${showFollowers ? 'Followers' : 'Following'}',
-                      15,
-                      bold,
-                      Colors.green)),
-              Expanded(
-                child: ListView.builder(
-                  itemCount: userDetails.length,
-                  itemBuilder: (context, index) {
-                    final user = userDetails[index];
-                    bool isMyProfile = user['uid'] == currentUserUid;
-
-                    return Padding(
-                      padding: const EdgeInsets.only(
-                          left: 30.0), // 30 pixels padding from the left
-                      child: GestureDetector(
-                        onTap: () {
-                          // Navigate to the OtherProfileView screen with the selected user's UID
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => OtherProfileView(
-                                uid: user['uid']!,
-                                isMyProfile: isMyProfile, // Pass the parameter
-                              ),
-                            ),
-                          );
-                        },
-                        child: ListTile(
-                            leading: CircleAvatar(
-                              backgroundImage: user['photoUrl'] != null &&
-                                      user['photoUrl']!.isNotEmpty
-                                  ? NetworkImage(user['photoUrl']!)
-                                  : null,
-                              child: user['photoUrl'] == null ||
-                                      user['photoUrl']!.isEmpty
-                                  ? Icon(Icons.person)
-                                  : null,
-                            ),
-                            title: poppinsText(
-                                user['user name'] ?? 'Unknown User',
-                                11,
-                                bold,
-                                Colors.black)),
+                return Padding(
+                  padding: const EdgeInsets.only(left: 30.0), // 30 pixels padding from the left
+                  child: GestureDetector(
+                    onTap: () {
+                      // Navigate to the OtherProfileView screen with the selected user's UID
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => OtherProfileView(
+                            uid: user['uid']!,
+                            isMyProfile: isMyProfile, // Pass the parameter
+                          ),
+                        ),
+                      );
+                    },
+                    child: ListTile(
+                      leading: CircleAvatar(
+                        backgroundImage: user['photoUrl'] != null &&
+                            user['photoUrl']!.isNotEmpty
+                            ? NetworkImage(user['photoUrl']!)
+                            : null,
+                        child: user['photoUrl'] == null ||
+                            user['photoUrl']!.isEmpty
+                            ? Icon(Icons.person)
+                            : null,
                       ),
-                    );
-                  },
-                ),
-              ),
-            ],
-          );
-        },
+                      title: poppinsText(
+                          user['user name'] ?? 'Unknown User',
+                          11,
+                          bold,
+                          Colors.black),
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
       ),
     );
   }

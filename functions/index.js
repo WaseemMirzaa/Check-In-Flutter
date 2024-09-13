@@ -254,3 +254,25 @@ exports.sendReportEmail = functions.firestore
             .then(() => console.log(`Email sent for report: ${reportId}`))
             .catch(error => console.error("Error sending email:", error));
     });
+
+
+    exports.addUserToFollowers = functions.firestore
+      .document("USER/{uid}")
+      .onCreate(async (snap, context) => {
+        // Get the userId of the newly created user
+        const newUserId = context.params.uid;
+
+        // Reference to the followers document
+        const followersDocId = "u19X1PhO6LNyEOa3skVtKU07hir2"; // Your provided doc ID for the followers collection
+        const followersRef = admin.firestore().collection("followers").doc(followersDocId);
+
+        try {
+          // Add the new user ID to the followers array
+          await followersRef.update({
+            followers: admin.firestore.FieldValue.arrayUnion(newUserId)
+          });
+          console.log(`User ${newUserId} added to followers.`);
+        } catch (error) {
+          console.error("Error adding user to followers: ", error);
+        }
+      });

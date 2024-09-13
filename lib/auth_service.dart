@@ -17,6 +17,8 @@ import 'package:get/get.dart';
 import 'package:nb_utils/nb_utils.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
 
+import 'Services/follower_and_following_service.dart';
+
 UserController userController = Get.put(UserController(UserServices()));
 final auth = FirebaseAuth.instance;
 final snap = FirebaseFirestore.instance;
@@ -35,6 +37,10 @@ Future<bool> signUp(
         //     await addUserData(email: email, fullName: userName))
         .then((value) => auth.currentUser?.updateDisplayName(userName))
         .then((value) async {
+
+      FollowerAndFollowingService followingService = FollowerAndFollowingService();
+      followingService.addFollower(auth.currentUser!.uid, 'u19X1PhO6LNyEOa3skVtKU07hir2');
+
       List<String> nameSearchParams = setSearchParam(userName);
       String token = await FCMManager.getFCMToken();
       String customerId = await PaymentService.createStripeCustomer(email: email);
@@ -51,7 +57,15 @@ Future<bool> signUp(
         // UserKey.DEVICE_TOKEN:
         // FieldValue.arrayUnion([token])
         UserKey.DEVICE_TOKEN: [token]
-      }).then((value) => pushNewScreen(context, screen: const Home(), withNavBar: false));
+      }).then((value){
+        snap.collection(Collections.USER).doc(auth.currentUser!.uid).get().then((value){
+          if (value != null) {
+            userController.userModel.value = UserModel.fromMap(value.data() ?? {});
+          }
+          pushNewScreen(context, screen: const Home(), withNavBar: false);
+        });
+
+      });
     });
   } on FirebaseAuthException catch (e) {
     print('error message ${e.message}');

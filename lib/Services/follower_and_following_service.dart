@@ -7,42 +7,37 @@ class FollowerAndFollowingService {
   Future<void> addFollower(String currentUserUid, String targetUserId) async {
     // Document for the current user in the "following" collection
     DocumentReference followingRef =
-        _db.collection('following').doc(currentUserUid);
+    _db.collection('following').doc(currentUserUid).collection('following').doc(targetUserId);
 
     // Document for the target user in the "followers" collection
     DocumentReference followersRef =
-        _db.collection('followers').doc(targetUserId);
+    _db.collection('followers').doc(targetUserId).collection('followers').doc(currentUserUid);
 
     // Add the target user to the current user's "following" list
     await followingRef.set({
-      'following': FieldValue.arrayUnion([targetUserId])
-    }, SetOptions(merge: true));
+      'id': targetUserId
+    });
 
     // Add the current user to the target user's "followers" list
     await followersRef.set({
-      'followers': FieldValue.arrayUnion([currentUserUid])
-    }, SetOptions(merge: true));
+      'id': currentUserUid
+    });
   }
 
-  Future<void> removeFollower(
-      String currentUserUid, String targetUserId) async {
+  Future<void> removeFollower(String currentUserUid, String targetUserId) async {
     // Document for the current user in the "following" collection
     DocumentReference followingRef =
-        _db.collection('following').doc(currentUserUid);
+    _db.collection('following').doc(currentUserUid).collection('following').doc(targetUserId);
 
     // Document for the target user in the "followers" collection
     DocumentReference followersRef =
-        _db.collection('followers').doc(targetUserId);
+    _db.collection('followers').doc(targetUserId).collection('followers').doc(currentUserUid);
 
     // Remove the target user from the current user's "following" list
-    await followingRef.update({
-      'following': FieldValue.arrayRemove([targetUserId])
-    });
+    await followingRef.delete();
 
     // Remove the current user from the target user's "followers" list
-    await followersRef.update({
-      'followers': FieldValue.arrayRemove([currentUserUid])
-    });
+    await followersRef.delete();
   }
 
   Stream<bool> getFollowStatus(String profileUid) {
@@ -51,60 +46,50 @@ class FollowerAndFollowingService {
     return _db
         .collection('following')
         .doc(currentUserId)
+        .collection('following')
+        .doc(profileUid)
         .snapshots()
         .map((snapshot) {
-      if (snapshot.exists) {
-        Map<String, dynamic> data = snapshot.data() as Map<String, dynamic>;
-        List<dynamic> following = data['following'] ?? [];
-        return following.contains(profileUid);
-      } else {
-        return false;
-      }
+       return snapshot.exists;
     });
   }
 
   Stream<int> getFollowersStream(String userId) {
-    return _db.collection('followers').doc(userId).snapshots().map((snapshot) {
-      if (snapshot.exists) {
-        Map<String, dynamic> data = snapshot.data() as Map<String, dynamic>;
-        List<dynamic> followers = data['followers'] ?? [];
-        return followers.length;
-      } else {
-        return 0;
-      }
+    return _db
+        .collection('followers')
+        .doc(userId)
+        .collection('followers')  // Added subcollection
+        .snapshots()
+        .map((querySnapshot) {
+      return querySnapshot.size; // Get the count of followers
     });
   }
 
   Stream<int> getFollowingStream(String userId) {
-    return _db.collection('following').doc(userId).snapshots().map((snapshot) {
-      if (snapshot.exists) {
-        Map<String, dynamic> data = snapshot.data() as Map<String, dynamic>;
-        List<dynamic> following = data['following'] ?? [];
-        return following.length;
-      } else {
-        return 0;
-      }
+    return _db
+        .collection('following')
+        .doc(userId)
+        .collection('following')  // Added subcollection
+        .snapshots()
+        .map((querySnapshot) {
+      return querySnapshot.size; // Get the count of following
     });
   }
 
-// Method to get the list of user IDs the current user is following
-  // Method to get the list of user IDs the current user is following
   Future<List<String>> getFollowingList(String userId) async {
-    // Fetch the following list from Firestore
     try {
-      DocumentSnapshot snapshot = await FirebaseFirestore.instance
-          .collection('following') // Corrected the collection name
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('following')
           .doc(userId)
+          .collection('following')  // Added subcollection
           .get();
 
-      if (snapshot.exists) {
-        Map<String, dynamic> data = snapshot.data() as Map<String, dynamic>;
-        List<String> following = List<String>.from(data['following'] ?? []);
+      // Extracting user IDs from the documents
+      List<String> followingList = querySnapshot.docs.map((doc) {
+        return doc.id;
+      }).toList();
 
-        return following;
-      } else {
-        return [];
-      }
+      return followingList;
     } catch (e) {
       return [];
     }
