@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:check_in/Services/user_services.dart';
 import 'package:check_in/controllers/user_controller.dart';
 import 'package:check_in/core/constant/app_assets.dart';
@@ -426,10 +427,16 @@ class _SharedPostCompState extends State<SharedPostComp> {
                         width: double.infinity,
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(8),
-                          child: Image.network(
-                            widget.data!.postUrl ?? '',
-                            fit: BoxFit.cover,
+                          child: CachedNetworkImage(
+                            imageUrl:  widget.data!.postUrl ?? '',
+                            progressIndicatorBuilder: (context, url, downloadProgress) =>
+                                Center(child: CircularProgressIndicator(value: downloadProgress.progress)),
+                            errorWidget: (context, url, error) => const Icon(Icons.error),
                           ),
+                          // child: Image.network(
+                          //   widget.data!.postUrl ?? '',
+                          //   fit: BoxFit.cover,
+                          // ),
                         ),
                       ),
                     )
@@ -454,10 +461,16 @@ class _SharedPostCompState extends State<SharedPostComp> {
                               borderRadius: BorderRadius.circular(8),
                               child: widget.data!.thumbnail == null
                                   ? Container(color: Colors.black,)
-                                  : Image.network(
-                                widget.data!.thumbnail!,
-                                fit: BoxFit.cover,
+                                  : CachedNetworkImage(
+                                imageUrl: widget.data!.thumbnail!,
+                                progressIndicatorBuilder: (context, url, downloadProgress) =>
+                                    Center(child: CircularProgressIndicator(value: downloadProgress.progress)),
+                                errorWidget: (context, url, error) => const Icon(Icons.error),
                               ),
+                              //     : Image.network(
+                              //   widget.data!.thumbnail!,
+                              //   fit: BoxFit.cover,
+                              // ),
                             ),
                             Center(
                               child: Container(

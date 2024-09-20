@@ -8,6 +8,8 @@ import 'dart:async';
 // Firebase Packages
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+import '../common.dart';
+
 /// A [StreamBuilder] that automatically loads more data when the user scrolls
 /// to the bottom.
 ///
@@ -199,13 +201,13 @@ class _FirestorePaginationState extends State<CustomFirestorePagination> {
 
       if (isDocRemoved || _isInitialLoading) {
         _isInitialLoading = false;
-        if (snapshot.docs.isNotEmpty) {
-          // Set updates listener for the existing data starting from the first
-          // document only.
-          await _loadDocuments(getMore: false);
-        } else {
-          _streamSub?.cancel();
-        }
+        // if (snapshot.docs.isNotEmpty) {
+        //   // Set updates listener for the existing data starting from the first
+        //   // document only.
+        //   await _loadDocuments(getMore: false);
+        // } else {
+        //   _streamSub?.cancel();
+        // }
         if (widget.isLive) _setLiveListener();
       }
 
@@ -213,13 +215,14 @@ class _FirestorePaginationState extends State<CustomFirestorePagination> {
 
       // Add data till the view is scrollable. This ensures that the user can
       // scroll to the bottom and load more data.
-      if (_isInitialLoading || _isFetching || _isEnded) return;
-      SchedulerBinding.instance.addPostFrameCallback((_) {
-        if (_controller.position.maxScrollExtent <= 0) {
-          _loadDocuments();
-        }
-      });
+      // if (_isInitialLoading || _isFetching || _isEnded) return;
+      // SchedulerBinding.instance.addPostFrameCallback((_) {
+      //   if (_controller.position.maxScrollExtent <= 0) {
+      //     _loadDocuments();
+      //   }
+      // });
     });
+
   }
 
   /// Sets the live listener for the query.

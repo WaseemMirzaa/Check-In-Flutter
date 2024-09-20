@@ -17,6 +17,7 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:nb_utils/nb_utils.dart';
 import 'package:sizer/sizer.dart';
+import '../../../../utils/common.dart';
 import '../../../../utils/custom/custom_firebase_pagination.dart';
 import '../../../widgets/custom_appbar.dart';
 import '../../terms_conditions.dart';
@@ -100,7 +101,6 @@ class _NewsFeedScreenState extends State<NewsFeedScreen> {
                     if (index % 5 == 4) {
                       return NavtiveAdsComp(key: ValueKey('Ad_$index'));
                     }
-
                     if (controller.shouldShowPost(data)) {
                       if (data[NewsFeed.HIDE_USER] is List) {
                         final hideUserList = data[NewsFeed.HIDE_USER] as List;

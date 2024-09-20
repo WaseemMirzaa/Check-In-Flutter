@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:typed_data';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:check_in/Services/message_service.dart';
 import 'package:check_in/Services/user_services.dart';
 import 'package:check_in/controllers/Messages/chat_controller.dart';
@@ -330,9 +331,15 @@ class _ListTileContainerState extends State<ListTileContainer> {
                             width: double.infinity,
                             child: ClipRRect(
                               borderRadius: BorderRadius.circular(8),
-                              child: Image.network(
-                                widget.data!.postUrl ?? '',
-                                fit: BoxFit.cover,
+                              // child: Image.network(
+                              //   widget.data!.postUrl ?? '',
+                              //   fit: BoxFit.cover,
+                              // ),
+                              child: CachedNetworkImage(
+                                imageUrl: widget.data!.postUrl ?? '',
+                                progressIndicatorBuilder: (context, url, downloadProgress) =>
+                                    Center(child: CircularProgressIndicator(value: downloadProgress.progress)),
+                                errorWidget: (context, url, error) => const Icon(Icons.error),
                               ),
                             ),
                           ),
@@ -356,10 +363,16 @@ class _ListTileContainerState extends State<ListTileContainer> {
                                   borderRadius: BorderRadius.circular(8),
                                   child: widget.data!.thumbnail == null
                                       ? Container(color: Colors.black,)
-                                      : Image.network(
-                                    widget.data!.thumbnail!,
-                                    fit: BoxFit.cover,
+                                      : CachedNetworkImage(
+                                    imageUrl: widget.data!.thumbnail!,
+                                    progressIndicatorBuilder: (context, url, downloadProgress) =>
+                                        Center(child: CircularProgressIndicator(value: downloadProgress.progress)),
+                                    errorWidget: (context, url, error) => const Icon(Icons.error),
                                   ),
+                                  //     : Image.network(
+                                  //   widget.data!.thumbnail!,
+                                  //   fit: BoxFit.cover,
+                                  // ),
                                 ),
                                 Center(
                                   child: Container(
