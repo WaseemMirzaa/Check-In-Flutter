@@ -191,17 +191,27 @@ class _NewsFeedScreenState extends State<NewsFeedScreen> {
           ],
         ),
 
-        // Centering the "No Posts Found" text
-        Positioned(
-          top: screenSize.height * 0.5 -
-              20, // Adjust the value to center it vertically
-          left: screenSize.width * 0.6 -
-              100, // Adjust the value to center it horizontally
-          child: Center(
-              child: isload
-                  ? const Center(child: CircularProgressIndicator(),)
-                  : poppinsText('No Posts Found', 16, medium, appBlackColor)),
+        Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              isload
+                  ? CircularProgressIndicator()
+                  : poppinsText('No Posts Found', 16, medium, appBlackColor),
+            ],
+          ),
         )
+        // // Centering the "No Posts Found" text
+        // Positioned(
+        //   top: screenSize.height * 0.5 -
+        //       20, // Adjust the value to center it vertically
+        //   left: screenSize.width * 0.6 -
+        //       100, // Adjust the value to center it horizontally
+        //   child: Center(
+        //       child: isload
+        //           ? const Center(child: CircularProgressIndicator(),)
+        //           : poppinsText('No Posts Found', 16, medium, appBlackColor)),
+        // )
       ],
     );
   }

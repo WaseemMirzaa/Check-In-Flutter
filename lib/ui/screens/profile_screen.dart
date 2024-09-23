@@ -404,7 +404,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                         image: NetworkImage(
                                                             _downloadUrl
                                                                 as String),
-                                                        fit: BoxFit.fill)))
+                                                        fit: BoxFit.contain)))
                                             : (!userController.userModel.value
                                                     .photoUrl.isEmptyOrNull)
                                                 ? Container(
@@ -419,7 +419,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                                         .value
                                                                         .photoUrl ??
                                                                     ""),
-                                                            fit: BoxFit.fill)))
+                                                            fit: BoxFit.contain)))
                                                 : Container(
                                                     height: 20.h,
                                                     width: 35.h,

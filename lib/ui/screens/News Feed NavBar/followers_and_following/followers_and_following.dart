@@ -31,7 +31,7 @@ class _FollowersAndFollowingScreenState
   bool hasMoreData = true;
   DocumentSnapshot? lastDocument; // To keep track of the last document
   final ScrollController _scrollController = ScrollController();
-  int FETCH_LIMIT = 15;
+  int FETCH_LIMIT = 30;
 
   @override
   void initState() {
