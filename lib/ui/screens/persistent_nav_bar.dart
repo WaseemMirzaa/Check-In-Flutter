@@ -1,10 +1,13 @@
 // ignore_for_file: avoid_print
+import 'package:check_in/auth_service.dart';
 import 'package:check_in/core/constant/temp_language.dart';
+import 'package:check_in/ui/screens/Messages%20NavBar/Messages/messages.dart';
 import 'package:check_in/ui/screens/News%20Feed%20NavBar/news_feed_onboarding/news_feed_onboarding.dart';
 import 'package:check_in/ui/screens/News%20Feed%20NavBar/open_post/open_post.dart';
 import 'package:check_in/ui/screens/check_in.dart';
 import 'package:check_in/ui/screens/profile_screen.dart';
 import 'package:check_in/ui/screens/start.dart';
+import 'package:check_in/ui/screens/terms_conditions.dart';
 import 'package:check_in/utils/colors.dart';
 import 'package:check_in/utils/common.dart';
 import 'package:check_in/utils/styles.dart';
@@ -18,7 +21,6 @@ import 'package:nb_utils/nb_utils.dart';
 
 import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
 
-import ' Messages NavBar/Messages/messages.dart';
 import 'History.dart';
 import '../../controllers/nav_bar_controller.dart';
 import 'News Feed NavBar/News Feed/news_feed_screen.dart';

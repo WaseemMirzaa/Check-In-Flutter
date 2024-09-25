@@ -156,7 +156,9 @@ class _FirestorePaginationState extends State<CustomFirebaseChatPagination> {
     // To cancel previous updates listener when new one is set.
     final tempSub = _streamSub;
 
-    if (getMore) setState(() => _isFetching = true);
+    if (getMore) {
+      if (mounted) setState(() => _isFetching = true);
+    }
 
     final docsLimit = _docs.length + (getMore ? widget.limit : 0);
     var docsQuery = widget.query.limit(docsLimit);
@@ -218,8 +220,14 @@ class _FirestorePaginationState extends State<CustomFirebaseChatPagination> {
       // scroll to the bottom and load more data.
       if (_isInitialLoading || _isFetching || _isEnded) return;
       SchedulerBinding.instance.addPostFrameCallback((_) {
-        if (_controller.position.maxScrollExtent <= 0) {
-          _loadDocuments();
+        try {
+          if (mounted) {
+            if (_controller.position.maxScrollExtent <= 0) {
+              _loadDocuments();
+            }
+          }
+        } catch (e) {
+          print(e);
         }
       });
     });

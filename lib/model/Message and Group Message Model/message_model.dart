@@ -13,15 +13,18 @@ class Messagemodel {
 
   //String? timeStamp;
   Timestamp? timeStamp;
-  String? senderId;
   String? requestStatus;
+  String? senderId;
+  String? senderImg;
   String? senderName;
   String? recieverName;
   String? recieverId;
+  String? recieverImg;
   List? memberIds;
   List? deleteIds;
   List? members;
   bool? showMessageTile;
+  String? blockId;
 
   Messagemodel({
     this.name,
@@ -41,6 +44,9 @@ class Messagemodel {
     this.deleteIds,
     this.showMessageTile,
     this.members,
+    this.senderImg,
+    this.recieverImg,
+    this.blockId
   });
 
   factory Messagemodel.fromJson(Map<String, dynamic> json,
@@ -62,6 +68,9 @@ class Messagemodel {
         deleteIds: deleteIds,
         members: json[MessageField.MEMBERS],
         showMessageTile: showMessageTile,
+        recieverImg: json[MessageField.RECIEVER_IMG],
+        senderImg: json[MessageField.SENDER_IMG],
+        blockId: json[MessageField.BLOCK_ID],
         yourname: yourName);
   }
 
@@ -91,6 +100,7 @@ class Messagemodel {
       String? senderName,
       String? recieverName,
       String? recieverId,
+      String? blockerId,
       List? memberIds,
       List? deleteIds,
       List? members,
@@ -112,7 +122,8 @@ class Messagemodel {
       memberIds: memberIds ?? this.memberIds,
       deleteIds: deleteIds ?? this.deleteIds,
       members: members ?? this.members,
-      showMessageTile: showMessageTile ?? this.showMessageTile
+      showMessageTile: showMessageTile ?? this.showMessageTile,
+        blockId: blockerId ?? this.blockId
     );
   }
 }

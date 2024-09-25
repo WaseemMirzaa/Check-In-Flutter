@@ -2,8 +2,8 @@ import 'package:check_in/auth_service.dart';
 import 'package:check_in/controllers/Messages/group_members_controller.dart';
 import 'package:check_in/core/constant/temp_language.dart';
 import 'package:check_in/model/Message%20and%20Group%20Message%20Model/group_member_model.dart';
-import 'package:check_in/ui/screens/%20Messages%20NavBar/Add%20New%20Member/add_new_grp_member.dart';
-import 'package:check_in/ui/screens/%20Messages%20NavBar/Group%20Members/Component/group_member_tile.dart';
+import 'package:check_in/ui/screens/Messages%20NavBar/Add%20New%20Member/add_new_grp_member.dart';
+import 'package:check_in/ui/screens/Messages%20NavBar/Group%20Members/Component/group_member_tile.dart';
 import 'package:check_in/utils/Constants/images.dart';
 import 'package:check_in/utils/gaps.dart';
 import 'package:flutter/material.dart';
@@ -33,9 +33,13 @@ class GroupMember extends GetView<GroupmemberController> {
               onPressed: () {
                 print('dd');
                 print(controller.memberIds);
-                pushNewScreen(context, screen: AddNewGroupMember(docId: controller.docid,memberIds:controller.memberIds));
+                pushNewScreen(context,
+                    screen: AddNewGroupMember(
+                        docId: controller.docid,
+                        memberIds: controller.memberIds));
               },
-              label: poppinsText(TempLanguage.addMember, 12, FontWeight.normal, whiteColor),
+              label: poppinsText(
+                  TempLanguage.addMember, 12, FontWeight.normal, whiteColor),
             )
           : null,
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
@@ -57,14 +61,19 @@ class GroupMember extends GetView<GroupmemberController> {
         children: [
           verticalGap(15),
           StreamBuilder<List<GroupMemberModel>>(
-              stream: controller.getGroupMember(userController.userModel.value.uid!),
+              stream: controller
+                  .getGroupMember(userController.userModel.value.uid!),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return loaderView();
                 } else {
                   return Padding(
                     padding: const EdgeInsets.only(left: 25.0),
-                    child: poppinsText("${snapshot.data!.length} ${TempLanguage.members}", 20, medium, blackColor),
+                    child: poppinsText(
+                        "${snapshot.data!.length} ${TempLanguage.members}",
+                        20,
+                        medium,
+                        blackColor),
                   );
                 }
               }),
@@ -82,7 +91,8 @@ class GroupMember extends GetView<GroupmemberController> {
             child: SizedBox(
                 height: 60.h,
                 child: StreamBuilder<List<GroupMemberModel>>(
-                    stream: controller.getGroupMember(userController.userModel.value.uid!),
+                    stream: controller
+                        .getGroupMember(userController.userModel.value.uid!),
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
                         return loaderView();
@@ -99,22 +109,27 @@ class GroupMember extends GetView<GroupmemberController> {
                             return Obx(() {
                               if (snapshot.data![index].memberName!
                                   .toLowerCase()
-                                  .contains(controller.searchQuery.toLowerCase())) {
+                                  .contains(
+                                      controller.searchQuery.toLowerCase())) {
                                 return GroupMemberTile(
                                   data: snapshot.data![index],
                                   removeMemberOntap: () {
                                     if (snapshot.data![index].iAmAdmin!) {
                                       print('object');
-                                      controller.removeGroupMember(snapshot.data![index].memberId!,);
+                                      controller.removeGroupMember(
+                                        snapshot.data![index].memberId!,
+                                      );
                                       Navigator.pop(context);
                                     }
                                   },
                                   ontap: () {
                                     if (snapshot.data![index].iAmAdmin!) {
                                       if (!snapshot.data![index].isAdmin!) {
-                                        controller.makeGroupAdmin(snapshot.data![index].memberId!);
+                                        controller.makeGroupAdmin(
+                                            snapshot.data![index].memberId!);
                                       } else {
-                                        controller.removeGroupAdmin(snapshot.data![index].memberId!);
+                                        controller.removeGroupAdmin(
+                                            snapshot.data![index].memberId!);
                                       }
                                       Navigator.pop(context);
                                     }

@@ -1,6 +1,6 @@
 import 'dart:io';
 import 'package:check_in/Services/user_services.dart';
-import 'package:check_in/ui/screens/%20Messages%20NavBar/other_profile/other_profile_view.dart';
+import 'package:check_in/ui/screens/Messages%20NavBar/other_profile/other_profile_view.dart';
 import 'package:check_in/ui/screens/News%20Feed%20NavBar/share_screen/share_screen.dart';
 import 'package:check_in/ui/screens/profile_screen.dart';
 import 'package:device_preview/device_preview.dart';
@@ -34,7 +34,8 @@ class SharePostComp extends StatefulWidget {
 }
 
 class _SharePostCompState extends State<SharePostComp> {
-  NewsFeedController newsFeedController = Get.put(NewsFeedController(NewsFeedService()));
+  NewsFeedController newsFeedController =
+      Get.put(NewsFeedController(NewsFeedService()));
 
   final addCommentController = TextEditingController();
 
@@ -44,143 +45,168 @@ class _SharePostCompState extends State<SharePostComp> {
   @override
   Widget build(BuildContext context) {
     newsFeedController.commentModel.value.userId = widget.data!.userId;
-    return FutureBuilder(future: userServices.getUserData(widget.data!.userId!),
+    return FutureBuilder(
+        future: userServices.getUserData(widget.data!.userId!),
         builder: (context, snapshot) {
-      if(snapshot.connectionState == ConnectionState.waiting){
-        return const SizedBox();
-      }
-        return CustomContainer1(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 15),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8),
-                  child: Row(
-                    children: [
-                      GestureDetector(
-                        onTap:  (){
-                          if(userController.userModel.value.uid == widget.data!.userId){
-                            pushNewScreen(context, screen: ProfileScreen(isNavBar: false,));
-                          }else{
-                            pushNewScreen(context,
-                                            screen: OtherProfileView(uid: widget.data!.shareUID!));
-                          }
-
-                        },
-                        child: Container(
-                                        height: 40,
-                                        width: 40,
-                                        decoration: BoxDecoration(
-                                            shape: BoxShape.circle,
-                                            image: DecorationImage(
-                                                image: snapshot.data!.photoUrl!.isEmptyOrNull ? NetworkImage(AppImage.userImagePath) : NetworkImage(snapshot.data!.photoUrl!),fit: BoxFit.cover))),
-                      ),
-
-                      horizontalGap(10),
-                      Expanded(
-                        child:  GestureDetector(
-                        onTap: (){
-                          if(userController.userModel.value.uid == widget.data!.userId){
-                            pushNewScreen(context, screen: ProfileScreen(isNavBar: false,));
-                          }else{
-                            pushNewScreen(context, screen: OtherProfileView(uid: widget.data!.userId!));
-                          }
-
-                        },
-                        child: poppinsText(snapshot.data?.userName ?? '', 14, bold, appDarkBlue,
-                              overflow: TextOverflow.ellipsis),
-                        ),
-                      ),
-                      horizontalGap(5),
-
-                    ],
-                  ),
-                ),
-                verticalGap(8),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                  child: poppinsText(widget.data!.description ?? "", 12, medium,
-                      appDarkBlue.withOpacity(0.8),
-                      maxlines: 3),
-                ),
-                verticalGap(8),
-                widget.data!.isType == 'image' && widget.data!.postUrl!.isNotEmpty
-                    ? GestureDetector(
-                        onTap: () {
-                          pushNewScreen(context, screen: FullScreenImage(newsFeedModel: widget.data!,));
-                        },
-                        child: SizedBox(
-                          height: 200,
-                          width: double.infinity,
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(8),
-                            child: Image.network(
-                              widget.data!.postUrl ?? '',
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                        ),
-                      )
-                    : widget.data!.isType == 'video' ? newsFeedController.videoLoad.value
-                    ? loaderView()
-                    : playing ?? false ? VideoPlayerWidget(videoUrl: widget.data!.postUrl!) : GestureDetector(
-                  onTap: () {
-                    //initializePlayer(widget.data!.postUrl!);
-                    setState(() {
-                      //_playingIndex = widget.index;
-                      playing = true;
-                    });
-                  },
-                  child: SizedBox(
-                    height: 200,
-                    width: double.infinity,
-                    child: Stack(
-                      fit: StackFit.expand,
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const SizedBox();
+          }
+          return CustomContainer1(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 15),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    child: Row(
                       children: [
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(8),
-                          child: widget.data!.thumbnail == null
-                              ? Container(color: Colors.black,)
-                              : Image.network(
-                            widget.data!.thumbnail!,
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                        Center(
+                        GestureDetector(
+                          onTap: () {
+                            if (userController.userModel.value.uid ==
+                                widget.data!.userId) {
+                              pushNewScreen(context,
+                                  screen: ProfileScreen(
+                                    isNavBar: false,
+                                  ));
+                            } else {
+                              pushNewScreen(context,
+                                  screen: OtherProfileView(
+                                      uid: widget.data!.shareUID!));
+                            }
+                          },
                           child: Container(
-                            padding: const EdgeInsets.all(12),
-                            decoration: BoxDecoration(
-                              color: Colors.black.withOpacity(0.5),
-                              shape: BoxShape.circle,
-                            ),
-                            child: const Icon(
-                              Icons.play_arrow,
-                              color: Colors.white,
-                              size: 40,
-                            ),
+                              height: 40,
+                              width: 40,
+                              decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  image: DecorationImage(
+                                      image: snapshot
+                                              .data!.photoUrl!.isEmptyOrNull
+                                          ? NetworkImage(AppImage.userImagePath)
+                                          : NetworkImage(
+                                              snapshot.data!.photoUrl!),
+                                      fit: BoxFit.cover))),
+                        ),
+                        horizontalGap(10),
+                        Expanded(
+                          child: GestureDetector(
+                            onTap: () {
+                              if (userController.userModel.value.uid ==
+                                  widget.data!.userId) {
+                                pushNewScreen(context,
+                                    screen: ProfileScreen(
+                                      isNavBar: false,
+                                    ));
+                              } else {
+                                pushNewScreen(context,
+                                    screen: OtherProfileView(
+                                        uid: widget.data!.userId!));
+                              }
+                            },
+                            child: poppinsText(snapshot.data?.userName ?? '',
+                                14, bold, appDarkBlue,
+                                overflow: TextOverflow.ellipsis),
                           ),
                         ),
+                        horizontalGap(5),
                       ],
                     ),
                   ),
-                ) : SizedBox(),
-                verticalGap(10),
-        ],
+                  verticalGap(8),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                    child: poppinsText(widget.data!.description ?? "", 12,
+                        medium, appDarkBlue.withOpacity(0.8),
+                        maxlines: 3),
+                  ),
+                  verticalGap(8),
+                  widget.data!.isType == 'image' &&
+                          widget.data!.postUrl!.isNotEmpty
+                      ? GestureDetector(
+                          onTap: () {
+                            pushNewScreen(context,
+                                screen: FullScreenImage(
+                                  newsFeedModel: widget.data!,
+                                ));
+                          },
+                          child: SizedBox(
+                            height: 200,
+                            width: double.infinity,
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(8),
+                              child: Image.network(
+                                widget.data!.postUrl ?? '',
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                          ),
+                        )
+                      : widget.data!.isType == 'video'
+                          ? newsFeedController.videoLoad.value
+                              ? loaderView()
+                              : playing ?? false
+                                  ? VideoPlayerWidget(
+                                      videoUrl: widget.data!.postUrl!)
+                                  : GestureDetector(
+                                      onTap: () {
+                                        //initializePlayer(widget.data!.postUrl!);
+                                        setState(() {
+                                          //_playingIndex = widget.index;
+                                          playing = true;
+                                        });
+                                      },
+                                      child: SizedBox(
+                                        height: 200,
+                                        width: double.infinity,
+                                        child: Stack(
+                                          fit: StackFit.expand,
+                                          children: [
+                                            ClipRRect(
+                                              borderRadius:
+                                                  BorderRadius.circular(8),
+                                              child: widget.data!.thumbnail ==
+                                                      null
+                                                  ? Container(
+                                                      color: Colors.black,
+                                                    )
+                                                  : Image.network(
+                                                      widget.data!.thumbnail!,
+                                                      fit: BoxFit.cover,
+                                                    ),
+                                            ),
+                                            Center(
+                                              child: Container(
+                                                padding:
+                                                    const EdgeInsets.all(12),
+                                                decoration: BoxDecoration(
+                                                  color: Colors.black
+                                                      .withOpacity(0.5),
+                                                  shape: BoxShape.circle,
+                                                ),
+                                                child: const Icon(
+                                                  Icons.play_arrow,
+                                                  color: Colors.white,
+                                                  size: 40,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    )
+                          : SizedBox(),
+                  verticalGap(10),
+                ],
+              ),
             ),
-          ),
-        );
-      }
-    );
+          );
+        });
   }
 }
 
 class ChewieDemo extends StatefulWidget {
-   ChewieDemo({
-    super.key,
-    required this.link
-  });
+  ChewieDemo({super.key, required this.link});
 
   String link;
   @override
@@ -188,6 +214,7 @@ class ChewieDemo extends StatefulWidget {
     return _ChewieDemoState();
   }
 }
+
 class _ChewieDemoState extends State<ChewieDemo> {
   TargetPlatform? _platform;
   late VideoPlayerController _videoPlayerController1;
@@ -208,7 +235,6 @@ class _ChewieDemoState extends State<ChewieDemo> {
     _chewieController?.dispose();
     super.dispose();
   }
-
 
   Future<void> initializePlayer() async {
     _videoPlayerController1 =
@@ -278,7 +304,7 @@ class _ChewieDemoState extends State<ChewieDemo> {
       autoPlay: true,
       looping: true,
       progressIndicatorDelay:
-      bufferDelay != null ? Duration(milliseconds: bufferDelay!) : null,
+          bufferDelay != null ? Duration(milliseconds: bufferDelay!) : null,
 
       additionalOptions: (context) {
         return <OptionItem>[
@@ -294,12 +320,12 @@ class _ChewieDemoState extends State<ChewieDemo> {
         padding: const EdgeInsets.all(10.0),
         child: subtitle is InlineSpan
             ? RichText(
-          text: subtitle,
-        )
+                text: subtitle,
+              )
             : Text(
-          subtitle.toString(),
-          style: const TextStyle(color: Colors.black),
-        ),
+                subtitle.toString(),
+                style: const TextStyle(color: Colors.black),
+              ),
       ),
 
       hideControlsTimer: const Duration(seconds: 1),
@@ -334,60 +360,60 @@ class _ChewieDemoState extends State<ChewieDemo> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: Column(
-          children: <Widget>[
-            Expanded(
-              child: Center(
-                child: _chewieController != null &&
-                    _chewieController!
-                        .videoPlayerController.value.isInitialized
-                    ? Chewie(
-                  controller: _chewieController!,
-                )
-                    : const Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    CircularProgressIndicator(),
-                    SizedBox(height: 20),
-                    Text('Loading'),
-                  ],
-                ),
-              ),
-            ),
-            TextButton(
-              onPressed: () {
-                _chewieController?.enterFullScreen();
-              },
-              child: const Text('Fullscreen'),
-            ),
-            Row(
-              children: <Widget>[
-                Expanded(
-                  child: TextButton(
-                    onPressed: () {
-                      setState(() {
-                        _videoPlayerController1.pause();
-                        _videoPlayerController1.seekTo(Duration.zero);
-                        _createChewieController();
-                      });
-                    },
-                    child: const Padding(
-                      padding: EdgeInsets.symmetric(vertical: 16.0),
-                      child: Text("Landscape Video"),
+      body: Column(
+        children: <Widget>[
+          Expanded(
+            child: Center(
+              child: _chewieController != null &&
+                      _chewieController!
+                          .videoPlayerController.value.isInitialized
+                  ? Chewie(
+                      controller: _chewieController!,
+                    )
+                  : const Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        CircularProgressIndicator(),
+                        SizedBox(height: 20),
+                        Text('Loading'),
+                      ],
                     ),
+            ),
+          ),
+          TextButton(
+            onPressed: () {
+              _chewieController?.enterFullScreen();
+            },
+            child: const Text('Fullscreen'),
+          ),
+          Row(
+            children: <Widget>[
+              Expanded(
+                child: TextButton(
+                  onPressed: () {
+                    setState(() {
+                      _videoPlayerController1.pause();
+                      _videoPlayerController1.seekTo(Duration.zero);
+                      _createChewieController();
+                    });
+                  },
+                  child: const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 16.0),
+                    child: Text("Landscape Video"),
                   ),
                 ),
-                Expanded(
-                  child: TextButton(
-                    onPressed: () {
-                      setState(() {
-                        _videoPlayerController2.pause();
-                        _videoPlayerController2.seekTo(Duration.zero);
-                        _chewieController = _chewieController!.copyWith(
-                          videoPlayerController: _videoPlayerController2,
-                          autoPlay: true,
-                          looping: true,
-                          /* subtitle: Subtitles([
+              ),
+              Expanded(
+                child: TextButton(
+                  onPressed: () {
+                    setState(() {
+                      _videoPlayerController2.pause();
+                      _videoPlayerController2.seekTo(Duration.zero);
+                      _chewieController = _chewieController!.copyWith(
+                        videoPlayerController: _videoPlayerController2,
+                        autoPlay: true,
+                        looping: true,
+                        /* subtitle: Subtitles([
                             Subtitle(
                               index: 0,
                               start: Duration.zero,
@@ -408,80 +434,80 @@ class _ChewieDemoState extends State<ChewieDemo> {
                               style: const TextStyle(color: Colors.white),
                             ),
                           ), */
-                        );
-                      });
-                    },
-                    child: const Padding(
-                      padding: EdgeInsets.symmetric(vertical: 16.0),
-                      child: Text("Portrait Video"),
-                    ),
-                  ),
-                )
-              ],
-            ),
-            Row(
-              children: <Widget>[
-                Expanded(
-                  child: TextButton(
-                    onPressed: () {
-                      setState(() {
-                        _platform = TargetPlatform.android;
-                      });
-                    },
-                    child: const Padding(
-                      padding: EdgeInsets.symmetric(vertical: 16.0),
-                      child: Text("Android controls"),
-                    ),
-                  ),
-                ),
-                Expanded(
-                  child: TextButton(
-                    onPressed: () {
-                      setState(() {
-                        _platform = TargetPlatform.iOS;
-                      });
-                    },
-                    child: const Padding(
-                      padding: EdgeInsets.symmetric(vertical: 16.0),
-                      child: Text("iOS controls"),
-                    ),
-                  ),
-                )
-              ],
-            ),
-            Row(
-              children: <Widget>[
-                Expanded(
-                  child: TextButton(
-                    onPressed: () {
-                      setState(() {
-                        _platform = TargetPlatform.windows;
-                      });
-                    },
-                    child: const Padding(
-                      padding: EdgeInsets.symmetric(vertical: 16.0),
-                      child: Text("Desktop controls"),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            if (Platform.isAndroid)
-              ListTile(
-                title: const Text("Delay"),
-                subtitle: DelaySlider(
-                  delay:
-                  _chewieController?.progressIndicatorDelay?.inMilliseconds,
-                  onSave: (delay) async {
-                    if (delay != null) {
-                      bufferDelay = delay == 0 ? null : delay;
-                      await initializePlayer();
-                    }
+                      );
+                    });
                   },
+                  child: const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 16.0),
+                    child: Text("Portrait Video"),
+                  ),
                 ),
               )
-          ],
-        ),
+            ],
+          ),
+          Row(
+            children: <Widget>[
+              Expanded(
+                child: TextButton(
+                  onPressed: () {
+                    setState(() {
+                      _platform = TargetPlatform.android;
+                    });
+                  },
+                  child: const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 16.0),
+                    child: Text("Android controls"),
+                  ),
+                ),
+              ),
+              Expanded(
+                child: TextButton(
+                  onPressed: () {
+                    setState(() {
+                      _platform = TargetPlatform.iOS;
+                    });
+                  },
+                  child: const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 16.0),
+                    child: Text("iOS controls"),
+                  ),
+                ),
+              )
+            ],
+          ),
+          Row(
+            children: <Widget>[
+              Expanded(
+                child: TextButton(
+                  onPressed: () {
+                    setState(() {
+                      _platform = TargetPlatform.windows;
+                    });
+                  },
+                  child: const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 16.0),
+                    child: Text("Desktop controls"),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          if (Platform.isAndroid)
+            ListTile(
+              title: const Text("Delay"),
+              subtitle: DelaySlider(
+                delay:
+                    _chewieController?.progressIndicatorDelay?.inMilliseconds,
+                onSave: (delay) async {
+                  if (delay != null) {
+                    bufferDelay = delay == 0 ? null : delay;
+                    await initializePlayer();
+                  }
+                },
+              ),
+            )
+        ],
+      ),
     );
   }
 }
@@ -526,11 +552,11 @@ class _DelaySliderState extends State<DelaySlider> {
         onPressed: saved
             ? null
             : () {
-          widget.onSave(delay);
-          setState(() {
-            saved = true;
-          });
-        },
+                widget.onSave(delay);
+                setState(() {
+                  saved = true;
+                });
+              },
       ),
     );
   }

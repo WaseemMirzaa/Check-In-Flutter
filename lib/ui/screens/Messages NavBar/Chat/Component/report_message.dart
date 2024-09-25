@@ -2,26 +2,27 @@ import 'package:check_in/auth_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:nb_utils/nb_utils.dart';
+import '../../../../../controllers/Messages/chat_controller.dart';
 
-class Report extends StatelessWidget {
-  const Report({
+class ReportMessage extends StatelessWidget {
+  const ReportMessage({
     super.key,
-    this.postId = '',
-    required this.reportedBy,
-    required this.isProfile,
-    this.profileId = ''
+    required this.docId,
+    required this.messageId,
+    required this.reportedBy
   });
 
-  final String postId;
+  final String messageId;
   final String reportedBy;
-  final bool isProfile;
-  final String profileId;
+  final String docId;
 
   @override
   Widget build(BuildContext context) {
+    var controller = Get.find<ChatController>();
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Report Content'),
+        title: const Text('Report Message'),
         centerTitle: true,
       ),
       body: FutureBuilder<List<String>>(
@@ -38,22 +39,12 @@ class Report extends StatelessWidget {
               itemBuilder: (context, index) {
                 return InkWell(
                   onTap: () async {
-                    if (isProfile) {
-                      final res = await newsFeedController.reportProfile(profileId, reportedBy, snapshot.data![index]);
-                      Get.back(result: res);
-                      if (res) {
-                        toast('Profile reported successfully');
-                      } else {
-                        toast('Error occurred');
-                      }
+                    final res = await controller.reportMessage(docId, messageId, reportedBy, snapshot.data![index]);
+                    Get.back();
+                    if (res) {
+                      toast('Message reported successfully');
                     } else {
-                      final res = await newsFeedController.reportPost(postId, reportedBy, snapshot.data![index]);
-                      Get.back(result: res);
-                      if (res) {
-                        toast('Post reported successfully');
-                      } else {
-                        toast('Error occurred');
-                      }
+                      toast('Error occurred');
                     }
                   },
                   child: Padding(
@@ -62,7 +53,7 @@ class Report extends StatelessWidget {
                       child: Padding(
                         padding: const EdgeInsets.all(16.0),
                         child: Text(
-                          snapshot.data![index]
+                            snapshot.data![index]
                         ),
                       ),
                     ),

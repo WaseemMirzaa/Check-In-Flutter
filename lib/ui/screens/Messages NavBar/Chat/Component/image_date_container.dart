@@ -1,5 +1,6 @@
 import 'package:check_in/controllers/Messages/chat_controller.dart';
 import 'package:check_in/core/constant/app_assets.dart';
+import 'package:check_in/ui/screens/Messages%20NavBar/Chat/Component/report_message.dart';
 import 'package:check_in/utils/DateTimeUtils.dart';
 import 'package:check_in/utils/loader.dart';
 import 'package:flutter/material.dart';
@@ -8,6 +9,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:nb_utils/nb_utils.dart';
 import 'package:sizer/sizer.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import '../../../../../auth_service.dart';
 import '../../../../../model/Message and Group Message Model/chat_model.dart';
 import '../../../../../utils/colors.dart';
 import '../../../../../utils/gaps.dart';
@@ -19,14 +21,15 @@ class ImageDateContainer extends StatefulWidget {
   Chatmodel? chat;
   bool? mymsg;
   bool? showLastSeen;
-
+  String? docId;
   bool? isGroup;
   ImageDateContainer(
       {super.key,
       this.chat,
       this.mymsg,
       this.showLastSeen,
-      this.isGroup});
+      this.isGroup,
+      this.docId});
 
   @override
   State<ImageDateContainer> createState() => _ImageDateContainerState();
@@ -35,21 +38,14 @@ class ImageDateContainer extends StatefulWidget {
 class _ImageDateContainerState extends State<ImageDateContainer> {
   final chatController = Get.find<ChatController>();
 
-  // @override
-  // void initState() {
-  //   // TODO: implement initState
-  //   super.initState();
-  //   setState(() {
-  //
-  //   });
-  // }
   @override
   Widget build(BuildContext context) {
     //String timeseperate = widget.chat!.time!.toString().split(' ')[1];
     //String timeseperate = widget.chat!.time!.toString().split(' ')[1];
     String time = DateTimeUtils.timeStamp24to12(widget.chat!.time!);
     return Column(
-      crossAxisAlignment: widget.mymsg! ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+      crossAxisAlignment:
+          widget.mymsg! ? CrossAxisAlignment.end : CrossAxisAlignment.start,
       children: [
         InkWell(
           onTap: widget.chat!.isDelete == true
@@ -64,7 +60,8 @@ class _ImageDateContainerState extends State<ImageDateContainer> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 17.0, vertical: 50),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 17.0, vertical: 50),
                               child: GestureDetector(
                                 onTap: () {
                                   Navigator.pop(context);
@@ -79,16 +76,22 @@ class _ImageDateContainerState extends State<ImageDateContainer> {
                               padding: const EdgeInsets.only(top: 40.0),
                               child: Image.network(
                                 widget.chat!.message!,
-                                loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
+                                loadingBuilder: (BuildContext context,
+                                    Widget child,
+                                    ImageChunkEvent? loadingProgress) {
                                   if (loadingProgress == null) {
                                     return child;
                                   } else {
                                     return Center(
                                       child: CircularProgressIndicator(
                                         color: whiteColor,
-                                        value: loadingProgress.expectedTotalBytes != null
-                                            ? loadingProgress.cumulativeBytesLoaded /
-                                                loadingProgress.expectedTotalBytes!
+                                        value: loadingProgress
+                                                    .expectedTotalBytes !=
+                                                null
+                                            ? loadingProgress
+                                                    .cumulativeBytesLoaded /
+                                                loadingProgress
+                                                    .expectedTotalBytes!
                                             : null,
                                       ),
                                     );
@@ -103,17 +106,23 @@ class _ImageDateContainerState extends State<ImageDateContainer> {
                         );
                       });
                 },
-          onLongPress: widget.mymsg! && widget.chat!.isDelete == null || widget.chat!.isDelete == false
+          onLongPress: widget.mymsg! && widget.chat!.isDelete == null ||
+                  widget.chat!.isDelete == false
               ? () {
                   showDialog(
                       context: context,
                       builder: (context) => AlertDialog(
                             title: Text(
                               'Delete Message',
-                              style: TextStyle(fontWeight: FontWeight.w600, color: appBlackColor),
+                              style: TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  color: appBlackColor),
                             ),
                             content: Text('Do you want to delete this message?',
-                                style: TextStyle(fontWeight: FontWeight.w400, color: appBlackColor, fontSize: 14)),
+                                style: TextStyle(
+                                    fontWeight: FontWeight.w400,
+                                    color: appBlackColor,
+                                    fontSize: 14)),
                             actions: [
                               TextButton(
                                   onPressed: () {
@@ -123,14 +132,19 @@ class _ImageDateContainerState extends State<ImageDateContainer> {
                               TextButton(
                                   onPressed: () async {
                                     await chatController
-                                        .deleteMessage(chatController.docId.value, widget.chat!.docID!)
-                                        .then((value) => Navigator.pop(context));
+                                        .deleteMessage(
+                                            chatController.docId.value,
+                                            widget.chat!.docID!)
+                                        .then(
+                                            (value) => Navigator.pop(context));
                                   },
                                   child: const Text('Yes'))
                             ],
                           ));
                 }
-              : null,
+              : () {
+                  showOptionDialog(context, widget.chat);
+                },
           child: widget.chat!.isDelete == true
               ? Container(
                   constraints: BoxConstraints(maxWidth: 65.w),
@@ -142,14 +156,17 @@ class _ImageDateContainerState extends State<ImageDateContainer> {
                             ? appGreenColor
                             : appGreyColor1.withOpacity(1),
                   ),
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
                   child: Text(
                     widget.chat!.message!,
                     style: GoogleFonts.poppins(
                       textStyle: TextStyle(
                           fontWeight: FontWeight.normal,
                           fontSize: 12,
-                          fontStyle: widget.chat!.isDelete == true ? FontStyle.italic : null,
+                          fontStyle: widget.chat!.isDelete == true
+                              ? FontStyle.italic
+                              : null,
                           color: widget.chat!.isDelete == true
                               ? appWhiteColor
                               : widget.mymsg!
@@ -170,7 +187,8 @@ class _ImageDateContainerState extends State<ImageDateContainer> {
                     child: CachedNetworkImage(
                       imageUrl: widget.chat!.message!,
                       fit: BoxFit.cover,
-                      placeholder: (context, url) => loaderView(loaderColor: whiteColor),
+                      placeholder: (context, url) =>
+                          loaderView(loaderColor: whiteColor),
                     ),
                   ),
                 ),
@@ -180,32 +198,60 @@ class _ImageDateContainerState extends State<ImageDateContainer> {
           children: [
             poppinsText(time, 10, medium, greyColor.withOpacity(1)),
             horizontalGap(5),
-            widget.chat!.isDelete !=true && widget.isGroup != true && widget.mymsg! && widget.chat!.isRead != true  ? Icon(Icons.check,size: 15,color: greyColor,) : widget.chat!.isDelete !=true && widget.isGroup != true && widget.mymsg! && widget.chat!.isRead == true ? const ImageIcon(AssetImage(AppAssets.DOUBLE_TICK),size: 15,color: greenColor) : const SizedBox(),
-
-            // mymsg!
-            //     ? poppinsText('✓', 10, medium, greyColor.withOpacity(1))
-            //     : const SizedBox(),
-            // horizontalGap(5),
-            // mymsg!
-            //     ? const CircleAvatar(
-            //         backgroundImage: CachedNetworkImageProvider(
-            //             'https://wac-cdn.atlassian.com/dam/jcr:ba03a215-2f45-40f5-8540-b2015223c918/Max-R_Headshot%20(1).jpg?cdnVersion=1365'),
-            //         radius: 8,
-            //       )
-            //     : const SizedBox()
+            widget.chat!.isDelete != true &&
+                    widget.isGroup != true &&
+                    widget.mymsg! &&
+                    widget.chat!.isRead != true
+                ? Icon(
+                    Icons.check,
+                    size: 15,
+                    color: greyColor,
+                  )
+                : widget.chat!.isDelete != true &&
+                        widget.isGroup != true &&
+                        widget.mymsg! &&
+                        widget.chat!.isRead == true
+                    ? const ImageIcon(AssetImage(AppAssets.DOUBLE_TICK),
+                        size: 15, color: greenColor)
+                    : const SizedBox(),
           ],
         ),
-        // widget.chat!.seenTimeStamp != '' && widget.showLastSeen == true && widget.isGroup == false
-        //     ? Container(
-        //         padding: const EdgeInsets.all(5),
-        //         decoration: BoxDecoration(
-        //           border: Border.all(),
-        //           borderRadius: BorderRadius.circular(15),
-        //         ),
-        //         child: poppinsText("Seen ${widget.seenTime}", 9, medium, greyColor),
-        //       )
-        //     : const SizedBox()
       ],
+    );
+  }
+
+  void showOptionDialog(BuildContext context, Chatmodel? chat) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Select an Option'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                ListTile(
+                  leading: const Icon(Icons.report),
+                  title: const Text('Report Message'),
+                  onTap: () {
+                    Navigator.pop(context);
+                    Get.to(ReportMessage(
+                        docId: widget.docId ?? '',
+                        messageId: chat?.docID ?? '',
+                        reportedBy: userController.userModel.value.uid!));
+                  },
+                ),
+                ListTile(
+                  leading: const Icon(Icons.visibility_off),
+                  title: const Text('Hide Message'),
+                  onTap: () {
+                    Navigator.pop(context);
+                  },
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }

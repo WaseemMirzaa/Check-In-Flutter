@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:check_in/Services/message_service.dart';
-import 'package:check_in/ui/screens/News%20Feed%20NavBar/News%20Feed/news_feed_screen.dart';
+import 'package:check_in/ui/screens/Messages%20NavBar/Chat/chat_screen.dart';
 import 'package:check_in/ui/screens/News%20Feed%20NavBar/open_post/open_post.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -10,7 +10,6 @@ import '../controllers/Messages/chat_controller.dart';
 import '../model/notification_model.dart';
 import 'package:http/http.dart' as http;
 
-import '../ui/screens/ Messages NavBar/Chat/chat_screen.dart';
 
 final ChatController chatcontroller = Get.find<ChatController>();
 
@@ -74,101 +73,25 @@ class PushNotificationServices {
     // print('Step 1');
     if (settings.authorizationStatus == AuthorizationStatus.authorized) {
       print('🟢🟢🟢🟢🟢 authorized');
-
-      // print('Step 2');
-      // handle received push notification messages
-      // FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
-      //   print('Received message: ${message.notification?.title}');
-      //   print('Received message: ${message.notification?.body}');
-      //   if (message.notification?.body != null) {
-      //     notificationsPlugin.show(
-      //         1,
-      //         message.notification?.title,
-      //         message.notification?.body,
-      //         NotificationDetails(
-      //             android: AndroidNotificationDetails(
-      //               channel.id,
-      //               channel.name,
-      //               importance: Importance.high,
-      //               color: Colors.blue,
-      //               playSound: true,
-      //               icon: '@mipmap/ic_launcher',
-      //             ),
-      //             iOS: IOSNotificationDetails(
-      //               presentSound: true,
-      //               presentAlert: true,
-      //               presentBadge: true,
-      //             )));
-      //
-      //     int notificationBadge = getIntAsync(SharePreferencesKey.NOTIFICATION_BADGE);
-      //     await setValue(SharePreferencesKey.NOTIFICATION_BADGE, notificationBadge++);
-      //     FlutterAppBadger.updateBadgeCount(notificationBadge++);
-      //
-      //   }
-      // });
-
-      // print('Step 3');
-      // FirebaseMessaging.onBackgroundMessage((RemoteMessage message) async {
-      //   log("data background is ${message.data}");
-      //   // int notificationBadge = 0;
-      //   if (message.data.isNotEmpty) {
-      //     //RemoteNotification? notification = message.notification;
-      //     String notificationType = message.data['notificationType'];
-      //     NotificationModel.type = notificationType;
-      //     NotificationModel.docId = message.data['docId'];
-      //     NotificationModel.name = message.data['name'];
-      //     NotificationModel.image = message.data['image'];
-      //     NotificationModel.isGroup = bool.parse(message.data['isGroup']);
-      //     NotificationModel.memberIds = json.decode(message.data['memberIds']);
-      //   }
-      //   notificationsPlugin.show(
-      //       1,
-      //       message.notification?.title,
-      //       message.notification?.body,
-      //       NotificationDetails(
-      //           android: AndroidNotificationDetails(
-      //             channel.id,
-      //             channel.name,
-      //             importance: Importance.high,
-      //             color: Colors.blue,
-      //             playSound: true,
-      //             icon: '@mipmap/ic_launcher',
-      //             channelShowBadge: true,
-      //           ),
-      //           iOS: const DarwinNotificationDetails(
-      //             presentSound: true,
-      //             presentAlert: true,
-      //             presentBadge: true,
-      //             // badgeNumber: notificationBadge
-      //           )));
-      // });
-
       print('🟢🟢🟢🟢🟢 adding listener');
 
       FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
         print('🟢🟢🟢🟢🟢 onMessageListened');
 
+        NotificationModel notificationModel = NotificationModel();
         // int notificationBadge = 0;
         if (message.data.isNotEmpty) {
           //RemoteNotification? notification = message.notification;
           String notificationType = message.data['notificationType'];
-          NotificationModel.type = notificationType;
-          NotificationModel.docId = message.data['docId'];
-          NotificationModel.name = message.data['name'];
-          NotificationModel.image = message.data['image'];
-          NotificationModel.isGroup = bool.parse(message.data['isGroup']);
-          NotificationModel.memberIds = json.decode(message.data['memberIds']);
+          notificationModel.type = notificationType;
+          notificationModel.docId = message.data['docId'];
+          notificationModel.name = message.data['name'];
+          notificationModel.image = message.data['image'];
+          notificationModel.isGroup = bool.parse(message.data['isGroup']);
+          notificationModel.memberIds = json.decode(message.data['memberIds']);
 
-          // print("notification type");
-          // print(NotificationModel.type);
-          // notificationBadge = getIntAsync(
-          //     SharedPreferenceKey.NOTIFICATION_BADGE,
-          //     defaultValue: 0);
-          // await setValue(
-          //     SharedPreferenceKey.NOTIFICATION_BADGE, notificationBadge++);
-          // FlutterAppBadger.updateBadgeCount(notificationBadge++);
         }
-        if (chatcontroller.docId.value != NotificationModel.docId) {
+        if (chatcontroller.docId.value != notificationModel.docId) {
           notificationsPlugin.show(
               1,
               message.notification?.title,
@@ -190,91 +113,41 @@ class PushNotificationServices {
                     // badgeNumber: notificationBadge
                   )));
         }
-        //....
-
-        // }
-        // }
       });
-
-      // FirebaseMessaging.onBackgroundMessage((message) => null)
 
       // handle notification messages when the app is in the background or terminated
       FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) async {
         print('🟢🟢🟢🟢🟢 onMessageOpenedApp');
 
-        //.............................
-        chatcontroller.docId.value = NotificationModel.docId;
-        chatcontroller.name.value = NotificationModel.name;
-        chatcontroller.isgroup = NotificationModel.isGroup;
-        chatcontroller.image.value = NotificationModel.image;
-        chatcontroller.memberId.value = NotificationModel.memberIds;
-        //.............................
+        chatcontroller.docId.value = message.data['docId'];
+        chatcontroller.name.value = message.data['name'];
+        chatcontroller.isgroup = bool.parse(message.data['isGroup']);
+        chatcontroller.image.value = message.data['image'];
+        List<dynamic> memberIdsList = jsonDecode(message.data['memberIds']);
+        chatcontroller.memberId.value = memberIdsList;
 
-        NotificationModel.type == 'newsFeed' ? Get.to(()=>OpenPost(postId: NotificationModel.docId,))  : Get.to(() => ChatScreen());
+        message.data['notificationType'] == 'newsFeed'
+            ? Get.to(() => OpenPost(postId: message.data['docId'],))
+            : Get.to(() => ChatScreen());
 
-        // print('Opened message: ${message.notification?.title}');
-        // handle the opened message here, for example by navigating to a specific screen
         String notificationType = message.data['notificationType'];
-        NotificationModel.type = notificationType;
-        // print("notification types");
-        // print(NotificationModel.type);
-        // if (notificationType == PushNotificationType.msg) {
-        //   print('Step 4');
-        //   String transac = message.data['transactionId'];
-        //   UserModel userModel =
-        //       await userService.userByUid(message.data['peer']);
-        //   print("peer id");
-        //   print(userModel.uid);
-        //   navBarController.controller.index = 1;
-        //   navBarController.currentIndex.value = 1;
-        //   NotificationModel.transactionId = message.data['transactionId'];
-        //   NotificationModel.peer = message.data['peer'];
-        //   Get.to(() => ChatPage(
-        //       arguments:
-        //           ChatPageArguments(peer: userModel, transactionId: transac)));
-        // } else {
-        //   print('Step 5');
-        //   navBarController.controller.index = 3;
-        //   navBarController.currentIndex.value = 3;
-        //   Get.to(() => Home());
-        // }
-        // print("2");
-        // print(NotificationModel.type);
+        NotificationModel notificationModel = NotificationModel();
+        notificationModel.type = notificationType;
       });
-      //
 
-      // print('Step 6');
       await notificationsPlugin.initialize(initializationSettings, onDidReceiveNotificationResponse: (payload) async {
         print('🟢🟢🟢🟢🟢 onDidReceiveNotificationResponse');
+        NotificationModel notificationModel = NotificationModel();
+        chatcontroller.docId.value = notificationModel.docId;
+        chatcontroller.name.value = notificationModel.name;
+        chatcontroller.isgroup = notificationModel.isGroup;
+        chatcontroller.image.value = notificationModel.image;
+        chatcontroller.memberId.value = notificationModel.memberIds;
 
-        // print("notification type is");
-        // print(NotificationModel.transactionId);
-        //.............................
-        chatcontroller.docId.value = NotificationModel.docId;
-        chatcontroller.name.value = NotificationModel.name;
-        chatcontroller.isgroup = NotificationModel.isGroup;
-        chatcontroller.image.value = NotificationModel.image;
-        chatcontroller.memberId.value = NotificationModel.memberIds;
-        //.............................
+        notificationModel.type == 'newsFeed'
+            ? Get.to(() => OpenPost(postId: notificationModel.docId,))
+            : Get.to(() => ChatScreen());
 
-        NotificationModel.type == 'newsFeed' ? Get.to(()=>OpenPost(postId: NotificationModel.docId,)) : Get.to(() => ChatScreen());
-
-        // if (NotificationModel.type == PushNotificationType.msg) {
-        //   print('Step 7');
-        //   String transac = NotificationModel.transactionId;
-        //   UserModel userModel =
-        //       await userService.userByUid(NotificationModel.peer);
-        //   navBarController.controller.index = 1;
-        //   navBarController.currentIndex.value = 1;
-        //   Get.to(() => ChatPage(
-        //       arguments:
-        //           ChatPageArguments(peer: userModel, transactionId: transac)));
-        // } else {
-        //   print('Step 8');
-        //   navBarController.controller.index = 3;
-        //   navBarController.currentIndex.value = 3;
-        //   Get.to(() => Home());
-        // }
       });
     }
   }

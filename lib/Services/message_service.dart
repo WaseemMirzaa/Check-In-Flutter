@@ -3,7 +3,6 @@
 import 'dart:async';
 import 'dart:developer';
 import 'dart:io';
-
 import 'package:check_in/core/constant/constant.dart';
 import 'package:check_in/core/constant/temp_language.dart';
 import 'package:check_in/model/Message%20and%20Group%20Message%20Model/chat_model.dart';
@@ -15,13 +14,11 @@ import 'package:check_in/utils/common.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
-
-import '../controllers/Messages/firestore_pagination.dart';
 import '../firebase_options.dart';
 import '../model/Message and Group Message Model/message_model.dart';
+import '../model/NewsFeed Model/report_posts_model.dart';
 
 // List<dynamic> mem = [];
 
@@ -30,29 +27,6 @@ class MessageService {
   final db = FirebaseFirestore.instance;
   final CollectionReference _messagesCollection = FirebaseFirestore.instance.collection(Collections.MESSAGES);
   final FirebaseStorage _storage = FirebaseStorage.instance;
-
-  FirestoreQueryBuilder<Messagemodel> buildChatMessageQueryBuilder(String myId, DocumentSnapshot? lastVisible) {
-    Query query =
-        _messagesCollection.where(MessageField.MEMBER_IDS, arrayContains: myId).orderBy('timestamp', descending: true);
-
-    if (lastVisible != null) {
-      query = query.startAfterDocument(lastVisible);
-    }
-
-    return FirestoreQueryBuilder<Messagemodel>(query);
-  }
-
-  FirestoreQueryBuilder<Chatmodel> buildConversationQueryBuilder(String docId, DocumentSnapshot? lastVisible) {
-    Query query =
-        _messagesCollection.doc(docId).collection(Collections.CHAT).orderBy(ChatField.TIME_STAMP, descending: true);
-
-    if (lastVisible != null) {
-      query = query.startAfterDocument(lastVisible);
-    }
-
-    return FirestoreQueryBuilder<Chatmodel>(query);
-  }
-
 //............ Get Message
   Stream<List<Messagemodel>> getChatMessage(String myId) {
     List<dynamic> mem = [];
@@ -63,12 +37,6 @@ class MessageService {
         .map((querySnapshot) => querySnapshot.docs.map<Messagemodel>((doc) {
               num unread = 0;
               Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
-
-              // if(data[MessageField.TIME_STAMP] is !Timestamp) {
-              //   return Messagemodel(
-              //     showMessageTile: false
-              //   );
-              // }
 
               bool checkMyId = false;
               bool checkDeleteStatus = true;
@@ -168,8 +136,6 @@ class MessageService {
                }) // Filter messages by timestamp
                 .map<Chatmodel>((doc) {
       calculateTimeDifference('GetConversation Stream Start');
-              // updateLastSeen(docId, uId);
-
                updateUnreadCount(docId, uId, mem);
 
               if (doc.data()['isRead'] == null && doc.data()['id'] != uId) {
@@ -202,21 +168,6 @@ class MessageService {
     }
   }
 
-  // Stream<List<Chatmodel>> getNewConversation(String docId, String uId, List mem) {
-  //   return _messagesCollection
-  //       .doc(docId)
-  //       .collection(Collections.CHAT)
-  //       .orderBy(ChatField.TIME_STAMP, descending: true)
-  //       .snapshots()
-  //       .asyncMap((querySnapshot) async {
-  //     List<Chatmodel> chatModels = [];
-  //     bool excludeMessage = false;
-  //     // updateLastSeen(docId, uId);
-  //     updateUnreadCount(docId, uId, 0, mem);
-  //     readReceipts(docId, uId);
-  //     return chatModels;
-  //   });
-  // }
 
   Future<Timestamp?> getDeleteTimeStamp(String docId, String uId) async {
     DocumentSnapshot messageSnapshot = await _messagesCollection.doc(docId).get();
@@ -244,8 +195,6 @@ class MessageService {
         Map<String, dynamic>? data = snapshot.data() as Map<String, dynamic>?;
         if (data != null && data.containsKey('senderStatus')) {
           String status = data['senderStatus'];
-          print('wwwwwww: $data');
-          print('wwwwwww: $status');
           if (status == 'Online') {
             return 'Online';
           } else if (status.isNotEmpty) {
@@ -256,8 +205,17 @@ class MessageService {
       }
       return '';
     } catch (e) {
-      print('Error fetching online status: $e');
       return '';
+    }
+  }
+
+  Future<bool> blockContact(String docID, String userID) async {
+    try {
+      /// id of the person that is blocked User
+      await _messagesCollection.doc(docID).update({MessageField.BLOCK_ID: userID});
+      return true;
+    } catch (e) {
+      return false;
     }
   }
 
@@ -343,7 +301,6 @@ class MessageService {
         if (data.containsKey(MessageField.DELETE_IDS)) {
           await _messagesCollection.doc(docId).set({MessageField.DELETE_IDS: deleteIds}, SetOptions(merge: true));
         }
-        // await _messagesCollection.doc(docId).set({MessageField.DELETE_IDS: deleteIds}, SetOptions(merge: true));
       }
     } catch (error) {
       print(" Error updating deleteIds: ${error.toString()}");
@@ -356,19 +313,22 @@ class MessageService {
       print(docId);
       print(uId);
       final docRef = _messagesCollection.doc(docId);
-      FirebaseFirestore.instance.runTransaction((transaction) async {
-        final snapshot = await transaction.get(docRef);
+
+      final snapshot = await docRef.get();
+      final data = snapshot.data() as Map<String, dynamic>;
+      if (data.containsKey(MessageField.SENDER_ID)) {
         if (snapshot.get(MessageField.SENDER_ID) == uId) {
-          docRef.update({'senderStatus': status});
+          await docRef.update({'senderStatus': status});
         } else {
-          docRef.update({'receiverStatus': status});
+          await docRef.update({'receiverStatus': status});
         }
-      });
+      }
       print('Online status updated successfully for user $docId');
     } catch (e) {
       print('Error updating online status: $e');
     }
   }
+
 
 //............ Update last Seen
   Future<void> updateLastSeen(String docId, String uid) async {
@@ -376,7 +336,6 @@ class MessageService {
     final docRef = _messagesCollection.doc(docId);
     final CollectionReference subcollectionRef = docRef.collection(Collections.CHAT);
 
-    // QuerySnapshot subcollectionSnapshot = await subcollectionRef.get();
     QuerySnapshot subcollectionSnapshot = await subcollectionRef.where('id', isNotEqualTo: uid).get();
 
     WriteBatch batch = FirebaseFirestore.instance.batch();
@@ -398,25 +357,27 @@ class MessageService {
     calculateTimeDifference('updateUnReadCount');
     final start = DateTime.now();
     final docRef = _messagesCollection.doc(docId);
-    FirebaseFirestore.instance.runTransaction((transaction) async {
-      final snapshot = await transaction.get(docRef);
-      if (snapshot.get(MessageField.IS_GROUP) == true && mem.isNotEmpty) {
-        for (int i = 0; i < mem.length; i++) {
-          if (mem[i][MessageField.MEMBER_UID] == uId) {
-            //print("------------>><${mem[i][MessageField.MEMBER_UID]}");
-            mem[i][MessageField.MEMBER_UNREAD_COUNT] = 0;
-            break;
-          }
-        }
-        docRef.update({MessageField.MEMBERS: mem});
-      } else {
-        if (snapshot.get(MessageField.SENDER_ID) == uId) {
-          docRef.update({MessageField.SENDER_UNREAD: 0});
-        } else {
-          docRef.update({MessageField.RECIEVER_UNREAD: 0});
+
+    final snapshot = await docRef.get();
+    if (snapshot.get(MessageField.IS_GROUP) == true && mem.isNotEmpty) {
+      for (int i = 0; i < mem.length; i++) {
+        if (mem[i][MessageField.MEMBER_UID] == uId) {
+          mem[i][MessageField.MEMBER_UNREAD_COUNT] = 0;
+          break;
         }
       }
-    });
+      await docRef.update({MessageField.MEMBERS: mem});
+    } else {
+      final data = snapshot.data() as Map<String, dynamic>;
+
+      if (data.containsKey(MessageField.SENDER_ID)) {
+        if (snapshot.get(MessageField.SENDER_ID) == uId) {
+          await docRef.update({MessageField.SENDER_UNREAD: 0});
+        } else {
+          await docRef.update({MessageField.RECIEVER_UNREAD: 0});
+        }
+      }
+    }
   }
 
   //.............. Delete Chat Function
@@ -456,36 +417,6 @@ class MessageService {
       'isRead': true
     });
     calculateTimeDifference('End Read Receipts');
-    // try {
-    //   if (Firebase.apps.isEmpty) {
-    //     print("🟢🟢🟢🟢🟢🟢🟢🟢🟢🟢No firebase app exist:🟢🟢🟢🟢🟢🟢🟢🟢🟢🟢");
-    //     return false;
-    //   }
-    //   final querySnapshot = await _messagesCollection
-    //       .doc(messageDoc)
-    //       .collection(Collections.CHAT)
-    //       .where('id', isNotEqualTo: uid)
-    //       .where('isRead', isEqualTo: null)
-    //       .get();
-    //
-    //   if (querySnapshot.docs.isNotEmpty) {
-    //     for (final doc in querySnapshot.docs) {
-    //       final chatModel = Chatmodel.fromJson(doc.data());
-    //       chatModel.isRead = true;
-    //       await doc.reference.update(chatModel.toJson());
-    //     }
-    //     calculateTimeDifference('End Read Receipts');
-    //     return true;
-    //   } else {
-    //     log("🟢🟢🟢🟢🟢DOCS ARE NULL🟢🟢🟢🟢🟢");
-    //     calculateTimeDifference('End Read Receipts');
-    //     return false; // No documents found where isRead is false
-    //   }
-    // } catch (error) {
-    //   calculateTimeDifference('End Read Receipts');
-    //   print("🟢🟢🟢🟢🟢🟢🟢🟢🟢🟢Error updating chat document models:🟢🟢🟢🟢🟢🟢🟢🟢🟢🟢 $error");
-    //   return false;
-    // }
   }
 
 //............ Get message request status
@@ -495,54 +426,6 @@ class MessageService {
     });
   }
 
-//............ Send message
-//   Future<DocumentSnapshot?> sendMessage(String docId, Chatmodel chatmodel, List mem) async {
-//     final batch = FirebaseFirestore.instance.batch();
-//
-//     print("member$mem");
-//     final docRef = _messagesCollection.doc(docId);
-//     DocumentSnapshot messageSnapshot = await docRef.get();
-//     if (chatmodel.type == 'image') {
-//       var image = await uploadChatImageToFirebase(
-//           docId, chatmodel.message!, chatmodel.id!, chatmodel.time!.microsecondsSinceEpoch.toString(), messageSnapshot, chatmodel.thumbnail!);
-//       chatmodel.message = image['original'];
-//       chatmodel.thumbnail = image['thumbnail'];
-//     }
-//
-//     CollectionReference chatCollection = _messagesCollection.doc(docId).collection(Collections.CHAT);
-//
-//     // Get a reference to the newly added document
-//     DocumentReference newDocumentRef = chatCollection.doc();
-//     batch.set(newDocumentRef, chatmodel.toJson());
-//
-//     CollectionReference messageCollection = _messagesCollection;
-//     //   update lastseen and timestamp
-//     batch.update(messageCollection.doc(docId), {
-//       MessageField.LAST_MESSAGE: chatmodel.type == 'image' ? 'Photo' : chatmodel.message,
-//       MessageField.TIME_STAMP: chatmodel.time,
-//     });
-//
-//     if (messageSnapshot.get(MessageField.IS_GROUP) == true) {
-//       for (int i = 0; i < mem.length; i++) {
-//         if (mem[i][MessageField.MEMBER_UID] != chatmodel.id) {
-//           int current = mem[i][MessageField.MEMBER_UNREAD_COUNT];
-//           mem[i][MessageField.MEMBER_UNREAD_COUNT] = current + 1;
-//         }
-//       }
-//       batch.update(docRef, {MessageField.MEMBERS: mem});
-//     } else {
-//       if (messageSnapshot.get(MessageField.SENDER_ID) == chatmodel.id) {
-//         batch.update(docRef, {MessageField.RECIEVER_UNREAD: FieldValue.increment(1)});
-//       } else {
-//         batch.update(docRef, {MessageField.SENDER_UNREAD: FieldValue.increment(1)});
-//       }
-//     }
-//     await batch.commit();
-//
-//     // Fetch and return the snapshot of the newly added document
-//     DocumentSnapshot newDocumentSnapshot = await newDocumentRef.get();
-//     return newDocumentSnapshot;
-//   }
 
   Future<void> _isolateGetTheMostLikes(List<Object> args,) async {
     final rootIsolateToken = args[0] as RootIsolateToken;
@@ -573,7 +456,6 @@ class MessageService {
   }
 
   Future<DocumentSnapshot?> sendMessage(String docId, Chatmodel chatmodel, List mem) async {
-    print("member$mem");
 
     calculateTimeDifference('Start Send Message');
     final docRef = _messagesCollection.doc(docId);
@@ -595,9 +477,6 @@ class MessageService {
       MessageField.LAST_MESSAGE: chatmodel.type == 'image' ? 'Photo' : chatmodel.message,
       MessageField.TIME_STAMP: chatmodel.time,
     });
-
-    // RootIsolateToken? rootIsolateToken = RootIsolateToken.instance;
-    // await Isolate.spawn(_isolateGetTheMostLikes, [rootIsolateToken!, messageSnapshot, mem, chatmodel, docRef]);
 
     if (messageSnapshot.get(MessageField.IS_GROUP) == true) {
       for (int i = 0; i < mem.length; i++) {
@@ -756,36 +635,19 @@ class MessageService {
 //........... Make Group Admin
   Future<void> makeGroupAdmin(String docId, String memberId, bool isAdmin) async {
     final docRef = _messagesCollection.doc(docId);
-    db.runTransaction((transaction) async {
-      final snapshot = await transaction.get(docRef);
-      List memberLst = snapshot.get(MessageField.MEMBERS);
-      for (var data in memberLst) {
-        if (data[MessageField.MEMBER_UID] == memberId) {
-          data[MessageField.IS_ADMIN] = isAdmin;
-        }
+
+    final snapshot = await docRef.get();
+    List memberLst = snapshot.get(MessageField.MEMBERS);
+
+    for (var data in memberLst) {
+      if (data[MessageField.MEMBER_UID] == memberId) {
+        data[MessageField.IS_ADMIN] = isAdmin;
       }
-      transaction.update(docRef, {MessageField.MEMBERS: memberLst});
-    });
+    }
+
+    await docRef.update({MessageField.MEMBERS: memberLst});
   }
 
-//........... Retrieve user for start new chat
-  // Stream<List<UserModel>> getUsers(String name) {
-  //   try {
-  //     return db
-  //         .collection('USER')
-  //         .where('user name', isEqualTo: name)
-  //         .snapshots()
-  //         .map((snapshot) => snapshot.docs.map((doc) {
-  //               Map<String, dynamic> data = doc.data();
-  //               return UserModel.fromMap(data);
-  //             }).toList());
-  //   } catch (e) {
-  //     print('Error: $e');
-  //     rethrow;
-  //   }
-  // }
-
-//...... foew now only for add new group member (make same for getting users for start new chat)
   Future<List<UserModel>> getUsers(String name) async {
     try {
       QuerySnapshot querySnapshot = await db.collection('USER').where('user name', isGreaterThanOrEqualTo: name).get();
@@ -817,17 +679,7 @@ class MessageService {
 
 //........... Start new chat
   Future<String> startNewChat(List ids, String senderName, String recieverName, String photoUrl, String UIimage) async {
-    // if (await areIdsMatching(ids) != '') {
-    //   print('No data added because IDs match');
-    //   // Do not add data and return an indication that no data waSs added
-    //   return {'NewChat': 'No', 'docId': areIdsMatching(ids)};
-    // }
-
-    // const uuid = Uuid();
-    // final documentId = uuid.v4();
     String documentId = _messagesCollection.doc().id;
-
-
 
     Map<String, dynamic> data = {
       MessageField.ID: documentId,
@@ -850,10 +702,6 @@ class MessageService {
     };
 
     await _messagesCollection.doc(documentId).set(data);
-    //String documentId = documentReference.id;
-
-    // Update the 'id' field in the model with the document ID
-    //await _messagesCollection.doc(documentId).update({MessageField.ID: documentId});
     return documentId;
   }
 
@@ -883,13 +731,8 @@ class MessageService {
   //........... Start new group chat
   Future<Map<String, String>> startNewGroupChat(
       List ids, List members, String groupName, groupInfo, String groupImage) async {
-    print('members $members');
-
-    // const uuid = Uuid();
-    // final documentId = uuid.v4();
 
     String documentId = _messagesCollection.doc().id;
-
 
     Map<String, dynamic> data = {
       MessageField.ABOUT_GROUP: groupInfo,
@@ -938,16 +781,6 @@ class MessageService {
     }
   }
 
-  // Future<bool> removeCurrentUserFromMemberIds(String docID) async {
-  //   String currentUserUid = FirebaseAuth.instance.currentUser!.uid;
-  //   CollectionReference messagesCollection = FirebaseFirestore.instance.collection(Collections.MESSAGES);
-  //   DocumentReference documentReference = messagesCollection.doc(docID);
-  //   DocumentSnapshot documentSnapshot = await documentReference.get();
-  //   List<dynamic> memberIds = documentSnapshot[MessageField.MEMBER_IDS];
-  //   memberIds.remove(currentUserUid);
-  //   await documentReference.update({MessageField.MEMBER_IDS: memberIds});
-  //   return true;
-  // }
 
   //........... Add new member
   Future<bool> addNewMember(List ids, List members, String docId) async {
@@ -987,18 +820,7 @@ class MessageService {
           MessageField.MEMBERS: currentData,
         });
       }
-      //.....Remove ID from DELETE_IDS array
-      // List<Map<String, dynamic>> deleteMapData =
-      //     List<Map<String, dynamic>>.from(documentSnapshot[MessageField.DELETE_IDS] ?? []);
-      // Map<String, dynamic> data = documentSnapshot.data() as Map<String, dynamic>;
-      // int indexToRemoveDelete = deleteMapData
-      //     .indexWhere((map) => map.containsKey(MessageField.MEMBER_UID) && map[MessageField.MEMBER_UID] == id);
-      // if (indexToRemoveDelete != -1) {
-      //   deleteMapData.removeAt(indexToRemoveDelete);
-      //   batch.update(_messagesCollection.doc(docId), {
-      //     MessageField.DELETE_IDS: deleteMapData,
-      //   });
-      // }
+
       await batch.commit();
     } catch (e) {
       log("Error is --------------------------> $e");
@@ -1006,30 +828,7 @@ class MessageService {
     }
   }
 
-  //........... Remove new member
-  // Future<void> removeMember(String id, docId) async {
-  //   print("doc id is: =========================> $docId");
-  //   try {
-  //     await _messagesCollection.doc(docId).update({
-  //       MessageField.MEMBER_IDS: FieldValue.arrayRemove([id]),
-  //     });
-  //     DocumentSnapshot documentSnapshot = await _messagesCollection.doc(docId).get();
-  //     List<Map<String, dynamic>> currentData =
-  //         List<Map<String, dynamic>>.from(documentSnapshot[MessageField.MEMBERS] ?? []);
-  //     int indexToRemove = currentData.indexWhere((map) => map[MessageField.MEMBER_UID] == id);
-  //     if (indexToRemove != -1) {
-  //       currentData.removeAt(indexToRemove);
-  //       await _messagesCollection.doc(docId).update({
-  //         MessageField.MEMBERS: currentData,
-  //       });
-  //     }
-  //   } catch (e) {
-  //     log("Error is --------------------------> $e");
-  //     rethrow;
-  //   }
-  // }
 
-//............. get device token
   Future<List<dynamic>> getDeviceToken(String id) async {
     DocumentReference userRef = FirebaseFirestore.instance.collection('USER').doc(id);
 
@@ -1049,6 +848,40 @@ class MessageService {
       );
     } catch (e) {
       print(e);
+    }
+  }
+
+  Future<bool> reportMessage(String docId, String messageId, String reportedBy, String reason) async {
+    try {
+      String reportId = FirebaseFirestore.instance.collection(Collections.REPORT_MESSAGE).doc().id;
+      ReportModel report = ReportModel(
+        reportId: reportId,
+        docId: docId,
+        messageId: messageId,
+        reportedBy: reportedBy,
+        reason: reason,
+        timestamp: Timestamp.now(),
+      );
+      await FirebaseFirestore.instance.collection(Collections.REPORT_MESSAGE).doc(reportId).set(report.toJson());
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  Future<bool> hideMessage(String docId, String messageId, String userId) async {
+    try {
+      await FirebaseFirestore.instance
+          .collection(Collections.MESSAGES)
+          .doc(docId)
+          .collection(Collections.CHAT)
+          .doc(messageId)
+          .update({
+        'hiddenBy': FieldValue.arrayUnion([userId])
+      });
+      return true;
+    } catch (e) {
+      return false;
     }
   }
 }

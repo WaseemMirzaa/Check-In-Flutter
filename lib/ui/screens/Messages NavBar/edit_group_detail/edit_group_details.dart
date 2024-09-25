@@ -6,8 +6,8 @@ import 'package:check_in/controllers/Messages/group_members_controller.dart';
 import 'package:check_in/controllers/Messages/messages_controller.dart';
 import 'package:check_in/core/constant/app_assets.dart';
 import 'package:check_in/core/constant/temp_language.dart';
-import 'package:check_in/ui/screens/%20Messages%20NavBar/Group%20Members/group_members.dart';
-import 'package:check_in/ui/screens/%20Messages%20NavBar/edit_group_detail/Component/textfields.dart';
+import 'package:check_in/ui/screens/Messages%20NavBar/Group%20Members/group_members.dart';
+import 'package:check_in/ui/screens/Messages%20NavBar/edit_group_detail/Component/textfields.dart';
 import 'package:check_in/ui/screens/persistent_nav_bar.dart';
 import 'package:check_in/ui/widgets/custom_appbar.dart';
 import 'package:check_in/utils/Constants/images.dart';
@@ -62,7 +62,8 @@ class _EditGroupDetailsState extends State<EditGroupDetails> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      controller.getGroupDetail(widget.docId!, userController.userModel.value.uid!);
+      controller.getGroupDetail(
+          widget.docId!, userController.userModel.value.uid!);
     });
   }
 
@@ -90,7 +91,9 @@ class _EditGroupDetailsState extends State<EditGroupDetails> {
                   builder: (context) => AlertDialog(
                         title: Text(
                           'Leave Group',
-                          style: TextStyle(fontWeight: FontWeight.w700, color: appBlackColor),
+                          style: TextStyle(
+                              fontWeight: FontWeight.w700,
+                              color: appBlackColor),
                         ),
                         content: Text(
                           'Do you really want to leave the group?',
@@ -105,8 +108,11 @@ class _EditGroupDetailsState extends State<EditGroupDetails> {
                           TextButton(
                               onPressed: () async {
                                 await groupmemberController
-                                    .leftGroup(userController.userModel.value.uid!, widget.docId!)
-                                    .then((value) => pushNewScreen(context, screen: const Home()));
+                                    .leftGroup(
+                                        userController.userModel.value.uid!,
+                                        widget.docId!)
+                                    .then((value) => pushNewScreen(context,
+                                        screen: const Home()));
                               },
                               child: const Text('Yes')),
                         ],
@@ -145,14 +151,23 @@ class _EditGroupDetailsState extends State<EditGroupDetails> {
                               children: [
                                 Expanded(
                                   child: NameTextfield(
-                                    readOnly: controller.nameTapped.value ? true : false,
-                                    isAdmin: controller.groupDetailModel!.isAdmin ?? false,
-                                    iconOnTap: controller.groupDetailModel!.isAdmin ?? false
+                                    readOnly: controller.nameTapped.value
+                                        ? true
+                                        : false,
+                                    isAdmin:
+                                        controller.groupDetailModel!.isAdmin ??
+                                            false,
+                                    iconOnTap: controller
+                                                .groupDetailModel!.isAdmin ??
+                                            false
                                         ? () {
-                                            controller.updateGroupName(widget.docId!);
-                                            chatcontroller.name.value = controller.nameController.text;
+                                            controller
+                                                .updateGroupName(widget.docId!);
+                                            chatcontroller.name.value =
+                                                controller.nameController.text;
 
-                                            controller.nameTapped.value = !controller.nameTapped.value;
+                                            controller.nameTapped.value =
+                                                !controller.nameTapped.value;
                                           }
                                         : null,
                                   ),
@@ -166,12 +181,20 @@ class _EditGroupDetailsState extends State<EditGroupDetails> {
                               child: Stack(
                                 children: [
                                   CircleAvatar(
-                                    backgroundColor: appGreenColor.withOpacity(0.6),
-                                    backgroundImage: controller.fileImage.value != null
-                                        ? FileImage(File(controller.fileImage.value!.path))
-                                        : controller.groupDetailModel!.groupImg.isEmptyOrNull
-                                            ? AssetImage(AppImage.user) as ImageProvider
-                                            : CachedNetworkImageProvider(controller.groupDetailModel!.groupImg!),
+                                    backgroundColor:
+                                        appGreenColor.withOpacity(0.6),
+                                    backgroundImage: controller
+                                                .fileImage.value !=
+                                            null
+                                        ? FileImage(File(
+                                            controller.fileImage.value!.path))
+                                        : controller.groupDetailModel!.groupImg
+                                                .isEmptyOrNull
+                                            ? AssetImage(AppImage.user)
+                                                as ImageProvider
+                                            : CachedNetworkImageProvider(
+                                                controller.groupDetailModel!
+                                                    .groupImg!),
                                     radius: 65,
                                   ),
                                   controller.groupDetailModel!.isAdmin ?? false
@@ -180,12 +203,18 @@ class _EditGroupDetailsState extends State<EditGroupDetails> {
                                           bottom: 1,
                                           child: GestureDetector(
                                             onTap: () {
-                                              showbottomSheet(context, controller, widget.docId!, chatcontroller);
+                                              showbottomSheet(
+                                                  context,
+                                                  controller,
+                                                  widget.docId!,
+                                                  chatcontroller);
                                             },
                                             child: Container(
                                               height: 40,
                                               width: 40,
-                                              decoration: BoxDecoration(color: appGreenColor, shape: BoxShape.circle),
+                                              decoration: BoxDecoration(
+                                                  color: appGreenColor,
+                                                  shape: BoxShape.circle),
                                               child: Icon(
                                                 Icons.camera_alt,
                                                 color: appWhiteColor,
@@ -201,18 +230,22 @@ class _EditGroupDetailsState extends State<EditGroupDetails> {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                poppinsText(TempLanguage.aboutGroup, 14, semiBold, appBlackColor),
+                                poppinsText(TempLanguage.aboutGroup, 14,
+                                    semiBold, appBlackColor),
                                 controller.groupDetailModel!.isAdmin ?? false
                                     ? GestureDetector(
                                         onTap: () {
                                           // controller.aboutfocusNode
                                           //     .requestFocus();
-                                          controller.updateGroupAbout(widget.docId!);
-                                          controller.aboutTapped.value = !controller.aboutTapped.value;
+                                          controller
+                                              .updateGroupAbout(widget.docId!);
+                                          controller.aboutTapped.value =
+                                              !controller.aboutTapped.value;
                                         },
                                         child: Obx(
                                           () => controller.aboutTapped.value
-                                              ? poppinsText(TempLanguage.save, 14, semiBold, appGreenColor)
+                                              ? poppinsText(TempLanguage.save,
+                                                  14, semiBold, appGreenColor)
                                               : SizedBox(
                                                   height: 2.4.h,
                                                   child: Image.asset(
@@ -226,7 +259,8 @@ class _EditGroupDetailsState extends State<EditGroupDetails> {
                             verticalGap(5),
                             AboutTextfield(
                               readOnly: controller.aboutTapped.value,
-                              isAdmin: controller.groupDetailModel!.isAdmin ?? false,
+                              isAdmin:
+                                  controller.groupDetailModel!.isAdmin ?? false,
                             ),
                             Divider(
                               // thickness: 1,

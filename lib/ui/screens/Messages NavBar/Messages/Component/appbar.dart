@@ -1,5 +1,5 @@
 import 'package:check_in/core/constant/temp_language.dart';
-import 'package:check_in/ui/screens/%20Messages%20NavBar/New%20Message/new_message.dart';
+import 'package:check_in/ui/screens/Messages%20NavBar/New%20Message/new_message.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';

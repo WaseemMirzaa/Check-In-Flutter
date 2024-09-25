@@ -6,9 +6,9 @@ import 'package:check_in/core/constant/app_assets.dart';
 import 'package:check_in/core/constant/constant.dart';
 import 'package:check_in/core/constant/temp_language.dart';
 import 'package:check_in/model/user_modal.dart';
-import 'package:check_in/ui/screens/%20Messages%20NavBar/Chat/Component/send_message_container.dart';
-import 'package:check_in/ui/screens/%20Messages%20NavBar/Chat/chat_screen.dart';
-import 'package:check_in/ui/screens/%20Messages%20NavBar/other_profile/other_profile_messages.dart';
+import 'package:check_in/ui/screens/Messages%20NavBar/Chat/Component/send_message_container.dart';
+import 'package:check_in/ui/screens/Messages%20NavBar/Chat/chat_screen.dart';
+import 'package:check_in/ui/screens/Messages%20NavBar/other_profile/other_profile_messages.dart';
 import 'package:check_in/ui/screens/News%20Feed%20NavBar/News%20Feed/Component/list_tile_container.dart';
 import 'package:check_in/ui/screens/News%20Feed%20NavBar/followers_and_following/controller/followers_and_following_controller.dart';
 import 'package:check_in/ui/screens/News%20Feed%20NavBar/followers_and_following/followers_and_following.dart';
@@ -29,6 +29,8 @@ import 'package:percent_indicator/percent_indicator.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
 import 'package:sizer/sizer.dart';
 
+import '../../../../auth_service.dart';
+import '../../News Feed NavBar/News Feed/Component/report_on_post_comp.dart';
 import '../../News Feed NavBar/News Feed/Component/shared_post_comp.dart';
 
 class OtherProfileView extends StatefulWidget {
@@ -239,6 +241,57 @@ class _OtherProfileViewState extends State<OtherProfileView> {
         backgroundColor: appWhiteColor,
         title: poppinsText(
             TempLanguage.profile, 20, FontWeight.bold, appBlackColor),
+        actions: [
+          PopupMenuButton<String>(
+            icon: Container(
+              padding: const EdgeInsets.all(4),
+              decoration:
+                  BoxDecoration(shape: BoxShape.circle, color: appGreyColor1),
+              child: Icon(
+                Icons.more_horiz,
+                color: greyColor,
+              ),
+            ),
+            onSelected: (String result) async {
+              switch (result) {
+                case 'Block Profile':
+                  final res = await userController.blockProfile(
+                      widget.uid, userController.userModel.value.uid!);
+                  if (res) {
+                    toast('Profile is successfully blocked for you');
+                  }
+                  break;
+                case 'Profile Report':
+                  final res = await Get.to(Report(
+                    profileId: widget.uid,
+                    reportedBy: userController.userModel.value.uid!,
+                    isProfile: true,
+                  ));
+                  break;
+              }
+            },
+            itemBuilder: (BuildContext context) {
+              List<PopupMenuEntry<String>> items = [
+                const PopupMenuItem<String>(
+                  value: 'Profile Report',
+                  child: ListTile(
+                    leading: Icon(Icons.report),
+                    title: Text('Profile Report'),
+                  ),
+                ),
+                const PopupMenuItem<String>(
+                  value: 'Block Profile',
+                  child: ListTile(
+                    leading: Icon(Icons.block),
+                    title: Text('Block Profile'),
+                  ),
+                ),
+              ];
+
+              return items;
+            },
+          )
+        ],
       ),
       body: SingleChildScrollView(
         controller: _scrollController,
@@ -358,6 +411,9 @@ class _OtherProfileViewState extends State<OtherProfileView> {
                                         FollowersAndFollowingScreen(
                                       otherUserId: widget.uid,
                                       showFollowers: true,
+                                      count: followerCountController
+                                          .followersCount.value
+                                          .toString(),
                                     ),
                                   ),
                                 );
@@ -379,16 +435,16 @@ class _OtherProfileViewState extends State<OtherProfileView> {
                                 ],
                               ),
                             ),
-                            SizedBox(width: 20),
+                            const SizedBox(width: 20),
                             Container(
                               height: 38,
-                              child: VerticalDivider(
+                              child: const VerticalDivider(
                                 width: 20,
                                 thickness: 2,
                                 color: Colors.grey,
                               ),
                             ),
-                            SizedBox(width: 20),
+                            const SizedBox(width: 20),
                             GestureDetector(
                               onTap: () {
                                 Navigator.push(
@@ -398,6 +454,9 @@ class _OtherProfileViewState extends State<OtherProfileView> {
                                         FollowersAndFollowingScreen(
                                       otherUserId: widget.uid,
                                       showFollowers: false,
+                                      count: followerCountController
+                                          .followingCount.value
+                                          .toString(),
                                     ),
                                   ),
                                 );

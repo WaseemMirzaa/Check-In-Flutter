@@ -2,13 +2,14 @@ import 'dart:async';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:check_in/controllers/Messages/chat_controller.dart';
+import 'package:check_in/controllers/Messages/messages_controller.dart';
 import 'package:check_in/controllers/user_controller.dart';
 import 'package:check_in/core/constant/app_assets.dart';
 import 'package:check_in/core/constant/constant.dart';
 import 'package:check_in/core/constant/temp_language.dart';
 import 'package:check_in/model/Message%20and%20Group%20Message%20Model/chat_model.dart';
-import 'package:check_in/ui/screens/%20Messages%20NavBar/edit_group_detail/edit_group_details.dart';
-import 'package:check_in/ui/screens/%20Messages%20NavBar/other_profile/other_profile_view.dart';
+import 'package:check_in/ui/screens/Messages%20NavBar/edit_group_detail/edit_group_details.dart';
+import 'package:check_in/ui/screens/Messages%20NavBar/other_profile/other_profile_view.dart';
 import 'package:check_in/ui/widgets/custom_appbar.dart';
 import 'package:check_in/utils/Constants/images.dart';
 import 'package:check_in/utils/colors.dart';
@@ -34,21 +35,12 @@ import 'Component/message_date_container.dart';
 import 'Component/send_message_container.dart';
 import 'Component/sticker_keyboard.dart';
 
-final chatQuery = FirebaseFirestore.instance
-    .collection(Collections.MESSAGES)
-    .withConverter<Chatmodel>(
-      fromFirestore: (snapshot, options) =>
-          Chatmodel.fromJson(snapshot.data()!),
-      toFirestore: (value, options) => value.toJson(),
-    );
-
 class ChatScreen extends StatefulWidget {
-  ChatScreen({
-    super.key,
-    this.image = '',
-    // this.docId,
-  });
+  ChatScreen({super.key, this.image = '', this.isBlocked = false
+      // this.docId,
+      });
   String? image;
+  bool isBlocked;
   // final String? docId;
 
   // bool isFirstTime;
@@ -59,13 +51,17 @@ class ChatScreen extends StatefulWidget {
 
 class _ChatScreenState extends State<ChatScreen> {
   var controller = Get.find<ChatController>();
+  var messageController = Get.find<MessageController>();
   var userController = Get.find<UserController>();
   String onlineStatus = '';
+
+  bool isBlocked = false;
 
   @override
   void initState() {
     super.initState();
 
+    isBlocked = widget.isBlocked;
     controller.sendMessageCall.value = false;
     controller.getSingleMessage();
     controller.issticker.value = true;
@@ -78,12 +74,6 @@ class _ChatScreenState extends State<ChatScreen> {
         : null;
   }
 
-  @override
-  void dispose() {
-    controller.docId.value = '';
-    super.dispose();
-  }
-
   fetchOnlineStatus(String userId) async {
     // print('in method:$userId');
     // print(userId);
@@ -93,97 +83,10 @@ class _ChatScreenState extends State<ChatScreen> {
           .getOnlineStatus(controller.docId.value); // Call the method
       controller.chatService.updateOnlineStatus(
           controller.docId.value, DateTime.now().toString(), userId);
-      setState(() {});
+      if (mounted) setState(() {});
       onlineStatus = status;
     } catch (e) {
       print('Error fetching online status: $e');
-    }
-  }
-
-  //added by asjad
-  // Future<void> fetchOnlineStatus(String userId) async {
-  //   try {
-  //     // Check if the controller's docId is empty
-  //     if (controller.docId.value.isEmpty) {
-  //       print("Controller docId is empty. Using widget.docId for update.");
-
-  //       // Use widget.docId if available
-  //       if (widget.docId != null && widget.docId!.isNotEmpty) {
-  //         // Fetch online status using widget.docId
-  //         String status =
-  //             await controller.chatService.getOnlineStatus(widget.docId!);
-  //         print("Using widget.docId: $widget.docId for fetching status.");
-
-  //         // Ensure status is handled if empty
-  //         if (status.isEmpty) {
-  //           status = "Unknown"; // Set a default value if status is empty
-  //         }
-
-  //         // Update the online status
-  //         await controller.chatService.updateOnlineStatus(
-  //             widget.docId!, DateTime.now().toString(), userId);
-
-  //         // Update the UI
-  //         setState(() {
-  //           onlineStatus = status;
-  //         });
-  //       } else {
-  //         print("No valid widget.docId available.");
-  //       }
-  //     } else {
-  //       // Fetch online status using the controller's docId
-  //       String status = await controller.chatService
-  //           .getOnlineStatus(controller.docId.value);
-
-  //       // Check if the status is empty
-  //       if (status.isEmpty) {
-  //         print("Status was empty. Using fallback widget.docId.");
-
-  //         // If status is empty, use widget.docId as a fallback
-  //         if (widget.docId != null && widget.docId!.isNotEmpty) {
-  //           status =
-  //               await controller.chatService.getOnlineStatus(widget.docId!);
-  //           print("Fallback status using widget.docId: $status");
-  //         } else {
-  //           print("No fallback docId available.");
-  //           status =
-  //               "Unknown"; // Set a default value if fallback status is empty
-  //         }
-  //       }
-
-  //       // Update the online status using controller.docId
-  //       await controller.chatService.updateOnlineStatus(
-  //           controller.docId.value, DateTime.now().toString(), userId);
-
-  //       // Update the UI
-  //       setState(() {
-  //         onlineStatus = status;
-  //       });
-  //     }
-  //   } catch (e) {
-  //     print('Error fetching online status: $e');
-  //   }
-  // }
-
-  void updateOnlineStatus(String docId, String status, String uId) async {
-    try {
-      final docRef = FirebaseFirestore.instance
-          .collection(Collections.MESSAGES)
-          .doc(docId);
-      await FirebaseFirestore.instance.runTransaction((transaction) async {
-        final snapshot = await transaction.get(docRef);
-        if (snapshot.get(MessageField.SENDER_ID) == uId) {
-          docRef.update({'senderStatus': status});
-          onlineStatus = status;
-        } else {
-          docRef.update({'receiverStatus': status});
-          onlineStatus = status;
-        }
-      });
-      print('Online status updated successfully for user $docId');
-    } catch (e) {
-      print('Error updating online status: $e');
-      // You can yield an error message or an empty string here if needed
     }
   }
 
@@ -289,6 +192,13 @@ class _ChatScreenState extends State<ChatScreen> {
                       ? true
                       : false;
 
+                  var hiddenBy = List<String>.from(chat.hiddenBy ?? []);
+
+                  // If current user has hidden the message, don't display it
+                  if (hiddenBy.contains(userController.userModel.value.uid)) {
+                    return const SizedBox.shrink();
+                  }
+
                   return Padding(
                     padding: EdgeInsets.only(
                       left: mymsg ? 0 : 14,
@@ -324,11 +234,12 @@ class _ChatScreenState extends State<ChatScreen> {
                                 chat: chat,
                                 mymsg: mymsg,
                                 // showLastSeen: showLastSeen,
-
+                                docId: controller.docId.value,
                                 isGroup: controller.isgroup)
                             : ImageDateContainer(
                                 chat: chat,
                                 mymsg: mymsg,
+                                docId: controller.docId.value,
                                 isGroup: controller.isgroup
                                 // showLastSeen: showLastSeen,
                                 )
@@ -591,6 +502,93 @@ class _ChatScreenState extends State<ChatScreen> {
                           ],
                         ),
                       );
+                    } else if (isBlocked) {
+                      if (snapshot.data?.blockId ==
+                          controller.userController.userModel.value.uid) {
+                        String name = '';
+                        if (snapshot.data?.blockId == snapshot.data?.senderId) {
+                          name = snapshot.data?.senderName ?? '';
+                        } else {
+                          name = snapshot.data?.recieverName ?? '';
+                        }
+                        return Container(
+                          // height: 160,
+                          // width: 50.w,
+                          padding: const EdgeInsets.all(13),
+                          decoration: BoxDecoration(
+                            color: appWhiteColor,
+                            borderRadius: BorderRadius.circular(10),
+                            boxShadow: [
+                              BoxShadow(
+                                color: blackTranslucentColor,
+                                offset: const Offset(0, 1),
+                                blurRadius: 6,
+                              ),
+                            ],
+                          ),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: poppinsText(
+                                    " ${name} ${TempLanguage.blockedYou}",
+                                    15,
+                                    medium,
+                                    appBlackColor,
+                                    align: TextAlign.center),
+                              ),
+                            ],
+                          ),
+                        );
+                      } else {
+                        return Container(
+                          // height: 160,
+                          width: double.infinity,
+                          padding: const EdgeInsets.all(13),
+                          decoration: BoxDecoration(
+                            color: appWhiteColor,
+                            borderRadius: BorderRadius.circular(10),
+                            boxShadow: [
+                              BoxShadow(
+                                color: blackTranslucentColor,
+                                offset: const Offset(0, 1),
+                                blurRadius: 6,
+                              ),
+                            ],
+                          ),
+                          child: Column(
+                            children: [
+                              poppinsText(TempLanguage.youBlockThisAccount, 15,
+                                  medium, appBlackColor),
+                              verticalGap(10),
+                              ChatButton(
+                                width: 35.w,
+                                onTap: () async {
+                                  final res =
+                                      await messageController.blockContact(
+                                          snapshot.data?.id! ?? '', '');
+                                  if (res) {
+                                    setState(() {
+                                      isBlocked = false;
+                                    });
+                                  } else {
+                                    toast(
+                                        'Something went wrong. Try again later');
+                                  }
+                                  // controller.updateRequestStatus(
+                                  //     RequestStatusEnum.accept.name,
+                                  //     'Unblocked',
+                                  //     0);
+                                  // controller.sendNotificationMethod(
+                                  //     '', "${userController.userModel.value.userName!} unblock you");
+                                },
+                                text: "${TempLanguage.unblock} ",
+                                buttonColor: appGreenColor,
+                                textColor: appWhiteColor,
+                              )
+                            ],
+                          ),
+                        );
+                      }
                     } else {
                       return SendMessageContainer(
                         textFieldController: controller.chatfieldController,

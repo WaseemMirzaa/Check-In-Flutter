@@ -9,10 +9,15 @@ import 'package:check_in/utils/styles.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-class OpenPost extends StatelessWidget {
+class OpenPost extends StatefulWidget {
   OpenPost({super.key, this.postId = '',});
   String postId;
 
+  @override
+  State<OpenPost> createState() => _OpenPostState();
+}
+
+class _OpenPostState extends State<OpenPost> {
   final controller = Get.put(NewsFeedController(NewsFeedService()));
 
   @override
@@ -30,7 +35,7 @@ class OpenPost extends StatelessWidget {
             elevation: 0,),
         body: SingleChildScrollView(
           child: StreamBuilder(
-                stream: controller.getPostsByDocID(postId),
+                stream: controller.getPostsByDocID(widget.postId),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState ==
                       ConnectionState.waiting) {

@@ -14,6 +14,8 @@ class UserModel {
   String? customerId;
   int? goldenCheckin;
   List? deviceTokes;
+  List? blockProfiles;
+  bool? isTermsVerified;
 
   UserModel(
       {this.userName,
@@ -27,7 +29,9 @@ class UserModel {
       this.customerId,
       this.homeCourt,
       this.goldenCheckin,
-      this.deviceTokes});
+      this.deviceTokes,
+        this.isTermsVerified,
+      this.blockProfiles});
 
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
@@ -42,7 +46,9 @@ class UserModel {
       UserKey.ABOUT_ME: aboutMe,
       UserKey.HOME_COURT: homeCourt,
       UserKey.GOLDEN_CHECK_IN: goldenCheckin,
-      UserKey.DEVICE_TOKEN: deviceTokes
+      UserKey.DEVICE_TOKEN: deviceTokes,
+      UserKey.BLOCK_PROFILES: blockProfiles,
+      UserKey.IS_TERMS_VERIFIED: isTermsVerified
     };
   }
 
@@ -59,7 +65,9 @@ class UserModel {
         homeCourt: map[UserKey.HOME_COURT] ?? "",
         customerId: map[UserKey.CUSTOMER_ID] ?? '',
         goldenCheckin: map[UserKey.GOLDEN_CHECK_IN] ?? 0,
-        deviceTokes: map[UserKey.DEVICE_TOKEN]);
+        deviceTokes: map[UserKey.DEVICE_TOKEN],
+        isTermsVerified: map[UserKey.IS_TERMS_VERIFIED],
+        blockProfiles: map[UserKey.BLOCK_PROFILES]);
   }
 
   UserModel copyWith({
@@ -74,7 +82,9 @@ class UserModel {
     String? aboutMe,
     String? homeCourt,
     int? goldenCheckin,
-    String? customerId
+    String? customerId,
+    bool? isTermsVerified,
+    List? blockProfiles
   }) {
     return UserModel(
       userName: userName ?? this.userName,
@@ -87,7 +97,9 @@ class UserModel {
       aboutMe: aboutMe ?? this.aboutMe,
       homeCourt: homeCourt ?? this.homeCourt,
       goldenCheckin: goldenCheckin ?? this.goldenCheckin,
-      customerId: customerId ?? this.customerId
+      customerId: customerId ?? this.customerId,
+      blockProfiles: blockProfiles ?? this.blockProfiles,
+      isTermsVerified: isTermsVerified ?? this.isTermsVerified
     );
   }
 }

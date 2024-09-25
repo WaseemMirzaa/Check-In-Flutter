@@ -1,6 +1,7 @@
 import 'package:check_in/Services/newfeed_service.dart';
 import 'package:check_in/controllers/News%20Feed/news_feed_controller.dart';
 import 'package:check_in/core/constant/app_assets.dart';
+import 'package:check_in/ui/screens/Messages%20NavBar/other_profile/other_profile_view.dart';
 import 'package:check_in/ui/screens/profile_screen.dart';
 import 'package:check_in/ui/widgets/custom_appbar.dart';
 import 'package:check_in/utils/Constants/images.dart';
@@ -15,7 +16,7 @@ import 'package:nb_utils/nb_utils.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
 import 'package:sizer/sizer.dart';
 
-import '../../ Messages NavBar/other_profile/other_profile_view.dart';
+
 
 class PostAllLikesView extends StatelessWidget {
   PostAllLikesView({super.key, required this.postId, this.isComment = false, this.isFromProfile = false});

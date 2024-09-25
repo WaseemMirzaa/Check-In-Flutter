@@ -11,13 +11,16 @@ import 'package:check_in/ui/screens/News%20Feed%20NavBar/News%20Feed/Component/t
 import 'package:check_in/ui/screens/News%20Feed%20NavBar/test_aid_comp/test_aid_comp.dart';
 import 'package:check_in/utils/colors.dart';
 import 'package:check_in/utils/styles.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:nb_utils/nb_utils.dart';
 import 'package:sizer/sizer.dart';
+import '../../../../utils/common.dart';
 import '../../../../utils/custom/custom_firebase_pagination.dart';
 import '../../../widgets/custom_appbar.dart';
+import '../../terms_conditions.dart';
 
 class NewsFeedScreen extends StatefulWidget {
   NewsFeedScreen({super.key, this.postId = '', this.isBack = false});
@@ -31,6 +34,24 @@ class NewsFeedScreen extends StatefulWidget {
 class _NewsFeedScreenState extends State<NewsFeedScreen> {
   final NewsFeedController controller =
       Get.put(NewsFeedController(NewsFeedService()));
+
+  Future<void> _handleRefresh() async {
+    Future.delayed(const Duration(seconds: 3));
+    setState(() {});
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsFlutterBinding.ensureInitialized().addPostFrameCallback((timeStamp) {
+      if (FirebaseAuth.instance.currentUser != null &&
+          userController.userModel.value.isTermsVerified == null) {
+        Get.to(const TermsAndConditions(
+          showButtons: true,
+        ));
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -61,7 +82,7 @@ class _NewsFeedScreenState extends State<NewsFeedScreen> {
 
               // If not loading and following list is not empty, show the content
               return RefreshIndicator(
-                onRefresh: controller.handleRefresh,
+                onRefresh: _handleRefresh,
                 child: CustomFirestorePagination(
                   key: UniqueKey(),
                   limit: 20,
@@ -83,7 +104,6 @@ class _NewsFeedScreenState extends State<NewsFeedScreen> {
                     if (index % 5 == 4) {
                       return NavtiveAdsComp(key: ValueKey('Ad_$index'));
                     }
-
                     if (controller.shouldShowPost(data)) {
                       if (data[NewsFeed.HIDE_USER] is List) {
                         final hideUserList = data[NewsFeed.HIDE_USER] as List;
@@ -92,15 +112,22 @@ class _NewsFeedScreenState extends State<NewsFeedScreen> {
                             .contains(userController.userModel.value.uid)) {
                           final newsFeedModel = NewsFeedModel.fromJson(data);
 
-                          return newsFeedModel.isOriginal!
-                              ? ListTileContainer(
-                                  key: ValueKey(newsFeedModel.id),
-                                  data: newsFeedModel,
-                                )
-                              : SharedPostComp(
-                                  key: ValueKey(newsFeedModel.shareID),
-                                  data: newsFeedModel,
-                                );
+                          if (userController.blockProfiles
+                                  .contains(newsFeedModel.userId) ||
+                              userController.blockProfiles
+                                  .contains(newsFeedModel.shareUID)) {
+                            return const SizedBox.shrink();
+                          } else {
+                            return newsFeedModel.isOriginal!
+                                ? ListTileContainer(
+                                    key: ValueKey(newsFeedModel.id),
+                                    data: newsFeedModel,
+                                  )
+                                : SharedPostComp(
+                                    key: ValueKey(newsFeedModel.shareID),
+                                    data: newsFeedModel,
+                                  );
+                          }
                         }
                       }
                     }
@@ -159,7 +186,6 @@ class _NewsFeedScreenState extends State<NewsFeedScreen> {
 
   // Builds the second top container
   Widget _buildSecondTopContainer(bool isload) {
-    var screenSize = MediaQuery.of(context).size;
     return Stack(
       children: [
         // Original content
@@ -170,17 +196,27 @@ class _NewsFeedScreenState extends State<NewsFeedScreen> {
           ],
         ),
 
-        // Centering the "No Posts Found" text
-        Positioned(
-          top: screenSize.height * 0.5 -
-              20, // Adjust the value to center it vertically
-          left: screenSize.width * 0.6 -
-              100, // Adjust the value to center it horizontally
-          child: Center(
-              child: isload
-                  ? const Text('')
-                  : poppinsText('No Posts Found', 16, medium, appBlackColor)),
+        Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              isload
+                  ? CircularProgressIndicator()
+                  : poppinsText('No Posts Found', 16, medium, appBlackColor),
+            ],
+          ),
         )
+        // // Centering the "No Posts Found" text
+        // Positioned(
+        //   top: screenSize.height * 0.5 -
+        //       20, // Adjust the value to center it vertically
+        //   left: screenSize.width * 0.6 -
+        //       100, // Adjust the value to center it horizontally
+        //   child: Center(
+        //       child: isload
+        //           ? const Center(child: CircularProgressIndicator(),)
+        //           : poppinsText('No Posts Found', 16, medium, appBlackColor)),
+        // )
       ],
     );
   }
@@ -192,7 +228,7 @@ class _NewsFeedScreenState extends State<NewsFeedScreen> {
       child: Align(
         alignment: Alignment.centerLeft,
         child: Container(
-          height: 50,
+          height: 30,
           width: 200,
           decoration: BoxDecoration(
             color: Colors.grey[200],

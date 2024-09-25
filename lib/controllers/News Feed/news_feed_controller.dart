@@ -171,15 +171,17 @@ class NewsFeedController extends GetxController {
   bool get isLoadingMore => myPostLoader.value;
 
   void getMyPosts() {
-    newsFeedService
-        .getMyPosts(FirebaseAuth.instance.currentUser?.uid ?? '')
-        .listen((postList) {
-      if (postList.isNotEmpty) {
-        userLastDoc = postList.last['snapshot'] as DocumentSnapshot;
-      }
-      _myPosts
-          .assignAll(postList.map((e) => e['model'] as NewsFeedModel).toList());
-    });
+    if (FirebaseAuth.instance.currentUser != null) {
+      newsFeedService
+          .getMyPosts(FirebaseAuth.instance.currentUser?.uid ?? '')
+          .listen((postList) {
+        if (postList.isNotEmpty) {
+          userLastDoc = postList.last['snapshot'] as DocumentSnapshot;
+        }
+        _myPosts.assignAll(
+            postList.map((e) => e['model'] as NewsFeedModel).toList());
+      });
+    }
   }
 
   void fetchMoreMyPosts() async {
@@ -322,9 +324,14 @@ class NewsFeedController extends GetxController {
     return newsFeedService.getNumOfComments(newsFeedId);
   }
 
-  Future<void> reportPost(
+  Future<bool> reportPost(
       String postId, String reportedBy, String reason) async {
     return newsFeedService.reportPost(postId, reportedBy, reason);
+  }
+
+  Future<bool> reportProfile(
+      String profileId, String reportedBy, String reason) async {
+    return newsFeedService.reportProfile(profileId, reportedBy, reason);
   }
 
   /// like on comments controller
@@ -502,14 +509,16 @@ class NewsFeedController extends GetxController {
 
   // Load the list of users the current user is following
   void loadFollowingList() async {
-    isLoading.value = true; // Set loading to true
-    String currentUserId = FirebaseAuth.instance.currentUser!.uid;
+    if (FirebaseAuth.instance.currentUser != null) {
+      isLoading.value = true; // Set loading to true
+      String currentUserId = FirebaseAuth.instance.currentUser!.uid;
 
-    final FollowerAndFollowingService service = FollowerAndFollowingService();
-    followingList = await service.getFollowingList(currentUserId);
+      final FollowerAndFollowingService service = FollowerAndFollowingService();
+      followingList = await service.getFollowingList(currentUserId);
 
-    isLoading.value = false; // Set loading to true
-    update(); // Update the controller only after the list is fetched
+      isLoading.value = false; // Set loading to true
+      update();
+    } // Update the controller only after the list is fetched
   }
 
   Query getNewsFeedQuery() {
@@ -531,14 +540,37 @@ class NewsFeedController extends GetxController {
     }
   }
 
+  // @override
+  // void onInit() {
+  //   super.onInit();
+  //   postController = TextEditingController();
+  //   postFocusNode = FocusNode();
+  //   // fetchInitialNewsFeed();
+  //   loadFollowingList();
+  //   getMyPosts();
+  //   Future.microtask(() async => await setValue('first', 'no'));
+  // }
+
   @override
   void onInit() {
     super.onInit();
+
+    // When loading the community feed for the first time, show loading
+    isLoading.value = true;
+
     postController = TextEditingController();
     postFocusNode = FocusNode();
-    // fetchInitialNewsFeed();
-    loadFollowingList();
-    getMyPosts();
+
+    // Initialize required data
+    loadFollowingList(); // This is only for following feed, not community
+    getMyPosts(); // Load community posts (or add any community-related data fetching here)
+
+    // Set loading to false after data is fetched for the first time
+    Future.delayed(Duration(seconds: 2), () {
+      isLoading.value = false; // Turn off loading after fetching data
+    });
+
+    // Optionally set an initial value
     Future.microtask(() async => await setValue('first', 'no'));
   }
 
@@ -547,5 +579,9 @@ class NewsFeedController extends GetxController {
         (selectedOption == 1 && followingList.contains(data['userId']));
 
     return showPost;
+  }
+
+  Future<List<String>> getReportArray() async {
+    return newsFeedService.getReportArray();
   }
 }

@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:app_tracking_transparency/app_tracking_transparency.dart';
 import 'package:flutter/material.dart';
 import 'package:check_in/Services/payment_service.dart';
 import 'package:check_in/auth_service.dart';
@@ -20,6 +21,7 @@ import 'package:check_in/utils/colors.dart';
 import 'package:check_in/utils/styles.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import '../../tracking_status_service.dart';
 import '../../utils/custom/custom_type_ahead.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
@@ -603,8 +605,34 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
     // _checkIfWithinRadius();
     super.initState();
     // initDynamicLinks(context);
+    WidgetsFlutterBinding.ensureInitialized().addPostFrameCallback((timeStamp) {
+      initTracking();
+      if (FirebaseAuth.instance.currentUser != null && userController.userModel.value.isTermsVerified == null) {
+        Get.to(const TermsAndConditions(showButtons: true,));
+      }
+    });
   }
 
+  // Platform messages are asynchronous, so we initialize in an async method.
+  Future<void> initTracking() async {
+    final TrackingStatus status =
+    await AppTrackingTransparency.trackingAuthorizationStatus;
+    setState(()=>{});
+    // If the system can show an authorization request dialog
+    if (status == TrackingStatus.notDetermined) {
+      // Show a custom explainer dialog before the system dialog
+      await TrackingStatusService.showCustomTrackingDialog(context);
+      // Wait for dialog popping animation
+      await Future.delayed(const Duration(milliseconds: 200));
+      // Request system's tracking authorization dialog
+      final TrackingStatus status =
+      await AppTrackingTransparency.requestTrackingAuthorization();
+      setState(()=>{});
+    }
+
+    final uuid = await AppTrackingTransparency.getAdvertisingIdentifier();
+    print("UUID: $uuid");
+  }
 
   // /// The deep link
   // Future<void> initDynamicLinks(BuildContext context) async {

@@ -1,6 +1,7 @@
 import 'package:check_in/controllers/Messages/chat_controller.dart';
 import 'package:check_in/core/constant/app_assets.dart';
 import 'package:check_in/core/constant/temp_language.dart';
+import 'package:check_in/ui/screens/Messages%20NavBar/Chat/Component/report_message.dart';
 import 'package:check_in/utils/DateTimeUtils.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -8,6 +9,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:nb_utils/nb_utils.dart';
 import 'package:sizer/sizer.dart';
 
+import '../../../../../auth_service.dart';
 import '../../../../../model/Message and Group Message Model/chat_model.dart';
 import 'chat_customshape.dart';
 import '../../../../../utils/colors.dart';
@@ -21,16 +23,17 @@ class MessageDateContainer extends StatelessWidget {
   bool? mymsg;
   bool? showLastSeen;
   bool? isGroup;
+  String? docId;
   MessageDateContainer(
       {super.key,
       // this.index,
       this.chat,
       this.mymsg,
       this.showLastSeen,
-      this.isGroup});
+      this.isGroup,
+      this.docId});
 
   final chatController = Get.find<ChatController>();
-
 
   @override
   Widget build(BuildContext context) {
@@ -44,7 +47,9 @@ class MessageDateContainer extends StatelessWidget {
 
       spans.add(TextSpan(
         text: character,
-        style: TextStyle(fontSize: isEmoji ? 16 : 12), // Set font size based on character type
+        style: TextStyle(
+            fontSize:
+                isEmoji ? 16 : 12), // Set font size based on character type
       ));
     }
     //....
@@ -52,7 +57,8 @@ class MessageDateContainer extends StatelessWidget {
     // String date = DateTimeUtils.formatTimestamp(c);
 
     return Column(
-      crossAxisAlignment: mymsg! ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+      crossAxisAlignment:
+          mymsg! ? CrossAxisAlignment.end : CrossAxisAlignment.start,
       children: [
         Row(
           crossAxisAlignment: CrossAxisAlignment.end,
@@ -62,37 +68,50 @@ class MessageDateContainer extends StatelessWidget {
                 : mymsg!
                     ? const SizedBox()
                     : CustomPaint(
-                        painter: CustomShape(bgcolor: appGreyColor1.withOpacity(1)),
+                        painter:
+                            CustomShape(bgcolor: appGreyColor1.withOpacity(1)),
                       ),
             InkWell(
-              onLongPress: mymsg! && chat!.isDelete == null || chat!.isDelete == false
-                  ? () {
-                      showDialog(
-                          context: context,
-                          builder: (context) => AlertDialog(
-                                title: Text(
-                                  'Delete Message',
-                                  style: TextStyle(fontWeight: FontWeight.w600, color: appBlackColor),
-                                ),
-                                content: Text('Do you want to delete this message?',
-                                    style: TextStyle(fontWeight: FontWeight.w400, color: appBlackColor, fontSize: 14)),
-                                actions: [
-                                  TextButton(
-                                      onPressed: () {
-                                        Navigator.pop(context);
-                                      },
-                                      child: const Text('No')),
-                                  TextButton(
-                                      onPressed: () async {
-                                        await chatController
-                                            .deleteMessage(chatController.docId.value, chat!.docID!)
-                                            .then((value) => Navigator.pop(context));
-                                      },
-                                      child: const Text('Yes'))
-                                ],
-                              ));
-                    }
-                  : null,
+              onLongPress:
+                  mymsg! && chat!.isDelete == null || chat!.isDelete == false
+                      ? () {
+                          showDialog(
+                              context: context,
+                              builder: (context) => AlertDialog(
+                                    title: Text(
+                                      'Delete Message',
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.w600,
+                                          color: appBlackColor),
+                                    ),
+                                    content: Text(
+                                        'Do you want to delete this message?',
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.w400,
+                                            color: appBlackColor,
+                                            fontSize: 14)),
+                                    actions: [
+                                      TextButton(
+                                          onPressed: () {
+                                            Navigator.pop(context);
+                                          },
+                                          child: const Text('No')),
+                                      TextButton(
+                                          onPressed: () async {
+                                            await chatController
+                                                .deleteMessage(
+                                                    chatController.docId.value,
+                                                    chat!.docID!)
+                                                .then((value) =>
+                                                    Navigator.pop(context));
+                                          },
+                                          child: const Text('Yes'))
+                                    ],
+                                  ));
+                        }
+                      : () {
+                          showOptionDialog(context, chat);
+                        },
               child: chat!.isDelete == true
                   ? Container(
                       constraints: BoxConstraints(maxWidth: 65.w),
@@ -104,14 +123,17 @@ class MessageDateContainer extends StatelessWidget {
                                 ? appGreenColor
                                 : appGreyColor1.withOpacity(1),
                       ),
-                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 20, vertical: 8),
                       child: Text(
                         chat!.message!,
                         style: GoogleFonts.poppins(
                           textStyle: TextStyle(
                               fontWeight: FontWeight.normal,
                               fontSize: 12,
-                              fontStyle: chat!.isDelete == true ? FontStyle.italic : null,
+                              fontStyle: chat!.isDelete == true
+                                  ? FontStyle.italic
+                                  : null,
                               color: chat!.isDelete == true
                                   ? appWhiteColor
                                   : mymsg!
@@ -165,8 +187,10 @@ class MessageDateContainer extends StatelessWidget {
                 ? const SizedBox()
                 : mymsg!
                     ? CustomPaint(
-                        painter:
-                            CustomShape(bgcolor: chat!.isDelete == true ? greyColor.withOpacity(0.2) : appGreenColor),
+                        painter: CustomShape(
+                            bgcolor: chat!.isDelete == true
+                                ? greyColor.withOpacity(0.2)
+                                : appGreenColor),
                       )
                     : const SizedBox(),
           ],
@@ -176,31 +200,24 @@ class MessageDateContainer extends StatelessWidget {
           children: [
             poppinsText(time, 10, medium, greyColor.withOpacity(1)),
             horizontalGap(5),
-            chat!.isDelete !=true && mymsg! && chat!.isRead != true && isGroup != true ? Icon(Icons.check,size: 15,color: greyColor,) : chat!.isDelete !=true && isGroup != true && mymsg! && chat!.isRead == true ? const ImageIcon(AssetImage(AppAssets.DOUBLE_TICK),size: 15,color: greenColor) : const SizedBox(),
-
-            // mymsg!
-            //     ? poppinsText('✓', 10, medium, greyColor.withOpacity(1))
-            //     : const SizedBox(),
-            // horizontalGap(5),
-            // mymsg!
-            //     ? const CircleAvatar(
-            //         backgroundImage: NetworkImage(
-            //             'https://wac-cdn.atlassian.com/dam/jcr:ba03a215-2f45-40f5-8540-b2015223c918/Max-R_Headshot%20(1).jpg?cdnVersion=1365'),
-            //         radius: 8,
-            //       )
-            //     : const SizedBox()
+            chat!.isDelete != true &&
+                    mymsg! &&
+                    chat!.isRead != true &&
+                    isGroup != true
+                ? Icon(
+                    Icons.check,
+                    size: 15,
+                    color: greyColor,
+                  )
+                : chat!.isDelete != true &&
+                        isGroup != true &&
+                        mymsg! &&
+                        chat!.isRead == true
+                    ? const ImageIcon(AssetImage(AppAssets.DOUBLE_TICK),
+                        size: 15, color: greenColor)
+                    : const SizedBox(),
           ],
         ),
-        // chat!.seenTimeStamp != '' && showLastSeen == true && isGroup == false
-        //     ? Container(
-        //         padding: const EdgeInsets.all(5),
-        //         decoration: BoxDecoration(
-        //           border: Border.all(),
-        //           borderRadius: BorderRadius.circular(15),
-        //         ),
-        //         child: poppinsText("Seen $seenTime", 9, medium, greyColor),
-        //       )
-        //     : const SizedBox()
       ],
     );
   }
@@ -230,5 +247,45 @@ class MessageDateContainer extends StatelessWidget {
         (codePoint >= 0x1F680 && codePoint <= 0x1F6FF) ||
         (codePoint >= 0x2600 && codePoint <= 0x26FF) ||
         (codePoint >= 0x2700 && codePoint <= 0x27BF);
+  }
+
+  void showOptionDialog(BuildContext context, Chatmodel? chat) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Select an Option'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                ListTile(
+                  leading: const Icon(Icons.report),
+                  title: const Text('Report Message'),
+                  onTap: () {
+                    Navigator.pop(context);
+                    Get.to(ReportMessage(
+                        docId: docId ?? '',
+                        messageId: chat?.docID ?? '',
+                        reportedBy: userController.userModel.value.uid!));
+                  },
+                ),
+                ListTile(
+                  leading: const Icon(Icons.visibility_off),
+                  title: const Text('Hide Message'),
+                  onTap: () async {
+                    Navigator.pop(context);
+                    final res = await chatController.hideMessage(docId ?? '',
+                        chat?.docID ?? '', userController.userModel.value.uid!);
+                    if (!res) {
+                      toast('Error occurred');
+                    }
+                  },
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
   }
 }

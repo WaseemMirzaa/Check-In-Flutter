@@ -8,6 +8,7 @@ class UserController extends GetxController {
   UserController(this.userServices);
 
   Rx<UserModel> userModel = UserModel().obs;
+  RxList blockProfiles = [].obs;
 
   void updateGoldenCheckin(int newGoldenCheckin) {
     userModel.update((val) {
@@ -21,12 +22,21 @@ class UserController extends GetxController {
           FirebaseAuth.instance.currentUser?.uid ?? '');
       if (userData != null) {
         userModel.value = userData;
-        print("User is: ${userModel.value.userName}");
-      } else {
-        print("User data is null");
+        blockProfiles.addAll(userData.blockProfiles ?? []);
       }
-      // Optionally, you can return the user data if needed
-      // return userData;
     }
   }
+
+  /// block profile
+  Future<bool> blockProfile(String profileId, String userId) async {
+    final res = await userServices.blockProfile(profileId, userId);
+    if (res) {
+      blockProfiles.add(profileId);
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+
 }

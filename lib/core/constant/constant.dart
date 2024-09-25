@@ -6,6 +6,8 @@ class Collections {
   static const String NEWSFEED = 'newsFeed';
   static const String COMMENTS = 'comments';
   static const String REPORTPOSTS = 'reportPosts';
+  static const String REPORTPROFILES = 'reportProfiles';
+  static const String REPORT_MESSAGE = 'reportMessage';
 
   ///
 }
@@ -23,7 +25,9 @@ class UserKey {
   static const HOME_COURT = "home court";
   static const GOLDEN_CHECK_IN = "goldenCheckin";
   static const DEVICE_TOKEN = "deviceToken";
+  static const BLOCK_PROFILES = "blockProfiles";
   static const PARAMS = "params";
+  static const IS_TERMS_VERIFIED = "isTermsVerified";
 }
 
 class CourtKey {
@@ -68,6 +72,7 @@ class MessageField {
   static const String ABOUT_USER = 'about';
   static const String REQUEST_STATUS = 'requestStatus';
   static const String DELETE_IDS = 'deleteIds';
+  static const String BLOCK_ID = 'blockId';
   static const String DELETE_TIMESTAMP = 'deleteTimeStamp';
   static const String IS_DELETED = 'isDeleted';
 }
