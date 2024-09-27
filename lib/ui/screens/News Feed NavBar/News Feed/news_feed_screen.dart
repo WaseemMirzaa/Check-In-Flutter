@@ -23,7 +23,7 @@ import '../../../widgets/custom_appbar.dart';
 import '../../terms_conditions.dart';
 
 class NewsFeedScreen extends StatefulWidget {
-  NewsFeedScreen({super.key, this.postId = '', this.isBack = false});
+  const NewsFeedScreen({super.key, this.postId = '', this.isBack = false});
   final String postId;
   final bool isBack;
 
@@ -31,14 +31,19 @@ class NewsFeedScreen extends StatefulWidget {
   State<NewsFeedScreen> createState() => _NewsFeedScreenState();
 }
 
-class _NewsFeedScreenState extends State<NewsFeedScreen> {
+//added a mixin "automatickeepaliveclientmixin"
+class _NewsFeedScreenState extends State<NewsFeedScreen>
+    with AutomaticKeepAliveClientMixin {
   final NewsFeedController controller =
       Get.put(NewsFeedController(NewsFeedService()));
 
   Future<void> _handleRefresh() async {
     Future.delayed(const Duration(seconds: 3));
-    setState(() {});
+    // setState(() {}); removed setstate
   }
+
+  @override
+  bool get wantKeepAlive => true;
 
   @override
   void initState() {
@@ -55,6 +60,7 @@ class _NewsFeedScreenState extends State<NewsFeedScreen> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context); //added in build
     return Scaffold(
       appBar: CustomAppbar(
         showicon: widget.isBack,
