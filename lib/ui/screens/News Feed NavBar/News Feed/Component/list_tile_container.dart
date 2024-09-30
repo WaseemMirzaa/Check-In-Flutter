@@ -150,10 +150,14 @@ class _ListTileContainerState extends State<ListTileContainer> {
                                           image: DecorationImage(
                                               image: userData!
                                                       .photoUrl.isEmptyOrNull
-                                                  ? NetworkImage(
+                                                  ? CachedNetworkImageProvider(
+                                                      //coverted to cached image
                                                       AppImage.userImagePath)
-                                                  : NetworkImage(
-                                                      userData!.photoUrl ?? ''),
+                                                  : CachedNetworkImageProvider(
+                                                      userData!.photoUrl ?? '',
+                                                      maxHeight:
+                                                          40, //compression
+                                                      maxWidth: 40),
                                               fit: BoxFit.cover)))),
                               if (userData!.isVerified == null ||
                                   userData!.isVerified == true)

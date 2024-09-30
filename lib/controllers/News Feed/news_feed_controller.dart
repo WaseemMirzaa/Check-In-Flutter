@@ -476,7 +476,7 @@ class NewsFeedController extends GetxController {
     await FlutterImageCompress.compressAndGetFile(
       fileImage.value!.path,
       originalPath,
-      quality: 60,
+      quality: 50,
       minHeight: 600,
       minWidth: 600,
     );

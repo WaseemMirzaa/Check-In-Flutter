@@ -1,19 +1,21 @@
-
 import 'package:check_in/core/constant/app_assets.dart';
 import 'package:check_in/utils/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:nb_utils/nb_utils.dart';
 
 Widget networkImage(String link,
-    {double? height, double? width, Widget? noneWidget}) =>
+        {double? height, double? width, Widget? noneWidget}) =>
     Container(
       width: width ?? 80,
       height: height ?? 80,
       decoration: BoxDecoration(
           shape: BoxShape.circle,
           color: appWhiteColor,
-          boxShadow: [BoxShadow(color: appBlackColor.withOpacity(0.4),offset: const Offset(5, 10))]
-      ),
+          boxShadow: [
+            BoxShadow(
+                color: appBlackColor.withOpacity(0.4),
+                offset: const Offset(5, 10))
+          ]),
       child: ClipOval(
         child: Image.network(
           link.isEmptyOrNull ? AppAssets.defaulImg : link,
@@ -30,7 +32,7 @@ Widget networkImage(String link,
                   color: Colors.blue,
                   value: loadingProgress.expectedTotalBytes != null
                       ? loadingProgress.cumulativeBytesLoaded /
-                      loadingProgress.expectedTotalBytes!
+                          loadingProgress.expectedTotalBytes!
                       : null,
                 ),
               );

@@ -91,7 +91,7 @@ class _NewsFeedScreenState extends State<NewsFeedScreen>
                 onRefresh: _handleRefresh,
                 child: CustomFirestorePagination(
                   key: UniqueKey(),
-                  limit: 20,
+                  limit: 10, //reduces initail pagination
                   viewType: ViewType.list,
                   isLive: true,
                   initialLoader: _buildTopContainer(),
