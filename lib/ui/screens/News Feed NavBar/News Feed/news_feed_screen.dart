@@ -40,7 +40,7 @@ class _NewsFeedScreenState extends State<NewsFeedScreen>
 
   Future<void> _handleRefresh() async {
     Future.delayed(const Duration(seconds: 3));
-    // setState(() {}); removed setstate
+    setState(() {});
   }
 
   @override
@@ -128,11 +128,7 @@ class _NewsFeedScreenState extends State<NewsFeedScreen>
                                 .userId!), // Get user data asynchronously
                             builder: (context, snapshot) {
                               // Check the status of the future
-                              if (snapshot.hasError) {
-                                return const Center(
-                                    child: Text(
-                                        "Error loading user data")); // Handle error state
-                              } else if (snapshot.hasData) {
+                             if (snapshot.hasData) {
                                 UserModel? userData = snapshot.data;
 
                                 // Proceed to check if the profile is blocked
