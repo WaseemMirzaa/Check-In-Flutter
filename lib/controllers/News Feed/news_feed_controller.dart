@@ -1,3 +1,4 @@
+
 import 'dart:io';
 import 'package:check_in/Services/newfeed_service.dart';
 
@@ -42,6 +43,7 @@ class NewsFeedController extends GetxController {
   RxString type = ''.obs;
   RxBool videoLoad = false.obs;
 
+  List<UserModel> usersList = [];
   String thumbnailPath = '';
   String originalPath = '';
 
@@ -51,16 +53,47 @@ class NewsFeedController extends GetxController {
   DocumentSnapshot? lastPostDoc;
 
   List<NewsFeedModel> get newsFeed => _newsFeed;
-  void fetchInitialNewsFeed() {
+  Future<void> fetchInitialNewsFeed() async {
+
+    if(usersList.isEmpty) {
+      usersList = await getUsersList();
+    }
+
     newsFeedService.getNewsFeed().listen((newsFeedList) {
+
       print("The news feed list is: ${newsFeedList.length}");
       if (newsFeedList.isNotEmpty) {
         lastPostDoc = newsFeedList.last['snapshot'] as DocumentSnapshot;
         print("The last document is: ${lastPostDoc!.id}");
       }
-      _newsFeed.assignAll(
-          newsFeedList.map((e) => e['model'] as NewsFeedModel).toList());
+
+      List<NewsFeedModel> tempList = [];
+
+      for (var e in newsFeedList) {
+
+        var mo = e['model'] as NewsFeedModel;
+
+        UserModel? result = usersList.firstWhere((user) => user.uid == mo.userId);
+
+        mo.user = result;
+
+        tempList.add(mo);
+      }
+
+      _newsFeed.assignAll(tempList);
+
     });
+  }
+
+  static getUsersList() async {
+
+    var usersSnapshot = await FirebaseFirestore.instance.collection(Collections.USER).get();
+
+    List<UserModel> users = usersSnapshot.docs
+        .map((doc) => UserModel.fromMap(doc.data() as Map<String, dynamic>))
+        .toList();
+
+    return users;
   }
 
   void fetchMoreNewsFeed() {
@@ -70,6 +103,9 @@ class NewsFeedController extends GetxController {
     print("The news feed document is: ${lastPostDoc!.id}");
     isLoader.value = true;
     newsFeedService.getNewsFeed(startAfter: lastPostDoc).listen((newsFeedList) {
+
+      List<NewsFeedModel> tempList = [];
+
       if (newsFeedList.isNotEmpty) {
         lastPostDoc = newsFeedList.last['snapshot'] as DocumentSnapshot;
         print("The last document is: ${lastPostDoc!.id}");
@@ -77,14 +113,23 @@ class NewsFeedController extends GetxController {
         // Get the existing IDs from the _newsFeed list
         final existingIds = _newsFeed.map((e) => e.id).toSet();
 
+
         // Filter out posts that already exist in _newsFeed
         final newPosts = newsFeedList
             .map((e) => e['model'] as NewsFeedModel)
             .where((post) => !existingIds.contains(post.id))
             .toList();
 
+        for (var e in newPosts) {
+
+          UserModel? result = usersList.firstWhere((user) => user.uid == e.userId);
+
+          e.user = result;
+
+          tempList.add(e);
+        }
         // Add only new posts to _newsFeed
-        _newsFeed.addAll(newPosts);
+        _newsFeed.addAll(tempList);
       }
       isLoader.value = false;
     });
@@ -103,7 +148,12 @@ class NewsFeedController extends GetxController {
   List<NewsFeedModel> get userPosts => _userPosts;
   bool get isUserPostMore => userPostLoader.value;
 
-  void getUserPosts(String userId) {
+  Future<void> getUserPosts(String userId) async {
+
+    if(usersList.isEmpty) {
+      usersList = await getUsersList();
+    }
+
     newsFeedService.getMyPosts(userId).listen((postList) {
       if (postList.isNotEmpty) {
         userLastDoc = postList.last['snapshot'] as DocumentSnapshot;
@@ -123,8 +173,25 @@ class NewsFeedController extends GetxController {
         .listen((postList) {
       if (postList.isNotEmpty) {
         userLastDoc = postList.last['snapshot'] as DocumentSnapshot;
-        _userPosts
-            .addAll(postList.map((e) => e['model'] as NewsFeedModel).toList());
+
+
+        List<NewsFeedModel> tempList = [];
+
+        for (var e in postList) {
+
+          var mo = e['model'] as NewsFeedModel;
+
+          UserModel? result = usersList.firstWhere((user) => user.uid == mo.userId);
+
+          mo.user = result;
+
+          tempList.add(mo);
+        }
+
+        _userPosts.addAll(tempList);
+
+        // _userPosts
+        //     .addAll(postList.map((e) => e['model'] as NewsFeedModel).toList());
       }
       userPostLoader.value = false;
     });
@@ -170,7 +237,11 @@ class NewsFeedController extends GetxController {
   List<NewsFeedModel> get myPosts => _myPosts;
   bool get isLoadingMore => myPostLoader.value;
 
-  void getMyPosts() {
+  Future<void> getMyPosts() async {
+
+    if(usersList.isEmpty) {
+      usersList = await getUsersList();
+    }
     if (FirebaseAuth.instance.currentUser != null) {
       newsFeedService
           .getMyPosts(FirebaseAuth.instance.currentUser?.uid ?? '')
@@ -178,8 +249,26 @@ class NewsFeedController extends GetxController {
         if (postList.isNotEmpty) {
           userLastDoc = postList.last['snapshot'] as DocumentSnapshot;
         }
-        _myPosts.assignAll(
-            postList.map((e) => e['model'] as NewsFeedModel).toList());
+
+
+        List<NewsFeedModel> tempList = [];
+
+        for (var e in postList) {
+
+          var mo = e['model'] as NewsFeedModel;
+
+          UserModel? result = usersList.firstWhere((user) => user.uid == mo.userId);
+
+          mo.user = result;
+
+          tempList.add(mo);
+        }
+
+        _myPosts.assignAll(tempList);
+
+
+        // _myPosts.assignAll(
+        //     postList.map((e) => e['model'] as NewsFeedModel).toList());
       });
     }
   }
@@ -194,8 +283,24 @@ class NewsFeedController extends GetxController {
         .listen((postList) {
       if (postList.isNotEmpty) {
         userLastDoc = postList.last['snapshot'] as DocumentSnapshot;
-        _myPosts
-            .addAll(postList.map((e) => e['model'] as NewsFeedModel).toList());
+
+        List<NewsFeedModel> tempList = [];
+
+        for (var e in postList) {
+
+          var mo = e['model'] as NewsFeedModel;
+
+          UserModel? result = usersList.firstWhere((user) => user.uid == mo.userId);
+
+          mo.user = result;
+
+          tempList.add(mo);
+        }
+
+        _myPosts.addAll(tempList);
+
+        // _myPosts
+        //     .addAll(postList.map((e) => e['model'] as NewsFeedModel).toList());
       }
       myPostLoader.value = false;
     });

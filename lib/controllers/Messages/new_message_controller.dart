@@ -41,6 +41,7 @@ class NewMessageController extends GetxController {
         .switchMap((query) => Stream.fromFuture(chatService
             .getUsersDocsWithPagination(query, DOCUMENT_PER_PAGE, null)))
         .listen((docs) {
+
       List<UserModel> users = docs
           .map((doc) => UserModel.fromMap(doc.data() as Map<String, dynamic>))
           .toList();

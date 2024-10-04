@@ -1,4 +1,6 @@
 import 'package:check_in/core/constant/constant.dart';
+import 'package:check_in/model/user_modal.dart';
+import 'package:check_in/ui/screens/Players.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class NewsFeedModel {
@@ -17,6 +19,7 @@ class NewsFeedModel {
   bool? isOriginal;
   Timestamp? timestamp;
   List<String>? hideUsers;
+  UserModel? user;
 
   String? shareName;
   String? shareImage;
@@ -47,7 +50,10 @@ class NewsFeedModel {
       this.shareID,
       this.sharePostID,
       this.shareText,
+        this.user,
       });
+
+
 
   factory NewsFeedModel.fromJson(Map<String, dynamic> json) {
     return NewsFeedModel(
@@ -74,6 +80,37 @@ class NewsFeedModel {
       thumbnail: json[NewsFeed.THUMBNAIL]
     );
   }
+
+  factory NewsFeedModel.fromJsonWithUsersList(Map<String, dynamic> json, List<UserModel> users) {
+
+
+
+
+    return NewsFeedModel(
+        id: json[NewsFeed.FEED_ID],
+        userId: json[NewsFeed.USER_ID],
+        name: json[NewsFeed.NAME],
+        description: json[NewsFeed.DESCRIPTION],
+        userImage: json[NewsFeed.USER_IMAGE],
+        postUrl: json[NewsFeed.POST_URL],
+        isType: json[NewsFeed.IS_TYPE],
+        likedBy: (json[NewsFeed.LIKED_BY] as List<dynamic>?)?.cast<String>() ?? [],
+        noOfLike: json[NewsFeed.NO_OF_LIKE],
+        noOfComment: json[NewsFeed.NO_OF_COMMENT],
+        noOfShared: json[NewsFeed.NO_OF_SHARED],
+        hideUsers: (json[NewsFeed.HIDE_USER] as List<dynamic>?)?.cast<String>() ?? [],
+        timestamp: json[NewsFeed.TIME_STAMP],
+        isOriginal: json[NewsFeed.IS_ORIGINAL] ?? true,
+        shareName: json[NewsFeed.SHARE_NAME],
+        shareImage: json[NewsFeed.SHARE_IMAGE],
+        shareUID: json[NewsFeed.SHARE_UID],
+        shareID: json[NewsFeed.SHARE_ID],
+        shareText: json[NewsFeed.SHARE_TEXT],
+        sharePostID: json[NewsFeed.SHARE_POSTID],
+        thumbnail: json[NewsFeed.THUMBNAIL],
+    );
+  }
+
   Map<String, dynamic> toJson() {
     final data = <String, dynamic>{};
     data[NewsFeed.FEED_ID] = id ?? '';

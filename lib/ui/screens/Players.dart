@@ -26,6 +26,7 @@ class PlayersView extends StatefulWidget {
 }
 
 class User {
+  String? id;
   final String name;
   final String email;
   final String about;
@@ -39,13 +40,16 @@ class User {
       required this.about,
       required this.court,
       required this.photoUrl,
-      this.isVerified});
+      this.isVerified, this.id});
 }
 
 class UserService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final LatLng court;
   UserService({required this.court});
+
+
+
   Stream<List<User>> get users {
     return _firestore.collection(Collections.USER).snapshots().map((snapshot) {
       return snapshot.docs

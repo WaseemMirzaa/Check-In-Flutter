@@ -80,10 +80,13 @@ class _ListTileContainerState extends State<ListTileContainer> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    Future.microtask(() async {
-      userData = await userServices.getUserData(widget.data!.userId!);
-      mounted ? setState(() {}) : null;
-    });
+
+    userData = widget.data!.user;
+
+    // Future.microtask(() async {
+    //   userData = await userServices.getUserData(widget.data!.userId!);
+    //   mounted ? setState(() {}) : null;
+    // });
   }
 
   RxBool isVisible = false.obs;

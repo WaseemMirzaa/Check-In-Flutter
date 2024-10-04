@@ -77,7 +77,7 @@ class _SharedPostCompState extends State<SharedPostComp> {
     // TODO: implement initState
     super.initState();
     Future.microtask(() async {
-      postUserData = await userServices.getUserData(widget.data?.userId ?? "");
+      postUserData = widget.data!.user;
       shareUserData =
           await userServices.getUserData(widget.data?.shareUID ?? "");
       mounted ? setState(() {}) : null;

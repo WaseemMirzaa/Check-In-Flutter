@@ -232,6 +232,7 @@ import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
+import 'package:nb_utils/nb_utils.dart';
 
 typedef FutureOr<Iterable<T>> SuggestionsCallback<T>(String pattern);
 typedef Widget ItemBuilder<T>(BuildContext context, T itemData);
@@ -389,7 +390,7 @@ class _TypeAheadFormFieldState<T> extends FormFieldState<String> {
         _controller = TextEditingController.fromValue(
             oldWidget.textFieldConfiguration.controller!.value);
       if (widget.textFieldConfiguration.controller != null) {
-        setValue(widget.textFieldConfiguration.controller!.text);
+        setValue(widget.textFieldConfiguration.controller!.text, false);
         if (oldWidget.textFieldConfiguration.controller == null)
           _controller = null;
       }
@@ -1283,7 +1284,7 @@ class _SuggestionsListState<T> extends State<_SuggestionsList<T>>
       padding: const EdgeInsets.all(8.0),
       child: Text(
         'Error: ${this._error}',
-        style: TextStyle(color: Theme.of(context).errorColor),
+        style: TextStyle(color: Colors.red),
       ),
     );
   }

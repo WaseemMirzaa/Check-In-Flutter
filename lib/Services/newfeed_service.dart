@@ -15,50 +15,48 @@ import 'package:rxdart/rxdart.dart' as RES;
 import 'package:video_compress_v2/video_compress_v2.dart';
 
 import '../model/NewsFeed Model/report_posts_model.dart';
-
+import '../ui/screens/Players.dart';
 
 class NewsFeedService {
   final db = FirebaseFirestore.instance;
   final CollectionReference _newsFeedCollection = FirebaseFirestore.instance.collection(Collections.NEWSFEED);
   final FirebaseFirestore firebaseRef = FirebaseFirestore.instance;
-
+  List<UserModel> allUsers = [];
   final FirebaseStorage _storage = FirebaseStorage.instance;
   final userController = Get.put(UserController(UserServices()));
 
-  Future<bool> updateCollection(String collectionName, String docId, Map<String, dynamic> list)async{
-    try{
+  Future<bool> updateCollection(String collectionName, String docId, Map<String, dynamic> list) async {
+    try {
       await db.collection(collectionName).doc(docId).update(list);
       return true;
-    }catch (e){
+    } catch (e) {
       return false;
     }
   }
 
-  Stream<List<Map<String, dynamic>>> getNewsFeed({DocumentSnapshot? startAfter}) {
-    Query query = _newsFeedCollection.orderBy(NewsFeed.TIME_STAMP, descending: true)
-        .limit(10);
+  Stream<List<Map<String, Object>>> getNewsFeed({DocumentSnapshot? startAfter})  {
+
+
+    Query query = _newsFeedCollection.orderBy(NewsFeed.TIME_STAMP, descending: true).limit(10);
 
     if (startAfter != null) {
       query = query.startAfterDocument(startAfter);
     }
 
     return query.snapshots().map((querySnapshot) => querySnapshot.docs
-        .where((doc) =>
-    doc.data() != null &&
-        (doc.data() as Map<String, dynamic>)[NewsFeed.HIDE_USER] is List &&
-        !(doc.data() as Map<String, dynamic>)[NewsFeed.HIDE_USER].contains(userController.userModel.value.uid))
-        .map((doc) {
-      return {
-        'model': NewsFeedModel.fromJson(doc.data() as Map<String, dynamic>),
-        'snapshot': doc
-      };
-    }).toList());
+            .where((doc) =>
+                doc.data() != null &&
+                (doc.data() as Map<String, dynamic>)[NewsFeed.HIDE_USER] is List &&
+                !(doc.data() as Map<String, dynamic>)[NewsFeed.HIDE_USER].contains(userController.userModel.value.uid))
+            .map((doc) {
+          return {'model': NewsFeedModel.fromJson(doc.data() as Map<String, dynamic>), 'snapshot': doc};
+        }).toList());
   }
-
 
   Stream<List<Map<String, dynamic>>> getMyPosts(String id, {DocumentSnapshot? startAfter}) {
     Query userPostsQuery = _newsFeedCollection
-        .where(NewsFeed.USER_ID, isEqualTo: id).where(NewsFeed.IS_ORIGINAL, isEqualTo: true)
+        .where(NewsFeed.USER_ID, isEqualTo: id)
+        .where(NewsFeed.IS_ORIGINAL, isEqualTo: true)
         .orderBy(NewsFeed.TIME_STAMP, descending: true)
         .limit(10);
 
@@ -80,7 +78,7 @@ class NewsFeedService {
     return RES.Rx.combineLatest2(
       userPostsQuery.snapshots(),
       sharedPostsQuery.snapshots(),
-          (QuerySnapshot userPostsSnapshot, QuerySnapshot sharedPostsSnapshot) {
+      (QuerySnapshot userPostsSnapshot, QuerySnapshot sharedPostsSnapshot) {
         final combinedDocs = [...userPostsSnapshot.docs, ...sharedPostsSnapshot.docs];
 
         // Remove duplicates (if any)
@@ -94,24 +92,14 @@ class NewsFeedService {
         });
 
         // Map to NewsFeedModel
-        return uniqueDocs
-            .map<Map<String, dynamic>>((doc) => {
-          'model': NewsFeedModel.fromJson(doc.data() as Map<String, dynamic>),
-          'snapshot': doc
-        })
-            .toList();
+        return uniqueDocs.map<Map<String, dynamic>>((doc) => {'model': NewsFeedModel.fromJson(doc.data() as Map<String, dynamic>), 'snapshot': doc}).toList();
       },
     );
   }
 
-
-/// Get post by spacific ID
+  /// Get post by spacific ID
   Stream<NewsFeedModel?> getPostsByDocID(String postId) {
-    return FirebaseFirestore.instance
-        .collection(Collections.NEWSFEED)
-        .doc(postId)
-        .snapshots()
-        .map((snapshot) {
+    return FirebaseFirestore.instance.collection(Collections.NEWSFEED).doc(postId).snapshots().map((snapshot) {
       if (!snapshot.exists) {
         return null; // Return null if the document doesn't exist
       }
@@ -122,41 +110,39 @@ class NewsFeedService {
       return postModel;
     });
   }
+
   /// Create news feed post
-  Future<bool> createPost(NewsFeedModel newsFeedModel,String compress) async{
-    try{
-      if(compress.isNotEmpty){
+  Future<bool> createPost(NewsFeedModel newsFeedModel, String compress) async {
+    try {
+      if (compress.isNotEmpty) {
         String? thumbnail;
         if (newsFeedModel.isType != 'image') {
-          final uint8list = await VideoCompressV2.getByteThumbnail(
-              compress,
+          final uint8list = await VideoCompressV2.getByteThumbnail(compress,
               quality: 50, // default(100)
               position: -1 // default(-1)
-          );
+              );
           thumbnail = await uploadUint8ListToFirebaseStorage(uint8list!, Timestamp.now().toString());
         }
 
-
-        final url = await uploadChatImageToFirebase(compress, userController.userModel.value.uid!, DateTime.now().toString(),newsFeedModel.isType == 'image' ? 'jpg' : 'mp4');
+        final url = await uploadChatImageToFirebase(
+            compress, userController.userModel.value.uid!, DateTime.now().toString(), newsFeedModel.isType == 'image' ? 'jpg' : 'mp4');
         newsFeedModel.postUrl = url;
         newsFeedModel.thumbnail = thumbnail;
-        if(newsFeedModel.postUrl!.isNotEmpty) {
-          DocumentReference docReff = FirebaseFirestore.instance.collection(
-              Collections.NEWSFEED).doc();
+        if (newsFeedModel.postUrl!.isNotEmpty) {
+          DocumentReference docReff = FirebaseFirestore.instance.collection(Collections.NEWSFEED).doc();
           newsFeedModel.id = docReff.id;
 
           await docReff.set(newsFeedModel.toJson());
           return true;
         }
         return true;
-      }else {
-        DocumentReference docReff = FirebaseFirestore.instance.collection(
-            Collections.NEWSFEED).doc();
+      } else {
+        DocumentReference docReff = FirebaseFirestore.instance.collection(Collections.NEWSFEED).doc();
         newsFeedModel.id = docReff.id;
         await docReff.set(newsFeedModel.toJson());
         return true;
       }
-    }catch (e){
+    } catch (e) {
       print(e.toString());
       return false;
     }
@@ -183,16 +169,14 @@ class NewsFeedService {
     }
   }
 
-   /// Create news share feed post
-  Future<bool> sharePost(NewsFeedModel newsFeedModel) async{
-    try{
-        DocumentReference docReff = FirebaseFirestore.instance.collection(
-            Collections.NEWSFEED).doc();
-        newsFeedModel.shareID = docReff.id;
-        await docReff.set(newsFeedModel.toJson());
-        return true;
-      
-    }catch (e){
+  /// Create news share feed post
+  Future<bool> sharePost(NewsFeedModel newsFeedModel) async {
+    try {
+      DocumentReference docReff = FirebaseFirestore.instance.collection(Collections.NEWSFEED).doc();
+      newsFeedModel.shareID = docReff.id;
+      await docReff.set(newsFeedModel.toJson());
+      return true;
+    } catch (e) {
       print(e.toString());
       return false;
     }
@@ -202,10 +186,7 @@ class NewsFeedService {
   Future<int?> getNumberOfShares(String postID) async {
     try {
       // Reference to the specific document in the newsFeed collection
-      DocumentSnapshot documentSnapshot = await FirebaseFirestore.instance
-          .collection(Collections.NEWSFEED)
-          .doc(postID)
-          .get();
+      DocumentSnapshot documentSnapshot = await FirebaseFirestore.instance.collection(Collections.NEWSFEED).doc(postID).get();
 
       // Check if the document exists and has the field
       if (documentSnapshot.exists && documentSnapshot.data() != null) {
@@ -266,11 +247,7 @@ class NewsFeedService {
 
   /// GET LIKED BY USERS IDS
   Stream<List<String>?> getPostLikedBy(String postId) {
-    return FirebaseFirestore.instance
-        .collection(Collections.NEWSFEED)
-        .doc(postId)
-        .snapshots()
-        .map((DocumentSnapshot<Map<String, dynamic>> snapshot) {
+    return FirebaseFirestore.instance.collection(Collections.NEWSFEED).doc(postId).snapshots().map((DocumentSnapshot<Map<String, dynamic>> snapshot) {
       if (!snapshot.exists) {
         return null; // Return null if the document doesn't exist
       }
@@ -280,54 +257,46 @@ class NewsFeedService {
     });
   }
 
-
-
   /// Fetch all likers on posts
   Future<List<UserModel>> fetchLikerUsers(String postId) async {
-    final postDoc = await FirebaseFirestore.instance
-        .collection(Collections.NEWSFEED)
-        .doc(postId)
-        .get();
+    final postDoc = await FirebaseFirestore.instance.collection(Collections.NEWSFEED).doc(postId).get();
 
     final likedBy = List<String>.from(postDoc['likedBy']);
 
     // Fetch user documents for each userId in likedBy
-    final usersQuery = await FirebaseFirestore.instance
-        .collection(Collections.USER)
-        .where(FieldPath.documentId, whereIn: likedBy)
-        .get();
+    final usersQuery = await FirebaseFirestore.instance.collection(Collections.USER).where(FieldPath.documentId, whereIn: likedBy).get();
 
     final likers = usersQuery.docs.map((doc) => UserModel.fromMap(doc.data())).toList();
 
     return likers;
   }
 
-/// Add comment on post
-  Future<bool> addCommentOnPost(String postId, CommentModel commentModel) async{
-    try{
+  /// Add comment on post
+  Future<bool> addCommentOnPost(String postId, CommentModel commentModel) async {
+    try {
       final commentDoc = _newsFeedCollection.doc(postId).collection(Collections.COMMENTS).doc();
       commentModel.commentId = commentDoc.id;
       await commentDoc.set(commentModel.toJson());
       return true;
-    }catch (e){
+    } catch (e) {
       return false;
     }
   }
 
-/// Add comment on comment
-  Future<bool> addCommentOnComment(String postId, String commentId ,CommentModel commentModel) async{
-    try{
+  /// Add comment on comment
+  Future<bool> addCommentOnComment(String postId, String commentId, CommentModel commentModel) async {
+    try {
       final commentDoc = _newsFeedCollection.doc(postId).collection(Collections.COMMENTS).doc(commentId).collection(Collections.COMMENTS).doc();
       commentModel.commentId = commentDoc.id;
       await commentDoc.set(commentModel.toJson());
       return true;
-    }catch (e){
+    } catch (e) {
       return false;
     }
   }
 
-/// Get comments on posts
-  Stream<List<CommentModel>> getPostComments(String postId){
+  /// Get comments on posts
+  Stream<List<CommentModel>> getPostComments(String postId) {
     return FirebaseFirestore.instance
         .collection(Collections.NEWSFEED)
         .doc(postId)
@@ -335,7 +304,6 @@ class NewsFeedService {
         .orderBy('timestamp', descending: true)
         .snapshots()
         .map((QuerySnapshot<Map<String, dynamic>> snapshot) {
-
       return snapshot.docs.map((doc) {
         return CommentModel.fromJson(doc.data());
       }).toList();
@@ -343,12 +311,14 @@ class NewsFeedService {
   }
 
   /// Get comments on comments
-  Stream<List<CommentModel>> getCommentsOnComment(String postId,String commentId){
+  Stream<List<CommentModel>> getCommentsOnComment(String postId, String commentId) {
     return FirebaseFirestore.instance
         .collection(Collections.NEWSFEED)
         .doc(postId)
-        .collection(Collections.COMMENTS).doc(commentId)
-        .collection(Collections.COMMENTS).orderBy('timestamp', descending: false)
+        .collection(Collections.COMMENTS)
+        .doc(commentId)
+        .collection(Collections.COMMENTS)
+        .orderBy('timestamp', descending: false)
         .snapshots()
         .map((QuerySnapshot<Map<String, dynamic>> snapshot) {
       return snapshot.docs.map((doc) {
@@ -357,9 +327,9 @@ class NewsFeedService {
     });
   }
 
-/// Like and unlike the comment
-  Future<bool> toggleLikeComment(String postId, String commentId ,String userId) async {
-    try{
+  /// Like and unlike the comment
+  Future<bool> toggleLikeComment(String postId, String commentId, String userId) async {
+    try {
       final docRef = FirebaseFirestore.instance.collection(Collections.NEWSFEED).doc(postId).collection(Collections.COMMENTS).doc(commentId);
       log(docRef.id.toString());
 
@@ -383,25 +353,27 @@ class NewsFeedService {
         });
       });
       return true;
-    }catch (e){
+    } catch (e) {
       return false;
     }
   }
 
   /// get the total number of comments on post
   Stream<int> getNumOfComments(String newsFeedId) {
-    CollectionReference commentsRef = FirebaseFirestore.instance
-        .collection(Collections.NEWSFEED)
-        .doc(newsFeedId)
-        .collection(Collections.COMMENTS);
+    CollectionReference commentsRef = FirebaseFirestore.instance.collection(Collections.NEWSFEED).doc(newsFeedId).collection(Collections.COMMENTS);
     return commentsRef.snapshots().map((snapshot) => snapshot.size);
   }
 
-
-/// Like and unlike the subcomment
-  Future<bool> toggleLikeSubComment(String postId, String commentId, String subCommentId ,String userId) async {
-    try{
-      final docRef = FirebaseFirestore.instance.collection(Collections.NEWSFEED).doc(postId).collection(Collections.COMMENTS).doc(commentId).collection(Collections.COMMENTS).doc(subCommentId);
+  /// Like and unlike the subcomment
+  Future<bool> toggleLikeSubComment(String postId, String commentId, String subCommentId, String userId) async {
+    try {
+      final docRef = FirebaseFirestore.instance
+          .collection(Collections.NEWSFEED)
+          .doc(postId)
+          .collection(Collections.COMMENTS)
+          .doc(commentId)
+          .collection(Collections.COMMENTS)
+          .doc(subCommentId);
       log("The doc is:${docRef.id}");
       await FirebaseFirestore.instance.runTransaction((transaction) async {
         final snapshot = await transaction.get(docRef);
@@ -423,25 +395,18 @@ class NewsFeedService {
         });
       });
       return true;
-    }catch (e){
+    } catch (e) {
       return false;
     }
   }
 
-
-/// Fetch all likers on comments
-  Future<List<UserModel>> fetchAllLikesComment(String postId,String commentId) async {
-    final postDoc = await FirebaseFirestore.instance
-        .collection(Collections.NEWSFEED)
-        .doc(postId).collection(Collections.COMMENTS).doc(commentId)
-        .get();
+  /// Fetch all likers on comments
+  Future<List<UserModel>> fetchAllLikesComment(String postId, String commentId) async {
+    final postDoc = await FirebaseFirestore.instance.collection(Collections.NEWSFEED).doc(postId).collection(Collections.COMMENTS).doc(commentId).get();
 
     final likedBy = List<String>.from(postDoc['likedBy']);
 
-    final usersQuery = await FirebaseFirestore.instance
-        .collection(Collections.USER)
-        .where(FieldPath.documentId, whereIn: likedBy)
-        .get();
+    final usersQuery = await FirebaseFirestore.instance.collection(Collections.USER).where(FieldPath.documentId, whereIn: likedBy).get();
 
     final likers = usersQuery.docs.map((doc) => UserModel.fromMap(doc.data())).toList();
 
@@ -449,18 +414,19 @@ class NewsFeedService {
   }
 
   /// fetch all likers on sub comments
-  Future<List<UserModel>> fetchAllLikesOnSubComment(String postId,String parentId,String commentId) async {
+  Future<List<UserModel>> fetchAllLikesOnSubComment(String postId, String parentId, String commentId) async {
     final postDoc = await FirebaseFirestore.instance
         .collection(Collections.NEWSFEED)
-        .doc(postId).collection(Collections.COMMENTS).doc(parentId).collection(Collections.COMMENTS).doc(commentId)
+        .doc(postId)
+        .collection(Collections.COMMENTS)
+        .doc(parentId)
+        .collection(Collections.COMMENTS)
+        .doc(commentId)
         .get();
 
     final likedBy = List<String>.from(postDoc['likedBy']);
 
-    final usersQuery = await FirebaseFirestore.instance
-        .collection(Collections.USER)
-        .where(FieldPath.documentId, whereIn: likedBy)
-        .get();
+    final usersQuery = await FirebaseFirestore.instance.collection(Collections.USER).where(FieldPath.documentId, whereIn: likedBy).get();
 
     final likers = usersQuery.docs.map((doc) => UserModel.fromMap(doc.data())).toList();
 
@@ -469,15 +435,14 @@ class NewsFeedService {
 
   /// Hide post for me
   Future<bool> hidePost(String docId) async {
-    try{
-       _newsFeedCollection.doc(docId).update({
-      NewsFeed.HIDE_USER: FieldValue.arrayUnion([userController.userModel.value.uid])
-    });
+    try {
+      _newsFeedCollection.doc(docId).update({
+        NewsFeed.HIDE_USER: FieldValue.arrayUnion([userController.userModel.value.uid])
+      });
       return true;
-    }catch (e){
+    } catch (e) {
       return false;
     }
-   
   }
 
   Future<bool> reportPost(String postId, String reportedBy, String reason) async {
@@ -597,14 +562,14 @@ class NewsFeedService {
     }
   }
 
-/// Upload image to firebase for news feed
-  Future<String> uploadChatImageToFirebase( String imagePath, String uId, String time, String extension) async {
+  /// Upload image to firebase for news feed
+  Future<String> uploadChatImageToFirebase(String imagePath, String uId, String time, String extension) async {
     try {
       Reference storageReference;
-        storageReference = _storage.ref().child('NewsFeed/$uId/$time.$extension');
+      storageReference = _storage.ref().child('NewsFeed/$uId/$time.$extension');
       await storageReference.putFile(File(imagePath));
       final downloadUrl = await storageReference.getDownloadURL();
-      return  downloadUrl;
+      return downloadUrl;
     } catch (e) {
       log(e.toString());
       return '';
@@ -624,7 +589,8 @@ class NewsFeedService {
     List<dynamic>? deviceTokens = userData[UserKey.DEVICE_TOKEN];
     return deviceTokens ?? [];
   }
-/// Tried
+
+  /// Tried
 //   Future<List<NewsFeedModel>> fetchNewsFeed({required DocumentSnapshot? lastDoc, required int pageSize}) async {
 //     List<NewsFeedModel> posts = [];
 //     try {
@@ -648,20 +614,30 @@ class NewsFeedService {
     try {
       final prefs = await SharedPreferences.getInstance();
       if (prefs.containsKey('reportPosts')) {
-            return prefs.getStringList('reportPosts')!;
-          } else {
-            DocumentSnapshot documentSnapshot = await FirebaseFirestore.instance.collection('configuration').doc('report').get();
-            if (documentSnapshot.exists) {
-              List<String> reportArray = List<String>.from(documentSnapshot['report']);
-              await prefs.setStringList('reportPosts', reportArray);
-              return reportArray;
-            } else {
-              return [];
-            }
-          }
+        return prefs.getStringList('reportPosts')!;
+      } else {
+        DocumentSnapshot documentSnapshot = await FirebaseFirestore.instance.collection('configuration').doc('report').get();
+        if (documentSnapshot.exists) {
+          List<String> reportArray = List<String>.from(documentSnapshot['report']);
+          await prefs.setStringList('reportPosts', reportArray);
+          return reportArray;
+        } else {
+          return [];
+        }
+      }
     } catch (e) {
       return [];
     }
   }
 
+  static getUsersList() async {
+
+    var usersSnapshot = await FirebaseFirestore.instance.collection(Collections.USER).get();
+
+    List<UserModel> users = usersSnapshot.docs
+        .map((doc) => UserModel.fromMap(doc.data()))
+        .toList();
+
+    return users;
+  }
 }
