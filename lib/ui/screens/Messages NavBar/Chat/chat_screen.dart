@@ -15,7 +15,6 @@ import 'package:check_in/utils/Constants/images.dart';
 import 'package:check_in/utils/colors.dart';
 import 'package:check_in/utils/custom/custom_firebase_chat_pagination.dart';
 import 'package:check_in/utils/gaps.dart';
-import 'package:check_in/utils/loader.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -27,7 +26,6 @@ import 'package:sizer/sizer.dart';
 
 import '../../../../model/Message and Group Message Model/message_model.dart';
 import '../../../../utils/Constants/enums.dart';
-import '../../../../utils/common.dart';
 import '../../../../utils/styles.dart';
 import 'Component/button.dart';
 import 'Component/image_date_container.dart';

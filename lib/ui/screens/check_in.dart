@@ -40,7 +40,6 @@ import 'Players.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
-import 'dart:developer'as developer;
 class CheckIn extends StatefulWidget {
   const CheckIn({Key? key}) : super(key: key);
 

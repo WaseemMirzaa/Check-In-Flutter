@@ -1,6 +1,5 @@
 import 'package:check_in/core/constant/temp_language.dart';
 import 'package:check_in/ui/screens/Messages%20NavBar/New%20Message/new_message.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';

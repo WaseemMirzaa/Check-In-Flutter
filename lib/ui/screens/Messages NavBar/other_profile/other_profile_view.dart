@@ -1,4 +1,3 @@
-import 'package:check_in/Services/follower_and_following_service.dart';
 import 'package:check_in/Services/newfeed_service.dart';
 import 'package:check_in/controllers/Messages/chat_controller.dart';
 import 'package:check_in/controllers/News%20Feed/news_feed_controller.dart';
@@ -6,7 +5,6 @@ import 'package:check_in/core/constant/app_assets.dart';
 import 'package:check_in/core/constant/constant.dart';
 import 'package:check_in/core/constant/temp_language.dart';
 import 'package:check_in/model/user_modal.dart';
-import 'package:check_in/ui/screens/Messages%20NavBar/Chat/Component/send_message_container.dart';
 import 'package:check_in/ui/screens/Messages%20NavBar/Chat/chat_screen.dart';
 import 'package:check_in/ui/screens/Messages%20NavBar/other_profile/other_profile_messages.dart';
 import 'package:check_in/ui/screens/News%20Feed%20NavBar/News%20Feed/Component/list_tile_container.dart';

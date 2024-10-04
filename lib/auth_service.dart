@@ -1,4 +1,3 @@
-import 'package:check_in/Services/dio_config.dart';
 import 'package:check_in/Services/newfeed_service.dart';
 import 'package:check_in/Services/payment_service.dart';
 import 'package:check_in/Services/push_notification_service.dart';

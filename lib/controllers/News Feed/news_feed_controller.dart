@@ -1,6 +1,5 @@
 import 'dart:io';
 import 'package:check_in/Services/newfeed_service.dart';
-
 import 'package:check_in/controllers/user_controller.dart';
 import 'package:check_in/core/constant/constant.dart';
 import 'package:check_in/model/NewsFeed%20Model/comment_model.dart';
@@ -11,7 +10,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:get/get.dart';
-import 'package:get/get_rx/get_rx.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:chewie/chewie.dart';
 import 'package:nb_utils/nb_utils.dart';
@@ -24,29 +22,19 @@ import '../../Services/follower_and_following_service.dart';
 class NewsFeedController extends GetxController {
   Rx<NewsFeedModel> newsFeedModel = NewsFeedModel().obs;
   Rx<CommentModel> commentModel = CommentModel().obs;
-
   NewsFeedService newsFeedService;
-
   late TextEditingController postController;
-
   UserController userController = Get.put(UserController(UserServices()));
-
   late FocusNode postFocusNode;
-
   late Rx<XFile?> fileImage = Rx<XFile?>(null);
-
   NewsFeedController(this.newsFeedService);
-
   VideoPlayerController? videoPlayerController;
   ChewieController? chewieController;
   RxString type = ''.obs;
   RxBool videoLoad = false.obs;
-
   String thumbnailPath = '';
   String originalPath = '';
-
   RxBool isLoader = false.obs;
-
   final _newsFeed = <NewsFeedModel>[].obs;
   DocumentSnapshot? lastPostDoc;
 
@@ -130,38 +118,12 @@ class NewsFeedController extends GetxController {
     });
   }
 
-  // //these two methods are added if any issue comment them and uncomment 2nd clearUserPosts
-
-  // @override
-  // void dispose() {
-  //   newsFeedController.clearUserPosts(isDisposing: true);
-  //   super.dispose();
-  // }
-
-  // void clearUserPosts({bool isDisposing = false}) {
-  //   if (!isDisposing) {
-  //     _userPosts.clear(); // Trigger UI updates only if not disposing
-  //     userLastDoc = null;
-  //     userPostLoader.value = false;
-  //   }
-  // }
-
   //uncomment this one if this issues
   void clearUserPosts() {
     _userPosts.clear();
     userLastDoc = null;
     userPostLoader.value = false;
   }
-
-// /// get news feed (posts) controller
-//   Stream<List<NewsFeedModel>> getNewsFeed() {
-//     return newsFeedService.getNewsFeed();
-//   }
-
-  // /// get my (posts) controller
-  // Stream<List<NewsFeedModel>> getMyPosts(String id) {
-  //   return newsFeedService.getMyPosts(id);
-  // }
 
   final _myPosts = <NewsFeedModel>[].obs;
   DocumentSnapshot? lastDocument;
@@ -476,7 +438,7 @@ class NewsFeedController extends GetxController {
     await FlutterImageCompress.compressAndGetFile(
       fileImage.value!.path,
       originalPath,
-      quality: 60,
+      quality: 50,
       minHeight: 600,
       minWidth: 600,
     );
@@ -539,17 +501,6 @@ class NewsFeedController extends GetxController {
       }
     }
   }
-
-  // @override
-  // void onInit() {
-  //   super.onInit();
-  //   postController = TextEditingController();
-  //   postFocusNode = FocusNode();
-  //   // fetchInitialNewsFeed();
-  //   loadFollowingList();
-  //   getMyPosts();
-  //   Future.microtask(() async => await setValue('first', 'no'));
-  // }
 
   @override
   void onInit() {

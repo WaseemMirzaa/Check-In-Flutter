@@ -1,10 +1,8 @@
 
 import 'package:check_in/Services/newfeed_service.dart';
-import 'package:check_in/controllers/News%20Feed/create_post_controller.dart';
 import 'package:check_in/controllers/News%20Feed/news_feed_controller.dart';
 import 'package:check_in/controllers/user_controller.dart';
 import 'package:check_in/core/constant/app_assets.dart';
-import 'package:check_in/ui/screens/News%20Feed%20NavBar/Create%20Post/create_post_screen.dart';
 import 'package:check_in/ui/screens/profile_screen.dart';
 import 'package:check_in/ui/widgets/custom_container.dart';
 import 'package:check_in/ui/widgets/text_field.dart';

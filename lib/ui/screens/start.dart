@@ -1,13 +1,10 @@
-import 'dart:io';
 
 import 'package:check_in/core/constant/app_assets.dart';
 import 'package:check_in/core/constant/temp_language.dart';
 import 'package:check_in/ui/screens/login.dart';
 import 'package:check_in/ui/screens/signup.dart';
 import 'package:check_in/ui/widgets/common_button.dart';
-import 'package:check_in/utils/common.dart';
 import 'package:check_in/utils/gaps.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
 import 'package:sizer/sizer.dart';

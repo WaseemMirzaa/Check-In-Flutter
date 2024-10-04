@@ -3,7 +3,6 @@ import 'package:check_in/Services/user_services.dart';
 import 'package:check_in/controllers/Messages/add_group_member_controller.dart';
 import 'package:check_in/controllers/Messages/messages_controller.dart';
 import 'package:check_in/controllers/Messages/new_message_controller.dart';
-import 'package:check_in/controllers/News%20Feed/create_post_controller.dart';
 import 'package:check_in/controllers/News%20Feed/news_feed_controller.dart';
 import 'package:check_in/controllers/user_controller.dart';
 import 'package:get/get.dart';

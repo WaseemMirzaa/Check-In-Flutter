@@ -5,20 +5,14 @@ import 'package:check_in/controllers/user_controller.dart';
 import 'package:check_in/core/constant/app_assets.dart';
 import 'package:check_in/core/constant/temp_language.dart';
 import 'package:check_in/ui/screens/Messages%20NavBar/Chat/chat_screen.dart';
-import 'package:check_in/ui/screens/News%20Feed%20NavBar/News%20Feed/news_feed_screen.dart';
 import 'package:check_in/ui/screens/persistent_nav_bar.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:nb_utils/nb_utils.dart';
 
 import '../../controllers/Messages/chat_controller.dart';
 import '../../model/notification_model.dart';
 import '../../utils/colors.dart';
-import 'dart:developer' as developer;
 
 import 'News Feed NavBar/open_post/open_post.dart';
 

@@ -9,16 +9,13 @@ import 'package:check_in/ui/screens/Messages%20NavBar/other_profile/other_profil
 import 'package:check_in/ui/screens/News%20Feed%20NavBar/share_screen/share_screen.dart';
 import 'package:check_in/ui/screens/profile_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:check_in/Services/newfeed_service.dart';
-import 'package:check_in/auth_service.dart';
 import 'package:check_in/controllers/News%20Feed/news_feed_controller.dart';
 import 'package:check_in/model/NewsFeed%20Model/news_feed_model.dart';
 import 'package:check_in/ui/screens/News%20Feed%20NavBar/All%20Comments/all_comments.dart';
 import 'package:check_in/ui/screens/News%20Feed%20NavBar/All%20Likes/post_all_likes_view.dart';
 import 'package:check_in/ui/screens/News%20Feed%20NavBar/Full%20Screen%20Image/full_screen_image.dart';
 import 'package:check_in/ui/screens/News%20Feed%20NavBar/News%20Feed/Component/comment_container.dart';
-import 'package:check_in/ui/screens/News%20Feed%20NavBar/News%20Feed/Component/custom_paint.dart';
 import 'package:check_in/ui/screens/News%20Feed%20NavBar/News%20Feed/Component/video_player_widget.dart';
 import 'package:check_in/ui/widgets/text_field.dart';
 import 'package:check_in/utils/loader.dart';
@@ -40,7 +37,6 @@ import 'package:share_plus/share_plus.dart';
 import 'package:sizer/sizer.dart';
 import 'package:video_player/video_player.dart';
 
-import 'list_tile_container.dart';
 import 'report_on_post_comp.dart';
 
 class SharedPostComp extends StatefulWidget {

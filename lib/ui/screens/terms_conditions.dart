@@ -1,11 +1,9 @@
-import 'dart:async';
 import 'dart:io';
 import 'package:check_in/auth_service.dart';
 import 'package:check_in/core/constant/app_assets.dart';
 import 'package:check_in/core/constant/constant.dart';
 import 'package:check_in/core/constant/temp_language.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';

@@ -1,13 +1,7 @@
 import 'package:check_in/Services/newfeed_service.dart';
 import 'package:check_in/controllers/News%20Feed/news_feed_controller.dart';
-import 'package:check_in/core/constant/constant.dart';
-import 'package:check_in/model/NewsFeed%20Model/news_feed_model.dart';
-import 'package:check_in/ui/screens/News%20Feed%20NavBar/News%20Feed/Component/list_tile_container.dart';
 import 'package:check_in/ui/screens/News%20Feed%20NavBar/News%20Feed/Component/share_post_comp.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:sizer/sizer.dart';
 class DeepLinkView extends StatelessWidget {
   final TextEditingController commentController = TextEditingController();
   String jobPost;

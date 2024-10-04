@@ -3,7 +3,6 @@ import 'package:check_in/controllers/News%20Feed/news_feed_controller.dart';
 import 'package:check_in/controllers/user_controller.dart';
 import 'package:check_in/core/constant/app_assets.dart';
 import 'package:check_in/model/NewsFeed%20Model/comment_model.dart';
-import 'package:check_in/model/user_modal.dart';
 import 'package:check_in/ui/screens/Messages%20NavBar/other_profile/other_profile_view.dart';
 import 'package:check_in/ui/screens/News%20Feed%20NavBar/News%20Feed/Component/comment_all_lIkes_view.dart';
 import 'package:check_in/ui/screens/News%20Feed%20NavBar/News%20Feed/Component/sub_comment_comp.dart';

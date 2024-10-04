@@ -1,13 +1,10 @@
 import 'package:check_in/core/constant/constant.dart';
 import 'package:check_in/core/constant/temp_language.dart';
-import 'package:check_in/ui/screens/profile_screen.dart';
 import 'package:check_in/utils/colors.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
 import '../../auth_service.dart';
-import '../../model/user_modal.dart';
-import '../../utils/DateTimeUtils.dart';
 import '../../utils/common.dart';
 import '../../utils/gaps.dart';
 

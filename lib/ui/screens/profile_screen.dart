@@ -1,14 +1,11 @@
-import 'dart:developer';
 import 'dart:io';
 
-import 'package:check_in/Services/follower_and_following_service.dart';
 import 'package:check_in/Services/newfeed_service.dart';
 import 'package:check_in/controllers/News%20Feed/news_feed_controller.dart';
 import 'package:check_in/controllers/user_controller.dart';
 import 'package:check_in/core/constant/app_assets.dart';
 import 'package:check_in/core/constant/constant.dart';
 import 'package:check_in/core/constant/temp_language.dart';
-import 'package:check_in/model/NewsFeed%20Model/news_feed_model.dart';
 import 'package:check_in/model/user_modal.dart';
 import 'package:check_in/ui/screens/News%20Feed%20NavBar/News%20Feed/Component/list_tile_container.dart';
 import 'package:check_in/ui/screens/News%20Feed%20NavBar/News%20Feed/Component/shared_post_comp.dart';
@@ -18,10 +15,8 @@ import 'package:check_in/ui/screens/add_home_court.dart';
 import 'package:check_in/ui/screens/persistent_nav_bar.dart';
 import 'package:check_in/ui/screens/terms_conditions.dart';
 import 'package:check_in/ui/screens/unique_courts_screen.dart';
-import 'package:check_in/ui/widgets/about_section.dart';
 import 'package:check_in/utils/colors.dart';
 import 'package:check_in/utils/common.dart';
-import 'package:check_in/utils/loader.dart';
 import 'package:check_in/utils/styles.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';

@@ -1,6 +1,5 @@
 // Flutter Packages
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 
 // Dart Packages
 import 'dart:async';
@@ -8,7 +7,6 @@ import 'dart:async';
 // Firebase Packages
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-import '../common.dart';
 
 /// A [StreamBuilder] that automatically loads more data when the user scrolls
 /// to the bottom.

@@ -1,7 +1,6 @@
 
 import 'package:check_in/ui/screens/Messages%20NavBar/other_profile/other_profile_view.dart';
 import 'package:check_in/utils/colors.dart';
-import 'package:check_in/utils/common.dart';
 import 'package:check_in/utils/styles.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';

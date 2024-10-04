@@ -4,7 +4,6 @@ import 'package:check_in/controllers/Messages/chat_controller.dart';
 import 'package:check_in/controllers/Messages/group_detail_controller.dart';
 import 'package:check_in/controllers/Messages/new_message_controller.dart';
 import 'package:check_in/controllers/user_controller.dart';
-import 'package:check_in/core/constant/app_assets.dart';
 import 'package:check_in/core/constant/constant.dart';
 import 'package:check_in/core/constant/temp_language.dart';
 import 'package:check_in/ui/screens/Messages%20NavBar/Chat/chat_screen.dart';

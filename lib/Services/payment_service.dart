@@ -1,12 +1,10 @@
 
 import 'dart:convert';
-import 'dart:developer';
 
 import 'package:check_in/auth_service.dart';
 import 'package:check_in/core/constant/constant.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:nb_utils/nb_utils.dart';

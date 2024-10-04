@@ -2,7 +2,6 @@ import 'package:check_in/Services/follower_and_following_service.dart';
 import 'package:check_in/Services/message_service.dart';
 import 'package:check_in/Services/push_notification_service.dart';
 import 'package:check_in/controllers/News%20Feed/news_feed_controller.dart';
-import 'package:check_in/core/constant/constant.dart';
 import 'package:check_in/ui/screens/News%20Feed%20NavBar/followers_and_following/controller/followers_and_following_controller.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
