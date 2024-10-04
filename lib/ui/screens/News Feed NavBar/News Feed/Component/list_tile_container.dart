@@ -40,9 +40,11 @@ class ListTileContainer extends StatefulWidget {
   NewsFeedModel? data;
   bool isMyProfile;
   bool isOtherProfile;
+  UserModel? userData;
   ListTileContainer(
       {super.key,
       this.data,
+      this.userData,
       this.isMyProfile = false,
       this.isOtherProfile = false});
 
@@ -60,18 +62,12 @@ class _ListTileContainerState extends State<ListTileContainer> {
 
   final userServices = UserServices();
 
-  UserModel? userData;
-
   bool? playing;
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    Future.microtask(() async {
-      userData = await userServices.getUserData(widget.data!.userId!);
-      mounted ? setState(() {}) : null;
-    });
   }
 
   RxBool isVisible = false.obs;
@@ -81,7 +77,7 @@ class _ListTileContainerState extends State<ListTileContainer> {
     newsFeedController.commentModel.value.userId =
         userController.userModel.value.uid ??
             FirebaseAuth.instance.currentUser!.uid;
-    return userData == null
+    return widget.userData == null
         ? const SizedBox()
         : LoaderOverlay(
             child: CustomContainer1(
@@ -136,15 +132,16 @@ class _ListTileContainerState extends State<ListTileContainer> {
                                       decoration: BoxDecoration(
                                           shape: BoxShape.circle,
                                           image: DecorationImage(
-                                              image: userData!
-                                                      .photoUrl.isEmptyOrNull
+                                              image: widget.userData!.photoUrl
+                                                      .isEmptyOrNull
                                                   ? NetworkImage(
                                                       AppImage.userImagePath)
-                                                  : NetworkImage(
-                                                      userData!.photoUrl ?? ''),
+                                                  : NetworkImage(widget
+                                                          .userData!.photoUrl ??
+                                                      ''),
                                               fit: BoxFit.cover)))),
-                              if (userData!.isVerified == null ||
-                                  userData!.isVerified == true)
+                              if (widget.userData!.isVerified == null ||
+                                  widget.userData!.isVerified == true)
                                 Positioned(
                                   right: -6,
                                   bottom: -2,
@@ -193,8 +190,11 @@ class _ListTileContainerState extends State<ListTileContainer> {
                                                     uid: widget.data!.userId!));
                                       }
                                     },
-                              child: poppinsText(userData!.userName ?? '', 14,
-                                  bold, appDarkBlue,
+                              child: poppinsText(
+                                  widget.userData!.userName ?? 'No Name',
+                                  14,
+                                  bold,
+                                  appDarkBlue,
                                   overflow: TextOverflow.ellipsis),
                             ),
                           ),

@@ -1,9 +1,11 @@
 import 'package:check_in/Services/newfeed_service.dart';
+import 'package:check_in/Services/user_services.dart';
 import 'package:check_in/auth_service.dart' hide newsFeedController;
 import 'package:check_in/controllers/News%20Feed/news_feed_controller.dart';
 import 'package:check_in/core/constant/constant.dart';
 import 'package:check_in/core/constant/temp_language.dart';
 import 'package:check_in/model/NewsFeed%20Model/news_feed_model.dart';
+import 'package:check_in/model/user_modal.dart';
 import 'package:check_in/ui/screens/News%20Feed%20NavBar/Create%20Post/create_post_screen.dart';
 import 'package:check_in/ui/screens/News%20Feed%20NavBar/News%20Feed/Component/list_tile_container.dart';
 import 'package:check_in/ui/screens/News%20Feed%20NavBar/News%20Feed/Component/shared_post_comp.dart';
@@ -43,6 +45,8 @@ class _NewsFeedScreenState extends State<NewsFeedScreen>
 
   @override
   bool get wantKeepAlive => true;
+
+  final userServices = UserServices();
 
   @override
   void initState() {
@@ -109,6 +113,7 @@ class _NewsFeedScreenState extends State<NewsFeedScreen>
                     if (index % 5 == 4) {
                       return NavtiveAdsComp(key: ValueKey('Ad_$index'));
                     }
+
                     if (controller.shouldShowPost(data)) {
                       if (data[NewsFeed.HIDE_USER] is List) {
                         final hideUserList = data[NewsFeed.HIDE_USER] as List;
@@ -117,26 +122,45 @@ class _NewsFeedScreenState extends State<NewsFeedScreen>
                             .contains(userController.userModel.value.uid)) {
                           final newsFeedModel = NewsFeedModel.fromJson(data);
 
-                          if (userController.blockProfiles
-                                  .contains(newsFeedModel.userId) ||
-                              userController.blockProfiles
-                                  .contains(newsFeedModel.shareUID)) {
-                            return const SizedBox.shrink();
-                          } else {
-                            return newsFeedModel.isOriginal!
-                                ? ListTileContainer(
-                                    key: ValueKey(newsFeedModel.id),
-                                    data: newsFeedModel,
-                                  )
-                                : SharedPostComp(
-                                    key: ValueKey(newsFeedModel.shareID),
-                                    data: newsFeedModel,
-                                  );
-                          }
+                          // Here we create a Future to get user data
+                          return FutureBuilder<UserModel?>(
+                            future: userServices.getUserData(newsFeedModel
+                                .userId!), // Get user data asynchronously
+                            builder: (context, snapshot) {
+                              // Check the status of the future
+                              if (snapshot.hasError) {
+                                return const Center(
+                                    child: Text(
+                                        "Error loading user data")); // Handle error state
+                              } else if (snapshot.hasData) {
+                                UserModel? userData = snapshot.data;
+
+                                // Proceed to check if the profile is blocked
+                                if (userController.blockProfiles
+                                        .contains(newsFeedModel.userId) ||
+                                    userController.blockProfiles
+                                        .contains(newsFeedModel.shareUID)) {
+                                  return const SizedBox.shrink();
+                                } else {
+                                  return newsFeedModel.isOriginal!
+                                      ? ListTileContainer(
+                                          key: ValueKey(newsFeedModel.id),
+                                          data: newsFeedModel,
+                                          userData: userData,
+                                        )
+                                      : SharedPostComp(
+                                          key: ValueKey(newsFeedModel.shareID),
+                                          data: newsFeedModel,
+                                        );
+                                }
+                              }
+                              return const SizedBox.shrink(); // Fallback
+                            },
+                          );
                         }
                       }
                     }
-                    return const SizedBox.shrink();
+                    return const SizedBox.shrink(); // Fallback
                   },
                 ),
               );
