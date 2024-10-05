@@ -42,3 +42,10 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+/.fvm/flutter_sdk/
+/ios/Runner.xcworkspace/xcshareddata/swiftpm/Package.resolved
+/.fvm/
+/functions/node_modules/
+
+# FVM Version Cache
+.fvm/

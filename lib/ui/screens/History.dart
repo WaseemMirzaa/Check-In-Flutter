@@ -1,6 +1,18 @@
-import 'package:checkinmod/utils/gaps.dart';
+import 'package:check_in/core/constant/temp_language.dart';
+import 'package:check_in/ui/screens/terms_conditions.dart';
+import 'package:check_in/utils/gaps.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 import 'package:sizer/sizer.dart';
+
+import '../../auth_service.dart';
+import '../../core/constant/constant.dart';
+import '../../utils/DateTimeUtils.dart';
+import '../../utils/colors.dart';
+import '../../utils/common.dart';
 
 class HistoryView extends StatefulWidget {
   const HistoryView({super.key});
@@ -10,140 +22,200 @@ class HistoryView extends StatefulWidget {
 }
 
 class _HistoryViewState extends State<HistoryView> {
-  var courtsList = [
-    'pexels-king-siberia-2277981',
-    'pexels-ricardo-esquivel-1607855',
-    'pexels-daniel-absi-680074',
-    'pexels-tom-jackson-2891884',
-    'pexels-tom-jackson-2891884',
-  ];
+  List<String> courts = ["Boston ", "Philadelphia", "Chicago", "Manhattan", "Los Angeles"];
 
-  List<String> courts = [
-    "Boston ","Philadelphia","Chicago","Manhattan","Los Angeles"
-  ];
+  Future<List<dynamic>> fetchData() async {
+    List<dynamic> dataArray = [];
+
+    final documentSnapshot =
+        await FirebaseFirestore.instance.collection(Collections.USER).doc(FirebaseAuth.instance.currentUser!.uid).get();
+    final checkedCourtsData = documentSnapshot.data()?[CourtKey.CHECKED_COURTS];
+
+    if (checkedCourtsData != null && checkedCourtsData is List<dynamic>) {
+      dataArray = List.from(checkedCourtsData).reversed.toList();
+    } else {
+      dataArray = [];
+    }
+
+    // print(dataArray);
+    // print(dataArray.length);
+
+    // setState(
+    //     () {}); // Assuming this method is inside a StatefulWidget, call setState to update the state
+
+    return dataArray;
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    // fetchData();
+    super.initState();
+    WidgetsFlutterBinding.ensureInitialized().addPostFrameCallback((timeStamp) {
+      if (FirebaseAuth.instance.currentUser != null && userController.userModel.value.isTermsVerified == null) {
+        Get.to(const TermsAndConditions(showButtons: true,));
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
+    // fetchData();
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        centerTitle: true,
-        title: Text(
-          'History',
-          style: TextStyle(
-            fontFamily: 'Poppins',
-            fontSize: 20,
-            color: const Color(0xff000000),
-            fontWeight: FontWeight.w700,
+        appBar: AppBar(
+          backgroundColor: appWhiteColor,
+          centerTitle: true,
+          automaticallyImplyLeading: false,
+          title: Text(
+            TempLanguage.history,
+            style: TextStyle(
+              fontFamily: TempLanguage.poppins,
+              fontSize: 20,
+              color: appBlackColor,
+              fontWeight: FontWeight.w700,
+            ),
+            textAlign: TextAlign.right,
+            softWrap: false,
           ),
-          textAlign: TextAlign.right,
-          softWrap: false,
+          elevation: 0,
         ),
-        elevation: 0,
-      ),
-      backgroundColor: Colors.white,
-      body: Padding(
-        padding: const EdgeInsets.only(top: 20),
-        child: ListView.builder(
-            itemCount: courts.length,
-            itemBuilder: (context, int index) {
-              return Column(
-                children: [
-                  Padding(
-                    padding: EdgeInsets.symmetric(
-                        horizontal: horizontalPadding, vertical: 1.1.h),
-                    child: Container(
-                      height: 14.h,
-                      decoration: BoxDecoration(
-                        color: const Color(0xffffffff),
-                        borderRadius: BorderRadius.circular(6.0),
-                        boxShadow: [
-                          BoxShadow(
-                            color: const Color(0x29000000),
-                            offset: Offset(0, 1),
-                            blurRadius: 6,
-                          ),
-                        ],
-                      ),
-                      child: Row(
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.all(12.0),
-                            child: Container(
-                              height: 10.2.h,
-                              width: 22.3.w,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(15.0),
-                              ),
-                              child: Image.asset(
-                                "assets/images/${courtsList[index]}.png",
-                                scale: 3,
-                                fit: BoxFit.fill,
-                              ),
-                            ),
-                          ),
-                          Text.rich(TextSpan(
-                              text: '${courts[index]}\n',
-                              style: TextStyle(
-                                fontFamily: 'Poppins',
-                                fontSize: 1.6.h,
-                                color: const Color(0xff000000),
-                                fontWeight: FontWeight.w600,
-                              ),
-                              children: [
-                                TextSpan(
-                                  style: TextStyle(
-                                    fontFamily: 'Poppins',
-                                    fontSize: 1.1.h,
-                                    color: const Color(0xff007a33),
-                                    height: 1.7,
-                                  ),
-                                  children: [
-                                    TextSpan(
-                                      text: 'Court Location :',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                    TextSpan(
-                                      text: ' Boston\n',
-                                      style: TextStyle(
-                                        color: const Color(0xff9f9f9f),
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                    ),
-                                    TextSpan(
-                                      text: 'Check in :',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                    TextSpan(
-                                      text: ' 00:00 ',
-                                      style: TextStyle(
-                                        color: const Color(0xff9f9f9f),
-                                        fontWeight: FontWeight.w500,
-                                      ),
+        backgroundColor: Colors.white,
+        body: FutureBuilder<List<dynamic>>(
+            future: fetchData(),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                // return const Center(child: CircularProgressIndicator());
+                return const Center(child: CircularProgressIndicator());
+              } else if (snapshot.hasData && snapshot.data != null && snapshot.data!.isNotEmpty) {
+                return Padding(
+                  padding: const EdgeInsets.only(top: 20),
+                  child: ListView.builder(
+                      itemCount: snapshot.data?.length ?? 0,
+                      itemBuilder: (context, int index) {
+                        final imageIndex = index % courtsList.length;
+                        return Column(
+                          children: [
+                            Padding(
+                              padding: EdgeInsets.symmetric(horizontal: horizontalPadding, vertical: 1.1.h),
+                              child: Container(
+                                height: 14.h,
+                                decoration: BoxDecoration(
+                                  color: appWhiteColor,
+                                  borderRadius: BorderRadius.circular(6.0),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: blackTranslucentColor,
+                                      offset: const Offset(0, 1),
+                                      blurRadius: 6,
                                     ),
                                   ],
                                 ),
-                              ]))
-                        ],
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.symmetric(
-                        horizontal: horizontalPadding + 15),
-                    child: Container(
-                      height: 1,
-                      color: Color(0xff9f9f9f),
-                    ),
-                  )
-                ],
-              );
-            }),
-      ),
-    );
+                                child: Row(
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.all(12.0),
+                                      child: Container(
+                                        height: 10.2.h,
+                                        width: 22.3.w,
+                                        decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.circular(15.0),
+                                        ),
+                                        child: Image.asset(
+                                          "assets/images/${courtsList[imageIndex]}.png",
+                                          scale: 3,
+                                          fit: BoxFit.fill,
+                                        ),
+                                      ),
+                                    ),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          Text(
+                                            '${snapshot.data![index]["courtName"]}',
+                                            style: TextStyle(
+                                              fontFamily: TempLanguage.poppins,
+                                              fontSize: 1.6.h,
+                                              color: appBlackColor,
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                            maxLines: 2,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                          Container(height: 10,),
+                                          RichText(
+                                            overflow: TextOverflow.ellipsis,
+                                            maxLines: 2,
+                                            text: TextSpan(
+                                              text: TempLanguage.courtLocation,
+                                              style: TextStyle(
+                                                fontFamily: TempLanguage.poppins,
+                                                fontSize: 1.1.h,
+                                                color: appGreenColor,
+                                                fontWeight: FontWeight.w600,
+                                              ),
+                                              children: [
+                                                TextSpan(
+                                                  text: ' ${snapshot.data![index]["courtName"]}',
+                                                  style: TextStyle(
+                                                    color: silverColor,
+                                                    fontWeight: FontWeight.w500,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                          Container(height: 5,),
+
+                                          RichText(
+                                            maxLines: 1,
+                                            text: TextSpan(
+                                              text: TempLanguage.checkInHistory,
+                                              style: TextStyle(
+                                                fontFamily: TempLanguage.poppins,
+                                                fontSize: 1.1.h,
+                                                color: appGreenColor,
+                                                fontWeight: FontWeight.w600,
+                                              ),
+                                              children: [
+                                                TextSpan(
+                                                  text: ' ${DateTimeUtils.time24to12(snapshot.data![index]["checkInTime"])} ',
+                                                  style: TextStyle(
+                                                    color: silverColor,
+                                                    fontWeight: FontWeight.w500,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    )
+                                  ],
+                                ),
+                              ),
+                            ),
+                            Padding(
+                              padding: EdgeInsets.symmetric(horizontal: horizontalPadding + 15),
+                              child: Container(
+                                height: 1,
+                                color: silverColor,
+                              ),
+                            )
+                          ],
+                        );
+                      }),
+                );
+              } else if (snapshot.hasError) {
+                return Center(
+                  child: Text(TempLanguage.wentWrong),
+                );
+              } else {
+                return Center(
+                  child: Text(TempLanguage.noDataFound),
+                );
+              }
+            }));
   }
 }

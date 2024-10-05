@@ -1,0 +1,7 @@
+platform :ios, '11.0'
+
+target 'Runner' do
+  use_frameworks!
+  # Add your pod dependencies here
+  pod 'Alamofire', '~> 5.0'
+end

@@ -1,48 +1,62 @@
-import 'package:checkinmod/ui/screens/check_in.dart';
-import 'package:checkinmod/ui/screens/profile_screen.dart';
-import 'package:checkinmod/utils/colors.dart';
+// ignore_for_file: avoid_print
+import 'package:check_in/auth_service.dart';
+import 'package:check_in/core/constant/temp_language.dart';
+import 'package:check_in/ui/screens/Messages%20NavBar/Messages/messages.dart';
+import 'package:check_in/ui/screens/News%20Feed%20NavBar/news_feed_onboarding/news_feed_onboarding.dart';
+import 'package:check_in/ui/screens/News%20Feed%20NavBar/open_post/open_post.dart';
+import 'package:check_in/ui/screens/check_in.dart';
+import 'package:check_in/ui/screens/profile_screen.dart';
+import 'package:check_in/ui/screens/start.dart';
+import 'package:check_in/ui/screens/terms_conditions.dart';
+import 'package:check_in/utils/colors.dart';
+import 'package:check_in/utils/common.dart';
+import 'package:check_in/utils/styles.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
+import 'package:nb_utils/nb_utils.dart';
 
 import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
 
 import 'History.dart';
 import '../../controllers/nav_bar_controller.dart';
+import 'News Feed NavBar/News Feed/news_feed_screen.dart';
+import 'dart:developer' as developer;
 
-
+import 'News Feed NavBar/deep_link_screen/deep_link_view.dart';
 class BottomNav {
   String icon;
   Color iconColor;
   Color boxColor;
+  String label;
 
   BottomNav(
       {required this.icon,
       required this.iconColor,
       required this.boxColor,
-      });
+      required this.label});
 
   getBottomNavItem() {
-    return PersistentBottomNavBarItem(
-      icon: Container(
-        height: 36,
-        width: 36,
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          color: boxColor
-        ),
-        child: Center(
-          child: SizedBox(
-            height: 19,width: 19,
-            child: SvgPicture.asset(
-              "assets/images/$icon.svg",
-               color: iconColor,
-
+    return BottomNavigationBarItem(
+        icon: Container(
+          height: 36,
+          width: 36,
+          decoration: BoxDecoration(shape: BoxShape.circle, color: boxColor),
+          child: Center(
+            child: SizedBox(
+              height: 19,
+              width: 19,
+              child: SvgPicture.asset(
+                "assets/images/$icon.svg",
+                color: iconColor,
+              ),
             ),
           ),
         ),
-      ),
-    );
+        label: label);
   }
 }
 
@@ -52,7 +66,8 @@ class CustomNavBarWidget extends StatelessWidget {
       items; // NOTE: You CAN declare your own model here instead of `PersistentBottomNavBarItem`.
   final ValueChanged<int> onItemSelected;
 
-  CustomNavBarWidget({
+  const CustomNavBarWidget({
+    super.key,
     required this.selectedIndex,
     required this.items,
     required this.onItemSelected,
@@ -86,9 +101,9 @@ class CustomNavBarWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.only(topLeft: Radius.circular(40))),
+      decoration: BoxDecoration(
+          color: appWhiteColor,
+          borderRadius: const BorderRadius.only(topLeft: Radius.circular(40))),
       child: SizedBox(
         width: double.infinity,
         child: Row(
@@ -98,7 +113,30 @@ class CustomNavBarWidget extends StatelessWidget {
             return Flexible(
               child: GestureDetector(
                 onTap: () {
-                  this.onItemSelected(index);
+                  if (FirebaseAuth.instance.currentUser == null) {
+                    showDialog(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                              title: poppinsText(TempLanguage.logInForFeatures,
+                                  16, FontWeight.w500, appBlackColor),
+                              actions: [
+                                TextButton(
+                                  onPressed: () {
+                                    Get.off(() => StartView(isBack: true));
+                                  },
+                                  child: Text(TempLanguage.logIn),
+                                ),
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                  },
+                                  child: Text(TempLanguage.cancel),
+                                ),
+                              ],
+                            ));
+                  } else {
+                    onItemSelected(index);
+                  }
                 },
                 child: _buildItem(item, selectedIndex == index),
               ),
@@ -111,101 +149,230 @@ class CustomNavBarWidget extends StatelessWidget {
 }
 
 class Home extends StatefulWidget {
+  const Home({super.key});
+
   @override
   State<Home> createState() => _HomeState();
 }
 
-class _HomeState extends State<Home> {
+class _HomeState extends State<Home> with AutomaticKeepAliveClientMixin {
   final NavBarController navBarController = Get.put(NavBarController());
+@override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    Future.microtask(() async{
+      FirebaseAuth.instance.currentUser != null && getStringAsync('first') != 'no' ?  Navigator.pushReplacement(
+          context, MaterialPageRoute(builder: (context) => const NewsFeedOnboarding())) : null;
+    });
+    initDynamicLinks(context);
 
-  List<Widget> _buildScreens() {
-      return [
-          const CheckIn(),
-          const HistoryView(),
-          const ProfileScreen(),
-      ];
+
+}
+  final List<Widget> _buildScreens = [
+    const CheckIn(),
+    MessageScreen(),
+    //................ News Feed
+    NewsFeedScreen(),
+    const HistoryView(),
+    ProfileScreen()
+    //KeyedSubtree(key: UniqueKey(), child: const ProfileScreen()),
+  ];
+  /// The deep link
+  Future<void> initDynamicLinks(BuildContext context) async {
+    print("\n\n\n\n\n First Call \n\n\n");
+    await Firebase.initializeApp();
+
+    // Handle initial link when the app is first opened
+    final PendingDynamicLinkData? initialLinkData = await FirebaseDynamicLinks.instance.getInitialLink();
+    _handleDeepLink(context, initialLinkData?.link);
+
+    FirebaseDynamicLinks.instance.onLink.listen(
+          (PendingDynamicLinkData dynamicLinkData) {
+        _handleDeepLink(context, dynamicLinkData?.link);
+      },
+      onError: (error) async {
+        developer.log('Dynamic Link Failed: ${error.toString()}');
+      },
+    );
+  }
+
+  void _handleDeepLink(BuildContext context, Uri? deepLink) {
+    print("\n\n\n\n\n 2nd Call \n\n\n");
+
+    if (deepLink != null) {
+      print("Deep Link URL: ${deepLink.toString()}");
+      var isPost = deepLink.pathSegments.contains('post');
+      print("The collection contains---> $isPost");
+      if (isPost) {
+        var postId = deepLink.queryParameters['postId'];
+        print("Post ID: $postId"); // Added debug statement
+        if (postId != null) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => OpenPost(postId: postId),
+            ),
+          );
+        } else {
+          print("Post ID is null");
+        }
+      } else {
+        print("Deep Link does not contain 'post' in path segments");
+      }
+    } else {
+      print("Deep Link is null");
     }
+  }
 
-  List<PersistentBottomNavBarItem> _navBarsItems() {
+
+
+
+  List<BottomNavigationBarItem> _navBarsItems() {
     return [
       BottomNav(
-        boxColor: navBarController.controller.index == 0 ? greenColor: whiteColor,
+        label: 'Home',
+        boxColor:
+            navBarController.controller.index == 0 ? appGreenColor : appWhiteColor,
         icon: "Group 12548",
-        iconColor: navBarController.controller.index == 0 ? whiteColor: blackColor,
+        iconColor:
+            navBarController.controller.index == 0 ? appWhiteColor : appBlackColor,
       ).getBottomNavItem(),
       BottomNav(
-        boxColor: navBarController.controller.index == 1 ? greenColor: whiteColor,
+        label: 'Chat',
+        boxColor:
+            navBarController.controller.index == 1 ? appGreenColor : appWhiteColor,
+        icon: "Path 28661",
+        iconColor:
+            navBarController.controller.index == 1 ? appWhiteColor : appBlackColor,
+      ).getBottomNavItem(),
+
+      //.......................... News Feed
+      BottomNav(
+        label: 'NewsFeed',
+        boxColor:
+            navBarController.controller.index == 2 ? appGreenColor : appWhiteColor,
+        icon: "calendar",
+        iconColor:
+            navBarController.controller.index == 2 ? appWhiteColor : appBlackColor,
+      ).getBottomNavItem(),
+      BottomNav(
+        label: 'History',
+        boxColor:
+            navBarController.controller.index == 3 ? appGreenColor : appWhiteColor,
         icon: "Icon awesome-history",
-        iconColor: navBarController.controller.index == 1 ? whiteColor: blackColor,
+        iconColor:
+            navBarController.controller.index == 3 ? appWhiteColor : appBlackColor,
       ).getBottomNavItem(),
       BottomNav(
-        boxColor: navBarController.controller.index == 2 ? greenColor: whiteColor,
+        label: 'Profile',
+        boxColor:
+            navBarController.controller.index == 4 ? appGreenColor : appWhiteColor,
         icon: "Icon material-person",
-        iconColor: navBarController.controller.index == 2 ? whiteColor: blackColor,
+        iconColor:
+            navBarController.controller.index == 4 ? appWhiteColor : appBlackColor,
       ).getBottomNavItem(),
     ];
   }
 
-
-  Future<bool> showExitPopup(BuildContext? context) async {
-    return await showDialog(
-      context: context!,
-      builder: (context) => AlertDialog(
-        title: const Text('Exit App'),
-        content: const Text('Do you want to exit an App?'),
-        actions:[
-          ElevatedButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            //return false when click on "NO"
-            child:const Text('No'),
-          ),
-
-          ElevatedButton(
-            onPressed: () => Navigator.of(context).pop(true),
-            //return true when click on "Yes"
-            child:const Text('Yes'),
-          ),
-        ],
-      ),
-    )??false; //if showDialouge had returned null, then return false
+  Future<bool> _onWillPop() async {
+    if (navBarController.currentIndex.value == 0) {
+      // Only show exit confirmation dialog on the first screen (CheckIn)
+      final bool shouldExit = await showExitPopup(context);
+      return shouldExit;
+    } else {
+      // Allow navigating back on other screens
+      return true;
+    }
+  }
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    navBarController.currentIndex.value = 0;
   }
 
-
+  @override
+  bool get wantKeepAlive => true;
   @override
   Widget build(BuildContext context) {
-    return  PersistentTabView.custom(
-      context,
-      controller: navBarController.controller,
-      itemCount: _navBarsItems().length,
-      // This is required in case of custom style! Pass the number of items for the nav bar.
-      screens: _buildScreens(),
-      navBarHeight: 60,
-      onWillPop:  (context) {
-        return showExitPopup(context);
-      },
-      hideNavigationBarWhenKeyboardShows: true,
-      backgroundColor: Colors.white,
-      popAllScreensOnTapOfSelectedTab: true,
-      confineInSafeArea: false,
-      handleAndroidBackButtonPress: true,
-      customWidget: (navBarEssentials) => Container(
-        decoration: const BoxDecoration(
-          borderRadius: BorderRadius.only(topLeft: Radius.circular(40)),
-        ),
-        child: CustomNavBarWidget(
-          // Your custom widget goes here
-          items: _navBarsItems(),
-          selectedIndex: navBarController.currentIndex.value,
-          onItemSelected: (index) {
-            setState(() {
-              navBarController.currentIndex.value = index;
-              navBarController.controller.index = index;// NOTE: THIS IS CRITICAL!! Don't miss it!
-            });
-            print(navBarController.currentIndex.value);
-            print(navBarController.controller.index);
-          },
-        ),
-      ),
-      );
+    return WillPopScope(
+      onWillPop: _onWillPop,
+      child: Obx(() {
+        return Scaffold(
+          body: _buildScreens[navBarController.currentIndex.value],
+          bottomNavigationBar: BottomNavigationBar(
+            items: _navBarsItems(),
+            currentIndex: navBarController.currentIndex.value,
+            //selectedItemColor: Colors.amber[800],
+            showSelectedLabels: false,
+            showUnselectedLabels: false,
+            onTap: (index) {
+              if (FirebaseAuth.instance.currentUser == null) {
+                showDialog(
+                    context: context,
+                    builder: (context) => AlertDialog(
+                          title: poppinsText(TempLanguage.logInForFeatures, 16,
+                              FontWeight.w500, appBlackColor),
+                          actions: [
+                            TextButton(
+                              onPressed: () {
+                                Get.off(() => StartView(isBack: true));
+                              },
+                              child: Text(TempLanguage.logIn),
+                            ),
+                            TextButton(
+                              onPressed: () {
+                                Navigator.pop(context);
+                              },
+                              child: Text(TempLanguage.cancel),
+                            ),
+                          ],
+                        ));
+              } else {
+                navBarController.currentIndex.value = index;
+                navBarController.controller.index = index;
+              }
+            },
+          ),
+        );
+      }),
+    );
+
+    // return WillPopScope(
+    //     onWillPop: _onWillPop,
+    //     child: PersistentTabView.custom(
+    //         context,
+    //         controller: navBarController.controller,
+    //         itemCount: _navBarsItems().length,
+    //         // This is required in case of custom style! Pass the number of items for the nav bar.
+    //         screens: _buildScreens(),
+    //         navBarHeight: 60,
+    //         onWillPop: (context) {
+    //           return showExitPopup(context);
+    //         },
+    //         resizeToAvoidBottomInset: true,
+    //         hideNavigationBarWhenKeyboardShows: true,
+    //         backgroundColor: whiteColor,
+    //         popAllScreensOnTapOfSelectedTab: true,
+    //         stateManagement: false,
+    //         confineInSafeArea: true,
+    //         handleAndroidBackButtonPress: true,
+    //         customWidget: (navBarEssentials) => Container(
+    //           decoration: const BoxDecoration(
+    //             borderRadius: BorderRadius.only(topLeft: Radius.circular(40)),
+    //           ),
+    //           child: Obx(() => CustomNavBarWidget(
+    //             items: _navBarsItems(),
+    //             selectedIndex: navBarController.currentIndex.value,
+    //             onItemSelected: (index) {
+    //               navBarController.currentIndex.value = index;
+    //               navBarController.controller.index = index;
+    //               log('${navBarController.controller.index}');
+    //             },
+    //           ),)
+    //         ),
+    //       ),
+    //     );
   }
 }

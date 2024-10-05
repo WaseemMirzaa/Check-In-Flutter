@@ -1,6 +1,6 @@
 {
-    "name": "checkinmod",
-    "short_name": "checkinmod",
+    "name": "check_in",
+    "short_name": "check_in",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

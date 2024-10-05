@@ -1,0 +1,117 @@
+class TempLanguage {
+  static String get poppins => 'Poppins';
+
+  static String get homePage => 'Home Page';
+  static String get searchPage => 'Search Page';
+  static String get profilePage => 'Profile Page';
+
+  static String get nameCap => 'Name';
+  static String get email => 'email';
+  static String get emailCap => 'Email';
+  static String get goldenCourtsText => 'Golden Courts';
+  static String get ok => 'OK';
+  static String get history => 'History';
+  static String get password => 'Password';
+  static String get contactUs => 'Contact Us';
+  static String get privacyPolicy => 'Privacy Policy';
+  static String get termsAndConditions => 'Terms And Conditions';
+  static String get forgotPassword => 'Forgot Password';
+  static String get enterText => 'Please enter some text';
+  static String get courtLocation => 'Court Location :';
+  static String get checkInHistory => 'Check in :';
+  static String get logOut => 'LogOut';
+  static String get logIn => 'Login';
+  static String get continueButton => 'Continue';
+  static String get signUp => 'Sign up';
+  static String get player => 'Player';
+  static String get userName => 'Username';
+  static String get homeCourt => 'Home Court';
+  static String get aboutMe => 'About me';
+  static String get numOfPlayers => 'Number of Players: ';
+  static String get profile => 'Profile';
+  static String get tellUsAboutGame => 'Tell us about your game';
+  static String get enterFirstName => 'Please enter your first name';
+  static String get agreeTo => 'I agree to the ';
+  static String get agreeToTerms => 'Agree to terms & conditions';
+  static String get enterUserName => 'Enter User Name';
+  static String get enterValidEmail => 'Enter Valid Email';
+  static String get poweredBy => 'Powered by';
+  static String get villeMarcos => 'Ville Marcos LLC';
+
+  static String get logInSpaced => 'Log in';
+  static String get cancel => 'Cancel';
+  static String get deleteAcc => 'Delete Acc';
+  static String get loading => 'Loading...';
+  static String get findCourts => 'Find Courts Near You';
+  static String get select => 'SELECT';
+  static String get submit => 'SUBMIT';
+  static String get sendEmail => 'Send Email';
+  static String get notLaunchEmailToast => "Could not launch email.";
+  static String get checkOutToastTitle => "Checked Out";
+  static String get checkOutToastMessage => "You have left the court.";
+  static String get notAtCourtToastTitle => "Alert";
+  static String get notAtCourtToastMessage => "You are not at a court.";
+  static String get verifyProfile => "Verify Profile";
+  static String get validEmail => "Enter Valid Email Address";
+  static String get passwordCheck => "Password must be 6 digits long";
+  static String get invalidPassword => "Invalid Password";
+  static String get checkIn => "CHECK IN";
+  static String get checkOut => "CHECK OUT";
+  static String get logInForFeatures => "Please log in to use more features";
+  static String get emailErrorToastTitle => "Alert";
+  static String get emailErrorToastMessage => "You are not at a court.";
+  static String get error => "Error";
+  static String get enterEmail => "Enter Email";
+  static String get enterPassword => "Enter Password";
+  static String get wentWrong => 'Something went wrong';
+  static String get noDataFound => 'No data found';
+  static String get save => 'Save';
+
+  static String get dearUser => "Dear User";
+  static String get alertContentText =>
+      'We care about your privacy and data security. We use your email to maintain your profile in our catalog database. Additionally, we use your location to provide you with the nearest basketball courts in your area.'
+          '\nTo enhance your experience, this app also collects tracking data to deliver personalized ads that are more relevant to you.'
+          '\nCan we continue to use your data to provide you with the best user experience? You can change this decision anytime in the app’s settings.';
+  static String get newsFeed => "News Feed";
+  static String get myPosts => "My Posts";
+  static String get checkOutHot => "Check out what's Hot";
+  static String get contentThatTrendingAndPopular => "Check out what's Hot";
+  static String get noMessageFound => "No messages found.";
+  static String get noPostFound => "No posts found.";
+  static String get typeSomething => "Type something";
+  static String get noRecent => "No Recent";
+  static String get noConversation => "No Conversation.";
+  static String get groupDetail => "Group Details";
+  static String get aboutGroup => "About Group";
+  // static String get save => "Save";
+  static String get makeGroupAdmin => "Make Group Admin";
+  static String get removeGroupAdmin => "Remove Group Admin";
+  static String get removeMember => "Remove Member";
+  static String get noMemberFound => "No members found.";
+  static String get messages => "Messages";
+  static String get sendMessage => "Send message";
+  static String get search => "Search";
+  static String get addMember => "Add Member";
+  static String get newMessage => 'New Messages';
+  static String get to => 'To';
+  static String get chat => 'chat';
+  static String get typeToFindMember => 'Search to find member';
+  static String get inviteSent => 'Invite Sent';
+  static String get acceptMessageRequest => 'Accept message request from';
+  static String get sendMessageRequestToCall =>
+      'Sent a message request to this person to message and call them.';
+  static String get sendRequest => 'Sent Request';
+  static String get ignore => 'Ignore';
+  static String get accept => 'Accept';
+  static String get block => 'Block';
+  static String get delete => 'Delete';
+  static String get members => 'Members';
+  static String get groupMembers => 'Group Members';
+  static String get add => 'Add';
+  static String get requestDeleted => 'Request Deleted by';
+  static String get youBlockThisAccount => 'You blocked this account';
+  static String get requestAgain => 'Request Again';
+  static String get blockedYou => 'Blocked You';
+  static String get unblock => 'Unblock';
+  static String get messageRequest => 'Message Request';
+}

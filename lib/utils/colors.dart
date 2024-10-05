@@ -1,12 +1,21 @@
-
-
-
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 
-Color blackColor = Colors.black;
-Color whiteColor = Colors.white;
-Color greenColor = Color(0xff007A33);
-Color greyColor = Color(0xff707070);
-Color textColor = Color(0xff777777);
+Color appBlackColor = Colors.black;
+Color appPrimaryColor = Color(0xff007A33);
+Color blackTranslucentColor = const Color(0x29000000);
+Color appWhiteColor = Colors.white;
+Color appGreenColor = const Color(0xff007A33);
+Color appRedColor = Colors.red;
+Color lightGreenColor = Colors.green;
+Color greyColor = const Color(0xff707070);
+Color textColor = const Color(0xff777777);
+Color blueAccentColor = Colors.blueAccent;
+Color yellowColor = Colors.yellow;
+Color darkYellowColor = const Color.fromARGB(255, 255, 206, 26);
+Color redColor = Colors.red;
+Color appBlueColor = Colors.blue;
+Color silverColor = const Color(0xff9f9f9f);
+Color appTransparentColor = Colors.transparent;
+Color offWhiteColor = const Color.fromARGB(255, 216, 227, 242);
+Color appGreyColor1 = const Color(0xFFEAECF2);
+Color appDarkBlue = const Color(0xff19295C);

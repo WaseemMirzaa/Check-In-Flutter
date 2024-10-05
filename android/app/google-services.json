@@ -1,0 +1,82 @@
+{
+  "project_info": {
+    "project_number": "41160719092",
+    "project_id": "check-in-7ecd7",
+    "storage_bucket": "check-in-7ecd7.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:41160719092:android:c706181dfebd457e463ca1",
+        "android_client_info": {
+          "package_name": "com.developlogix.checkin"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "41160719092-6jonc7jq3e1uvf63u0gmlnbi4fc7b210.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyArLxMF1wjbQzOw4xIqh_zfNJ8-cG7CaBY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "41160719092-6jonc7jq3e1uvf63u0gmlnbi4fc7b210.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "41160719092-sdkcvbdqcrci7lso8p83nrnpkvt89dqc.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.developlogix.checkin"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:41160719092:android:ffefda83c8b104d8463ca1",
+        "android_client_info": {
+          "package_name": "com.developlogix.checkinapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "41160719092-6jonc7jq3e1uvf63u0gmlnbi4fc7b210.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyArLxMF1wjbQzOw4xIqh_zfNJ8-cG7CaBY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "41160719092-6jonc7jq3e1uvf63u0gmlnbi4fc7b210.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "41160719092-sdkcvbdqcrci7lso8p83nrnpkvt89dqc.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.developlogix.checkin"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

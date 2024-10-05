@@ -1,10 +1,20 @@
-import 'package:checkinmod/ui/screens/persistent_nav_bar.dart';
-import 'package:checkinmod/ui/screens/start.dart';
-import 'package:checkinmod/ui/widgets/common_button.dart';
-import 'package:checkinmod/utils/gaps.dart';
+import 'package:check_in/auth_service.dart';
+import 'package:check_in/core/constant/app_assets.dart';
+import 'package:check_in/core/constant/temp_language.dart';
+import 'package:check_in/ui/screens/privacy_policy.dart';
+import 'package:check_in/ui/screens/start.dart';
+import 'package:check_in/ui/screens/terms_conditions.dart';
+import 'package:check_in/ui/widgets/common_button.dart';
+import 'package:check_in/utils/gaps.dart';
+import 'package:check_in/val.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
 import 'package:sizer/sizer.dart';
+import 'package:get/get.dart';
+
+import '../../utils/colors.dart';
 
 class SignupView extends StatefulWidget {
   const SignupView({super.key});
@@ -14,124 +24,291 @@ class SignupView extends StatefulWidget {
 }
 
 class _SignupViewState extends State<SignupView> {
+  String userName = '';
+  String email = '';
+  String password = '';
+  bool isVerified = false;
+  bool agreeToTerms = false;
+  bool isSignUpButtonEnabled = false;
+
+  int index = 0;
+  RxBool isLoading = false.obs;
+
+  void changeIndex() {
+    if (index == 0) {
+      index = 1;
+    } else {
+      index = 0;
+    }
+    setState(() {});
+    print(index);
+  }
+
+  final auth = FirebaseAuth.instance;
+  final snap = FirebaseFirestore.instance;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: appWhiteColor,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: appWhiteColor,
         leading: Row(
           children: [
             SizedBox(
-              width: 30,
+              width: 2.5.w,
             ),
             GestureDetector(
               onTap: () {
-                pushNewScreen(context, screen: StartView(), withNavBar: false);
+                pushNewScreen(context,
+                    screen: StartView(isBack: false), withNavBar: false);
               },
               child: SizedBox(
                 height: 2.1.h,
                 width: 2.9.w,
-                child: Image.asset("assets/images/Path 6.png"),
+                child: Image.asset(AppAssets.LEFT_ARROW),
               ),
             )
           ],
         ),
         elevation: 0,
       ),
-      body: Padding(
-        padding: EdgeInsets.all(horizontalPadding),
-        child: SizedBox(
-          height: MediaQuery.of(context).size.height,
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Image.asset("assets/images/logo.jpeg",),
-                SizedBox(height: 12.h,),
-                SizedBox(
-                  child: Column(
-                    children: [
-                      Padding(
-                        padding: EdgeInsets.only(top: 0.9.h, bottom: 0.9.h),
-                        child: TextField(
-                          enableSuggestions: false,
-                          autocorrect: false,
-                          decoration: InputDecoration(
-                            enabledBorder: UnderlineInputBorder(
-                              borderSide: BorderSide(color: Color(0xff707070)),
-                            ),
-                            focusedBorder: UnderlineInputBorder(
-                              borderSide: BorderSide(color: Color(0xff707070)),
-                            ),
-                            hintText: 'Username',
-                            hintStyle: TextStyle(
-                              fontFamily: 'Poppins',
-                              fontSize: 1.7.h,
-                              color: const Color(0xff707070),
-                              fontWeight: FontWeight.w600,
-                              height: 1.2142857142857142,
-                            ),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: EdgeInsets.all(horizontalPadding),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              SizedBox(
+                height: 3.h,
+              ),
+              Image.asset(
+                AppAssets.LOGO_NEW,
+                scale: 3,
+              ),
+              SizedBox(
+                height: 5.h,
+              ),
+              SizedBox(
+                child: Column(
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.only(top: 0.9.h, bottom: 0.9.h),
+                      child: TextFormField(
+                        enableSuggestions: false,
+                        autocorrect: false,
+                        textInputAction: TextInputAction.next,
+                        onEditingComplete: () =>
+                            FocusScope.of(context).nextFocus(),
+                        validator: (v) {
+                          if (v == null || v.isEmpty) {
+                            return TempLanguage.enterFirstName;
+                          }
+                          return null;
+                        },
+                        onChanged: (val) {
+                          setState(() {
+                            userName = val;
+                          });
+                        },
+                        decoration: InputDecoration(
+                          enabledBorder: UnderlineInputBorder(
+                            borderSide: BorderSide(color: greyColor),
                           ),
-                        ),
-                      ),Padding(
-                        padding: EdgeInsets.only(top: 0.9.h, bottom: 0.9.h),
-                        child: TextField(
-                          enableSuggestions: false,
-                          autocorrect: false,
-                          decoration: InputDecoration(
-                            enabledBorder: UnderlineInputBorder(
-                              borderSide: BorderSide(color: Color(0xff707070)),
-                            ),
-                            focusedBorder: UnderlineInputBorder(
-                              borderSide: BorderSide(color: Color(0xff707070)),
-                            ),
-                            hintText: 'Email',
-                            hintStyle: TextStyle(
-                              fontFamily: 'Poppins',
-                              fontSize: 1.7.h,
-                              color: const Color(0xff707070),
-                              fontWeight: FontWeight.w600,
-                              height: 1.2142857142857142,
-                            ),
+                          focusedBorder: UnderlineInputBorder(
+                            borderSide: BorderSide(color: greyColor),
+                          ),
+                          hintText: TempLanguage.userName,
+                          hintStyle: TextStyle(
+                            fontFamily: TempLanguage.poppins,
+                            fontSize: 1.7.h,
+                            color: greyColor,
+                            fontWeight: FontWeight.w600,
+                            height: 1.2142857142857142,
                           ),
                         ),
                       ),
-                      Padding(
-                        padding: EdgeInsets.only(top: 0.9.h, bottom: 0.9.h),
-                        child: TextField(
-                          enableSuggestions: false,
-                          autocorrect: false,
-                          obscureText: true,
-                          decoration: InputDecoration(
-                            enabledBorder: UnderlineInputBorder(
-                              borderSide: BorderSide(color: Color(0xff707070)),
-                            ),
-                            focusedBorder: UnderlineInputBorder(
-                              borderSide: BorderSide(color: Color(0xff707070)),
-                            ),
-                            hintText: 'Password',
-                            hintStyle: TextStyle(
-                              fontFamily: 'Poppins',
-                              fontSize: 1.7.h,
-                              color: const Color(0xff707070),
-                              fontWeight: FontWeight.w600,
-                              height: 1.2142857142857142,
-                            ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.only(top: 0.9.h, bottom: 0.9.h),
+                      child: TextFormField(
+                        enableSuggestions: false,
+                        autocorrect: false,
+                        textInputAction: TextInputAction.next,
+                        onEditingComplete: () =>
+                            FocusScope.of(context).nextFocus(),
+                        keyboardType: TextInputType.emailAddress,
+                        validator: (v) {
+                          if (v == null || v.isEmpty || !Validate(email)) {
+                            return 'Please ${TempLanguage.validEmail}';
+                          }
+                          return null;
+                        },
+                        onChanged: (val) {
+                          setState(() {
+                            email = val.trim();
+                          });
+                          Validate(email);
+                        },
+                        decoration: InputDecoration(
+                          enabledBorder: UnderlineInputBorder(
+                            borderSide: BorderSide(color: greyColor),
+                          ),
+                          focusedBorder: UnderlineInputBorder(
+                            borderSide: BorderSide(color: greyColor),
+                          ),
+                          hintText: TempLanguage.emailCap,
+                          hintStyle: TextStyle(
+                            fontFamily: TempLanguage.poppins,
+                            fontSize: 1.7.h,
+                            color: greyColor,
+                            fontWeight: FontWeight.w600,
+                            height: 1.2142857142857142,
                           ),
                         ),
                       ),
-                      Padding(
-                          padding: EdgeInsets.only(top: 3.6.h),
-                          child: fullWidthButton('Sign up', () {
+                    ),
+                    Padding(
+                      padding: EdgeInsets.only(top: 0.9.h, bottom: 0.9.h),
+                      child: TextFormField(
+                        enableSuggestions: false,
+                        autocorrect: false,
+                        obscureText: index == 0 ? true : false,
+                        validator: (v) {
+                          if (v == null || v.isEmpty || v.length < 6) {
+                            return TempLanguage.passwordCheck;
+                          }
+                          return null;
+                        },
+                        onChanged: (v) {
+                          setState(() {
+                            password = v;
+                          });
+                        },
+                        decoration: InputDecoration(
+                          enabledBorder: UnderlineInputBorder(
+                            borderSide: BorderSide(color: greyColor),
+                          ),
+                          focusedBorder: UnderlineInputBorder(
+                            borderSide: BorderSide(color: greyColor),
+                          ),
+                          hintText: TempLanguage.password,
+                          hintStyle: TextStyle(
+                            fontFamily: TempLanguage.poppins,
+                            fontSize: 1.7.h,
+                            color: greyColor,
+                            fontWeight: FontWeight.w600,
+                            height: 1.2142857142857142,
+                          ),
+                        ),
+                      ),
+                    ),
+                    Row(
+                      children: [
+                        Checkbox(
+                          value: agreeToTerms,
+                          onChanged: (value) async {
+                            final res = await Get.to(const TermsAndConditions(fromSignup: true, showButtons: true,));
+                            if (res ?? false) {
+                              setState(() {
+                                agreeToTerms = value ?? false;
+                                isSignUpButtonEnabled = agreeToTerms;
+                              });
+                            }
+                          },
+                        ),
+                        // Expanded(
+                        //   child:
+                        Text(
+                          TempLanguage.agreeTo,
+                          style: TextStyle(
+                            fontFamily: TempLanguage.poppins,
+                            fontSize: 1.2.h,
+                            color: greyColor,
+                            fontWeight: FontWeight.w600,
+                            // height: 1.2142857142857142,
+                          ),
+                        ),
+                        // ),
+                        GestureDetector(
+                          onTap: () {
                             pushNewScreen(context,
-                                screen: Home(), withNavBar: false);
-                          })),
-                    ],
-                  ),
+                                screen: const PrivacyPolicy(),
+                                withNavBar: false);
+                          },
+                          child: Text(
+                            TempLanguage.privacyPolicy,
+                            style: TextStyle(
+                              color: appBlueColor,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 1.2.h,
+                            ),
+                          ),
+                        ),
+                        Text(
+                          " & ",
+                          style: TextStyle(
+                            fontFamily: TempLanguage.poppins,
+                            fontSize: 1.2.h,
+                            color: greyColor,
+                            fontWeight: FontWeight.w600,
+                            // height: 1.2142857142857142,
+                          ),
+                        ),
+                        GestureDetector(
+                          onTap: () async {
+                            // pushNewScreen(context,
+                            //     screen: const TermsAndConditions(),
+                            //     withNavBar:
+                            //         false); // Handle the action to open the Terms & Conditions screen
+                            final res = await Get.to(const TermsAndConditions(fromSignup: true, showButtons: true,));
+                            if (res ?? false) {
+                              setState(() {
+                                agreeToTerms = true;
+                                isSignUpButtonEnabled = agreeToTerms;
+                              });
+                            }
+                          },
+                          child: Text(
+                            TempLanguage.termsAndConditions,
+                            style: TextStyle(
+                              color: appBlueColor,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 1.2.h,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 2.0.h),
+                    // Add some spacing between the checkbox and the sign-up button
+                    Obx( () {
+                      return Padding(
+                          padding: EdgeInsets.only(top: 3.6.h),
+                          child: isLoading.value ? const Center(child: CircularProgressIndicator()) : fullWidthButton(TempLanguage.signUp, () async {
+                            if (!isSignUpButtonEnabled) {
+                              Get.snackbar(
+                                  TempLanguage.error, TempLanguage.agreeToTerms);
+                            } else if (userName != '') {
+                              if (Validate(email)) {
+                                isLoading.value = true;
+                                bool isSuccess = await signUp(email, password, userName, context);
+
+                                isLoading.value = false;
+                              } else {
+                                Get.snackbar(TempLanguage.error, TempLanguage.enterValidEmail);
+
+                              }
+                            } else if (userName == '') {
+                              Get.snackbar(TempLanguage.error, TempLanguage.enterUserName);
+                            }
+                          }));
+                    },
+                    ),
+                  ],
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),

@@ -1,18 +1,26 @@
+// ignore_for_file: library_private_types_in_public_api
+
+import 'package:check_in/core/constant/temp_language.dart';
 import 'package:flutter/material.dart';
 
+import '../../utils/colors.dart';
+
 class MyNavigationBar extends StatefulWidget {
-  MyNavigationBar ({Key? key}) : super(key: key);
+  const MyNavigationBar({Key? key}) : super(key: key);
 
   @override
   _MyNavigationBarState createState() => _MyNavigationBarState();
 }
 
-class _MyNavigationBarState extends State<MyNavigationBar > {
+class _MyNavigationBarState extends State<MyNavigationBar> {
   int _selectedIndex = 0;
-  static const List<Widget> _widgetOptions = <Widget>[
-    Text('Home Page', style: TextStyle(fontSize: 35, fontWeight: FontWeight.bold)),
-    Text('Search Page', style: TextStyle(fontSize: 35, fontWeight: FontWeight.bold)),
-    Text('Profile Page', style: TextStyle(fontSize: 35, fontWeight: FontWeight.bold)),
+  static List<Widget> _widgetOptions = <Widget>[
+    Text(TempLanguage.homePage,
+        style: TextStyle(fontSize: 35, fontWeight: FontWeight.bold)),
+    Text(TempLanguage.searchPage,
+        style: TextStyle(fontSize: 35, fontWeight: FontWeight.bold)),
+    Text(TempLanguage.searchPage,
+        style: TextStyle(fontSize: 35, fontWeight: FontWeight.bold)),
   ];
 
   void _onItemTapped(int index) {
@@ -26,36 +34,32 @@ class _MyNavigationBarState extends State<MyNavigationBar > {
     return Scaffold(
       appBar: AppBar(
           title: const Text('Flutter BottomNavigationBar Example'),
-          backgroundColor: Colors.green
-      ),
+          backgroundColor: lightGreenColor),
       body: Center(
         child: _widgetOptions.elementAt(_selectedIndex),
       ),
       bottomNavigationBar: BottomNavigationBar(
-          items: const <BottomNavigationBarItem>[
+          items: <BottomNavigationBarItem>[
             BottomNavigationBarItem(
-              label: "f",
+                label: "f",
                 icon: Icon(Icons.home),
-                backgroundColor: Colors.green
-            ),
+                backgroundColor: lightGreenColor),
             BottomNavigationBarItem(
                 label: "f",
                 icon: Icon(Icons.search),
-                backgroundColor: Colors.yellow
-            ),
+                backgroundColor: yellowColor),
             BottomNavigationBarItem(
               label: "f",
               icon: Icon(Icons.person),
-              backgroundColor: Colors.blue,
+              backgroundColor: appBlueColor,
             ),
           ],
           type: BottomNavigationBarType.shifting,
           currentIndex: _selectedIndex,
-          selectedItemColor: Colors.black,
+          selectedItemColor: appBlackColor,
           iconSize: 40,
           onTap: _onItemTapped,
-          elevation: 5
-      ),
+          elevation: 5),
     );
   }
-} 
+}

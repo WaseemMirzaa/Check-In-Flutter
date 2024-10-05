@@ -1,7 +1,9 @@
-import 'package:checkinmod/ui/screens/persistent_nav_bar.dart';
-import 'package:checkinmod/ui/widgets/common_button.dart';
+import 'package:check_in/core/constant/app_assets.dart';
+import 'package:check_in/core/constant/temp_language.dart';
+import 'package:check_in/ui/widgets/common_button.dart';
 import 'package:flutter/material.dart';
-import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
+import 'package:get/get.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../utils/colors.dart';
@@ -16,74 +18,89 @@ class ContactUs extends StatefulWidget {
 }
 
 class _ContactUsState extends State<ContactUs> {
+  final TextEditingController nameController = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
+
+  @override
+  void dispose() {
+    nameController.dispose();
+    emailController.dispose();
+    super.dispose();
+  }
+
+  void _launchEmailApp() async {
+    final Uri params = Uri(
+      scheme: 'mailto',
+      path: 'support@checkinhoops.net',
+      query:
+          'subject=Contact Us Inquiry&body=Name: ${nameController.text}\nEmail: ${emailController.text}',
+    );
+
+    final String url = params.toString();
+    bool canLaunch = false;
+    try {
+      canLaunch = await canLaunchUrl(params);
+    } catch (e) {
+      print(e);
+    }
+
+    if (canLaunch) {
+      await launchUrl(params);
+    } else {
+      Get.snackbar(TempLanguage.emailErrorToastTitle, TempLanguage.emailErrorToastMessage,
+          backgroundColor: appWhiteColor,
+          borderWidth: 4,
+          borderColor: redColor,
+          colorText: appBlackColor);
+      print('Could not launch email app.');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         leading: Row(
           children: [
-            SizedBox(
+            const SizedBox(
               width: 30,
             ),
             GestureDetector(
-              onTap: (){
+              onTap: () {
                 Navigator.pop(context);
               },
               child: SizedBox(
                 height: 2.1.h,
                 width: 2.9.w,
-                child: Image.asset("assets/images/Path 6.png"),
+                child: Image.asset(AppAssets.LEFT_ARROW),
               ),
             )
           ],
         ),
         elevation: 0,
         centerTitle: true,
-        backgroundColor: whiteColor,
-        title: poppinsText("Contact Us", 20, FontWeight.bold, blackColor),
+        backgroundColor: appWhiteColor,
+        title: poppinsText(TempLanguage.contactUs, 20, FontWeight.bold, appBlackColor),
       ),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Padding(
-            padding: EdgeInsets.symmetric(horizontal: 50, vertical: 36),
+            padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 36),
             child: Column(
               children: [
-                customTextField("Name", greenColor),
-                customTextField("Email", greenColor),
+                customTextField(TempLanguage.nameCap, appGreenColor, nameController),
+                customTextField(TempLanguage.emailCap, appGreenColor, emailController),
               ],
             ),
           ),
           Padding(
-            padding: EdgeInsets.symmetric(horizontal: 20),
-            child: Stack(
-              alignment: Alignment.center,
-              children: [
-                Container(
-                    height: 143,
-                    width: MediaQuery.of(context).size.width,
-                    child: Image(
-                      image: AssetImage("assets/images/Group 12499.png"),
-                      fit: BoxFit.fill,
-                    )),
-                Positioned(
-                    left: 30,
-                    right: 30,
-                    child: poppinsText(
-                        "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore  et dolore magna aliquyam erat, sed diam voluptua. At vero.",
-                        14,
-                        regular,
-                        textColor))
-              ],
-            ),
-          ),
-          Padding(
-            padding: EdgeInsets.symmetric(
+            padding: const EdgeInsets.symmetric(
               horizontal: 30,
               vertical: 15,
             ),
-            child: fullWidthButton("SUBMIT", () {
-              pushNewScreen(context, screen: Home(), withNavBar: false);
+            child: fullWidthButton(TempLanguage.submit, () {
+              _launchEmailApp();
             }),
           )
         ],

@@ -1,0 +1,155 @@
+import 'dart:async';
+
+import 'package:check_in/core/constant/constant.dart';
+import 'package:check_in/model/user_modal.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:rxdart/rxdart.dart';
+
+import '../../Services/message_service.dart';
+
+class NewMessageController extends GetxController {
+  final MessageService chatService;
+  late TextEditingController searchController;
+  NewMessageController(this.chatService);
+  late final RxList<UserModel> userDataList = RxList<UserModel>();
+  RxString searchQuery = ''.obs;
+  DocumentSnapshot? _lastDocument;
+  List<Map<String, dynamic>> dataArray = [];
+  List memberIds = [];
+  final DOCUMENT_PER_PAGE = 20;
+  final DELAY_IN_MILLISECONDS = 300;
+
+  RxMap<String, dynamic> mydata = <String, dynamic>{}.obs;
+  // RxMap<String, dynamic> dataArray = <String, dynamic>{}.obs;
+
+  // StreamController to manage the text input stream
+  final _searchQuerySubject = BehaviorSubject<String>();
+  // StreamSubscription to clean up the subscription when the controller is disposed
+  late StreamSubscription<List<DocumentSnapshot>> _userSubscription;
+
+  @override
+  void onInit() {
+    super.onInit();
+    searchController = TextEditingController();
+
+    // Listen to changes in the search query stream and call getUser with a debounce
+    _userSubscription = _searchQuerySubject
+        .debounceTime(Duration(milliseconds: DELAY_IN_MILLISECONDS))
+        .distinct()
+        .switchMap((query) => Stream.fromFuture(chatService
+            .getUsersDocsWithPagination(query, DOCUMENT_PER_PAGE, null)))
+        .listen((docs) {
+
+      List<UserModel> users = docs
+          .map((doc) => UserModel.fromMap(doc.data() as Map<String, dynamic>))
+          .toList();
+
+      if (docs.isNotEmpty) {
+        userDataList.clear();
+        _lastDocument = docs.last;
+        userDataList.addAll(users);
+      }
+    });
+  }
+
+//............ get user list for start new chat
+  // Future<void> getUser() async {
+  //   // chatService.getUsers(searchQuery.value).forEach((element) {
+  //   //   print(element);
+  //   // });
+  //   await chatService.getUsers(searchQuery.value).then((value) {
+  //     userDataList.assignAll(value);
+  //   });
+  // }
+
+  Future<void> fetchMore() async {
+    List<DocumentSnapshot> docs = await chatService.getUsersDocsWithPagination(
+        searchController.text, DOCUMENT_PER_PAGE, _lastDocument);
+
+    List<UserModel> users = docs
+        .map((doc) => UserModel.fromMap(doc.data() as Map<String, dynamic>))
+        .toList();
+
+    if (docs.isNotEmpty) {
+      _lastDocument = docs.last;
+      userDataList.addAll(users);
+    }
+  }
+
+//............ start new chat  //copy this method only
+  Future<Map<String, dynamic>> startNewChat(
+      String myUid, String uNAme, String UImage) async {
+    //....... matching ids to check whether chat already exist or not
+    var response = await chatService.areIdsMatching([myUid, mydata.keys.first]);
+    if (response != '') {
+      // Do not add data and
+      return {'isNewChat': false, 'docId': response};
+    } else {
+      UserModel model = mydata.values.first;
+      var res = await chatService.startNewChat([myUid, mydata.keys.first],
+          uNAme, model.userName!, model.photoUrl!, UImage);
+      return {'isNewChat': true, 'docId': res};
+    }
+  }
+
+  Future<void> updateDeleteChatStatus(String docId, String userId) async {
+    try {
+      final response = await chatService.updateUserDelete(docId, userId);
+    } catch(e) {
+    }
+  }
+
+//........... start new group chat
+  Future<String> startNewGroupChat(
+      String myUid, String uNAme, String memberImage, String about) async {
+    dataArray = [
+      {
+        MessageField.MEMBER_UID: myUid,
+        MessageField.MEMBER_NAME: uNAme,
+        MessageField.ABOUT_USER: about,
+        MessageField.MEMBER_IMG: memberImage,
+        MessageField.IS_ADMIN: true,
+        MessageField.IS_OWNER: true,
+        MessageField.MEMBER_UNREAD_COUNT: 0
+      }
+    ];
+    memberIds = [myUid];
+    mydata.forEach((id, data) {
+      UserModel value = data;
+      String uid = value.uid!;
+      String name = value.userName!;
+      String about = value.aboutMe!;
+      String image = value.photoUrl!;
+
+      Map<String, dynamic> userData = {
+        MessageField.MEMBER_UID: uid,
+        MessageField.MEMBER_NAME: name,
+        MessageField.ABOUT_USER: about,
+        MessageField.MEMBER_IMG: image,
+        MessageField.IS_ADMIN: false,
+        MessageField.IS_OWNER: false,
+        MessageField.MEMBER_UNREAD_COUNT: 0
+      };
+      dataArray.add(userData);
+      memberIds.add(value.uid);
+    });
+
+    return '';
+    // return chatService.startNewGroupChat(memberIds, dataArray);
+  }
+
+  // Method to update the search query
+  void updateSearchQuery(String value) {
+    _searchQuerySubject.add(value);
+  }
+
+  @override
+  void dispose() {
+    searchController.dispose();
+    _userSubscription.cancel();
+    _searchQuerySubject.close();
+    super.dispose();
+  }
+}
