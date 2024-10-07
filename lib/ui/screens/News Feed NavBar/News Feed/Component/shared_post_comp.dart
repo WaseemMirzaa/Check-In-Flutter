@@ -47,7 +47,10 @@ class SharedPostComp extends StatefulWidget {
       {super.key,
       this.data,
       this.isMyProfile = false,
-      this.isOtherProfile = false});
+      this.isOtherProfile = false, this.postUserData, this.shareUserData});
+
+  UserModel? shareUserData;
+  UserModel? postUserData;
 
   @override
   State<SharedPostComp> createState() => _SharedPostCompState();
@@ -63,8 +66,6 @@ class _SharedPostCompState extends State<SharedPostComp> {
 
   final userServices = UserServices();
 
-  UserModel? shareUserData;
-  UserModel? postUserData;
 
   bool? playing;
 
@@ -72,9 +73,10 @@ class _SharedPostCompState extends State<SharedPostComp> {
   void initState() {
     // TODO: implement initState
     super.initState();
+    if(widget.postUserData == null || widget.shareUserData == null)
     Future.microtask(() async {
-      postUserData = await userServices.getUserData(widget.data?.userId ?? "");
-      shareUserData =
+      widget.postUserData = await userServices.getUserData(widget.data?.userId ?? "");
+      widget.shareUserData =
           await userServices.getUserData(widget.data?.shareUID ?? "");
       mounted ? setState(() {}) : null;
     });
@@ -86,7 +88,7 @@ class _SharedPostCompState extends State<SharedPostComp> {
     newsFeedController.commentModel.value.userId =
         userController.userModel.value.uid ??
             FirebaseAuth.instance.currentUser!.uid;
-    return shareUserData == null || postUserData == null
+    return widget.shareUserData == null || widget.postUserData == null
         ? const SizedBox()
         : CustomContainer1(
             child: Padding(
@@ -144,16 +146,16 @@ class _SharedPostCompState extends State<SharedPostComp> {
                                 decoration: BoxDecoration(
                                     shape: BoxShape.circle,
                                     image: DecorationImage(
-                                        image: shareUserData!
+                                        image: widget.shareUserData!
                                                 .photoUrl.isEmptyOrNull
                                             ? NetworkImage(
                                                 AppImage.userImagePath)
                                             : NetworkImage(
-                                                shareUserData!.photoUrl ?? ''),
+                                            widget.shareUserData!.photoUrl ?? ''),
                                         fit: BoxFit.cover))),
                           ),
-                          if (shareUserData!.isVerified == null ||
-                              shareUserData!.isVerified == true)
+                          if (widget.shareUserData!.isVerified == null ||
+                              widget.shareUserData!.isVerified == true)
                             Positioned(
                               right: -6,
                               bottom: -2,
@@ -212,7 +214,7 @@ class _SharedPostCompState extends State<SharedPostComp> {
                                   }
                                 },
                           child: richText(
-                              shareUserData!.userName ?? '', 'shared a post'),
+                              widget.shareUserData!.userName ?? '', 'shared a post'),
                         ),
                       ),
                       horizontalGap(5),
@@ -403,16 +405,16 @@ class _SharedPostCompState extends State<SharedPostComp> {
                                           decoration: BoxDecoration(
                                               shape: BoxShape.circle,
                                               image: DecorationImage(
-                                                  image: postUserData!.photoUrl
+                                                  image: widget.postUserData!.photoUrl
                                                           .isEmptyOrNull
                                                       ? NetworkImage(AppImage
                                                           .userImagePath)
                                                       : NetworkImage(
-                                                          postUserData!
+                                                      widget.postUserData!
                                                               .photoUrl!),
                                                   fit: BoxFit.cover)))),
-                                  if (postUserData!.isVerified == null ||
-                                      postUserData!.isVerified == true)
+                                  if (widget.postUserData!.isVerified == null ||
+                                      widget.postUserData!.isVerified == true)
                                     Positioned(
                                       right: -6,
                                       bottom: -2,
@@ -475,7 +477,7 @@ class _SharedPostCompState extends State<SharedPostComp> {
                                           }
                                         },
                                   child: poppinsText(
-                                      postUserData!.userName ?? '',
+                                      widget.postUserData!.userName ?? '',
                                       14,
                                       bold,
                                       appDarkBlue,

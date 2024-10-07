@@ -72,8 +72,8 @@ class _NativeTestAds extends State<NavtiveAdsComp> {
                     child: ConstrainedBox(
                       constraints: BoxConstraints(
                         minWidth: 100.w,
-                        minHeight: 50.h,
-                        maxHeight: 50.h,
+                        minHeight: 40.h,
+                        maxHeight: 40.h,
                         maxWidth: 100.w,
                       ),
                       child: AdWidget(ad: _nativeAd!),

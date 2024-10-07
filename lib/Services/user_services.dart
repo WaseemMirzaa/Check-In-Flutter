@@ -27,6 +27,33 @@ class UserServices{
     }
   }
 
+  Future<List<UserModel>?> getUsersList() async {
+
+    List<UserModel> usersList = [];
+    try {
+
+      QuerySnapshot<Map<String, dynamic>> snapshot =
+      await db.collection(Collections.USER).get();
+
+      if (snapshot.docs.isNotEmpty) {
+
+        for (var snap in snapshot.docs) {
+
+          usersList.add(UserModel.fromMap(snap.data()));
+
+        }
+
+        return usersList;
+
+      }
+    } catch (e) {
+      return null;
+    }
+
+    return null;
+
+  }
+
   /// Hide profile for me
   Future<bool> blockProfile(String profileId, String userId) async {
     try{
