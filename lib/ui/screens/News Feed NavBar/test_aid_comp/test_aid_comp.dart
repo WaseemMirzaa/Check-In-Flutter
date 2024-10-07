@@ -66,9 +66,9 @@ class _NativeTestAds extends State<NavtiveAdsComp> {
         child: Obx(() //handle through getx obx
             {
           return _nativeAdIsLoaded.value
-              ? CustomContainer1(
+              ? CustomContainer2(
                   child: ClipRRect(
-                    borderRadius: BorderRadius.circular(12),
+                    // borderRadius: BorderRadius.circular(12),
                     child: ConstrainedBox(
                       constraints: BoxConstraints(
                         minWidth: 100.w,
