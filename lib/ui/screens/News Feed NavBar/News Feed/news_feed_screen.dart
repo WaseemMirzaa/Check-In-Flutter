@@ -134,14 +134,13 @@ class _NewsFeedScreenState extends State<NewsFeedScreen>
 
                                 final newsFeedModel = NewsFeedModel.fromJson(data);
 
-
-
                                 UserModel? matchingUserShared, matchingUser;
+                                try {
+                                  matchingUser = snapshot.data!.firstWhere(
+                                          (user) => user.uid == newsFeedModel.userId);
+                                } catch (_) {}
                                 if (newsFeedModel.shareUID != null) {
-                                  try {
-                                    matchingUser = snapshot.data!.firstWhere(
-                                            (user) => user.uid == newsFeedModel.userId);
-                                  } catch (_) {}
+
 
                                   try {
                                     matchingUserShared = snapshot.data!.firstWhere(

@@ -68,9 +68,11 @@ class _ListTileContainerState extends State<ListTileContainer> {
 
   @override
   void initState() {
+
     // TODO: implement initState
+
     super.initState();
-    if(widget.userData != null) {
+    if(widget.userData == null) {
       Future.microtask(() async {
         widget.userData = await userServices.getUserData(widget.data!.userId!);
         mounted ? setState(() {}) : null;
