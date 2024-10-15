@@ -35,7 +35,7 @@ class NewsFeedOnboarding extends StatelessWidget {
                   alignment: Alignment.centerRight,
                   child: GestureDetector(
                       onTap: (){
-                        Navigator.pushReplacement(context,MaterialPageRoute(builder: (context)=>Home()));
+                        Navigator.pushReplacement(context,MaterialPageRoute(builder: (context)=>const Home()));
                       },
                       child: poppinsText('Skip', 12.sp, medium, textPrimaryColor))),
               SizedBox( height:55.h),

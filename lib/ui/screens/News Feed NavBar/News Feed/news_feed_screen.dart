@@ -94,10 +94,10 @@ class _NewsFeedScreenState extends State<NewsFeedScreen>
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     // Show a loader while the future is being fetched
-                    return Center(child: CircularProgressIndicator());
+                    return const Center(child: CircularProgressIndicator());
                   } else if (snapshot.hasError) {
                     // Handle error state
-                    return Center(child: Text('Error fetching user data'));
+                    return const Center(child: Text('Error fetching user data'));
                   } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
                     // Handle empty data state
                     return _buildEmptyState();
@@ -325,7 +325,7 @@ class _NewsFeedScreenState extends State<NewsFeedScreen>
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               isload
-                  ? CircularProgressIndicator()
+                  ? const CircularProgressIndicator()
                   : poppinsText('No Posts Found', 16, medium, appBlackColor),
             ],
           ),
@@ -363,7 +363,7 @@ class _NewsFeedScreenState extends State<NewsFeedScreen>
                 color: Colors.black.withOpacity(0.2), // Shadow color
                 spreadRadius: 1, // Spread radius
                 blurRadius: 5, // Blur radius
-                offset: Offset(0, 3), // Shadow position
+                offset: const Offset(0, 3), // Shadow position
               ),
             ],
           ),

@@ -222,7 +222,7 @@ class _PlayersViewState extends State<PlayersView> {
                                       boxShadow: [
                                         BoxShadow(
                                           color: blackTranslucentColor,
-                                          offset: Offset(0, 1),
+                                          offset: const Offset(0, 1),
                                           blurRadius: 6,
                                         ),
                                       ],
@@ -255,8 +255,9 @@ class _PlayersViewState extends State<PlayersView> {
                                                                 (context, child,
                                                                     loadingProgress) {
                                                               if (loadingProgress ==
-                                                                  null)
+                                                                  null) {
                                                                 return child;
+                                                              }
                                                               return const Center(
                                                                 child:
                                                                     CircularProgressIndicator(), // You can replace this with any loading indicator you prefer.

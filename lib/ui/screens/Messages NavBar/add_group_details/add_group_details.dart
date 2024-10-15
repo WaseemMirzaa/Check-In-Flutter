@@ -7,7 +7,6 @@ import 'package:check_in/controllers/user_controller.dart';
 import 'package:check_in/core/constant/constant.dart';
 import 'package:check_in/core/constant/temp_language.dart';
 import 'package:check_in/ui/screens/Messages%20NavBar/Chat/chat_screen.dart';
-import 'package:check_in/ui/screens/Messages%20NavBar/Chat/chat_screen.dart';
 import 'package:check_in/ui/widgets/custom_appbar.dart';
 import 'package:check_in/utils/Constants/images.dart';
 import 'package:check_in/utils/colors.dart';
@@ -223,9 +222,9 @@ class AddGroupDetails extends GetView<GroupDetailController> {
                     XFile? pickedFile =
                         await picker.pickImage(source: ImageSource.camera);
                     if (pickedFile != null) {
-                      File _imageFile = await compressImage(pickedFile,
+                      File imageFile = await compressImage(pickedFile,
                           quality: 20, height: 200, width: 200);
-                      pickedFile = XFile(_imageFile.path);
+                      pickedFile = XFile(imageFile.path);
 
                       controller.fileImage.value = pickedFile;
                       Navigator.pop(context);
@@ -254,9 +253,9 @@ class AddGroupDetails extends GetView<GroupDetailController> {
                     XFile? pickedFile =
                         await picker.pickImage(source: ImageSource.gallery);
                     if (pickedFile != null) {
-                      File _imageFile = await compressImage(pickedFile,
+                      File imageFile = await compressImage(pickedFile,
                           quality: 20, height: 200, width: 200);
-                      pickedFile = XFile(_imageFile.path);
+                      pickedFile = XFile(imageFile.path);
 
                       controller.fileImage.value = pickedFile;
                       Navigator.pop(context);

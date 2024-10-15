@@ -59,7 +59,7 @@ class UniqueCourtsScreen extends StatelessWidget {
           style: TextStyle(
             fontFamily: TempLanguage.poppins,
             fontSize: 20,
-            color: Color(0xff000000),
+            color: const Color(0xff000000),
             fontWeight: FontWeight.w700,
           ),
           textAlign: TextAlign.right,
@@ -91,7 +91,7 @@ class UniqueCourtsScreen extends StatelessWidget {
                             boxShadow: [
                               BoxShadow(
                                 color: blackTranslucentColor,
-                                offset: Offset(0, 1),
+                                offset: const Offset(0, 1),
                                 blurRadius: 6,
                               ),
                             ],
@@ -132,7 +132,7 @@ class UniqueCourtsScreen extends StatelessWidget {
                                       children: [
                                         TextSpan(
                                           text: TempLanguage.courtLocation,
-                                          style: TextStyle(
+                                          style: const TextStyle(
                                             fontWeight: FontWeight.w600,
                                           ),
                                         ),

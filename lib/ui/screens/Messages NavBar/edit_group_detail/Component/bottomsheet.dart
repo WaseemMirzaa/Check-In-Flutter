@@ -39,8 +39,8 @@ Future<void> showbottomSheet(
 
 
                   if (pickedFile != null) {
-                    File _imageFile = await compressImage(pickedFile, quality: 20, height: 200, width: 200);
-                    pickedFile = XFile(_imageFile.path);
+                    File imageFile = await compressImage(pickedFile, quality: 20, height: 200, width: 200);
+                    pickedFile = XFile(imageFile.path);
 
                     controller.fileImage.value = pickedFile;
                     Navigator.pop(context);
@@ -67,8 +67,8 @@ Future<void> showbottomSheet(
                   XFile? pickedFile =
                       await picker.pickImage(source: ImageSource.gallery,);
                   if (pickedFile != null) {
-                    File _imageFile = await compressImage(pickedFile, quality: 20, height: 200, width: 200);
-                    pickedFile = XFile(_imageFile.path);
+                    File imageFile = await compressImage(pickedFile, quality: 20, height: 200, width: 200);
+                    pickedFile = XFile(imageFile.path);
 
                     controller.fileImage.value = pickedFile;
                     Navigator.pop(context);

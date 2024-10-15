@@ -20,7 +20,6 @@ import 'package:check_in/ui/screens/News%20Feed%20NavBar/News%20Feed/Component/v
 import 'package:check_in/ui/widgets/text_field.dart';
 import 'package:check_in/utils/loader.dart';
 import 'package:chewie/chewie.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:check_in/ui/widgets/custom_container.dart';
@@ -28,7 +27,6 @@ import 'package:check_in/utils/Constants/images.dart';
 import 'package:check_in/utils/colors.dart';
 import 'package:check_in/utils/gaps.dart';
 import 'package:check_in/utils/styles.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:nb_utils/nb_utils.dart';
@@ -73,13 +71,14 @@ class _SharedPostCompState extends State<SharedPostComp> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    if(widget.postUserData == null || widget.shareUserData == null)
-    Future.microtask(() async {
+    if(widget.postUserData == null || widget.shareUserData == null) {
+      Future.microtask(() async {
       widget.postUserData = await userServices.getUserData(widget.data?.userId ?? "");
       widget.shareUserData =
           await userServices.getUserData(widget.data?.shareUID ?? "");
       mounted ? setState(() {}) : null;
     });
+    }
   }
 
   RxBool isVisible = false.obs;

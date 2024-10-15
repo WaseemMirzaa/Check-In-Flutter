@@ -91,7 +91,7 @@ class _TermsAndConditionsState extends State<TermsAndConditions> {
                 onWebViewCreated: (WebViewController webViewController) {
                   _controller = webViewController;
                 },
-                javascriptChannels: Set.from([
+                javascriptChannels: {
                   JavascriptChannel(
                     name: 'ScrollDetector',
                     onMessageReceived: (JavascriptMessage message) {
@@ -102,7 +102,7 @@ class _TermsAndConditionsState extends State<TermsAndConditions> {
                       }
                     },
                   ),
-                ]),
+                },
                 navigationDelegate: (NavigationRequest request) {
                   if (request.url.startsWith('https://www.youtube.com/')) {
                     print('blocking navigation to $request}');

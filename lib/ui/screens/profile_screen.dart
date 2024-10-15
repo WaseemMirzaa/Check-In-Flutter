@@ -21,7 +21,6 @@ import 'package:check_in/utils/styles.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -213,7 +212,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           MessageField.SENDER_IMG: downloadUrl,
         });
       });
-      await firestore.collection(Collections.MESSAGES).where(
+      firestore.collection(Collections.MESSAGES).where(
           MessageField.SENDER_ID,
           isEqualTo: userController.userModel.value.uid);
     }
@@ -524,10 +523,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 ),
                                 const SizedBox(
                                     width: 20), // Space before the divider
-                                Container(
+                                const SizedBox(
                                   height:
                                       38, // Adjust to fit the height of your text
-                                  child: const VerticalDivider(
+                                  child: VerticalDivider(
                                     width: 20, // Adjust width if needed
                                     thickness: 2, // Adjust thickness if needed
                                     color:

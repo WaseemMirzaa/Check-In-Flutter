@@ -517,7 +517,7 @@ class NewsFeedController extends GetxController {
     getMyPosts(); // Load community posts (or add any community-related data fetching here)
 
     // Set loading to false after data is fetched for the first time
-    Future.delayed(Duration(seconds: 2), () {
+    Future.delayed(const Duration(seconds: 2), () {
       isLoading.value = false; // Turn off loading after fetching data
     });
 

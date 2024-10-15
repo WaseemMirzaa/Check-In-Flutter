@@ -191,7 +191,7 @@ class _SharePostCompState extends State<SharePostComp> {
                                         ),
                                       ),
                                     )
-                          : SizedBox(),
+                          : const SizedBox(),
                   verticalGap(10),
                 ],
               ),

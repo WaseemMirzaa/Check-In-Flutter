@@ -11,7 +11,7 @@ class UserServices{
 
   Future<UserModel?> getUserData(String uid) async {
     try {
-      if (uid.isEmpty || uid == null) {
+      if (uid.isEmpty) {
         return null;
       }
       DocumentSnapshot<Map<String, dynamic>> snapshot =

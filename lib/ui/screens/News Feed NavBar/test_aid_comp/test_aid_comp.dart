@@ -15,7 +15,7 @@ class NavtiveAdsComp extends StatefulWidget {
 
 class _NativeTestAds extends State<NavtiveAdsComp> {
   NativeAd? _nativeAd;
-  RxBool _nativeAdIsLoaded = false.obs; // use obs to make reactive
+  final RxBool _nativeAdIsLoaded = false.obs; // use obs to make reactive
 
   @override
   void didChangeDependencies() {

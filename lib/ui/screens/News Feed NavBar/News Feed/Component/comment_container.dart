@@ -21,7 +21,6 @@ import 'package:nb_utils/nb_utils.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
 import 'package:sizer/sizer.dart';
 
-import 'package:check_in/ui/screens/Messages%20NavBar/other_profile/other_profile_view.dart';
 import 'package:check_in/Services/user_services.dart';
 
 class CommentContainer extends StatefulWidget {

@@ -528,7 +528,7 @@ class _ChatScreenState extends State<ChatScreen> {
                             children: [
                               Expanded(
                                 child: poppinsText(
-                                    " ${name} ${TempLanguage.blockedYou}",
+                                    " $name ${TempLanguage.blockedYou}",
                                     15,
                                     medium,
                                     appBlackColor,
@@ -636,7 +636,7 @@ class _ChatScreenState extends State<ChatScreen> {
       if (member['uid'] == chatId) {
         // Return the user image URL if found
         return (member['image'] == null || member['image'] == '')
-            ? NetworkImage(AppAssets.defaulImg)
+            ? const NetworkImage(AppAssets.defaulImg)
             : NetworkImage(member['image']);
       }
     }

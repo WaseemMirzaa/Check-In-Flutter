@@ -170,7 +170,7 @@ class _HomeState extends State<Home> with AutomaticKeepAliveClientMixin {
     const CheckIn(),
     MessageScreen(),
     //................ News Feed
-    NewsFeedScreen(),
+    const NewsFeedScreen(),
     const HistoryView(),
     ProfileScreen()
     //KeyedSubtree(key: UniqueKey(), child: const ProfileScreen()),
@@ -186,7 +186,7 @@ class _HomeState extends State<Home> with AutomaticKeepAliveClientMixin {
 
     FirebaseDynamicLinks.instance.onLink.listen(
           (PendingDynamicLinkData dynamicLinkData) {
-        _handleDeepLink(context, dynamicLinkData?.link);
+        _handleDeepLink(context, dynamicLinkData.link);
       },
       onError: (error) async {
         developer.log('Dynamic Link Failed: ${error.toString()}');

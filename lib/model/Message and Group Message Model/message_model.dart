@@ -123,7 +123,7 @@ class Messagemodel {
       deleteIds: deleteIds ?? this.deleteIds,
       members: members ?? this.members,
       showMessageTile: showMessageTile ?? this.showMessageTile,
-        blockId: blockerId ?? this.blockId
+        blockId: blockerId ?? blockId
     );
   }
 }

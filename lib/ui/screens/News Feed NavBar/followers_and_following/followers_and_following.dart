@@ -134,7 +134,7 @@ class _FollowersAndFollowingScreenState
           onPressed: () {
             Get.back();
           },
-          icon: Icon(Icons.arrow_back_ios),
+          icon: const Icon(Icons.arrow_back_ios),
         ),
       ),
       body: Column(
@@ -158,11 +158,11 @@ class _FollowersAndFollowingScreenState
                 if (index == userDetails.length) {
                   // Show loading indicator at the end
                   return hasMoreData
-                      ? Padding(
-                    padding: const EdgeInsets.all(8.0),
+                      ? const Padding(
+                    padding: EdgeInsets.all(8.0),
                     child: Center(child: CircularProgressIndicator()),
                   )
-                      : SizedBox(); // No more data to load
+                      : const SizedBox(); // No more data to load
                 }
 
                 final user = userDetails[index];
@@ -192,7 +192,7 @@ class _FollowersAndFollowingScreenState
                             : null,
                         child: user['photoUrl'] == null ||
                             user['photoUrl']!.isEmpty
-                            ? Icon(Icons.person)
+                            ? const Icon(Icons.person)
                             : null,
                       ),
                       title: poppinsText(

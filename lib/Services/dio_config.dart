@@ -38,7 +38,7 @@ class DioHelper {
       } else{
         return ApiResponse(null, false);
       }
-    } on DioException catch (e) {
+    } on DioException {
       return ApiResponse(null, false);
     }
   }

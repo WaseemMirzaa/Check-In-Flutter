@@ -16,7 +16,7 @@ class SharePostScreen extends StatelessWidget {
   final NewsFeedModel data;
   final TextEditingController commentController = TextEditingController();
 
-  SharePostScreen({required this.data});
+  SharePostScreen({super.key, required this.data});
   NewsFeedController feedController = Get.put(NewsFeedController(NewsFeedService()));
   UserController userController = Get.put(UserController(UserServices()));
 
@@ -42,9 +42,9 @@ class SharePostScreen extends StatelessWidget {
                   await feedController.updateCollection(
                       Collections.NEWSFEED, data.shareID!,
                       {
-                        NewsFeed.NO_OF_SHARED: data!.noOfShared! + 1,
+                        NewsFeed.NO_OF_SHARED: data.noOfShared! + 1,
                       });
-                  await feedController.sendNotificationMethod('newsFeed', '${userController.userModel.value.userName} shared your post', 'New share', data?.shareID ?? '', [
+                  await feedController.sendNotificationMethod('newsFeed', '${userController.userModel.value.userName} shared your post', 'New share', data.shareID ?? '', [
                     FirebaseAuth.instance.currentUser!.uid,
                     data.shareUID
                   ]);
@@ -65,9 +65,9 @@ class SharePostScreen extends StatelessWidget {
                   await feedController.updateCollection(
                       Collections.NEWSFEED, data.id!,
                       {
-                        NewsFeed.NO_OF_SHARED: data!.noOfShared! + 1,
+                        NewsFeed.NO_OF_SHARED: data.noOfShared! + 1,
                       });
-                  await feedController.sendNotificationMethod('newsFeed', '${userController.userModel.value.userName} shared your post', 'New share', data?.id ?? '', [
+                  await feedController.sendNotificationMethod('newsFeed', '${userController.userModel.value.userName} shared your post', 'New share', data.id ?? '', [
                     FirebaseAuth.instance.currentUser!.uid,
                     data.userId
                   ]);
@@ -76,7 +76,7 @@ class SharePostScreen extends StatelessWidget {
                  feedController.newsFeedModel.value.noOfShared = 0;
                 final share = await feedController.sharePost(feedController.newsFeedModel.value);
                 print("Share : $share");
-                print("Number of shares are : ${data!.noOfShared}");
+                print("Number of shares are : ${data.noOfShared}");
                 if(share){
                   print("The share id is:${data.shareID!}");
 

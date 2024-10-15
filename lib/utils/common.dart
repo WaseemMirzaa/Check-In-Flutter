@@ -120,7 +120,7 @@ Future<File> compressImage(XFile fileImage, {int quality = 50, int height = 500,
   // final lastIndex = fileImage.value!.path.lastIndexOf(RegExp(r'.'));
   // final splitted = fileImage.value!.path.substring(0, (lastIndex));
   // thumbnailPath = "${fileImage!.path}_thumbnail";
-  String originalPath = "${fileImage!.path}_original";
+  String originalPath = "${fileImage.path}_original";
   FlutterImageCompress.validator.ignoreCheckExtName = true;
   // print('thumbnailpath =$thumbnailPath');
 //............. for thumbnail
@@ -133,7 +133,7 @@ Future<File> compressImage(XFile fileImage, {int quality = 50, int height = 500,
 //   );
 //............. for original image
   await FlutterImageCompress.compressAndGetFile(
-    fileImage!.path,
+    fileImage.path,
     originalPath,
     quality: quality,
     minHeight: height,

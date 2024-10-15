@@ -592,7 +592,7 @@ class NewsFeedService {
       final ShortDynamicLink shortDynamicLink = await FirebaseDynamicLinks.instance.buildShortLink(parameters);
       return shortDynamicLink.shortUrl.toString();
     } catch (e) {
-      log("The error is----------\n\n\n\n\n\n\ $e\n\n\n");
+      log("The error is----------\n\n\n\n\n\n $e\n\n\n");
       return '';
     }
   }

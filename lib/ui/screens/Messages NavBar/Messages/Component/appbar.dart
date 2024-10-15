@@ -27,7 +27,7 @@ class MessageAppBar extends StatelessWidget implements PreferredSizeWidget {
           padding: const EdgeInsets.only(right: 20.0),
           child: GestureDetector(
             onTap: () {
-              pushNewScreen(context, screen: NewMessageScreen());
+              pushNewScreen(context, screen: const NewMessageScreen());
             },
             child: Image.asset(
               AppImage.addPeople,

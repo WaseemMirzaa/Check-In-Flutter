@@ -10,10 +10,6 @@ class FollowerCountingController extends GetxController {
 
   late String userId;
 
-  @override
-  void onInit() {
-    super.onInit();
-  }
 
   void setUserId(String uid) {
     userId = uid;

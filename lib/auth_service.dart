@@ -58,10 +58,8 @@ Future<bool> signUp(
         UserKey.DEVICE_TOKEN: [token]
       }).then((value){
         snap.collection(Collections.USER).doc(auth.currentUser!.uid).get().then((value){
-          if (value != null) {
-            userController.userModel.value = UserModel.fromMap(value.data() ?? {});
-          }
-          pushNewScreen(context, screen: const Home(), withNavBar: false);
+          userController.userModel.value = UserModel.fromMap(value.data() ?? {});
+                  pushNewScreen(context, screen: const Home(), withNavBar: false);
         });
 
       });

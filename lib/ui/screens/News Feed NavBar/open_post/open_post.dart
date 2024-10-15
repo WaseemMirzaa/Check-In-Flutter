@@ -27,7 +27,7 @@ class _OpenPostState extends State<OpenPost> {
             leading: IconButton(
               icon: Icon(Icons.arrow_back_ios, color: appBlackColor),
               onPressed: () {
-                Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>Home()), (route) => false);
+                Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>const Home()), (route) => false);
               },
             ),
             centerTitle: true,

@@ -17,9 +17,7 @@ import 'package:check_in/utils/colors.dart';
 import 'package:check_in/utils/styles.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:nb_utils/nb_utils.dart';
@@ -427,16 +425,16 @@ class _OtherProfileViewState extends State<OtherProfileView> {
                                         bold,
                                         appBlackColor,
                                       )),
-                                  SizedBox(height: 4),
+                                  const SizedBox(height: 4),
                                   poppinsText(
                                       'Followers', 16, medium, appBlackColor),
                                 ],
                               ),
                             ),
                             const SizedBox(width: 20),
-                            Container(
+                            const SizedBox(
                               height: 38,
-                              child: const VerticalDivider(
+                              child: VerticalDivider(
                                 width: 20,
                                 thickness: 2,
                                 color: Colors.grey,
@@ -470,7 +468,7 @@ class _OtherProfileViewState extends State<OtherProfileView> {
                                         bold,
                                         appBlackColor,
                                       )),
-                                  SizedBox(height: 4),
+                                  const SizedBox(height: 4),
                                   poppinsText(
                                       'Following', 16, medium, appBlackColor),
                                 ],
@@ -510,7 +508,7 @@ class _OtherProfileViewState extends State<OtherProfileView> {
                                       ),
                                     ),
                                   )),
-                              SizedBox(
+                              const SizedBox(
                                 width: 10,
                               ),
                               Obx(() {
@@ -600,7 +598,7 @@ class _OtherProfileViewState extends State<OtherProfileView> {
                                         child: Center(
                                           child: sendMessageController
                                                   .isLoading.value
-                                              ? Container(
+                                              ? const SizedBox(
                                                   height: 15,
                                                   width: 15,
                                                   child:

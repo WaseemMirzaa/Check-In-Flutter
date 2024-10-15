@@ -2,7 +2,6 @@ import 'package:check_in/Services/newfeed_service.dart';
 import 'package:check_in/controllers/News%20Feed/news_feed_controller.dart';
 import 'package:check_in/core/constant/app_assets.dart';
 import 'package:check_in/ui/screens/Messages%20NavBar/other_profile/other_profile_view.dart';
-import 'package:check_in/ui/screens/Messages%20NavBar/other_profile/other_profile_view.dart';
 import 'package:check_in/ui/screens/profile_screen.dart';
 import 'package:check_in/ui/widgets/custom_appbar.dart';
 import 'package:check_in/utils/Constants/images.dart';

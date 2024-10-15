@@ -10,7 +10,7 @@ import 'package:http/http.dart' as http;
 import 'package:google_maps_webservice/src/places.dart';
 
 class LocationController extends GetxController {
-  final Placemark _pickPlaceMark = Placemark();
+  final Placemark _pickPlaceMark = const Placemark();
   Placemark get pickPlaceMark => _pickPlaceMark;
 
   List<Prediction> _predictionList = [];

@@ -14,13 +14,13 @@ class MyNavigationBar extends StatefulWidget {
 
 class _MyNavigationBarState extends State<MyNavigationBar> {
   int _selectedIndex = 0;
-  static List<Widget> _widgetOptions = <Widget>[
+  static final List<Widget> _widgetOptions = <Widget>[
     Text(TempLanguage.homePage,
-        style: TextStyle(fontSize: 35, fontWeight: FontWeight.bold)),
+        style: const TextStyle(fontSize: 35, fontWeight: FontWeight.bold)),
     Text(TempLanguage.searchPage,
-        style: TextStyle(fontSize: 35, fontWeight: FontWeight.bold)),
+        style: const TextStyle(fontSize: 35, fontWeight: FontWeight.bold)),
     Text(TempLanguage.searchPage,
-        style: TextStyle(fontSize: 35, fontWeight: FontWeight.bold)),
+        style: const TextStyle(fontSize: 35, fontWeight: FontWeight.bold)),
   ];
 
   void _onItemTapped(int index) {
@@ -42,15 +42,15 @@ class _MyNavigationBarState extends State<MyNavigationBar> {
           items: <BottomNavigationBarItem>[
             BottomNavigationBarItem(
                 label: "f",
-                icon: Icon(Icons.home),
+                icon: const Icon(Icons.home),
                 backgroundColor: lightGreenColor),
             BottomNavigationBarItem(
                 label: "f",
-                icon: Icon(Icons.search),
+                icon: const Icon(Icons.search),
                 backgroundColor: yellowColor),
             BottomNavigationBarItem(
               label: "f",
-              icon: Icon(Icons.person),
+              icon: const Icon(Icons.person),
               backgroundColor: appBlueColor,
             ),
           ],
