@@ -77,7 +77,8 @@ class _NewsFeedScreenState extends State<NewsFeedScreen>
       body: Column(
         children: [
           Expanded(
-            child: Obx(() {
+            child:
+             Obx(() {
               // Check if loading state is active
               if (controller.isLoading.value) {
                 return _buildSecondTopContainer(true);
@@ -89,7 +90,8 @@ class _NewsFeedScreenState extends State<NewsFeedScreen>
                 return _buildSecondTopContainer(false);
               }
 
-              return FutureBuilder<List<UserModel>?>(
+              return
+               FutureBuilder<List<UserModel>?>(
                 future: userServices.getUsersList(), // Fetch the list of users
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
@@ -114,9 +116,10 @@ class _NewsFeedScreenState extends State<NewsFeedScreen>
                         bottomLoader: Container(),
                         physics: const AlwaysScrollableScrollPhysics(),
                         onEmpty: _buildEmptyState(),
-                        query: controller.getNewsFeedQuery(),
+                        query: controller.getNewsFeedQuery(),                        
                         itemBuilder: (context, documentSnapshot, index) {
-                          final data = documentSnapshot.data() as Map<String, Object?>;
+                          final data =
+                              documentSnapshot.data() as Map<String, Object?>;
 
                           if (index == 0) {
                             return _buildTopContainer();
@@ -126,65 +129,69 @@ class _NewsFeedScreenState extends State<NewsFeedScreen>
                             return NavtiveAdsComp(key: ValueKey('Ad_$index'));
                           }
 
-                          if (data.isNotEmpty && controller.shouldShowPost(data)) {
+                          if (data.isNotEmpty &&
+                              controller.shouldShowPost(data)) {
                             if (data[NewsFeed.HIDE_USER] is List) {
-                              final hideUserList = data[NewsFeed.HIDE_USER] as List;
+                              final hideUserList =
+                                  data[NewsFeed.HIDE_USER] as List;
 
-                              if (!hideUserList.contains(userController.userModel.value.uid)) {
-
-                                final newsFeedModel = NewsFeedModel.fromJson(data);
+                              if (!hideUserList.contains(
+                                  userController.userModel.value.uid)) {
+                                final newsFeedModel =
+                                    NewsFeedModel.fromJson(data);
 
                                 UserModel? matchingUserShared, matchingUser;
                                 try {
                                   matchingUser = snapshot.data!.firstWhere(
-                                          (user) => user.uid == newsFeedModel.userId);
+                                      (user) =>
+                                          user.uid == newsFeedModel.userId);
                                 } catch (_) {}
                                 if (newsFeedModel.shareUID != null) {
-
-
                                   try {
-                                    matchingUserShared = snapshot.data!.firstWhere(
-                                            (user) => user.uid == newsFeedModel.shareUID);
+                                    matchingUserShared = snapshot.data!
+                                        .firstWhere((user) =>
+                                            user.uid == newsFeedModel.shareUID);
                                   } catch (_) {}
                                 }
 
                                 // Check if the user profile is blocked
-                                if (userController.blockProfiles.contains(newsFeedModel.userId) ||
-                                    userController.blockProfiles.contains(newsFeedModel.shareUID)) {
+                                if (userController.blockProfiles
+                                        .contains(newsFeedModel.userId) ||
+                                    userController.blockProfiles
+                                        .contains(newsFeedModel.shareUID)) {
                                   return const SizedBox.shrink();
                                 }
 
-                                if(matchingUser == null) {
-
-                                  return const SizedBox.shrink(); // Fallback for unhandled cases
-
+                                if (matchingUser == null) {
+                                  return const SizedBox
+                                      .shrink(); // Fallback for unhandled cases
                                 }
 
                                 // Build the appropriate post based on the original or shared post
                                 return newsFeedModel.isOriginal!
                                     ? ListTileContainer(
-                                  key: ValueKey(newsFeedModel.id),
-                                  data: newsFeedModel,
-                                  userData: matchingUser,
-                                )
+                                        key: ValueKey(newsFeedModel.id),
+                                        data: newsFeedModel,
+                                        userData: matchingUser,
+                                      )
                                     : SharedPostComp(
-                                  postUserData: matchingUser,
-                                  shareUserData: matchingUserShared,
-                                  key: ValueKey(newsFeedModel.shareID),
-                                  data: newsFeedModel,
-                                );
+                                        postUserData: matchingUser,
+                                        shareUserData: matchingUserShared,
+                                        key: ValueKey(newsFeedModel.shareID),
+                                        data: newsFeedModel,
+                                      );
                               }
                             }
                           }
 
-                          return const SizedBox.shrink(); // Fallback for unhandled cases
+                          return const SizedBox
+                              .shrink(); // Fallback for unhandled cases
                         },
                       ),
                     );
                   }
                 },
               );
-
 
               // If not loading and following list is not empty, show the content
               return RefreshIndicator(
@@ -225,7 +232,7 @@ class _NewsFeedScreenState extends State<NewsFeedScreen>
                                 .userId!), // Get user data asynchronously
                             builder: (context, snapshot) {
                               // Check the status of the future
-                             if (snapshot.hasData) {
+                              if (snapshot.hasData) {
                                 UserModel? userData = snapshot.data;
 
                                 // Proceed to check if the profile is blocked
@@ -235,10 +242,8 @@ class _NewsFeedScreenState extends State<NewsFeedScreen>
                                         .contains(newsFeedModel.shareUID)) {
                                   return const SizedBox.shrink();
                                 } else {
-                                  return
-                                    newsFeedModel.isOriginal!
-                                      ?
-                                  ListTileContainer(
+                                  return newsFeedModel.isOriginal!
+                                      ? ListTileContainer(
                                           key: ValueKey(newsFeedModel.id),
                                           data: newsFeedModel,
                                           userData: userData,

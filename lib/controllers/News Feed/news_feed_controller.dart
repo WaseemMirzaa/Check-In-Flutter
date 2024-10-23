@@ -92,6 +92,8 @@ class NewsFeedController extends GetxController {
   bool get isUserPostMore => userPostLoader.value;
 
   void getUserPosts(String userId) {
+    // Clear existing posts when fetching new user posts
+    clearUserPosts();
     newsFeedService.getMyPosts(userId).listen((postList) {
       if (postList.isNotEmpty) {
         userLastDoc = postList.last['snapshot'] as DocumentSnapshot;
@@ -102,10 +104,16 @@ class NewsFeedController extends GetxController {
     });
   }
 
+// Update this function in your controller
   void fetchMoreUserPosts(String userId) async {
     print("Fetching more posts for user: $userId");
+    // Check if there's a last document and that we're not already loading posts
     if (userLastDoc == null || userPostLoader.value) return;
+
+    // Set loading state to true
     userPostLoader.value = true;
+
+    // Fetch the next batch of posts
     newsFeedService
         .getMyPosts(userId, startAfter: userLastDoc)
         .listen((postList) {
@@ -113,8 +121,10 @@ class NewsFeedController extends GetxController {
         userLastDoc = postList.last['snapshot'] as DocumentSnapshot;
         _userPosts
             .addAll(postList.map((e) => e['model'] as NewsFeedModel).toList());
+      } else {
+        userLastDoc = null; // No more posts to fetch
       }
-      userPostLoader.value = false;
+      userPostLoader.value = false; // Set loading state to false
     });
   }
 
@@ -133,6 +143,7 @@ class NewsFeedController extends GetxController {
   bool get isLoadingMore => myPostLoader.value;
 
   void getMyPosts() {
+    clearMyPosts();
     if (FirebaseAuth.instance.currentUser != null) {
       newsFeedService
           .getMyPosts(FirebaseAuth.instance.currentUser?.uid ?? '')
@@ -147,21 +158,43 @@ class NewsFeedController extends GetxController {
   }
 
   void fetchMoreMyPosts() async {
-    print("Hello  ++++++++++++++++++++++++  ");
+    // Check if there's a last document and that we're not already loading posts
     if (userLastDoc == null || myPostLoader.value) return;
+
+    // Set loading state to true
     myPostLoader.value = true;
+
+    // Fetch the next batch of posts
     newsFeedService
-        .getMyPosts(FirebaseAuth.instance.currentUser?.uid ?? '',
-            startAfter: userLastDoc)
+        .getMyPosts(FirebaseAuth.instance.currentUser?.uid ?? '', startAfter: userLastDoc)
         .listen((postList) {
       if (postList.isNotEmpty) {
         userLastDoc = postList.last['snapshot'] as DocumentSnapshot;
         _myPosts
             .addAll(postList.map((e) => e['model'] as NewsFeedModel).toList());
+      } else {
+        userLastDoc = null; // No more posts to fetch
       }
-      myPostLoader.value = false;
+      myPostLoader.value = false; // Set loading state to false
     });
   }
+
+  // void fetchMoreMyPosts() async {
+  //   print("Hello  ++++++++++++++++++++++++  ");
+  //   if (userLastDoc == null || myPostLoader.value) return;
+  //   myPostLoader.value = true;
+  //   newsFeedService
+  //       .getMyPosts(FirebaseAuth.instance.currentUser?.uid ?? '',
+  //           startAfter: userLastDoc)
+  //       .listen((postList) {
+  //     if (postList.isNotEmpty) {
+  //       userLastDoc = postList.last['snapshot'] as DocumentSnapshot;
+  //       _myPosts
+  //           .addAll(postList.map((e) => e['model'] as NewsFeedModel).toList());
+  //     }
+  //     myPostLoader.value = false;
+  //   });
+  // }
 
   void clearMyPosts() {
     _myPosts.clear();

@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:check_in/Services/newfeed_service.dart';
 import 'package:check_in/controllers/News%20Feed/news_feed_controller.dart';
 import 'package:check_in/controllers/user_controller.dart';
@@ -21,7 +20,6 @@ import 'package:check_in/utils/styles.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -241,6 +239,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   late FollowerCountingController followerCountController;
 
+  final userServices = UserServices();
+
   @override
   void initState() {
     getUser();
@@ -250,7 +250,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
     // TODO: implement initState
 
     super.initState();
-    _scrollController.addListener(_onScroll);
+
+    //turn this off if you don't see all posts
+    //-----YOU NEED TO UNDERSTAND THIS METHOD IN ORDER TO UNDERSTAND THE FETCHING CODE
     controller.getMyPosts();
 
     // Retrieve current user UID
@@ -263,8 +265,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
 
     WidgetsFlutterBinding.ensureInitialized().addPostFrameCallback((timeStamp) {
-      if (FirebaseAuth.instance.currentUser != null && userController.userModel.value.isTermsVerified == null) {
-        Get.to(const TermsAndConditions(showButtons: true,));
+      if (FirebaseAuth.instance.currentUser != null &&
+          userController.userModel.value.isTermsVerified == null) {
+        Get.to(const TermsAndConditions(
+          showButtons: true,
+        ));
       }
     });
   }
@@ -310,19 +315,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
   TextEditingController aboutMeController = TextEditingController();
   bool tapped = false;
 
-  final ScrollController _scrollController = ScrollController();
-
-  void _onScroll() {
-    if (_scrollController.position.pixels ==
-        _scrollController.position.maxScrollExtent) {
-      controller.fetchMoreMyPosts();
-    }
-  }
-
   @override
   void dispose() {
     super.dispose();
-    _scrollController.dispose();
+
     controller.clearMyPosts();
   }
 
@@ -352,626 +348,1343 @@ class _ProfileScreenState extends State<ProfileScreen> {
         title: poppinsText(
             TempLanguage.profile, 20, FontWeight.bold, appBlackColor),
       ),
-      body: SizedBox(
-        height: MediaQuery.of(context).size.height,
-        child: !userController.userModel.value.uid.isEmptyOrNull
-            ? ListView(
-                controller: _scrollController,
-                keyboardDismissBehavior:
-                    ScrollViewKeyboardDismissBehavior.onDrag,
-                children: [
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Column(
-                          children: [
-                            SizedBox(
-                              width: 30.9.w,
-                              //   padding: EdgeInsets.all(10),
-                              child: GestureDetector(
-                                onTap: _selectImage,
-                                child: Stack(
-                                  //  clipBehavior: Clip.antiAliasWithSaveLayer,
-                                  alignment: Alignment.bottomCenter,
-                                  children: [
-                                    isUploading
-                                        ? Container(
-                                            height: 20.h,
-                                            width: 35.h,
-                                            decoration: const BoxDecoration(
-                                              shape: BoxShape.circle,
-                                              color: Colors
-                                                  .white, // White background
-                                            ),
-                                            child: const Center(
-                                              child:
-                                                  CircularProgressIndicator(),
-                                            ),
-                                          )
-                                        : (_downloadUrl != null)
-                                            ? Container(
-                                                height: 20.h,
-                                                width: 35.h,
-                                                decoration: BoxDecoration(
-                                                    shape: BoxShape.circle,
-                                                    image: DecorationImage(
-                                                        image: NetworkImage(
-                                                            _downloadUrl
-                                                                as String),
-                                                        fit: BoxFit.contain)))
-                                            : (!userController.userModel.value
-                                                    .photoUrl.isEmptyOrNull)
-                                                ? Container(
-                                                    height: 20.h,
-                                                    width: 35.h,
-                                                    decoration: BoxDecoration(
-                                                        shape: BoxShape.circle,
-                                                        image: DecorationImage(
-                                                            image: NetworkImage(
-                                                                userController
-                                                                        .userModel
-                                                                        .value
-                                                                        .photoUrl ??
-                                                                    ""),
-                                                            fit: BoxFit.contain)))
-                                                : Container(
-                                                    height: 20.h,
-                                                    width: 35.h,
-                                                    decoration: BoxDecoration(
-                                                        shape: BoxShape.circle,
-                                                        border: Border.all(
-                                                            width: 2,
-                                                            color:
-                                                                appGreenColor),
-                                                        image: const DecorationImage(
-                                                            image: AssetImage(
-                                                                AppAssets
-                                                                    .LOGO_NEW),
-                                                            fit: BoxFit.fill)),
-                                                  ),
-                                    if (userController
-                                                .userModel.value.isVerified ==
-                                            null ||
-                                        userController
-                                                .userModel.value.isVerified ==
-                                            true)
-                                      Align(
-                                        alignment: Alignment.bottomRight,
-                                        child: Container(
-                                          height: 5.5.h,
-                                          width: 12.1.w,
-                                          decoration: const BoxDecoration(
-                                              shape: BoxShape.circle,
-                                              image: DecorationImage(
-                                                  image: AssetImage(AppAssets
-                                                      .INSTAGRAM_VERIFICATION))),
-                                        ),
-                                      )
-                                    else
-                                      const SizedBox(),
-                                  ],
-                                ),
-                              ),
-                            ),
-                            poppinsText(
-                                // FirebaseAuth.instance.currentUser?.displayName
-                                //     as String,
-                                userController.userModel.value.userName ?? "",
-                                24,
-                                FontWeight.bold,
-                                appBlackColor),
-                            // poppinsText(
-                            //     "@${userController.userModel.value.email.substring(0, userController.userModel.value.email.indexOf('@'))}",
-                            //     12,
-                            //     FontWeight.normal,
-                            //     blackColor),
+      body: Column(
+        children: [
+          Expanded(
+            child: FutureBuilder<List<UserModel>?>(
+              // Fetch users list
+              future: userServices.getUsersList(),
+              builder: (context, snapshot) {
+                // Handling the user data retrieval state
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                } else if (snapshot.hasError ||
+                    !snapshot.hasData ||
+                    snapshot.data!.isEmpty) {
+                  return const Center(child: Text('Error fetching user data'));
+                } else {
+                  final users =
+                      snapshot.data!; // Users list retrieved from FutureBuilder
 
-                            // poppinsText(
-                            //   // FirebaseAuth.insztance.currentUser?.displayName
-                            //   //     as String,
-                            //     userController.userModel.value.email ?? "",
-                            //     12,
-                            //     FontWeight.normal,
-                            //     appBlackColor),
-                            // poppinsText(
-                            //     "@${userController.userModel.value.email.substring(0, userController.userModel.value.email.indexOf('@'))}",
-                            //     12,
-                            //     FontWeight.normal,
-                            //     blackColor),
-                            const SizedBox(
-                              height: 15,
-                            ),
+                  return RefreshIndicator(
+                    onRefresh: _handleRefresh,
+                    child: NotificationListener<ScrollNotification>(
+                      onNotification: (ScrollNotification scrollInfo) {
+                        // Check if we've scrolled to the bottom of the list
+                        if (scrollInfo.metrics.pixels ==
+                            scrollInfo.metrics.maxScrollExtent) {
+                          print("Fetching more posts...");
+                          controller.fetchMoreMyPosts(); // Fetch more posts
+                        }
+                        return false;
+                      },
+                      child: Obx(() {
+                        // Use Obx to listen to changes in _userPosts
+                        final posts = controller
+                            .myPosts; // Use the observable list directly
 
-                            //added by asjad
+                        if (posts.isEmpty) {
+                          return _buildEmptyState(); // Handle empty state
+                        }
 
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                GestureDetector(
-                                  onTap: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) =>
-                                            FollowersAndFollowingScreen(
-                                          showFollowers: true,
-                                              count: followerCountController
-                                                  .profileFollowersCount.value
-                                                  .toString(),
-                                        ),
-                                      ),
-                                    );
-                                  },
-                                  child: Column(
-                                    children: [
-                                      Obx(() {
-                                        return poppinsText(
-                                          followerCountController
-                                              .profileFollowersCount.value
-                                              .toString(),
-                                          16,
-                                          underline: true,
-                                          bold,
-                                          appBlackColor,
-                                        );
-                                      }),
-                                      const SizedBox(height: 4),
-                                      poppinsText('Followers', 16, medium,
-                                          appBlackColor),
-                                    ],
-                                  ),
-                                ),
-                                const SizedBox(
-                                    width: 20), // Space before the divider
-                                Container(
-                                  height:
-                                      38, // Adjust to fit the height of your text
-                                  child: const VerticalDivider(
-                                    width: 20, // Adjust width if needed
-                                    thickness: 2, // Adjust thickness if needed
-                                    color:
-                                        Colors.grey, // Adjust color if needed
-                                  ),
-                                ),
-                                const SizedBox(
-                                    width: 20), // Space after the divider
-                                GestureDetector(
-                                  onTap: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) =>
-                                            FollowersAndFollowingScreen(
-                                          showFollowers: false,
-                                              count: followerCountController
-                                                  .profileFollowingCount.value
-                                                  .toString(),
-                                        ),
-                                      ),
-                                    );
-                                  },
-                                  child: Column(
-                                    children: [
-                                      Obx(() {
-                                        return poppinsText(
-                                          followerCountController
-                                              .profileFollowingCount.value
-                                              .toString(),
-                                          16,
-                                          underline: true,
-                                          bold,
-                                          appBlackColor,
-                                        );
-                                      }),
-                                      const SizedBox(height: 4),
-                                      poppinsText('Following', 16, medium,
-                                          appBlackColor),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-
-                            const SizedBox(
-                              height: 15,
-                            ),
-
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Container(
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    border: Border.all(
-                                      color: offWhiteColor,
-                                      width: 8.0,
-                                    ),
-                                  ),
-                                  child: FutureBuilder<List<UserModel>?>(
-                                    future: getUniqueCourtNameMaps(),
-                                    builder: (context, snapshot) {
-                                      if (snapshot.connectionState ==
-                                          ConnectionState.waiting) {
-                                        return const SizedBox(
-                                            height: 110,
-                                            width: 110,
-                                            child: Center(
-                                                child:
-                                                    CircularProgressIndicator()));
-                                      } else if (snapshot.hasData &&
-                                          snapshot.data != null) {
-                                        return InkWell(
-                                          onTap: () {
-                                            Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        const UniqueCourtsScreen()));
-                                          },
-                                          child: CircularPercentIndicator(
-                                            radius: 50.0,
-                                            lineWidth: 8.0,
-                                            animation: true,
-                                            percent:
-                                                ((snapshot.data?.length ?? 0) /
-                                                        (totalCount ?? 10))
-                                                    .clamp(0.0, 1.0),
-                                            center: Text(
-                                              "${snapshot.data?.length ?? 0}\nCheck ins",
-                                              textAlign: TextAlign.center,
-                                              style: const TextStyle(
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 14.0,
-                                              ),
-                                            ),
-                                            circularStrokeCap:
-                                                CircularStrokeCap.round,
-                                            progressColor: darkYellowColor,
-                                          ),
-                                        );
-                                      } else if (snapshot.hasError) {
-                                        return Center(
-                                          child: Text(TempLanguage.wentWrong),
-                                        );
-                                      } else {
-                                        return InkWell(
-                                          onTap: () {
-                                            Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        const UniqueCourtsScreen()));
-                                          },
-                                          child: CircularPercentIndicator(
-                                            radius: 50.0,
-                                            lineWidth: 8.0,
-                                            animation: true,
-                                            percent: (0 / (totalCount ?? 10))
-                                                .clamp(0.0, 1.0),
-                                            center: const Text(
-                                              "0\nCheck ins",
-                                              textAlign: TextAlign.center,
-                                              style: TextStyle(
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 14.0,
-                                              ),
-                                            ),
-                                            circularStrokeCap:
-                                                CircularStrokeCap.round,
-                                            progressColor: darkYellowColor,
-                                          ),
-                                        );
-                                      }
-                                    },
-                                  ),
-                                ),
-                                const SizedBox(
-                                  width: 15,
-                                ),
-                                InkWell(
-                                  onTap: () {
-                                    Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                const UniqueCourtsScreen()));
-                                  },
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      poppinsText("Golden", 22, FontWeight.bold,
-                                          appBlackColor),
-                                      poppinsText("Courts", 22, FontWeight.bold,
-                                          appBlackColor),
-                                      FutureBuilder<List<UserModel>?>(
-                                        future: getUniqueCourtNameMaps(),
-                                        builder: (context, snapshot) {
-                                          if (snapshot.connectionState ==
-                                              ConnectionState.waiting) {
-                                            // return const Center(child: CircularProgressIndicator());
-                                            return const Center(
-                                                child:
-                                                    CircularProgressIndicator());
-                                          } else if (snapshot.hasData &&
-                                              snapshot.data != null) {
-                                            return poppinsText(
-                                                "${snapshot.data?.length ?? 0} Check ins",
-                                                12,
-                                                FontWeight.normal,
-                                                appBlackColor);
-                                          } else if (snapshot.hasError) {
-                                            return Center(
-                                              child:
-                                                  Text(TempLanguage.wentWrong),
-                                            );
-                                          } else {
-                                            return poppinsText(
-                                                "0 Check ins",
-                                                12,
-                                                FontWeight.normal,
-                                                appBlackColor);
-                                          }
-                                        },
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                        const SizedBox(
-                          height: 25,
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 12),
-                          child: Stack(
-                            clipBehavior: Clip.none,
-                            alignment: Alignment.topCenter,
-                            children: [
-                              Container(
-                                width: 100.w,
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 10, vertical: 4),
-                                decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(8),
-                                    color: appGreyColor1),
-                                child: TextField(
-                                  controller: aboutMeController,
-                                  textInputAction: TextInputAction.done,
-                                  onSubmitted: (value) {
-                                    // setState(() {
-                                    //   // userController.userModel.value.
-                                    //   //..........
-                                    //   aboutMe = value;
-                                    //   widget.userController.userModel.value.aboutMe = value;
-                                    //   FirebaseFirestore.instance
-                                    //       .collection(Collections.USER)
-                                    //       .doc(FirebaseAuth.instance.currentUser!.uid)
-                                    //       .update({UserKey.ABOUT_ME: aboutMe});
-                                    // });
-                                  },
-                                  maxLines: userController
-                                          .userModel.value.aboutMe.isEmptyOrNull
-                                      ? 1
-                                      : 3,
-                                  onChanged: (val) {},
-                                  decoration: InputDecoration(
-                                      border: InputBorder.none,
-                                      enabled: tapped,
-                                      enabledBorder: InputBorder.none,
-                                      disabledBorder: InputBorder.none,
-                                      errorBorder: InputBorder.none,
-                                      focusedBorder: InputBorder.none,
-                                      focusedErrorBorder: InputBorder.none,
-                                      hintText: TempLanguage.tellUsAboutGame,
-                                      helperStyle: GoogleFonts.poppins(
-                                          fontSize: 14,
-                                          fontWeight: regular,
-                                          color: silverColor)),
-                                ),
-                              ),
-
-                              //   child: poppinsText(userController.userModel.value.aboutMe.isEmptyOrNull
-                              // ? TempLanguage.tellUsAboutGame
-                              // : userController.userModel.value.aboutMe ?? TempLanguage.tellUsAboutGame, 12, FontWeight.normal, appBlackColor),),
-                              Align(
-                                alignment: Alignment.topRight,
-                                child: Padding(
-                                  padding: const EdgeInsets.all(5.0),
-                                  child: InkWell(
-                                    onTap: () => setState(() {
-                                      if (tapped) {
-                                        setState(() {
-                                          // userController.userModel.value.
-                                          //..........
-                                          aboutMe = aboutMeController.text;
-                                          userController.userModel.value
-                                              .aboutMe = aboutMe;
-                                          FirebaseFirestore.instance
-                                              .collection(Collections.USER)
-                                              .doc(FirebaseAuth
-                                                  .instance.currentUser!.uid)
-                                              .update(
-                                                  {UserKey.ABOUT_ME: aboutMe});
-                                        });
-                                      }
-                                      tapped = !tapped;
-                                    }),
-                                    child: Padding(
-                                        padding: const EdgeInsets.all(4),
-                                        child: tapped
-                                            ? poppinsText(TempLanguage.save, 14,
-                                                semiBold, appGreenColor)
-                                            : const ImageIcon(
-                                                AssetImage(
-                                                  AppAssets.EDIT_ICON,
-                                                ),
-                                                size: 20,
-                                              )),
-                                  ),
-                                ),
-                              ),
-                              Positioned(
-                                  top: -10,
-                                  child: Center(
-                                    child: Container(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 12, vertical: 3),
-                                      decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(30),
-                                          color: appGreenColor),
-                                      child: poppinsText('About Me', 12,
-                                          FontWeight.w400, appWhiteColor),
-                                    ),
-                                  ))
-                            ],
-                          ),
-                        ),
-                        const SizedBox(
-                          height: 25,
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 12),
-                          child: Stack(
-                            clipBehavior: Clip.none,
-                            alignment: Alignment.topCenter,
-                            children: [
-                              Container(
-                                width: 100.w,
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 12, vertical: 10),
-                                decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(8),
-                                    color: appGreyColor1),
-                                child: Row(
+                        return ListView.builder(
+                          physics: const AlwaysScrollableScrollPhysics(),
+                          itemCount:
+                              posts.length + 1, // Add one for the red container
+                          itemBuilder: (context, index) {
+                            if (index == 0) {
+                              return Column(children: [
+                                Column(
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
                                   children: [
-                                    poppinsText(
-                                        userController.userModel.value.homeCourt
-                                                .isEmptyOrNull
-                                            ? ''
-                                            : userController.userModel.value
-                                                    .homeCourt ??
-                                                '',
-                                        14,
-                                        FontWeight.w500,
-                                        silverColor),
-                                    Align(
-                                      alignment: Alignment.centerRight,
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(5.0),
-                                        child: InkWell(
-                                          onTap: () {
-                                            pushNewScreen(context,
-                                                screen: const AddHomeCourt(),
-                                                withNavBar: false);
-                                          },
-                                          child: SizedBox(
-                                            height: 2.3.h,
-                                            width: 4.47.w,
-                                            child:
-                                                Image.asset(AppAssets.MAP_PIN),
+                                    Column(
+                                      children: [
+                                        SizedBox(
+                                          width: 30.9.w,
+                                          //   padding: EdgeInsets.all(10),
+                                          child: GestureDetector(
+                                            onTap: _selectImage,
+                                            child: Stack(
+                                              //  clipBehavior: Clip.antiAliasWithSaveLayer,
+                                              alignment: Alignment.bottomCenter,
+                                              children: [
+                                                isUploading
+                                                    ? Container(
+                                                        height: 20.h,
+                                                        width: 35.h,
+                                                        decoration:
+                                                            const BoxDecoration(
+                                                          shape:
+                                                              BoxShape.circle,
+                                                          color: Colors
+                                                              .white, // White background
+                                                        ),
+                                                        child: const Center(
+                                                          child:
+                                                              CircularProgressIndicator(),
+                                                        ),
+                                                      )
+                                                    : (_downloadUrl != null)
+                                                        ? Container(
+                                                            height: 20.h,
+                                                            width: 35.h,
+                                                            decoration: BoxDecoration(
+                                                                shape: BoxShape
+                                                                    .circle,
+                                                                image: DecorationImage(
+                                                                    image: NetworkImage(
+                                                                        _downloadUrl
+                                                                            as String),
+                                                                    fit: BoxFit
+                                                                        .contain)))
+                                                        : (!userController
+                                                                .userModel
+                                                                .value
+                                                                .photoUrl
+                                                                .isEmptyOrNull)
+                                                            ? Container(
+                                                                height: 20.h,
+                                                                width: 35.h,
+                                                                decoration: BoxDecoration(
+                                                                    shape: BoxShape
+                                                                        .circle,
+                                                                    image: DecorationImage(
+                                                                        image: NetworkImage(userController.userModel.value.photoUrl ??
+                                                                            ""),
+                                                                        fit: BoxFit
+                                                                            .contain)))
+                                                            : Container(
+                                                                height: 20.h,
+                                                                width: 35.h,
+                                                                decoration: BoxDecoration(
+                                                                    shape: BoxShape
+                                                                        .circle,
+                                                                    border: Border.all(
+                                                                        width:
+                                                                            2,
+                                                                        color:
+                                                                            appGreenColor),
+                                                                    image: const DecorationImage(
+                                                                        image: AssetImage(AppAssets
+                                                                            .LOGO_NEW),
+                                                                        fit: BoxFit
+                                                                            .fill)),
+                                                              ),
+                                                if (userController.userModel
+                                                            .value.isVerified ==
+                                                        null ||
+                                                    userController.userModel
+                                                            .value.isVerified ==
+                                                        true)
+                                                  Align(
+                                                    alignment:
+                                                        Alignment.bottomRight,
+                                                    child: Container(
+                                                      height: 5.5.h,
+                                                      width: 12.1.w,
+                                                      decoration: const BoxDecoration(
+                                                          shape:
+                                                              BoxShape.circle,
+                                                          image: DecorationImage(
+                                                              image: AssetImage(
+                                                                  AppAssets
+                                                                      .INSTAGRAM_VERIFICATION))),
+                                                    ),
+                                                  )
+                                                else
+                                                  const SizedBox(),
+                                              ],
+                                            ),
                                           ),
                                         ),
+                                        poppinsText(
+                                            // FirebaseAuth.instance.currentUser?.displayName
+                                            //     as String,
+                                            userController
+                                                    .userModel.value.userName ??
+                                                "",
+                                            24,
+                                            FontWeight.bold,
+                                            appBlackColor),
+                                        // poppinsText(
+                                        //     "@${userController.userModel.value.email.substring(0, userController.userModel.value.email.indexOf('@'))}",
+                                        //     12,
+                                        //     FontWeight.normal,
+                                        //     blackColor),
+
+                                        // poppinsText(
+                                        //   // FirebaseAuth.insztance.currentUser?.displayName
+                                        //   //     as String,
+                                        //     userController.userModel.value.email ?? "",
+                                        //     12,
+                                        //     FontWeight.normal,
+                                        //     appBlackColor),
+                                        // poppinsText(
+                                        //     "@${userController.userModel.value.email.substring(0, userController.userModel.value.email.indexOf('@'))}",
+                                        //     12,
+                                        //     FontWeight.normal,
+                                        //     blackColor),
+                                        const SizedBox(
+                                          height: 15,
+                                        ),
+
+                                        //added by asjad
+
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            GestureDetector(
+                                              onTap: () {
+                                                Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        FollowersAndFollowingScreen(
+                                                      showFollowers: true,
+                                                      count: followerCountController
+                                                          .profileFollowersCount
+                                                          .value
+                                                          .toString(),
+                                                    ),
+                                                  ),
+                                                );
+                                              },
+                                              child: Column(
+                                                children: [
+                                                  Obx(() {
+                                                    return poppinsText(
+                                                      followerCountController
+                                                          .profileFollowersCount
+                                                          .value
+                                                          .toString(),
+                                                      16,
+                                                      underline: true,
+                                                      bold,
+                                                      appBlackColor,
+                                                    );
+                                                  }),
+                                                  const SizedBox(height: 4),
+                                                  poppinsText('Followers', 16,
+                                                      medium, appBlackColor),
+                                                ],
+                                              ),
+                                            ),
+                                            const SizedBox(
+                                                width:
+                                                    20), // Space before the divider
+                                            Container(
+                                              height:
+                                                  38, // Adjust to fit the height of your text
+                                              child: const VerticalDivider(
+                                                width:
+                                                    20, // Adjust width if needed
+                                                thickness:
+                                                    2, // Adjust thickness if needed
+                                                color: Colors
+                                                    .grey, // Adjust color if needed
+                                              ),
+                                            ),
+                                            const SizedBox(
+                                                width:
+                                                    20), // Space after the divider
+                                            GestureDetector(
+                                              onTap: () {
+                                                Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        FollowersAndFollowingScreen(
+                                                      showFollowers: false,
+                                                      count: followerCountController
+                                                          .profileFollowingCount
+                                                          .value
+                                                          .toString(),
+                                                    ),
+                                                  ),
+                                                );
+                                              },
+                                              child: Column(
+                                                children: [
+                                                  Obx(() {
+                                                    return poppinsText(
+                                                      followerCountController
+                                                          .profileFollowingCount
+                                                          .value
+                                                          .toString(),
+                                                      16,
+                                                      underline: true,
+                                                      bold,
+                                                      appBlackColor,
+                                                    );
+                                                  }),
+                                                  const SizedBox(height: 4),
+                                                  poppinsText('Following', 16,
+                                                      medium, appBlackColor),
+                                                ],
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+
+                                        const SizedBox(
+                                          height: 15,
+                                        ),
+
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            Container(
+                                              decoration: BoxDecoration(
+                                                shape: BoxShape.circle,
+                                                border: Border.all(
+                                                  color: offWhiteColor,
+                                                  width: 8.0,
+                                                ),
+                                              ),
+                                              child: FutureBuilder<
+                                                  List<UserModel>?>(
+                                                future:
+                                                    getUniqueCourtNameMaps(),
+                                                builder: (context, snapshot) {
+                                                  if (snapshot
+                                                          .connectionState ==
+                                                      ConnectionState.waiting) {
+                                                    return const SizedBox(
+                                                        height: 110,
+                                                        width: 110,
+                                                        child: Center(
+                                                            child:
+                                                                CircularProgressIndicator()));
+                                                  } else if (snapshot.hasData &&
+                                                      snapshot.data != null) {
+                                                    return InkWell(
+                                                      onTap: () {
+                                                        Navigator.push(
+                                                            context,
+                                                            MaterialPageRoute(
+                                                                builder:
+                                                                    (context) =>
+                                                                        const UniqueCourtsScreen()));
+                                                      },
+                                                      child:
+                                                          CircularPercentIndicator(
+                                                        radius: 50.0,
+                                                        lineWidth: 8.0,
+                                                        animation: true,
+                                                        percent: ((snapshot.data
+                                                                        ?.length ??
+                                                                    0) /
+                                                                (totalCount ??
+                                                                    10))
+                                                            .clamp(0.0, 1.0),
+                                                        center: Text(
+                                                          "${snapshot.data?.length ?? 0}\nCheck ins",
+                                                          textAlign:
+                                                              TextAlign.center,
+                                                          style:
+                                                              const TextStyle(
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                            fontSize: 14.0,
+                                                          ),
+                                                        ),
+                                                        circularStrokeCap:
+                                                            CircularStrokeCap
+                                                                .round,
+                                                        progressColor:
+                                                            darkYellowColor,
+                                                      ),
+                                                    );
+                                                  } else if (snapshot
+                                                      .hasError) {
+                                                    return Center(
+                                                      child: Text(TempLanguage
+                                                          .wentWrong),
+                                                    );
+                                                  } else {
+                                                    return InkWell(
+                                                      onTap: () {
+                                                        Navigator.push(
+                                                            context,
+                                                            MaterialPageRoute(
+                                                                builder:
+                                                                    (context) =>
+                                                                        const UniqueCourtsScreen()));
+                                                      },
+                                                      child:
+                                                          CircularPercentIndicator(
+                                                        radius: 50.0,
+                                                        lineWidth: 8.0,
+                                                        animation: true,
+                                                        percent: (0 /
+                                                                (totalCount ??
+                                                                    10))
+                                                            .clamp(0.0, 1.0),
+                                                        center: const Text(
+                                                          "0\nCheck ins",
+                                                          textAlign:
+                                                              TextAlign.center,
+                                                          style: TextStyle(
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                            fontSize: 14.0,
+                                                          ),
+                                                        ),
+                                                        circularStrokeCap:
+                                                            CircularStrokeCap
+                                                                .round,
+                                                        progressColor:
+                                                            darkYellowColor,
+                                                      ),
+                                                    );
+                                                  }
+                                                },
+                                              ),
+                                            ),
+                                            const SizedBox(
+                                              width: 15,
+                                            ),
+                                            InkWell(
+                                              onTap: () {
+                                                Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                        builder: (context) =>
+                                                            const UniqueCourtsScreen()));
+                                              },
+                                              child: Column(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  poppinsText(
+                                                      "Golden",
+                                                      22,
+                                                      FontWeight.bold,
+                                                      appBlackColor),
+                                                  poppinsText(
+                                                      "Courts",
+                                                      22,
+                                                      FontWeight.bold,
+                                                      appBlackColor),
+                                                  FutureBuilder<
+                                                      List<UserModel>?>(
+                                                    future:
+                                                        getUniqueCourtNameMaps(),
+                                                    builder:
+                                                        (context, snapshot) {
+                                                      if (snapshot
+                                                              .connectionState ==
+                                                          ConnectionState
+                                                              .waiting) {
+                                                        // return const Center(child: CircularProgressIndicator());
+                                                        return const Center(
+                                                            child:
+                                                                CircularProgressIndicator());
+                                                      } else if (snapshot
+                                                              .hasData &&
+                                                          snapshot.data !=
+                                                              null) {
+                                                        return poppinsText(
+                                                            "${snapshot.data?.length ?? 0} Check ins",
+                                                            12,
+                                                            FontWeight.normal,
+                                                            appBlackColor);
+                                                      } else if (snapshot
+                                                          .hasError) {
+                                                        return Center(
+                                                          child: Text(
+                                                              TempLanguage
+                                                                  .wentWrong),
+                                                        );
+                                                      } else {
+                                                        return poppinsText(
+                                                            "0 Check ins",
+                                                            12,
+                                                            FontWeight.normal,
+                                                            appBlackColor);
+                                                      }
+                                                    },
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(
+                                      height: 25,
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 12),
+                                      child: Stack(
+                                        clipBehavior: Clip.none,
+                                        alignment: Alignment.topCenter,
+                                        children: [
+                                          Container(
+                                            width: 100.w,
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 10, vertical: 4),
+                                            decoration: BoxDecoration(
+                                                borderRadius:
+                                                    BorderRadius.circular(8),
+                                                color: appGreyColor1),
+                                            child: TextField(
+                                              controller: aboutMeController,
+                                              textInputAction:
+                                                  TextInputAction.done,
+                                              onSubmitted: (value) {
+                                                // setState(() {
+                                                //   // userController.userModel.value.
+                                                //   //..........
+                                                //   aboutMe = value;
+                                                //   widget.userController.userModel.value.aboutMe = value;
+                                                //   FirebaseFirestore.instance
+                                                //       .collection(Collections.USER)
+                                                //       .doc(FirebaseAuth.instance.currentUser!.uid)
+                                                //       .update({UserKey.ABOUT_ME: aboutMe});
+                                                // });
+                                              },
+                                              maxLines: userController
+                                                      .userModel
+                                                      .value
+                                                      .aboutMe
+                                                      .isEmptyOrNull
+                                                  ? 1
+                                                  : 3,
+                                              onChanged: (val) {},
+                                              decoration: InputDecoration(
+                                                  border: InputBorder.none,
+                                                  enabled: tapped,
+                                                  enabledBorder:
+                                                      InputBorder.none,
+                                                  disabledBorder:
+                                                      InputBorder.none,
+                                                  errorBorder: InputBorder.none,
+                                                  focusedBorder:
+                                                      InputBorder.none,
+                                                  focusedErrorBorder:
+                                                      InputBorder.none,
+                                                  hintText: TempLanguage
+                                                      .tellUsAboutGame,
+                                                  helperStyle:
+                                                      GoogleFonts.poppins(
+                                                          fontSize: 14,
+                                                          fontWeight: regular,
+                                                          color: silverColor)),
+                                            ),
+                                          ),
+
+                                          //   child: poppinsText(userController.userModel.value.aboutMe.isEmptyOrNull
+                                          // ? TempLanguage.tellUsAboutGame
+                                          // : userController.userModel.value.aboutMe ?? TempLanguage.tellUsAboutGame, 12, FontWeight.normal, appBlackColor),),
+                                          Align(
+                                            alignment: Alignment.topRight,
+                                            child: Padding(
+                                              padding:
+                                                  const EdgeInsets.all(5.0),
+                                              child: InkWell(
+                                                onTap: () => setState(() {
+                                                  if (tapped) {
+                                                    setState(() {
+                                                      // userController.userModel.value.
+                                                      //..........
+                                                      aboutMe =
+                                                          aboutMeController
+                                                              .text;
+                                                      userController
+                                                          .userModel
+                                                          .value
+                                                          .aboutMe = aboutMe;
+                                                      FirebaseFirestore.instance
+                                                          .collection(
+                                                              Collections.USER)
+                                                          .doc(FirebaseAuth
+                                                              .instance
+                                                              .currentUser!
+                                                              .uid)
+                                                          .update({
+                                                        UserKey.ABOUT_ME:
+                                                            aboutMe
+                                                      });
+                                                    });
+                                                  }
+                                                  tapped = !tapped;
+                                                }),
+                                                child: Padding(
+                                                    padding:
+                                                        const EdgeInsets.all(4),
+                                                    child: tapped
+                                                        ? poppinsText(
+                                                            TempLanguage.save,
+                                                            14,
+                                                            semiBold,
+                                                            appGreenColor)
+                                                        : const ImageIcon(
+                                                            AssetImage(
+                                                              AppAssets
+                                                                  .EDIT_ICON,
+                                                            ),
+                                                            size: 20,
+                                                          )),
+                                              ),
+                                            ),
+                                          ),
+                                          Positioned(
+                                              top: -10,
+                                              child: Center(
+                                                child: Container(
+                                                  padding: const EdgeInsets
+                                                      .symmetric(
+                                                      horizontal: 12,
+                                                      vertical: 3),
+                                                  decoration: BoxDecoration(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              30),
+                                                      color: appGreenColor),
+                                                  child: poppinsText(
+                                                      'About Me',
+                                                      12,
+                                                      FontWeight.w400,
+                                                      appWhiteColor),
+                                                ),
+                                              ))
+                                        ],
                                       ),
                                     ),
+                                    const SizedBox(
+                                      height: 25,
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 12),
+                                      child: Stack(
+                                        clipBehavior: Clip.none,
+                                        alignment: Alignment.topCenter,
+                                        children: [
+                                          Container(
+                                            width: 100.w,
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 12, vertical: 10),
+                                            decoration: BoxDecoration(
+                                                borderRadius:
+                                                    BorderRadius.circular(8),
+                                                color: appGreyColor1),
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              children: [
+                                                poppinsText(
+                                                    userController
+                                                            .userModel
+                                                            .value
+                                                            .homeCourt
+                                                            .isEmptyOrNull
+                                                        ? ''
+                                                        : userController
+                                                                .userModel
+                                                                .value
+                                                                .homeCourt ??
+                                                            '',
+                                                    14,
+                                                    FontWeight.w500,
+                                                    silverColor),
+                                                Align(
+                                                  alignment:
+                                                      Alignment.centerRight,
+                                                  child: Padding(
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                            5.0),
+                                                    child: InkWell(
+                                                      onTap: () {
+                                                        pushNewScreen(context,
+                                                            screen:
+                                                                const AddHomeCourt(),
+                                                            withNavBar: false);
+                                                      },
+                                                      child: SizedBox(
+                                                        height: 2.3.h,
+                                                        width: 4.47.w,
+                                                        child: Image.asset(
+                                                            AppAssets.MAP_PIN),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                          Positioned(
+                                              top: -10,
+                                              child: Center(
+                                                child: Container(
+                                                  padding: const EdgeInsets
+                                                      .symmetric(
+                                                      horizontal: 12,
+                                                      vertical: 3),
+                                                  decoration: BoxDecoration(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              20),
+                                                      color: appGreenColor),
+                                                  child: poppinsText(
+                                                      'Home Court',
+                                                      12,
+                                                      FontWeight.w400,
+                                                      appWhiteColor),
+                                                ),
+                                              ))
+                                        ],
+                                      ),
+                                    ),
+                                    const SizedBox(
+                                      height: 10,
+                                    ),
+                                    Center(
+                                      child: Container(
+                                        width: 90,
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 10,
+                                          vertical: 4,
+                                        ),
+                                        decoration: BoxDecoration(
+                                            color: appGreyColor1,
+                                            borderRadius:
+                                                BorderRadius.circular(30)),
+                                        child: Center(
+                                            child: poppinsText(
+                                                'My Posts',
+                                                12,
+                                                FontWeight.normal,
+                                                appBlackColor)),
+                                      ),
+                                    ),
+                                    const SizedBox(
+                                      height: 10,
+                                    ),
+                                    controller.myPostLoader.value
+                                        ? const Center(
+                                            key: ValueKey('Loader'),
+                                            child: CircularProgressIndicator(),
+                                          )
+                                        : const SizedBox(
+                                            key: ValueKey('Empty'),
+                                          ),
+                                    SizedBox(
+                                      height: 10,
+                                    )
                                   ],
                                 ),
-                              ),
-                              Positioned(
-                                  top: -10,
-                                  child: Center(
-                                    child: Container(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 12, vertical: 3),
-                                      decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(20),
-                                          color: appGreenColor),
-                                      child: poppinsText('Home Court', 12,
-                                          FontWeight.w400, appWhiteColor),
-                                    ),
-                                  ))
-                            ],
-                          ),
-                        ),
-                        const SizedBox(
-                          height: 10,
-                        ),
-                        Center(
-                          child: Container(
-                            width: 90,
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 10,
-                              vertical: 4,
-                            ),
-                            decoration: BoxDecoration(
-                                color: appGreyColor1,
-                                borderRadius: BorderRadius.circular(30)),
-                            child: Center(
-                                child: poppinsText('My Posts', 12,
-                                    FontWeight.normal, appBlackColor)),
-                          ),
-                        ),
-                        const SizedBox(
-                          height: 10,
-                        ),
-                        Obx(() {
-                          if (controller.myPosts.isEmpty) {
-                            return Center(
-                                child: Text(TempLanguage.noPostFound));
-                          } else {
-                            return ListView.builder(
-                              physics: const NeverScrollableScrollPhysics(),
-                              shrinkWrap: true,
-                              itemCount: controller.myPosts.length +
-                                  (controller.isLoadingMore ? 1 : 0),
-                              itemBuilder: (context, index) {
-                                if (index == controller.myPosts.length) {
-                                  return const Center(
-                                      child: CircularProgressIndicator());
-                                }
-                                var data = controller.myPosts[index];
-                                return data.isOriginal!
-                                    ? ListTileContainer(
-                                        isMyProfile: true,
-                                        key: ValueKey(data.id),
-                                        data: data,
-                                      )
-                                    : SharedPostComp(
-                                        isMyProfile: true,
-                                        isOtherProfile: widget.isOther,
-                                        key: ValueKey(data.id),
-                                        data: data,
-                                      );
-                              },
-                            );
-                          }
-                        }),
-                        controller.myPostLoader.value
-                            ? const Center(
-                                key: ValueKey('Loader'),
-                                child: CircularProgressIndicator(),
-                              )
-                            : const SizedBox(
-                                key: ValueKey('Empty'),
-                              ),
-                        SizedBox(
-                          height: 2.h,
-                        )
-                      ],
+                              ]);
+                            } else {
+                              final data =
+                                  posts[index - 1]; // Adjust index for posts
+
+                              // Your existing logic for matching users
+                              UserModel? matchingUser, matchingUserShared;
+                              try {
+                                matchingUser = users.firstWhere(
+                                    (user) => user.uid == data.userId);
+                              } catch (_) {}
+
+                              if (data.shareUID != null) {
+                                try {
+                                  matchingUserShared = users.firstWhere(
+                                      (user) => user.uid == data.shareUID);
+                                } catch (_) {}
+                              }
+
+                              // Skip blocked users
+                              if (userController.blockProfiles
+                                      .contains(data.userId) ||
+                                  userController.blockProfiles
+                                      .contains(data.shareUID)) {
+                                return const SizedBox.shrink();
+                              }
+
+                              // If no matching user found, skip rendering the post
+                              if (matchingUser == null) {
+                                return const SizedBox.shrink();
+                              }
+
+                              // Display the post (original or shared)
+                              return data.isOriginal!
+                                  ? ListTileContainer(
+                                      key: ValueKey(data.id),
+                                      data: data,
+                                      userData: matchingUser,
+                                    )
+                                  : SharedPostComp(
+                                      postUserData: matchingUser,
+                                      shareUserData: matchingUserShared,
+                                      key: ValueKey(data.shareID),
+                                      data: data,
+                                    );
+                            }
+                          },
+                        );
+                      }),
                     ),
-                  ])
-            : const Center(child: CircularProgressIndicator()),
-        // : const Center(child: Text("Loading...")),
+                  );
+                }
+              },
+            ),
+          ),
+        ],
       ),
     );
     // });
+  }
+
+  Future<void> _handleRefresh() async {
+    Future.delayed(const Duration(seconds: 3));
+    setState(() {});
+  }
+
+  Widget _buildEmptyState() {
+    return Column(children: [
+      Column(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Column(
+            children: [
+              SizedBox(
+                width: 30.9.w,
+                //   padding: EdgeInsets.all(10),
+                child: GestureDetector(
+                  onTap: _selectImage,
+                  child: Stack(
+                    //  clipBehavior: Clip.antiAliasWithSaveLayer,
+                    alignment: Alignment.bottomCenter,
+                    children: [
+                      isUploading
+                          ? Container(
+                              height: 20.h,
+                              width: 35.h,
+                              decoration: const BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: Colors.white, // White background
+                              ),
+                              child: const Center(
+                                child: CircularProgressIndicator(),
+                              ),
+                            )
+                          : (_downloadUrl != null)
+                              ? Container(
+                                  height: 20.h,
+                                  width: 35.h,
+                                  decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      image: DecorationImage(
+                                          image: NetworkImage(
+                                              _downloadUrl as String),
+                                          fit: BoxFit.contain)))
+                              : (!userController
+                                      .userModel.value.photoUrl.isEmptyOrNull)
+                                  ? Container(
+                                      height: 20.h,
+                                      width: 35.h,
+                                      decoration: BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          image: DecorationImage(
+                                              image: NetworkImage(userController
+                                                      .userModel
+                                                      .value
+                                                      .photoUrl ??
+                                                  ""),
+                                              fit: BoxFit.contain)))
+                                  : Container(
+                                      height: 20.h,
+                                      width: 35.h,
+                                      decoration: BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          border: Border.all(
+                                              width: 2, color: appGreenColor),
+                                          image: const DecorationImage(
+                                              image: AssetImage(
+                                                  AppAssets.LOGO_NEW),
+                                              fit: BoxFit.fill)),
+                                    ),
+                      if (userController.userModel.value.isVerified == null ||
+                          userController.userModel.value.isVerified == true)
+                        Align(
+                          alignment: Alignment.bottomRight,
+                          child: Container(
+                            height: 5.5.h,
+                            width: 12.1.w,
+                            decoration: const BoxDecoration(
+                                shape: BoxShape.circle,
+                                image: DecorationImage(
+                                    image: AssetImage(
+                                        AppAssets.INSTAGRAM_VERIFICATION))),
+                          ),
+                        )
+                      else
+                        const SizedBox(),
+                    ],
+                  ),
+                ),
+              ),
+              poppinsText(
+                  // FirebaseAuth.instance.currentUser?.displayName
+                  //     as String,
+                  userController.userModel.value.userName ?? "",
+                  24,
+                  FontWeight.bold,
+                  appBlackColor),
+              // poppinsText(
+              //     "@${userController.userModel.value.email.substring(0, userController.userModel.value.email.indexOf('@'))}",
+              //     12,
+              //     FontWeight.normal,
+              //     blackColor),
+
+              // poppinsText(
+              //   // FirebaseAuth.insztance.currentUser?.displayName
+              //   //     as String,
+              //     userController.userModel.value.email ?? "",
+              //     12,
+              //     FontWeight.normal,
+              //     appBlackColor),
+              // poppinsText(
+              //     "@${userController.userModel.value.email.substring(0, userController.userModel.value.email.indexOf('@'))}",
+              //     12,
+              //     FontWeight.normal,
+              //     blackColor),
+              const SizedBox(
+                height: 15,
+              ),
+
+              //added by asjad
+
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => FollowersAndFollowingScreen(
+                            showFollowers: true,
+                            count: followerCountController
+                                .profileFollowersCount.value
+                                .toString(),
+                          ),
+                        ),
+                      );
+                    },
+                    child: Column(
+                      children: [
+                        Obx(() {
+                          return poppinsText(
+                            followerCountController.profileFollowersCount.value
+                                .toString(),
+                            16,
+                            underline: true,
+                            bold,
+                            appBlackColor,
+                          );
+                        }),
+                        const SizedBox(height: 4),
+                        poppinsText('Followers', 16, medium, appBlackColor),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 20), // Space before the divider
+                  Container(
+                    height: 38, // Adjust to fit the height of your text
+                    child: const VerticalDivider(
+                      width: 20, // Adjust width if needed
+                      thickness: 2, // Adjust thickness if needed
+                      color: Colors.grey, // Adjust color if needed
+                    ),
+                  ),
+                  const SizedBox(width: 20), // Space after the divider
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => FollowersAndFollowingScreen(
+                            showFollowers: false,
+                            count: followerCountController
+                                .profileFollowingCount.value
+                                .toString(),
+                          ),
+                        ),
+                      );
+                    },
+                    child: Column(
+                      children: [
+                        Obx(() {
+                          return poppinsText(
+                            followerCountController.profileFollowingCount.value
+                                .toString(),
+                            16,
+                            underline: true,
+                            bold,
+                            appBlackColor,
+                          );
+                        }),
+                        const SizedBox(height: 4),
+                        poppinsText('Following', 16, medium, appBlackColor),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+
+              const SizedBox(
+                height: 15,
+              ),
+
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: offWhiteColor,
+                        width: 8.0,
+                      ),
+                    ),
+                    child: FutureBuilder<List<UserModel>?>(
+                      future: getUniqueCourtNameMaps(),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return const SizedBox(
+                              height: 110,
+                              width: 110,
+                              child:
+                                  Center(child: CircularProgressIndicator()));
+                        } else if (snapshot.hasData && snapshot.data != null) {
+                          return InkWell(
+                            onTap: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          const UniqueCourtsScreen()));
+                            },
+                            child: CircularPercentIndicator(
+                              radius: 50.0,
+                              lineWidth: 8.0,
+                              animation: true,
+                              percent: ((snapshot.data?.length ?? 0) /
+                                      (totalCount ?? 10))
+                                  .clamp(0.0, 1.0),
+                              center: Text(
+                                "${snapshot.data?.length ?? 0}\nCheck ins",
+                                textAlign: TextAlign.center,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 14.0,
+                                ),
+                              ),
+                              circularStrokeCap: CircularStrokeCap.round,
+                              progressColor: darkYellowColor,
+                            ),
+                          );
+                        } else if (snapshot.hasError) {
+                          return Center(
+                            child: Text(TempLanguage.wentWrong),
+                          );
+                        } else {
+                          return InkWell(
+                            onTap: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          const UniqueCourtsScreen()));
+                            },
+                            child: CircularPercentIndicator(
+                              radius: 50.0,
+                              lineWidth: 8.0,
+                              animation: true,
+                              percent: (0 / (totalCount ?? 10)).clamp(0.0, 1.0),
+                              center: const Text(
+                                "0\nCheck ins",
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 14.0,
+                                ),
+                              ),
+                              circularStrokeCap: CircularStrokeCap.round,
+                              progressColor: darkYellowColor,
+                            ),
+                          );
+                        }
+                      },
+                    ),
+                  ),
+                  const SizedBox(
+                    width: 15,
+                  ),
+                  InkWell(
+                    onTap: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) =>
+                                  const UniqueCourtsScreen()));
+                    },
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        poppinsText(
+                            "Golden", 22, FontWeight.bold, appBlackColor),
+                        poppinsText(
+                            "Courts", 22, FontWeight.bold, appBlackColor),
+                        FutureBuilder<List<UserModel>?>(
+                          future: getUniqueCourtNameMaps(),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              // return const Center(child: CircularProgressIndicator());
+                              return const Center(
+                                  child: CircularProgressIndicator());
+                            } else if (snapshot.hasData &&
+                                snapshot.data != null) {
+                              return poppinsText(
+                                  "${snapshot.data?.length ?? 0} Check ins",
+                                  12,
+                                  FontWeight.normal,
+                                  appBlackColor);
+                            } else if (snapshot.hasError) {
+                              return Center(
+                                child: Text(TempLanguage.wentWrong),
+                              );
+                            } else {
+                              return poppinsText("0 Check ins", 12,
+                                  FontWeight.normal, appBlackColor);
+                            }
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          const SizedBox(
+            height: 25,
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            child: Stack(
+              clipBehavior: Clip.none,
+              alignment: Alignment.topCenter,
+              children: [
+                Container(
+                  width: 100.w,
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(8),
+                      color: appGreyColor1),
+                  child: TextField(
+                    controller: aboutMeController,
+                    textInputAction: TextInputAction.done,
+                    onSubmitted: (value) {
+                      // setState(() {
+                      //   // userController.userModel.value.
+                      //   //..........
+                      //   aboutMe = value;
+                      //   widget.userController.userModel.value.aboutMe = value;
+                      //   FirebaseFirestore.instance
+                      //       .collection(Collections.USER)
+                      //       .doc(FirebaseAuth.instance.currentUser!.uid)
+                      //       .update({UserKey.ABOUT_ME: aboutMe});
+                      // });
+                    },
+                    maxLines:
+                        userController.userModel.value.aboutMe.isEmptyOrNull
+                            ? 1
+                            : 3,
+                    onChanged: (val) {},
+                    decoration: InputDecoration(
+                        border: InputBorder.none,
+                        enabled: tapped,
+                        enabledBorder: InputBorder.none,
+                        disabledBorder: InputBorder.none,
+                        errorBorder: InputBorder.none,
+                        focusedBorder: InputBorder.none,
+                        focusedErrorBorder: InputBorder.none,
+                        hintText: TempLanguage.tellUsAboutGame,
+                        helperStyle: GoogleFonts.poppins(
+                            fontSize: 14,
+                            fontWeight: regular,
+                            color: silverColor)),
+                  ),
+                ),
+
+                //   child: poppinsText(userController.userModel.value.aboutMe.isEmptyOrNull
+                // ? TempLanguage.tellUsAboutGame
+                // : userController.userModel.value.aboutMe ?? TempLanguage.tellUsAboutGame, 12, FontWeight.normal, appBlackColor),),
+                Align(
+                  alignment: Alignment.topRight,
+                  child: Padding(
+                    padding: const EdgeInsets.all(5.0),
+                    child: InkWell(
+                      onTap: () => setState(() {
+                        if (tapped) {
+                          setState(() {
+                            // userController.userModel.value.
+                            //..........
+                            aboutMe = aboutMeController.text;
+                            userController.userModel.value.aboutMe = aboutMe;
+                            FirebaseFirestore.instance
+                                .collection(Collections.USER)
+                                .doc(FirebaseAuth.instance.currentUser!.uid)
+                                .update({UserKey.ABOUT_ME: aboutMe});
+                          });
+                        }
+                        tapped = !tapped;
+                      }),
+                      child: Padding(
+                          padding: const EdgeInsets.all(4),
+                          child: tapped
+                              ? poppinsText(TempLanguage.save, 14, semiBold,
+                                  appGreenColor)
+                              : const ImageIcon(
+                                  AssetImage(
+                                    AppAssets.EDIT_ICON,
+                                  ),
+                                  size: 20,
+                                )),
+                    ),
+                  ),
+                ),
+                Positioned(
+                    top: -10,
+                    child: Center(
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 3),
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(30),
+                            color: appGreenColor),
+                        child: poppinsText(
+                            'About Me', 12, FontWeight.w400, appWhiteColor),
+                      ),
+                    ))
+              ],
+            ),
+          ),
+          const SizedBox(
+            height: 25,
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            child: Stack(
+              clipBehavior: Clip.none,
+              alignment: Alignment.topCenter,
+              children: [
+                Container(
+                  width: 100.w,
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(8),
+                      color: appGreyColor1),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      poppinsText(
+                          userController.userModel.value.homeCourt.isEmptyOrNull
+                              ? ''
+                              : userController.userModel.value.homeCourt ?? '',
+                          14,
+                          FontWeight.w500,
+                          silverColor),
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: Padding(
+                          padding: const EdgeInsets.all(5.0),
+                          child: InkWell(
+                            onTap: () {
+                              pushNewScreen(context,
+                                  screen: const AddHomeCourt(),
+                                  withNavBar: false);
+                            },
+                            child: SizedBox(
+                              height: 2.3.h,
+                              width: 4.47.w,
+                              child: Image.asset(AppAssets.MAP_PIN),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Positioned(
+                    top: -10,
+                    child: Center(
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 3),
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(20),
+                            color: appGreenColor),
+                        child: poppinsText(
+                            'Home Court', 12, FontWeight.w400, appWhiteColor),
+                      ),
+                    ))
+              ],
+            ),
+          ),
+          const SizedBox(
+            height: 10,
+          ),
+          Center(
+            child: Container(
+              width: 90,
+              padding: const EdgeInsets.symmetric(
+                horizontal: 10,
+                vertical: 4,
+              ),
+              decoration: BoxDecoration(
+                  color: appGreyColor1,
+                  borderRadius: BorderRadius.circular(30)),
+              child: Center(
+                  child: poppinsText(
+                      'My Posts', 12, FontWeight.normal, appBlackColor)),
+            ),
+          ),
+          const SizedBox(
+            height: 10,
+          ),
+          controller.myPostLoader.value
+              ? const Center(
+                  key: ValueKey('Loader'),
+                  child: CircularProgressIndicator(),
+                )
+              : const SizedBox(
+                  key: ValueKey('Empty'),
+                ),
+          SizedBox(
+            height: 10,
+          )
+        ],
+      ),
+    ]);
   }
 }

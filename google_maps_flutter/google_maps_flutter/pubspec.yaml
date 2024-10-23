@@ -20,11 +20,11 @@ dependencies:
   flutter:
     sdk: flutter
   google_maps_flutter_android:
-    path: /Users/user/Documents/Projects/Check-In-Flutter/google_maps_flutter/google_maps_flutter_android
+    path: C:/Users/Asjad/Desktop/Flutter Projects Developlogix/check_in_hoops/google_maps_flutter/google_maps_flutter_android
   google_maps_flutter_ios:
-    path: /Users/user/Documents/Projects/Check-In-Flutter/google_maps_flutter/google_maps_flutter_ios
+    path: C:/Users/Asjad/Desktop/Flutter Projects Developlogix/check_in_hoops/google_maps_flutter/google_maps_flutter_ios
   google_maps_flutter_platform_interface:
-    path: /Users/user/Documents/Projects/Check-In-Flutter/google_maps_flutter/google_maps_flutter_platform_interface
+    path: C:/Users/Asjad/Desktop/Flutter Projects Developlogix/check_in_hoops/google_maps_flutter/google_maps_flutter_platform_interface
 
 
 dev_dependencies:
@@ -37,8 +37,8 @@ dev_dependencies:
 ## FOR TESTING ONLY. DO NOT MERGE.
 #dependency_overrides:
 #  google_maps_flutter_android:
-#    path: /Users/user/Documents/Projects/Check-In-Flutter/google_maps_flutter/google_maps_flutter_android
+#    path: C:/Users/Asjad/Desktop/Flutter Projects Developlogix/check_in_hoops/google_maps_flutter/google_maps_flutter_android
 #  google_maps_flutter_ios:
-#    path: /Users/user/Documents/Projects/Check-In-Flutter/google_maps_flutter/google_maps_flutter_ios
+#    path: C:/Users/Asjad/Desktop/Flutter Projects Developlogix/check_in_hoops/google_maps_flutter/google_maps_flutter_ios
 #  google_maps_flutter_platform_interface:
-#    path: /Users/user/Documents/Projects/Check-In-Flutter/google_maps_flutter/google_maps_flutter_platform_interface
+#    path: C:/Users/Asjad/Desktop/Flutter Projects Developlogix/check_in_hoops/google_maps_flutter/google_maps_flutter_platform_interface

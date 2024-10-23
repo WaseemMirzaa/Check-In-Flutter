@@ -154,18 +154,38 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> with AutomaticKeepAliveClientMixin {
   final NavBarController navBarController = Get.put(NavBarController());
-@override
+  @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    Future.microtask(() async{
-      FirebaseAuth.instance.currentUser != null && getStringAsync('first') != 'no' ?  Navigator.pushReplacement(
-          context, MaterialPageRoute(builder: (context) => const NewsFeedOnboarding())) : null;
+    // Set default tab to index 2 (NewsFeed tab)
+    // Run after the build phase completes
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      // Check if user is logged in
+      if (FirebaseAuth.instance.currentUser != null) {
+        // Set default tab to index 2 (NewsFeed tab) if the user is logged in
+        navBarController.currentIndex.value = 2;
+        navBarController.controller.index =
+            2; // Optional, if using tab controller
+      } else {
+        // Set default tab to index 0 (Home tab) if user is not logged in
+        navBarController.currentIndex.value = 0;
+        navBarController.controller.index = 0;
+      }
+    });
+
+    Future.microtask(() async {
+      FirebaseAuth.instance.currentUser != null &&
+              getStringAsync('first') != 'no'
+          ? Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => const NewsFeedOnboarding()))
+          : null;
     });
     initDynamicLinks(context);
+  }
 
-
-}
   final List<Widget> _buildScreens = [
     const CheckIn(),
     MessageScreen(),
@@ -175,17 +195,19 @@ class _HomeState extends State<Home> with AutomaticKeepAliveClientMixin {
     ProfileScreen()
     //KeyedSubtree(key: UniqueKey(), child: const ProfileScreen()),
   ];
+
   /// The deep link
   Future<void> initDynamicLinks(BuildContext context) async {
     print("\n\n\n\n\n First Call \n\n\n");
     await Firebase.initializeApp();
 
     // Handle initial link when the app is first opened
-    final PendingDynamicLinkData? initialLinkData = await FirebaseDynamicLinks.instance.getInitialLink();
+    final PendingDynamicLinkData? initialLinkData =
+        await FirebaseDynamicLinks.instance.getInitialLink();
     _handleDeepLink(context, initialLinkData?.link);
 
     FirebaseDynamicLinks.instance.onLink.listen(
-          (PendingDynamicLinkData dynamicLinkData) {
+      (PendingDynamicLinkData dynamicLinkData) {
         _handleDeepLink(context, dynamicLinkData?.link);
       },
       onError: (error) async {
@@ -222,52 +244,59 @@ class _HomeState extends State<Home> with AutomaticKeepAliveClientMixin {
     }
   }
 
-
-
-
   List<BottomNavigationBarItem> _navBarsItems() {
     return [
       BottomNav(
         label: 'Home',
-        boxColor:
-            navBarController.controller.index == 0 ? appGreenColor : appWhiteColor,
+        boxColor: navBarController.controller.index == 0
+            ? appGreenColor
+            : appWhiteColor,
         icon: "Group 12548",
-        iconColor:
-            navBarController.controller.index == 0 ? appWhiteColor : appBlackColor,
+        iconColor: navBarController.controller.index == 0
+            ? appWhiteColor
+            : appBlackColor,
       ).getBottomNavItem(),
       BottomNav(
         label: 'Chat',
-        boxColor:
-            navBarController.controller.index == 1 ? appGreenColor : appWhiteColor,
+        boxColor: navBarController.controller.index == 1
+            ? appGreenColor
+            : appWhiteColor,
         icon: "Path 28661",
-        iconColor:
-            navBarController.controller.index == 1 ? appWhiteColor : appBlackColor,
+        iconColor: navBarController.controller.index == 1
+            ? appWhiteColor
+            : appBlackColor,
       ).getBottomNavItem(),
 
       //.......................... News Feed
       BottomNav(
         label: 'NewsFeed',
-        boxColor:
-            navBarController.controller.index == 2 ? appGreenColor : appWhiteColor,
+        boxColor: navBarController.controller.index == 2
+            ? appGreenColor
+            : appWhiteColor,
         icon: "calendar",
-        iconColor:
-            navBarController.controller.index == 2 ? appWhiteColor : appBlackColor,
+        iconColor: navBarController.controller.index == 2
+            ? appWhiteColor
+            : appBlackColor,
       ).getBottomNavItem(),
       BottomNav(
         label: 'History',
-        boxColor:
-            navBarController.controller.index == 3 ? appGreenColor : appWhiteColor,
+        boxColor: navBarController.controller.index == 3
+            ? appGreenColor
+            : appWhiteColor,
         icon: "Icon awesome-history",
-        iconColor:
-            navBarController.controller.index == 3 ? appWhiteColor : appBlackColor,
+        iconColor: navBarController.controller.index == 3
+            ? appWhiteColor
+            : appBlackColor,
       ).getBottomNavItem(),
       BottomNav(
         label: 'Profile',
-        boxColor:
-            navBarController.controller.index == 4 ? appGreenColor : appWhiteColor,
+        boxColor: navBarController.controller.index == 4
+            ? appGreenColor
+            : appWhiteColor,
         icon: "Icon material-person",
-        iconColor:
-            navBarController.controller.index == 4 ? appWhiteColor : appBlackColor,
+        iconColor: navBarController.controller.index == 4
+            ? appWhiteColor
+            : appBlackColor,
       ).getBottomNavItem(),
     ];
   }
@@ -282,6 +311,7 @@ class _HomeState extends State<Home> with AutomaticKeepAliveClientMixin {
       return true;
     }
   }
+
   @override
   void dispose() {
     // TODO: implement dispose

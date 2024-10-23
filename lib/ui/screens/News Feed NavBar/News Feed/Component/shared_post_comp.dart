@@ -68,6 +68,7 @@ class _SharedPostCompState extends State<SharedPostComp> {
 
 
   bool? playing;
+  
 
   @override
   void initState() {
