@@ -176,6 +176,7 @@ android {
     defaultConfig {
         applicationId "com.developlogix.checkinapp"
         minSdkVersion 24
+        compileSdkVersion flutter.targetSdkVersion
         targetSdkVersion flutter.targetSdkVersion
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
