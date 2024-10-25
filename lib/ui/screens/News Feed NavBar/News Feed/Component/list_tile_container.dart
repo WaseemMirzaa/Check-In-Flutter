@@ -35,7 +35,6 @@ import '../../../../../core/constant/app_assets.dart';
 import 'report_on_post_comp.dart';
 
 class ListTileContainer extends StatefulWidget {
-
   NewsFeedModel? data;
   bool isMyProfile;
   bool isOtherProfile;
@@ -66,17 +65,15 @@ class _ListTileContainerState extends State<ListTileContainer> {
 
   @override
   void initState() {
-
     // TODO: implement initState
 
     super.initState();
-    if(widget.userData == null) {
+    if (widget.userData == null) {
       Future.microtask(() async {
         widget.userData = await userServices.getUserData(widget.data!.userId!);
         mounted ? setState(() {}) : null;
       });
     }
-
   }
 
   RxBool isVisible = false.obs;
