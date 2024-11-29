@@ -135,7 +135,10 @@ class _OtherProfileViewState extends State<OtherProfileView>
     // _scrollController.addListener(_onScroll);
 
     //-----YOU NEED TO UNDERSTAND THIS METHOD IN ORDER TO UNDERSTAND THE FETCHING CODE
-    controller.getUserPosts(widget.uid);
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      controller.getUserPosts(widget.uid);
+    });
 
     // Initialize the FollowerCountingController and set the userId
     followerCountController = Get.put(FollowerCountingController());

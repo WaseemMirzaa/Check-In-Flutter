@@ -77,198 +77,152 @@ class _NewsFeedScreenState extends State<NewsFeedScreen>
       body: Column(
         children: [
           Expanded(
-            child:
-             Obx(() {
-              // Check if loading state is active
-              if (controller.isLoading.value) {
-                return _buildSecondTopContainer(true);
-              }
+            child: Obx(
+              () {
+                // Check if loading state is active
+                if (controller.isLoading.value) {
+                  return _buildSecondTopContainer(true);
+                }
 
-              // Check if the following list is empty when selectedOption is 1
-              if (controller.selectedOption == 1 &&
-                  controller.followingList.isEmpty) {
-                return _buildSecondTopContainer(false);
-              }
+                // Check if the following list is empty when selectedOption is 1
+                if (controller.selectedOption == 1 &&
+                    controller.followingList.isEmpty) {
+                  return _buildSecondTopContainer(false);
+                }
 
-              return
-               FutureBuilder<List<UserModel>?>(
-                future: userServices.getUsersList(), // Fetch the list of users
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    // Show a loader while the future is being fetched
-                    return Center(child: CircularProgressIndicator());
-                  } else if (snapshot.hasError) {
-                    // Handle error state
-                    return Center(child: Text('Error fetching user data'));
-                  } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                    // Handle empty data state
-                    return _buildEmptyState();
-                  } else {
-                    // When data is successfully fetched, return the RefreshIndicator wrapped pagination feed
-                    return RefreshIndicator(
-                      onRefresh: _handleRefresh,
-                      child: CustomFirestorePagination(
-                        key: UniqueKey(),
-                        limit: 20, // Reduces initial pagination
-                        viewType: ViewType.list,
-                        isLive: true,
-                        initialLoader: _buildTopContainer(),
-                        bottomLoader: Container(),
-                        physics: const AlwaysScrollableScrollPhysics(),
-                        onEmpty: _buildEmptyState(),
-                        query: controller.getNewsFeedQuery(),                        
-                        itemBuilder: (context, documentSnapshot, index) {
-                          final data =
-                              documentSnapshot.data() as Map<String, Object?>;
+                return FutureBuilder<List<UserModel>?>(
+                  future:
+                      userServices.getUsersList(), // Fetch the list of users
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      // Show a loader while the future is being fetched
+                      return const Center(
+                          child: const CircularProgressIndicator());
+                    } else if (snapshot.hasError) {
+                      // Handle error state
+                      return const Center(
+                          child: Text('Error fetching user data'));
+                    } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                      // Handle empty data state
+                      return _buildEmptyState();
+                    } else {
+                      // When data is successfully fetched, return the RefreshIndicator wrapped pagination feed
+                      return RefreshIndicator(
+                        onRefresh: _handleRefresh,
+                        child: CustomFirestorePagination(
+                          key: UniqueKey(),
+                          limit: 20, // Reduces initial pagination
+                          viewType: ViewType.list,
+                          isLive: true,
+                          initialLoader: _buildTopContainer(),
+                          bottomLoader: Container(),
+                          physics: const AlwaysScrollableScrollPhysics(),
+                          onEmpty: _buildEmptyState(),
+                          query: controller.getNewsFeedQuery(),
 
-                          if (index == 0) {
-                            return _buildTopContainer();
-                          }
+                          itemBuilder: (context, documentSnapshot, index) {
+                            final data =
+                                documentSnapshot.data() as Map<String, Object?>;
 
-                          if (index % 10 == 9) {
-                            return NavtiveAdsComp(key: ValueKey('Ad_$index'));
-                          }
-
-                          if (data.isNotEmpty &&
-                              controller.shouldShowPost(data)) {
-                            if (data[NewsFeed.HIDE_USER] is List) {
-                              final hideUserList =
-                                  data[NewsFeed.HIDE_USER] as List;
-
-                              if (!hideUserList.contains(
-                                  userController.userModel.value.uid)) {
-                                final newsFeedModel =
-                                    NewsFeedModel.fromJson(data);
-
-                                UserModel? matchingUserShared, matchingUser;
-                                try {
-                                  matchingUser = snapshot.data!.firstWhere(
-                                      (user) =>
-                                          user.uid == newsFeedModel.userId);
-                                } catch (_) {}
-                                if (newsFeedModel.shareUID != null) {
-                                  try {
-                                    matchingUserShared = snapshot.data!
-                                        .firstWhere((user) =>
-                                            user.uid == newsFeedModel.shareUID);
-                                  } catch (_) {}
-                                }
-
-                                // Check if the user profile is blocked
-                                if (userController.blockProfiles
-                                        .contains(newsFeedModel.userId) ||
-                                    userController.blockProfiles
-                                        .contains(newsFeedModel.shareUID)) {
-                                  return const SizedBox.shrink();
-                                }
-
-                                if (matchingUser == null) {
-                                  return const SizedBox
-                                      .shrink(); // Fallback for unhandled cases
-                                }
-
-                                // Build the appropriate post based on the original or shared post
-                                return newsFeedModel.isOriginal!
-                                    ? ListTileContainer(
-                                        key: ValueKey(newsFeedModel.id),
-                                        data: newsFeedModel,
-                                        userData: matchingUser,
-                                      )
-                                    : SharedPostComp(
-                                        postUserData: matchingUser,
-                                        shareUserData: matchingUserShared,
-                                        key: ValueKey(newsFeedModel.shareID),
-                                        data: newsFeedModel,
-                                      );
-                              }
+                            if (index == 0) {
+                              return _buildTopContainer();
                             }
-                          }
 
-                          return const SizedBox
-                              .shrink(); // Fallback for unhandled cases
-                        },
-                      ),
-                    );
-                  }
-                },
-              );
+                            // Adjust index to account for the initial custom widget
+                            int adjustedIndex = index - 1;
 
-              // If not loading and following list is not empty, show the content
-              return RefreshIndicator(
-                onRefresh: _handleRefresh,
-                child: CustomFirestorePagination(
-                  key: UniqueKey(),
-                  limit: 20, //reduces initail pagination
-                  viewType: ViewType.list,
-                  isLive: true,
-                  initialLoader: _buildTopContainer(),
-                  bottomLoader: Container(),
-                  physics: const AlwaysScrollableScrollPhysics(),
-                  onEmpty: _buildEmptyState(),
-                  query: controller.getNewsFeedQuery(),
-                  itemBuilder: (context, documentSnapshot, index) {
-                    final data =
-                        documentSnapshot.data() as Map<String, Object?>;
+                            // Check if an ad should be inserted
+                            if (adjustedIndex > 0 && adjustedIndex % 10 == 9) {
+                              return Column(
+                                children: [
+                                  // Original post
+                                  _buildPostWidget(data, adjustedIndex,
+                                      users: snapshot
+                                          .data // Pass the entire users list
+                                      ),
 
-                    if (index == 0) {
-                      return _buildTopContainer();
+                                  // Ad
+                                  NavtiveAdsComp(
+                                      key: ValueKey('Ad_$adjustedIndex')),
+                                ],
+                              );
+                            }
+
+                            // Regular post rendering
+                            return _buildPostWidget(data, adjustedIndex,
+                                users:
+                                    snapshot.data // Pass the entire users list
+                                );
+                          },
+                        ),
+                      );
                     }
-
-                    if (index % 5 == 4) {
-                      return Container();
-                    }
-
-                    if (controller.shouldShowPost(data)) {
-                      if (data[NewsFeed.HIDE_USER] is List) {
-                        final hideUserList = data[NewsFeed.HIDE_USER] as List;
-
-                        if (!hideUserList
-                            .contains(userController.userModel.value.uid)) {
-                          final newsFeedModel = NewsFeedModel.fromJson(data);
-
-                          // Here we create a Future to get user data
-                          return FutureBuilder<UserModel?>(
-                            future: userServices.getUserData(newsFeedModel
-                                .userId!), // Get user data asynchronously
-                            builder: (context, snapshot) {
-                              // Check the status of the future
-                              if (snapshot.hasData) {
-                                UserModel? userData = snapshot.data;
-
-                                // Proceed to check if the profile is blocked
-                                if (userController.blockProfiles
-                                        .contains(newsFeedModel.userId) ||
-                                    userController.blockProfiles
-                                        .contains(newsFeedModel.shareUID)) {
-                                  return const SizedBox.shrink();
-                                } else {
-                                  return newsFeedModel.isOriginal!
-                                      ? ListTileContainer(
-                                          key: ValueKey(newsFeedModel.id),
-                                          data: newsFeedModel,
-                                          userData: userData,
-                                        )
-                                      : SharedPostComp(
-                                          key: ValueKey(newsFeedModel.shareID),
-                                          data: newsFeedModel,
-                                        );
-                                }
-                              }
-                              return const SizedBox.shrink(); // Fallback
-                            },
-                          );
-                        }
-                      }
-                    }
-                    return const SizedBox.shrink(); // Fallback
                   },
-                ),
-              );
-            }),
+                );
+              },
+            ),
           ),
         ],
       ),
     );
+  }
+
+  // Modified helper method with optional users parameter
+  Widget _buildPostWidget(Map<String, Object?> data, int postIndex,
+      {List<UserModel>? users}) {
+    if (data.isNotEmpty && controller.shouldShowPost(data)) {
+      if (data[NewsFeed.HIDE_USER] is List) {
+        final hideUserList = data[NewsFeed.HIDE_USER] as List;
+
+        if (!hideUserList.contains(userController.userModel.value.uid)) {
+          final newsFeedModel = NewsFeedModel.fromJson(data);
+
+          // Find matching users with null safety
+          UserModel? matchingUser;
+          UserModel? matchingUserShared;
+
+          if (users != null) {
+            try {
+              matchingUser =
+                  users.firstWhere((user) => user.uid == newsFeedModel.userId);
+            } catch (_) {}
+
+            if (newsFeedModel.shareUID != null) {
+              try {
+                matchingUserShared = users
+                    .firstWhere((user) => user.uid == newsFeedModel.shareUID);
+              } catch (_) {}
+            }
+          }
+
+          // Check if the user profile is blocked
+          if (userController.blockProfiles.contains(newsFeedModel.userId) ||
+              userController.blockProfiles.contains(newsFeedModel.shareUID)) {
+            return const SizedBox.shrink();
+          }
+
+          if (matchingUser == null) {
+            return const SizedBox.shrink();
+          }
+
+          // Build the appropriate post based on the original or shared post
+          return newsFeedModel.isOriginal!
+              ? ListTileContainer(
+                  key: ValueKey(newsFeedModel.id),
+                  data: newsFeedModel,
+                  userData: matchingUser,
+                )
+              : SharedPostComp(
+                  postUserData: matchingUser,
+                  shareUserData: matchingUserShared,
+                  key: ValueKey(newsFeedModel.shareID),
+                  data: newsFeedModel,
+                );
+        }
+      }
+    }
+
+    return const SizedBox.shrink();
   }
 
   Widget _buildContentofContainer() {
@@ -330,7 +284,7 @@ class _NewsFeedScreenState extends State<NewsFeedScreen>
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               isload
-                  ? CircularProgressIndicator()
+                  ? const CircularProgressIndicator()
                   : poppinsText('No Posts Found', 16, medium, appBlackColor),
             ],
           ),
@@ -368,7 +322,7 @@ class _NewsFeedScreenState extends State<NewsFeedScreen>
                 color: Colors.black.withOpacity(0.2), // Shadow color
                 spreadRadius: 1, // Spread radius
                 blurRadius: 5, // Blur radius
-                offset: Offset(0, 3), // Shadow position
+                offset: const Offset(0, 3), // Shadow position
               ),
             ],
           ),

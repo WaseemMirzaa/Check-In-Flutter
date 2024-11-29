@@ -166,7 +166,8 @@ class NewsFeedController extends GetxController {
 
     // Fetch the next batch of posts
     newsFeedService
-        .getMyPosts(FirebaseAuth.instance.currentUser?.uid ?? '', startAfter: userLastDoc)
+        .getMyPosts(FirebaseAuth.instance.currentUser?.uid ?? '',
+            startAfter: userLastDoc)
         .listen((postList) {
       if (postList.isNotEmpty) {
         userLastDoc = postList.last['snapshot'] as DocumentSnapshot;

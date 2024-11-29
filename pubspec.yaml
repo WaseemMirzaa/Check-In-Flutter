@@ -110,6 +110,7 @@ dependencies:
   google_maps_webservice: any
   video_player: any
   flutter_keyboard_visibility: any
+  shimmer: ^3.0.0
 dev_dependencies:
   flutter_test:
     sdk: flutter

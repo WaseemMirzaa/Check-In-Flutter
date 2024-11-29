@@ -6,6 +6,7 @@ import 'package:check_in/model/user_modal.dart';
 import 'package:check_in/ui/screens/Messages%20NavBar/other_profile/other_profile_view.dart';
 import 'package:check_in/ui/screens/News%20Feed%20NavBar/share_screen/share_screen.dart';
 import 'package:check_in/ui/screens/profile_screen.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:check_in/Services/newfeed_service.dart';
 import 'package:check_in/controllers/News%20Feed/news_feed_controller.dart';
@@ -27,6 +28,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 import 'package:loader_overlay/loader_overlay.dart';
 import 'package:nb_utils/nb_utils.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
@@ -79,6 +81,17 @@ class _ListTileContainerState extends State<ListTileContainer> {
   }
 
   RxBool isVisible = false.obs;
+
+  String _formatDateTime(Timestamp timestamp) {
+    // Convert Timestamp to DateTime
+    DateTime dateTime = timestamp.toDate();
+
+    // Format the DateTime object to 'dd/MM/yyyy hh:mma'
+    String formattedDate = DateFormat('dd/MM/yyyy hh:mma').format(dateTime);
+
+    // Return the formatted string in lowercase to ensure "am/pm" is in lowercase
+    return formattedDate.toLowerCase();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -453,6 +466,25 @@ class _ListTileContainerState extends State<ListTileContainer> {
                       ),
                     ),
                     verticalGap(15),
+
+                    //---------------------------------Date and Time---------------------------------
+
+                    // Padding(
+                    //   padding: const EdgeInsets.symmetric(horizontal: 10),
+                    //   child: Row(
+                    //     children: [
+                    //       poppinsText(
+                    //         _formatDateTime(widget.data!.timestamp!),
+                    //         11,
+                    //         medium,
+                    //         appDarkBlue,
+                    //       ),
+                    //     ],
+                    //   ),
+                    // ),
+                    // verticalGap(15),
+
+                    //---------------------------------Date and Time---------------------------------
 
                     Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 10),
