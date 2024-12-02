@@ -110,8 +110,8 @@ class _NewsFeedScreenState extends State<NewsFeedScreen>
                       return RefreshIndicator(
                         onRefresh: _handleRefresh,
                         child: CustomFirestorePagination(
-                          key: UniqueKey(),
-                          limit: 20, // Reduces initial pagination
+                          // key: UniqueKey(),
+                          limit: 200, // Reduces initial pagination
                           viewType: ViewType.list,
                           isLive: true,
                           initialLoader: _buildTopContainer(),
