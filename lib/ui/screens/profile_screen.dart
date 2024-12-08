@@ -253,7 +253,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     //turn this off if you don't see all posts
     //-----YOU NEED TO UNDERSTAND THIS METHOD IN ORDER TO UNDERSTAND THE FETCHING CODE
-    controller.getMyPosts();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      controller.getMyPosts();
+    });
 
     // Retrieve current user UID
     String? currentUserUid = FirebaseAuth.instance.currentUser?.uid;

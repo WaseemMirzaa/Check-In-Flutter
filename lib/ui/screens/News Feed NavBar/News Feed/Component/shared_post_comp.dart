@@ -8,6 +8,7 @@ import 'package:check_in/model/user_modal.dart';
 import 'package:check_in/ui/screens/Messages%20NavBar/other_profile/other_profile_view.dart';
 import 'package:check_in/ui/screens/News%20Feed%20NavBar/share_screen/share_screen.dart';
 import 'package:check_in/ui/screens/profile_screen.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:check_in/Services/newfeed_service.dart';
 import 'package:check_in/controllers/News%20Feed/news_feed_controller.dart';
@@ -20,6 +21,7 @@ import 'package:check_in/ui/screens/News%20Feed%20NavBar/News%20Feed/Component/v
 import 'package:check_in/ui/widgets/text_field.dart';
 import 'package:check_in/utils/loader.dart';
 import 'package:chewie/chewie.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:check_in/ui/widgets/custom_container.dart';
@@ -27,8 +29,10 @@ import 'package:check_in/utils/Constants/images.dart';
 import 'package:check_in/utils/colors.dart';
 import 'package:check_in/utils/gaps.dart';
 import 'package:check_in/utils/styles.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:nb_utils/nb_utils.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
 import 'package:share_plus/share_plus.dart';
@@ -45,7 +49,9 @@ class SharedPostComp extends StatefulWidget {
       {super.key,
       this.data,
       this.isMyProfile = false,
-      this.isOtherProfile = false, this.postUserData, this.shareUserData});
+      this.isOtherProfile = false,
+      this.postUserData,
+      this.shareUserData});
 
   UserModel? shareUserData;
   UserModel? postUserData;
@@ -64,22 +70,32 @@ class _SharedPostCompState extends State<SharedPostComp> {
 
   final userServices = UserServices();
 
-
   bool? playing;
-  
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    if(widget.postUserData == null || widget.shareUserData == null) {
+    if (widget.postUserData == null || widget.shareUserData == null) {
       Future.microtask(() async {
-      widget.postUserData = await userServices.getUserData(widget.data?.userId ?? "");
-      widget.shareUserData =
-          await userServices.getUserData(widget.data?.shareUID ?? "");
-      mounted ? setState(() {}) : null;
-    });
+        widget.postUserData =
+            await userServices.getUserData(widget.data?.userId ?? "");
+        widget.shareUserData =
+            await userServices.getUserData(widget.data?.shareUID ?? "");
+        mounted ? setState(() {}) : null;
+      });
     }
+  }
+
+  String _formatDateTime(Timestamp timestamp) {
+    // Convert Timestamp to DateTime
+    DateTime dateTime = timestamp.toDate();
+
+    // Format the DateTime object to 'dd/MM/yyyy hh:mma'
+    String formattedDate = DateFormat('dd/MM/yyyy hh:mma').format(dateTime);
+
+    // Return the formatted string in lowercase to ensure "am/pm" is in lowercase
+    return formattedDate.toLowerCase();
   }
 
   RxBool isVisible = false.obs;
@@ -146,12 +162,13 @@ class _SharedPostCompState extends State<SharedPostComp> {
                                 decoration: BoxDecoration(
                                     shape: BoxShape.circle,
                                     image: DecorationImage(
-                                        image: widget.shareUserData!
-                                                .photoUrl.isEmptyOrNull
+                                        image: widget.shareUserData!.photoUrl
+                                                .isEmptyOrNull
                                             ? NetworkImage(
                                                 AppImage.userImagePath)
-                                            : NetworkImage(
-                                            widget.shareUserData!.photoUrl ?? ''),
+                                            : NetworkImage(widget
+                                                    .shareUserData!.photoUrl ??
+                                                ''),
                                         fit: BoxFit.cover))),
                           ),
                           if (widget.shareUserData!.isVerified == null ||
@@ -213,8 +230,8 @@ class _SharedPostCompState extends State<SharedPostComp> {
                                                 uid: widget.data!.shareUID!));
                                   }
                                 },
-                          child: richText(
-                              widget.shareUserData!.userName ?? '', 'shared a post'),
+                          child: richText(widget.shareUserData!.userName ?? '',
+                              'shared a post'),
                         ),
                       ),
                       horizontalGap(5),
@@ -405,13 +422,15 @@ class _SharedPostCompState extends State<SharedPostComp> {
                                           decoration: BoxDecoration(
                                               shape: BoxShape.circle,
                                               image: DecorationImage(
-                                                  image: widget.postUserData!.photoUrl
+                                                  image: widget
+                                                          .postUserData!
+                                                          .photoUrl
                                                           .isEmptyOrNull
                                                       ? NetworkImage(AppImage
                                                           .userImagePath)
-                                                      : NetworkImage(
-                                                      widget.postUserData!
-                                                              .photoUrl!),
+                                                      : NetworkImage(widget
+                                                          .postUserData!
+                                                          .photoUrl!),
                                                   fit: BoxFit.cover)))),
                                   if (widget.postUserData!.isVerified == null ||
                                       widget.postUserData!.isVerified == true)
@@ -618,6 +637,26 @@ class _SharedPostCompState extends State<SharedPostComp> {
                           ),
                         ),
                         verticalGap(15),
+
+                        //---------------------------------Date and Time---------------------------------
+
+                        // Padding(
+                        //   padding: const EdgeInsets.symmetric(horizontal: 10),
+                        //   child: Row(
+                        //     children: [
+                        //       poppinsText(
+                        //         _formatDateTime(widget.data!.timestamp!),
+                        //         11,
+                        //         medium,
+                        //         appDarkBlue,
+                        //       ),
+                        //     ],
+                        //   ),
+                        // ),
+                        // verticalGap(15),
+
+                        //---------------------------------Date and Time---------------------------------
+
                         Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 10),
                             child: StreamBuilder(
