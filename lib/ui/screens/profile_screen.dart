@@ -26,7 +26,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:nb_utils/nb_utils.dart' as nbutils;
 import 'package:percent_indicator/circular_percent_indicator.dart';
-import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
+import 'package:persistent_bottom_nav_bar_v2/persistent_bottom_nav_bar_v2.dart';
 // import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:sizer/sizer.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -1010,7 +1010,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                             5.0),
                                                     child: InkWell(
                                                       onTap: () {
-                                                        pushNewScreen(context,
+                                                        pushScreen(context,
                                                             screen:
                                                                 const AddHomeCourt(),
                                                             withNavBar: false);
@@ -1623,7 +1623,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           padding: const EdgeInsets.all(5.0),
                           child: InkWell(
                             onTap: () {
-                              pushNewScreen(context,
+                              pushScreen(context,
                                   screen: const AddHomeCourt(),
                                   withNavBar: false);
                             },

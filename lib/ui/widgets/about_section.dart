@@ -3,7 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:nb_utils/nb_utils.dart' hide greenColor, blackColor, whiteColor;
-import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
+import 'package:persistent_bottom_nav_bar_v2/persistent_bottom_nav_bar_v2.dart';
 import 'package:sizer/sizer.dart';
 import '../../controllers/user_controller.dart';
 import '../../core/constant/app_assets.dart';
@@ -16,7 +16,8 @@ import '../screens/add_home_court.dart';
 
 class AboutSection extends StatefulWidget {
   final UserController userController;
-  const AboutSection({Key? key, required this.userController}) : super(key: key);
+  const AboutSection({Key? key, required this.userController})
+      : super(key: key);
 
   @override
   State<AboutSection> createState() => _AboutSectionState();
@@ -52,15 +53,18 @@ class _AboutSectionState extends State<AboutSection> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   poppinsText(
-                      (widget.userController.userModel.value.homeCourt.isEmptyOrNull)
+                      (widget.userController.userModel.value.homeCourt
+                              .isEmptyOrNull)
                           ? ""
-                          : widget.userController.userModel.value.homeCourt ?? "",
+                          : widget.userController.userModel.value.homeCourt ??
+                              "",
                       14,
                       semiBold,
                       appBlackColor),
                   InkWell(
                     onTap: () {
-                      pushNewScreen(context, screen: const AddHomeCourt(), withNavBar: false);
+                      pushScreen(context,
+                          screen: const AddHomeCourt(), withNavBar: false);
                     },
                     child: SizedBox(
                       height: 2.3.h,
@@ -92,7 +96,9 @@ class _AboutSectionState extends State<AboutSection> {
               // height: 30.h,
               decoration: BoxDecoration(
                 color: appWhiteColor,
-                borderRadius: const BorderRadius.only(topLeft: Radius.circular(10), topRight: Radius.circular(10)),
+                borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(10),
+                    topRight: Radius.circular(10)),
                 boxShadow: [
                   BoxShadow(
                     color: greyColor.withOpacity(0.2),
@@ -109,7 +115,9 @@ class _AboutSectionState extends State<AboutSection> {
                     height: 0.5.h,
                     decoration: BoxDecoration(
                         color: appGreenColor,
-                        borderRadius: const BorderRadius.only(bottomLeft: Radius.circular(5), bottomRight: Radius.circular(5))),
+                        borderRadius: const BorderRadius.only(
+                            bottomLeft: Radius.circular(5),
+                            bottomRight: Radius.circular(5))),
                   ),
                   SizedBox(
                     height: 2.h,
@@ -117,7 +125,8 @@ class _AboutSectionState extends State<AboutSection> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      poppinsText(TempLanguage.aboutMe, 14, semiBold, appBlackColor),
+                      poppinsText(
+                          TempLanguage.aboutMe, 14, semiBold, appBlackColor),
                       InkWell(
                         onTap: () => setState(() {
                           if (tapped) {
@@ -125,8 +134,10 @@ class _AboutSectionState extends State<AboutSection> {
                               // userController.userModel.value.
                               //..........
                               aboutMe = aboutMeController.text;
-                              widget.userController.userModel.value.aboutMe = aboutMe;
-                              FirebaseFirestore.instance.collection(Collections.USER)
+                              widget.userController.userModel.value.aboutMe =
+                                  aboutMe;
+                              FirebaseFirestore.instance
+                                  .collection(Collections.USER)
                                   .doc(FirebaseAuth.instance.currentUser!.uid)
                                   .update({UserKey.ABOUT_ME: aboutMe});
                             });
@@ -136,7 +147,8 @@ class _AboutSectionState extends State<AboutSection> {
                         child: Padding(
                             padding: const EdgeInsets.only(left: 8),
                             child: tapped
-                                ? poppinsText(TempLanguage.save, 14, semiBold, appGreenColor)
+                                ? poppinsText(TempLanguage.save, 14, semiBold,
+                                    appGreenColor)
                                 : const ImageIcon(
                                     AssetImage(
                                       AppAssets.EDIT_ICON,
@@ -161,7 +173,11 @@ class _AboutSectionState extends State<AboutSection> {
                       //       .update({UserKey.ABOUT_ME: aboutMe});
                       // });
                     },
-                    maxLines: widget.userController.userModel.value.isVerified == false ? 3 : 5,
+                    maxLines:
+                        widget.userController.userModel.value.isVerified ==
+                                false
+                            ? 3
+                            : 5,
                     onChanged: (val) {},
                     decoration: InputDecoration(
                         border: InputBorder.none,
@@ -172,7 +188,10 @@ class _AboutSectionState extends State<AboutSection> {
                         focusedBorder: InputBorder.none,
                         focusedErrorBorder: InputBorder.none,
                         hintText: TempLanguage.tellUsAboutGame,
-                        helperStyle: GoogleFonts.poppins(fontSize: 14, fontWeight: regular, color: silverColor)),
+                        helperStyle: GoogleFonts.poppins(
+                            fontSize: 14,
+                            fontWeight: regular,
+                            color: silverColor)),
                   ),
                   // verticalGap(20),
                   Container(

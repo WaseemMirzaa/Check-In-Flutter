@@ -13,6 +13,7 @@ import 'package:check_in/ui/screens/contact_us.dart';
 import 'package:check_in/ui/screens/persistent_nav_bar.dart';
 import 'package:check_in/ui/screens/privacy_policy.dart';
 import 'package:check_in/ui/screens/start.dart';
+import 'package:flutter_google_places_hoc081098/google_maps_webservice_places.dart';
 import 'package:nb_utils/nb_utils.dart' as nbutils;
 import 'package:check_in/ui/screens/terms_conditions.dart';
 import 'package:check_in/ui/widgets/common_button.dart';
@@ -21,6 +22,7 @@ import 'package:check_in/utils/colors.dart';
 import 'package:check_in/utils/styles.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:persistent_bottom_nav_bar_v2/persistent_bottom_nav_bar_v2.dart';
 import '../../tracking_status_service.dart';
 import '../../utils/custom/custom_type_ahead.dart';
 import 'package:geolocator/geolocator.dart';
@@ -28,9 +30,7 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:google_maps_webservice/places.dart';
 import 'package:nb_utils/nb_utils.dart';
-import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../constants.dart';
 import '../../controllers/user_controller.dart';
@@ -40,6 +40,7 @@ import 'Players.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
+
 class CheckIn extends StatefulWidget {
   const CheckIn({Key? key}) : super(key: key);
 
@@ -66,8 +67,9 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
   final auth = FirebaseAuth.instance;
   final snap = FirebaseFirestore.instance;
 
-  DocumentReference docRef =
-      FirebaseFirestore.instance.collection(Collections.USER).doc(FirebaseAuth.instance.currentUser?.uid);
+  DocumentReference docRef = FirebaseFirestore.instance
+      .collection(Collections.USER)
+      .doc(FirebaseAuth.instance.currentUser?.uid);
 
   LatLng? loc;
 
@@ -106,8 +108,9 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
 
   Future indexValue() async {
     if (FirebaseAuth.instance.currentUser != null) {
-      final document =
-          FirebaseFirestore.instance.collection(Collections.USER).doc(FirebaseAuth.instance.currentUser!.uid);
+      final document = FirebaseFirestore.instance
+          .collection(Collections.USER)
+          .doc(FirebaseAuth.instance.currentUser!.uid);
       document.get().then((DocumentSnapshot snapshot) {
         if (snapshot.exists) {
           dynamic data = snapshot.data();
@@ -141,7 +144,18 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
 
   Future<Position?> getCurrentLocation() async {
     try {
-      Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+      LocationPermission permission;
+      permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+        if (permission == LocationPermission.denied) {
+          return Future.error('Location permissions are denied');
+        }
+      }
+      Position position = await Geolocator.getCurrentPosition(
+          locationSettings: LocationSettings(
+        accuracy: LocationAccuracy.high,
+      ));
       // courtNames();
       // print(currentLocation?.longitude);
       if (mounted) {
@@ -149,38 +163,43 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
           currentLocation = position;
           courtNames();
         });
+        return Future.value(currentLocation);
       }
     } catch (e) {
       log('Enable location');
       nbutils.toast('Enable your location');
     }
-
-    return Future.value(currentLocation);
   }
 
   Future courtNames() async {
     // Golden Location
     try {
       if (courtlist.isEmpty) {
-        await snap.collection(Collections.GOLDEN_LOCATIONS).get().then((querySnapshot) {
+        await snap
+            .collection(Collections.GOLDEN_LOCATIONS)
+            .get()
+            .then((querySnapshot) {
           for (var doc in querySnapshot.docs) {
             courtlist.add(doc.data());
             double latitude = doc.data()[CourtKey.LAT];
             double longitude = doc.data()[CourtKey.LNG];
             String name = doc.data()[CourtKey.NAME];
+            String courtId = doc.data()[CourtKey.ID].toString();
 
             LatLng location = LatLng(latitude, longitude);
             Marker marker = Marker(
               markerId: MarkerId(doc.id),
               position: location,
               infoWindow: InfoWindow(title: name, snippet: CourtKey.GOLDEN),
-              icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueYellow),
+              icon: BitmapDescriptor.defaultMarkerWithHue(
+                  BitmapDescriptor.hueYellow),
               onTap: () {
-                pushNewScreen(context,
+                pushScreen(context,
                     screen: PlayersView(
                       courtLatLng: location,
                       courtName: name,
                       isCheckedIn: checkedInCourtName == name,
+                      courtId: courtId,
                     ),
                     withNavBar: false);
               },
@@ -195,19 +214,22 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
           double latitude = doc[CourtKey.LAT];
           double longitude = doc[CourtKey.LNG];
           String name = doc[CourtKey.NAME];
+          String courtId = doc[CourtKey.ID].toString();
 
           LatLng location = LatLng(latitude, longitude);
           Marker marker = Marker(
-            markerId: MarkerId(doc[CourtKey.ID].toString()),
+            markerId: MarkerId(courtId),
             position: location,
             infoWindow: InfoWindow(title: name, snippet: CourtKey.GOLDEN),
-            icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueYellow),
+            icon: BitmapDescriptor.defaultMarkerWithHue(
+                BitmapDescriptor.hueYellow),
             onTap: () {
-              pushNewScreen(context,
+              pushScreen(context,
                   screen: PlayersView(
                     courtLatLng: location,
                     courtName: name,
                     isCheckedIn: checkedInCourtName == name,
+                    courtId: courtId,
                   ),
                   withNavBar: false);
             },
@@ -259,12 +281,13 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
         ),
         // icon: icon,
         onTap: () {
-          pushNewScreen(
+          pushScreen(
             context,
             screen: PlayersView(
               courtLatLng: location,
               courtName: place.title,
               isCheckedIn: checkedInCourtName == place.title,
+              courtId: place.placeId,
             ),
             withNavBar: false,
           );
@@ -284,8 +307,8 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
 
   Future<PlacesSearchResponse?> getBasketballCourts() async {
     final apiKey = Constants.API_KEY;
-    final url =
-        Uri.parse('https://maps.googleapis.com/maps/api/place/textsearch/json?query=basketball+courts&key=$apiKey');
+    final url = Uri.parse(
+        'https://maps.googleapis.com/maps/api/place/textsearch/json?query=basketball+courts&key=$apiKey');
     final response = await http.get(url);
 
     if (response.statusCode == 200) {
@@ -394,15 +417,19 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
 
   void addLocationChangeListener() {
     // Configure the location callback
-    var locationOptions = const LocationOptions(
+    var locationOptions = const LocationSettings(
       accuracy: LocationAccuracy.best,
-      distanceFilter: 10, // Minimum distance (in meters) for location change updates
+      distanceFilter:
+          10, // Minimum distance (in meters) for location change updates
     );
 
     // Listen for location changes
     _positionStreamSubscription = Geolocator.getPositionStream(
-      desiredAccuracy: LocationAccuracy.best,
-      distanceFilter: 10, // Minimum distance (in meters) for location change updates
+      locationSettings: AndroidSettings(
+        accuracy: LocationAccuracy.best,
+        distanceFilter:
+            10, // Minimum distance (in meters) for location change updates
+      ),
     ).listen((Position position) {
       if (mounted) {
         setState(() {
@@ -414,8 +441,8 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
   }
 
   bool _checkIfWithinRadius(Position userPos, LatLng court) {
-    double distanceInMeters =
-        Geolocator.distanceBetween(userPos.latitude, userPos.longitude, court.latitude, court.longitude);
+    double distanceInMeters = Geolocator.distanceBetween(
+        userPos.latitude, userPos.longitude, court.latitude, court.longitude);
     if (distanceInMeters <= 100) {
       // print("user in radius");
       return true;
@@ -504,12 +531,19 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
     // return Future.value(withinRadius);
   }
 
-  Future<bool> isCourtAlreadyStored(double currentCourtLat, double currentCourtLng) async {
-    DocumentSnapshot userDoc = await snap.collection(Collections.USER).doc(auth.currentUser!.uid).get();
-    List<dynamic> checkedCourts = (userDoc.data() as Map<String, dynamic>?)?[CourtKey.CHECKED_COURTS] ?? [];
+  Future<bool> isCourtAlreadyStored(
+      double currentCourtLat, double currentCourtLng) async {
+    DocumentSnapshot userDoc = await snap
+        .collection(Collections.USER)
+        .doc(auth.currentUser!.uid)
+        .get();
+    List<dynamic> checkedCourts =
+        (userDoc.data() as Map<String, dynamic>?)?[CourtKey.CHECKED_COURTS] ??
+            [];
     // Check if the coordinates are already present in the array
-    if (checkedCourts
-        .any((court) => court[CourtKey.COURT_LAT] == currentCourtLat && court[CourtKey.COURT_LNG] == currentCourtLng)) {
+    if (checkedCourts.any((court) =>
+        court[CourtKey.COURT_LAT] == currentCourtLat &&
+        court[CourtKey.COURT_LNG] == currentCourtLng)) {
       return false;
     } else {
       return true;
@@ -523,7 +557,8 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
     if (index == 1) {
       if (mounted) {
         setState(() {
-          courtInfo['checkInTime'] = DateFormat('HH:mm:ss').format(DateTime.now());
+          courtInfo['checkInTime'] =
+              DateFormat('HH:mm:ss').format(DateTime.now());
           courtInfo[CheckedCourts.checkInTimeStamp] = Timestamp.now();
 
           checkedInCourtName = courtInfo['courtName'];
@@ -552,7 +587,10 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
       }
 
       Get.snackbar("Checked In", "You have checked into this court.",
-          backgroundColor: appWhiteColor, borderWidth: 4, borderColor: appBlackColor, colorText: appBlackColor);
+          backgroundColor: appWhiteColor,
+          borderWidth: 4,
+          borderColor: appBlackColor,
+          colorText: appBlackColor);
       // print(index);
       // print(withinRadius);
     }
@@ -568,8 +606,12 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
 
       checkedInCourtName = '';
 
-      Get.snackbar(TempLanguage.checkOutToastTitle, TempLanguage.checkOutToastMessage,
-          backgroundColor: appWhiteColor, borderWidth: 4, borderColor: appBlackColor, colorText: appBlackColor);
+      Get.snackbar(
+          TempLanguage.checkOutToastTitle, TempLanguage.checkOutToastMessage,
+          backgroundColor: appWhiteColor,
+          borderWidth: 4,
+          borderColor: appBlackColor,
+          colorText: appBlackColor);
     }
   }
 
@@ -588,7 +630,8 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
           .collection(Collections.USER)
           .doc(FirebaseAuth.instance.currentUser?.uid ?? "")
           .get();
-      userController.userModel.value = UserModel.fromMap(snapshot.data() as Map<String, dynamic>);
+      userController.userModel.value =
+          UserModel.fromMap(snapshot.data() as Map<String, dynamic>);
       print(userController.userModel.value);
     }
     // UserModel currentUser = UserModel.fromMap(snapshot.data() as Map<String, dynamic>);
@@ -606,8 +649,11 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
     // initDynamicLinks(context);
     WidgetsFlutterBinding.ensureInitialized().addPostFrameCallback((timeStamp) {
       initTracking();
-      if (FirebaseAuth.instance.currentUser != null && userController.userModel.value.isTermsVerified == null) {
-        Get.to(const TermsAndConditions(showButtons: true,));
+      if (FirebaseAuth.instance.currentUser != null &&
+          userController.userModel.value.isTermsVerified == null) {
+        Get.to(const TermsAndConditions(
+          showButtons: true,
+        ));
       }
     });
   }
@@ -615,8 +661,8 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
   // Platform messages are asynchronous, so we initialize in an async method.
   Future<void> initTracking() async {
     final TrackingStatus status =
-    await AppTrackingTransparency.trackingAuthorizationStatus;
-    setState(()=>{});
+        await AppTrackingTransparency.trackingAuthorizationStatus;
+    setState(() => {});
     // If the system can show an authorization request dialog
     if (status == TrackingStatus.notDetermined) {
       // Show a custom explainer dialog before the system dialog
@@ -625,8 +671,8 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
       await Future.delayed(const Duration(milliseconds: 200));
       // Request system's tracking authorization dialog
       final TrackingStatus status =
-      await AppTrackingTransparency.requestTrackingAuthorization();
-      setState(()=>{});
+          await AppTrackingTransparency.requestTrackingAuthorization();
+      setState(() => {});
     }
 
     final uuid = await AppTrackingTransparency.getAdvertisingIdentifier();
@@ -704,7 +750,8 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
                 ),
                 title: Text(TempLanguage.contactUs),
                 onTap: () {
-                  pushNewScreen(context, screen: const ContactUs(), withNavBar: false);
+                  pushScreen(context,
+                      screen: const ContactUs(), withNavBar: false);
                 },
               ),
               ListTile(
@@ -713,7 +760,8 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
                 ),
                 title: Text(TempLanguage.privacyPolicy),
                 onTap: () {
-                  pushNewScreen(context, screen: const PrivacyPolicy(), withNavBar: false);
+                  pushScreen(context,
+                      screen: const PrivacyPolicy(), withNavBar: false);
                 },
               ),
               ListTile(
@@ -722,7 +770,8 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
                 ),
                 title: Text(TempLanguage.termsAndConditions),
                 onTap: () {
-                  pushNewScreen(context, screen: const TermsAndConditions(), withNavBar: false);
+                  pushScreen(context,
+                      screen: const TermsAndConditions(), withNavBar: false);
                 },
               ),
               FirebaseAuth.instance.currentUser == null
@@ -736,35 +785,46 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
                           ),
                           title: Text(TempLanguage.verifyProfile),
                           onTap: () async {
-                            nbutils.showConfirmDialogCustom(
-                              context,
-                              title: 'Get Verified on Check In Hoops Today! \n- 1 Time Purchase',
-                              subTitle: '',
-                              dialogType: nbutils.DialogType.CONFIRMATION,
-                              cancelable: false,
-                              onAccept: (ctx) async {
-                                Navigator.pop(ctx);
-                                showLoadingIndicator(context);
-                                if (userController.userModel.value.isVerified == false) {
-                                  if (userController.userModel.value.customerId.isEmptyOrNull) {
-                                    try {
-                                      String customerId = await PaymentService.createStripeCustomer(email: userController.userModel.value.email ?? '');
-                                      // await FirebaseFirestore.instance.collection(Collections.USER).doc(FirebaseAuth.instance.currentUser!.uid).update({
-                                      //   UserKey.CUSTOMER_ID: customerId
-                                      // });
-                                      await PaymentService.initPaymentSheet(context: context, amount: 1000, customerId: customerId);
-                                    } catch (e) {
-                                      log(e.toString());
-                                    }
-                                  } else {
-                                    await PaymentService.initPaymentSheet(context: context, amount: 1000, customerId: userController.userModel.value.customerId ?? '');
+                            nbutils.showConfirmDialogCustom(context,
+                                title:
+                                    'Get Verified on Check In Hoops Today! \n- 1 Time Purchase',
+                                subTitle: '',
+                                dialogType: nbutils.DialogType.CONFIRMATION,
+                                cancelable: false, onAccept: (ctx) async {
+                              Navigator.pop(ctx);
+                              showLoadingIndicator(context);
+                              if (userController.userModel.value.isVerified ==
+                                  false) {
+                                if (userController
+                                    .userModel.value.customerId.isEmptyOrNull) {
+                                  try {
+                                    String customerId = await PaymentService
+                                        .createStripeCustomer(
+                                            email: userController
+                                                    .userModel.value.email ??
+                                                '');
+                                    // await FirebaseFirestore.instance.collection(Collections.USER).doc(FirebaseAuth.instance.currentUser!.uid).update({
+                                    //   UserKey.CUSTOMER_ID: customerId
+                                    // });
+                                    await PaymentService.initPaymentSheet(
+                                        context: context,
+                                        amount: 1000,
+                                        customerId: customerId);
+                                  } catch (e) {
+                                    log(e.toString());
                                   }
+                                } else {
+                                  await PaymentService.initPaymentSheet(
+                                      context: context,
+                                      amount: 1000,
+                                      customerId: userController
+                                              .userModel.value.customerId ??
+                                          '');
                                 }
-                              },
-                              onCancel: (ctx){
-                                Navigator.pop(ctx);
                               }
-                            );
+                            }, onCancel: (ctx) {
+                              Navigator.pop(ctx);
+                            });
                             // sendEmail(
                             //     userController.userModel.value.userName ?? "",
                             //     userController.userModel.value.email ?? "",
@@ -816,7 +876,8 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
 
                         // tileOverlays: ,
                         initialCameraPosition: CameraPosition(
-                          target: LatLng(currentLocation!.latitude, currentLocation!.longitude
+                          target: LatLng(currentLocation!.latitude,
+                              currentLocation!.longitude
                               // 42.3878,
                               // -71.1105
                               ),
@@ -874,11 +935,12 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
                               maxIntensity: 1,
                               // Radius behaves differently on web and Android/iOS.
                               // For Android: According to documentation, radius should be between 10 to 50
-                              radius: kIsWeb
+                              radius: HeatmapRadius.fromPixels(kIsWeb
                                   ? 10
-                                  : defaultTargetPlatform == TargetPlatform.android
+                                  : defaultTargetPlatform ==
+                                          TargetPlatform.android
                                       ? heatMapRadius.value
-                                      : heatMapRadius.value,
+                                      : heatMapRadius.value),
                             )
                           }),
               ),
@@ -922,7 +984,10 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
                                 // Get.offAll(CheckIn());
                                 //....................
                                 Navigator.pushAndRemoveUntil(
-                                    context, MaterialPageRoute(builder: (context) => const Home()), (route) => false);
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => const Home()),
+                                    (route) => false);
                                 //...................
                                 // setState(() {});
                                 // Navigator.pushReplacement(
@@ -972,7 +1037,10 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
                                     focusedErrorBorder: InputBorder.none,
                                     fillColor: appWhiteColor,
                                     hintText: TempLanguage.findCourts,
-                                    hintStyle: GoogleFonts.poppins(fontSize: 12, fontWeight: medium, color: greyColor),
+                                    hintStyle: GoogleFonts.poppins(
+                                        fontSize: 12,
+                                        fontWeight: medium,
+                                        color: greyColor),
                                     suffixIcon: Row(
                                       mainAxisAlignment: MainAxisAlignment.end,
                                       mainAxisSize: MainAxisSize.min,
@@ -997,7 +1065,9 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
                                   if (currentLocation == null) {
                                     return [];
                                   }
-                                  final courts = await CourtsParser().getCourtsByNameOrAddressFromCSVFile(pattern);
+                                  final courts = await CourtsParser()
+                                      .getCourtsByNameOrAddressFromCSVFile(
+                                          pattern);
 
                                   // final placesResponse =
                                   //     await _places.searchNearbyWithRadius(
@@ -1022,7 +1092,8 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
                                 onSuggestionSelected: (prediction) async {
                                   mounted
                                       ? setState(() {
-                                          _selectedPlace = prediction.title as String;
+                                          _selectedPlace =
+                                              prediction.title as String;
                                         })
                                       : null;
                                   typeAheadController.text = _selectedPlace;
@@ -1035,7 +1106,8 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
                                   var lat = prediction.latitude;
                                   var lng = prediction.longitude;
 
-                                  final GoogleMapController controller = await _googleMapController.future;
+                                  final GoogleMapController controller =
+                                      await _googleMapController.future;
                                   controller.animateCamera(
                                     CameraUpdate.newCameraPosition(
                                       CameraPosition(
@@ -1058,12 +1130,14 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
                                     ),
                                     // icon: icon,
                                     onTap: () {
-                                      pushNewScreen(
+                                      pushScreen(
                                         context,
                                         screen: PlayersView(
                                           courtLatLng: location,
                                           courtName: prediction.title,
-                                          isCheckedIn: checkedInCourtName == prediction.title,
+                                          isCheckedIn: checkedInCourtName ==
+                                              prediction.title,
+                                          courtId: prediction.placeId,
                                         ),
                                         withNavBar: false,
                                       );
@@ -1084,7 +1158,8 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
                                     mounted ? setState(() {}) : null;
                                   }
                                 },
-                                transitionBuilder: (context, suggestionsBox, controller) {
+                                transitionBuilder:
+                                    (context, suggestionsBox, controller) {
                                   return suggestionsBox;
                                 },
                               ),
@@ -1094,18 +1169,26 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
                       ],
                     ),
                     Padding(
-                      padding: const EdgeInsets.only(left: 40, right: 40, bottom: 10),
-                      child: fullWidthButton(index == 0 ? TempLanguage.checkIn : TempLanguage.checkOut, () {
+                      padding: const EdgeInsets.only(
+                          left: 40, right: 40, bottom: 10),
+                      child: fullWidthButton(
+                          index == 0
+                              ? TempLanguage.checkIn
+                              : TempLanguage.checkOut, () {
                         if (FirebaseAuth.instance.currentUser == null) {
                           showDialog(
                               context: context,
                               builder: (context) => AlertDialog(
-                                    title:
-                                        poppinsText(TempLanguage.logInForFeatures, 16, FontWeight.w500, appBlackColor),
+                                    title: poppinsText(
+                                        TempLanguage.logInForFeatures,
+                                        16,
+                                        FontWeight.w500,
+                                        appBlackColor),
                                     actions: [
                                       TextButton(
                                         onPressed: () {
-                                          Get.off(() => StartView(isBack: true));
+                                          Get.off(
+                                              () => StartView(isBack: true));
                                         },
                                         child: Text(TempLanguage.logIn),
                                       ),
@@ -1120,7 +1203,8 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
                         } else {
                           withinRadius == true || index == 1
                               ? _buttonPress()
-                              : Get.snackbar(TempLanguage.notAtCourtToastTitle, TempLanguage.notAtCourtToastMessage,
+                              : Get.snackbar(TempLanguage.notAtCourtToastTitle,
+                                  TempLanguage.notAtCourtToastMessage,
                                   backgroundColor: appWhiteColor,
                                   borderWidth: 4,
                                   borderColor: appBlackColor,

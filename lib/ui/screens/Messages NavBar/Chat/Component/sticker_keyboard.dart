@@ -20,20 +20,27 @@ class StickerKeyboard extends StatelessWidget {
           onBackspacePressed: () {},
           textEditingController: controller,
           config: Config(
-              columns: 7,
-              emojiSizeMax: 25 * (foundation.defaultTargetPlatform == TargetPlatform.iOS ? 1.30 : 1.0),
-              recentsLimit: 30,
-              noRecents: Text(
-                TempLanguage.noRecent,
-                style: const TextStyle(fontSize: 20, color: Colors.black26),
-                textAlign: TextAlign.center,
+              emojiViewConfig: EmojiViewConfig(
+                columns: 7,
+                emojiSizeMax: 25 *
+                    (foundation.defaultTargetPlatform == TargetPlatform.iOS
+                        ? 1.30
+                        : 1.0),
+                recentsLimit: 30,
+                noRecents: Text(
+                  TempLanguage.noRecent,
+                  style: const TextStyle(fontSize: 20, color: Colors.black26),
+                  textAlign: TextAlign.center,
+                ),
+                loadingIndicator: const SizedBox.shrink(),
               ),
-              loadingIndicator: const SizedBox.shrink(),
-              tabIndicatorAnimDuration: kTabScrollDuration,
-              categoryIcons: const CategoryIcons(),
-              checkPlatformCompatibility: true,
-              iconColorSelected: appGreenColor,
-              backspaceColor: appGreenColor),
+              categoryViewConfig: CategoryViewConfig(
+                tabIndicatorAnimDuration: kTabScrollDuration,
+                categoryIcons: const CategoryIcons(),
+                iconColorSelected: appGreenColor,
+                backspaceColor: appGreenColor,
+              ),
+              checkPlatformCompatibility: true),
         ));
   }
 }

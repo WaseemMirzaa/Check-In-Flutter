@@ -2,7 +2,7 @@ import 'package:check_in/core/constant/temp_language.dart';
 import 'package:check_in/ui/screens/Messages%20NavBar/New%20Message/new_message.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
+import 'package:persistent_bottom_nav_bar_v2/persistent_bottom_nav_bar_v2.dart';
 
 import '../../../../../utils/Constants/images.dart';
 import '../../../../../utils/colors.dart';
@@ -27,7 +27,7 @@ class MessageAppBar extends StatelessWidget implements PreferredSizeWidget {
           padding: const EdgeInsets.only(right: 20.0),
           child: GestureDetector(
             onTap: () {
-              pushNewScreen(context, screen: const NewMessageScreen());
+              pushScreen(context, screen: const NewMessageScreen());
             },
             child: Image.asset(
               AppImage.addPeople,

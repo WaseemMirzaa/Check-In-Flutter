@@ -21,7 +21,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:nb_utils/nb_utils.dart';
-import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
+import 'package:persistent_bottom_nav_bar_v2/persistent_bottom_nav_bar_v2.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../../../model/Message and Group Message Model/message_model.dart';
@@ -105,14 +105,14 @@ class _ChatScreenState extends State<ChatScreen> {
               title: GestureDetector(
             onTap: controller.isgroup
                 ? () {
-                    pushNewScreen(context,
+                    pushScreen(context,
                         screen: EditGroupDetails(
                           docId: controller.docId.value,
                           // members: controller.memberId,
                         )).then((_) => null);
                   }
                 : () {
-                    pushNewScreen(context,
+                    pushScreen(context,
                         screen: OtherProfileView(
                             uid: controller.otherUserId.value));
                   },

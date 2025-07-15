@@ -91,7 +91,8 @@ class CourtsParser {
     return filteredLocations;
   }
 
-  Future<List<CourtModel>> getCourtsByNameOrAddressFromCSVFile(String search) async {
+  Future<List<CourtModel>> getCourtsByNameOrAddressFromCSVFile(
+      String search) async {
     final List<CourtModel> filteredLocations = [];
 
     try {
@@ -150,8 +151,8 @@ class CourtsParser {
   }
 
   bool checkIfWithinRadius(Position userPos, LatLng court) {
-    double distanceInMeters =
-        Geolocator.distanceBetween(userPos.latitude, userPos.longitude, court.latitude, court.longitude);
+    double distanceInMeters = Geolocator.distanceBetween(
+        userPos.latitude, userPos.longitude, court.latitude, court.longitude);
     if (distanceInMeters <= 50000) {
       print("user in radius");
       return true;
@@ -162,19 +163,17 @@ class CourtsParser {
   }
 
   Future<Position> getCurrentLocation() async {
-    final geolocator = Geolocator();
-    const locationOptions = LocationOptions(
-      accuracy: LocationAccuracy.best,
-      distanceFilter: 10, // Minimum distance for location updates (in meters)
-    );
-
     final permission = await Geolocator.requestPermission();
-    if (permission != LocationPermission.whileInUse && permission != LocationPermission.always) {
+    if (permission != LocationPermission.whileInUse &&
+        permission != LocationPermission.always) {
       throw Exception('Location permission denied');
     }
 
     final currentLocation = await Geolocator.getCurrentPosition(
-      desiredAccuracy: LocationAccuracy.best,
+      locationSettings: const LocationSettings(
+        accuracy: LocationAccuracy.best,
+        distanceFilter: 10, // Minimum distance for location updates (in meters)
+      ),
     );
 
     return currentLocation;

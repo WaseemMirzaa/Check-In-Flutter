@@ -1,4 +1,3 @@
-
 import 'package:check_in/Services/newfeed_service.dart';
 import 'package:check_in/controllers/News%20Feed/news_feed_controller.dart';
 import 'package:check_in/controllers/user_controller.dart';
@@ -14,21 +13,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:nb_utils/nb_utils.dart';
-import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
+import 'package:persistent_bottom_nav_bar_v2/persistent_bottom_nav_bar_v2.dart';
 import 'package:sizer/sizer.dart';
 import 'package:check_in/Services/user_services.dart';
 
 class TopContainer extends GetView<NewsFeedController> {
-
-  TopContainer({super.key, this.onWriteSomethingTap, this.onPhotoTap, this.onVideoTap});
+  TopContainer(
+      {super.key, this.onWriteSomethingTap, this.onPhotoTap, this.onVideoTap});
   final Function()? onWriteSomethingTap;
   final Function(String)? onPhotoTap;
   final Function(String)? onVideoTap;
 
-
   UserController userController = Get.put(UserController(UserServices()));
-  NewsFeedController newsFeedController = Get.put(NewsFeedController(NewsFeedService()));
-
+  NewsFeedController newsFeedController =
+      Get.put(NewsFeedController(NewsFeedService()));
 
   @override
   Widget build(BuildContext context) {
@@ -43,27 +41,37 @@ class TopContainer extends GetView<NewsFeedController> {
                 alignment: Alignment.bottomRight,
                 children: [
                   GestureDetector(
-                    onTap: (){
-                      pushNewScreen(context, screen: ProfileScreen(isNavBar: false,));
+                    onTap: () {
+                      pushScreen(context,
+                          screen: ProfileScreen(
+                            isNavBar: false,
+                          ));
                     },
-                    child: (userController.userModel.value.photoUrl == null || !userController.userModel.value.photoUrl.isEmptyOrNull)
+                    child: (userController.userModel.value.photoUrl == null ||
+                            !userController
+                                .userModel.value.photoUrl.isEmptyOrNull)
                         ? Container(
-                        height: 5.8.h,
-                        width: 5.8.h,
-                        decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            image: DecorationImage(
-                              // image:  AssetImage(AppAssets.LOGO_NEW), fit: BoxFit.fill)))
-                                 image: NetworkImage(userController.userModel.value.photoUrl ?? ''), fit: BoxFit.fill)))
+                            height: 5.8.h,
+                            width: 5.8.h,
+                            decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                image: DecorationImage(
+                                    // image:  AssetImage(AppAssets.LOGO_NEW), fit: BoxFit.fill)))
+                                    image: NetworkImage(userController
+                                            .userModel.value.photoUrl ??
+                                        ''),
+                                    fit: BoxFit.fill)))
                         : Container(
-                      height: 5.8.h,
-                      width: 5.8.h,
-                      decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          border: Border.all(width: 2, color: appGreenColor),
-                          image: const DecorationImage(
-                              image: AssetImage(AppAssets.LOGO_NEW), fit: BoxFit.fill)),
-                    ),
+                            height: 5.8.h,
+                            width: 5.8.h,
+                            decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                border:
+                                    Border.all(width: 2, color: appGreenColor),
+                                image: const DecorationImage(
+                                    image: AssetImage(AppAssets.LOGO_NEW),
+                                    fit: BoxFit.fill)),
+                          ),
                   ),
                   if (userController.userModel.value.isVerified == null ||
                       userController.userModel.value.isVerified == true)
@@ -77,7 +85,9 @@ class TopContainer extends GetView<NewsFeedController> {
                           width: 2.4.h,
                           decoration: const BoxDecoration(
                               shape: BoxShape.circle,
-                              image: DecorationImage(image: AssetImage(AppAssets.INSTAGRAM_VERIFICATION))),
+                              image: DecorationImage(
+                                  image: AssetImage(
+                                      AppAssets.INSTAGRAM_VERIFICATION))),
                         ),
                       ),
                     )
@@ -99,7 +109,7 @@ class TopContainer extends GetView<NewsFeedController> {
                     hintText: 'Write something...',
                     onTap: () {
                       newsFeedController.type.value = 'text';
-                      //pushNewScreen(context, screen: CreatePost());
+                      //pushScreen(context, screen: CreatePost());
                       onWriteSomethingTap?.call();
                     },
                     onTapOutside: (_) {
@@ -118,10 +128,11 @@ class TopContainer extends GetView<NewsFeedController> {
                   horizontalGap(5),
                   GestureDetector(
                       onTap: () async {
-                        String? checkNavigate = await newsFeedController.filePicker('image');
+                        String? checkNavigate =
+                            await newsFeedController.filePicker('image');
                         // newsFeedController.newsFeedModel.value.postUrl = checkNavigate;
                         // checkNavigate!.isNotEmpty
-                        //     ? pushNewScreen(context, screen:  CreatePost())
+                        //     ? pushScreen(context, screen:  CreatePost())
                         //     : null;
                         onPhotoTap?.call(checkNavigate!);
                       },
@@ -135,7 +146,7 @@ class TopContainer extends GetView<NewsFeedController> {
                             await newsFeedController.filePicker('video');
                         // newsFeedController.newsFeedModel.value.postUrl = checkNavigate;
                         // checkNavigate!.isNotEmpty
-                        //     ? pushNewScreen(context, screen:  CreatePost())
+                        //     ? pushScreen(context, screen:  CreatePost())
                         //     : null;
                         onVideoTap?.call(checkNavigate!);
                       },

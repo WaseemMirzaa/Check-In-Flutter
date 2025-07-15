@@ -12,7 +12,7 @@ import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:nb_utils/nb_utils.dart';
 import 'package:rxdart/rxdart.dart' as RES;
-import 'package:video_compress_v2/video_compress_v2.dart';
+import 'package:video_compress/video_compress.dart';
 
 import '../model/NewsFeed Model/report_posts_model.dart';
 
@@ -152,7 +152,7 @@ class NewsFeedService {
       if (compress.isNotEmpty) {
         String? thumbnail;
         if (newsFeedModel.isType != 'image') {
-          final uint8list = await VideoCompressV2.getByteThumbnail(compress,
+          final uint8list = await VideoCompress.getByteThumbnail(compress,
               quality: 50, // default(100)
               position: -1 // default(-1)
               );

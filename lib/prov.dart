@@ -17,8 +17,9 @@ class GetxMaps with ChangeNotifier {
 
   void getMoveCamera() async {
     List<Placemark> placemark = await placemarkFromCoordinates(
-        _initialposition.latitude, _initialposition.longitude,
-        localeIdentifier: "en_US");
+      _initialposition.latitude,
+      _initialposition.longitude,
+    );
 
     if (placemark.isNotEmpty) {
       locationController.text = placemark[0].name!;

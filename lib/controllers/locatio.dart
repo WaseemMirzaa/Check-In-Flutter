@@ -2,12 +2,12 @@
 
 import 'package:check_in/core/constant/temp_language.dart';
 import 'package:check_in/loc.dart';
+import 'package:flutter_google_places_hoc081098/google_maps_webservice_places.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:get/get.dart';
 import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
-import 'package:google_maps_webservice/src/places.dart';
 
 class LocationController extends GetxController {
   final Placemark _pickPlaceMark = const Placemark();

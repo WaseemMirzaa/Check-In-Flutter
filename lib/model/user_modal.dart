@@ -16,6 +16,7 @@ class UserModel {
   List? deviceTokes;
   List? blockProfiles;
   bool? isTermsVerified;
+  bool? isPremium;
 
   UserModel(
       {this.userName,
@@ -30,8 +31,9 @@ class UserModel {
       this.homeCourt,
       this.goldenCheckin,
       this.deviceTokes,
-        this.isTermsVerified,
-      this.blockProfiles});
+      this.isTermsVerified,
+      this.blockProfiles,
+      this.isPremium});
 
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
@@ -48,7 +50,8 @@ class UserModel {
       UserKey.GOLDEN_CHECK_IN: goldenCheckin,
       UserKey.DEVICE_TOKEN: deviceTokes,
       UserKey.BLOCK_PROFILES: blockProfiles,
-      UserKey.IS_TERMS_VERIFIED: isTermsVerified
+      UserKey.IS_TERMS_VERIFIED: isTermsVerified,
+      UserKey.IS_PREMIUM: isPremium
     };
   }
 
@@ -57,7 +60,8 @@ class UserModel {
         userName: map[UserKey.USER_NAME] ?? "",
         email: map[UserKey.EMAIL] ?? "",
         uid: map[UserKey.UID] ?? "",
-        isVerified: map[UserKey.IS_VERIFIED] ?? false, //because all previous users are verified
+        isVerified: map[UserKey.IS_VERIFIED] ??
+            false, //because all previous users are verified
         photoUrl: map[UserKey.PHOTO_URL] ?? "",
         checkedIn: map[UserKey.CHECKED_IN] ?? false,
         checkedInCourtName: map[UserKey.CHECKED_IN_COURT_NAME] ?? "",
@@ -67,39 +71,40 @@ class UserModel {
         goldenCheckin: map[UserKey.GOLDEN_CHECK_IN] ?? 0,
         deviceTokes: map[UserKey.DEVICE_TOKEN],
         isTermsVerified: map[UserKey.IS_TERMS_VERIFIED],
+        isPremium: map[UserKey.IS_PREMIUM],
         blockProfiles: map[UserKey.BLOCK_PROFILES]);
   }
 
-  UserModel copyWith({
-    String? userName,
-    String? email,
-    String? uid,
-    bool? isVerified,
-    String? photoUrl,
-    bool? checkedIn,
-    String? checkedInCourtName,
-    // String? checkedCourts,
-    String? aboutMe,
-    String? homeCourt,
-    int? goldenCheckin,
-    String? customerId,
-    bool? isTermsVerified,
-    List? blockProfiles
-  }) {
+  UserModel copyWith(
+      {String? userName,
+      String? email,
+      String? uid,
+      bool? isVerified,
+      String? photoUrl,
+      bool? checkedIn,
+      String? checkedInCourtName,
+      // String? checkedCourts,
+      String? aboutMe,
+      String? homeCourt,
+      int? goldenCheckin,
+      String? customerId,
+      bool? isTermsVerified,
+      bool? isPremium,
+      List? blockProfiles}) {
     return UserModel(
-      userName: userName ?? this.userName,
-      email: email ?? this.email,
-      uid: uid ?? this.uid,
-      isVerified: isVerified ?? this.isVerified,
-      photoUrl: photoUrl ?? this.photoUrl,
-      checkedIn: checkedIn ?? this.checkedIn,
-      checkedInCourtName: checkedInCourtName ?? this.checkedInCourtName,
-      aboutMe: aboutMe ?? this.aboutMe,
-      homeCourt: homeCourt ?? this.homeCourt,
-      goldenCheckin: goldenCheckin ?? this.goldenCheckin,
-      customerId: customerId ?? this.customerId,
-      blockProfiles: blockProfiles ?? this.blockProfiles,
-      isTermsVerified: isTermsVerified ?? this.isTermsVerified
-    );
+        userName: userName ?? this.userName,
+        email: email ?? this.email,
+        uid: uid ?? this.uid,
+        isVerified: isVerified ?? this.isVerified,
+        photoUrl: photoUrl ?? this.photoUrl,
+        checkedIn: checkedIn ?? this.checkedIn,
+        checkedInCourtName: checkedInCourtName ?? this.checkedInCourtName,
+        aboutMe: aboutMe ?? this.aboutMe,
+        homeCourt: homeCourt ?? this.homeCourt,
+        goldenCheckin: goldenCheckin ?? this.goldenCheckin,
+        customerId: customerId ?? this.customerId,
+        blockProfiles: blockProfiles ?? this.blockProfiles,
+        isTermsVerified: isTermsVerified ?? this.isTermsVerified,
+        isPremium: isPremium ?? this.isPremium);
   }
 }

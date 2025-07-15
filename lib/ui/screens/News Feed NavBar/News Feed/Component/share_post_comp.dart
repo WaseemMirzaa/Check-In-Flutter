@@ -18,7 +18,7 @@ import 'package:check_in/utils/gaps.dart';
 import 'package:check_in/utils/styles.dart';
 import 'package:get/get.dart';
 import 'package:nb_utils/nb_utils.dart';
-import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
+import 'package:persistent_bottom_nav_bar_v2/persistent_bottom_nav_bar_v2.dart';
 import 'package:video_player/video_player.dart';
 
 class SharePostComp extends StatefulWidget {
@@ -61,12 +61,12 @@ class _SharePostCompState extends State<SharePostComp> {
                           onTap: () {
                             if (userController.userModel.value.uid ==
                                 widget.data!.userId) {
-                              pushNewScreen(context,
+                              pushScreen(context,
                                   screen: ProfileScreen(
                                     isNavBar: false,
                                   ));
                             } else {
-                              pushNewScreen(context,
+                              pushScreen(context,
                                   screen: OtherProfileView(
                                       uid: widget.data!.shareUID!));
                             }
@@ -90,12 +90,12 @@ class _SharePostCompState extends State<SharePostComp> {
                             onTap: () {
                               if (userController.userModel.value.uid ==
                                   widget.data!.userId) {
-                                pushNewScreen(context,
+                                pushScreen(context,
                                     screen: ProfileScreen(
                                       isNavBar: false,
                                     ));
                               } else {
-                                pushNewScreen(context,
+                                pushScreen(context,
                                     screen: OtherProfileView(
                                         uid: widget.data!.userId!));
                               }
@@ -121,7 +121,7 @@ class _SharePostCompState extends State<SharePostComp> {
                           widget.data!.postUrl!.isNotEmpty
                       ? GestureDetector(
                           onTap: () {
-                            pushNewScreen(context,
+                            pushScreen(context,
                                 screen: FullScreenImage(
                                   newsFeedModel: widget.data!,
                                 ));
@@ -305,7 +305,9 @@ class _ChewieDemoState extends State<ChewieDemo> {
       additionalOptions: (context) {
         return <OptionItem>[
           OptionItem(
-            onTap: toggleVideo,
+            onTap: (context) {
+              toggleVideo();
+            },
             iconData: Icons.live_tv_sharp,
             title: 'Toggle Video Src',
           ),

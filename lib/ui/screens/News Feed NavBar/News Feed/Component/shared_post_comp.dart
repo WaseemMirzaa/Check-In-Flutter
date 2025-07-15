@@ -34,7 +34,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:nb_utils/nb_utils.dart';
-import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
+import 'package:persistent_bottom_nav_bar_v2/persistent_bottom_nav_bar_v2.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:sizer/sizer.dart';
 import 'package:video_player/video_player.dart';
@@ -136,7 +136,7 @@ class _SharedPostCompState extends State<SharedPostComp> {
                                                         isNavBar: false,
                                                         isOther: true,
                                                       )))
-                                          : pushNewScreen(context,
+                                          : pushScreen(context,
                                               screen: ProfileScreen(
                                                 isNavBar: false,
                                               ));
@@ -151,7 +151,7 @@ class _SharedPostCompState extends State<SharedPostComp> {
                                                       OtherProfileView(
                                                           uid: widget.data!
                                                               .shareUID!)))
-                                          : pushNewScreen(context,
+                                          : pushScreen(context,
                                               screen: OtherProfileView(
                                                   uid: widget.data!.shareUID!));
                                     }
@@ -210,7 +210,7 @@ class _SharedPostCompState extends State<SharedPostComp> {
                                                       isNavBar: false,
                                                       isOther: true,
                                                     )))
-                                        : pushNewScreen(context,
+                                        : pushScreen(context,
                                             screen: ProfileScreen(
                                               isNavBar: false,
                                             ));
@@ -225,7 +225,7 @@ class _SharedPostCompState extends State<SharedPostComp> {
                                                     OtherProfileView(
                                                         uid: widget
                                                             .data!.shareUID!)))
-                                        : pushNewScreen(context,
+                                        : pushScreen(context,
                                             screen: OtherProfileView(
                                                 uid: widget.data!.shareUID!));
                                   }
@@ -390,7 +390,7 @@ class _SharedPostCompState extends State<SharedPostComp> {
                                                                       false,
                                                                   isOther: true,
                                                                 )))
-                                                    : pushNewScreen(context,
+                                                    : pushScreen(context,
                                                         screen: ProfileScreen(
                                                           isNavBar: false,
                                                         ));
@@ -408,7 +408,7 @@ class _SharedPostCompState extends State<SharedPostComp> {
                                                                     uid: widget
                                                                         .data!
                                                                         .userId!)))
-                                                    : pushNewScreen(context,
+                                                    : pushScreen(context,
                                                         screen:
                                                             OtherProfileView(
                                                                 uid: widget
@@ -472,7 +472,7 @@ class _SharedPostCompState extends State<SharedPostComp> {
                                                               isNavBar: false,
                                                               isOther: true,
                                                             )))
-                                                : pushNewScreen(context,
+                                                : pushScreen(context,
                                                     screen: ProfileScreen(
                                                       isNavBar: false,
                                                     ));
@@ -489,7 +489,7 @@ class _SharedPostCompState extends State<SharedPostComp> {
                                                                 uid: widget
                                                                     .data!
                                                                     .userId!)))
-                                                : pushNewScreen(context,
+                                                : pushScreen(context,
                                                     screen: OtherProfileView(
                                                         uid: widget
                                                             .data!.userId!));
@@ -519,7 +519,7 @@ class _SharedPostCompState extends State<SharedPostComp> {
                                 widget.data!.postUrl!.isNotEmpty
                             ? GestureDetector(
                                 onTap: () {
-                                  pushNewScreen(context,
+                                  pushScreen(context,
                                       screen: FullScreenImage(
                                         newsFeedModel: widget.data!,
                                       ));
@@ -780,7 +780,7 @@ class _SharedPostCompState extends State<SharedPostComp> {
                                         horizontalGap(3.w),
                                         GestureDetector(
                                           onTap: () async {
-                                            pushNewScreen(context,
+                                            pushScreen(context,
                                                 screen: SharePostScreen(
                                                     data: widget.data!));
                                           },
@@ -807,7 +807,7 @@ class _SharedPostCompState extends State<SharedPostComp> {
                                         Expanded(
                                           child: GestureDetector(
                                               onTap: () {
-                                                pushNewScreen(context,
+                                                pushScreen(context,
                                                     screen: PostAllLikesView(
                                                       postId:
                                                           widget.data!.shareID!,
@@ -843,7 +843,7 @@ class _SharedPostCompState extends State<SharedPostComp> {
                                         horizontalGap(2.w),
                                         GestureDetector(
                                           onTap: () {
-                                            pushNewScreen(context,
+                                            pushScreen(context,
                                                 screen: PostAllLikesView(
                                                   postId: widget.data!.shareID!,
                                                 ));
@@ -1013,7 +1013,7 @@ class _SharedPostCompState extends State<SharedPostComp> {
                                                   ? const SizedBox()
                                                   : GestureDetector(
                                                       onTap: () {
-                                                        pushNewScreen(context,
+                                                        pushScreen(context,
                                                             screen:
                                                                 AllCommentsScreen(
                                                               docId: snapshot
@@ -1243,7 +1243,7 @@ class _ChewieDemoState extends State<ChewieDemo> {
       additionalOptions: (context) {
         return <OptionItem>[
           OptionItem(
-            onTap: toggleVideo,
+            onTap: (context) => toggleVideo(),
             iconData: Icons.live_tv_sharp,
             title: 'Toggle Video Src',
           ),

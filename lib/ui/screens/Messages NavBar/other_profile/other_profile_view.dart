@@ -26,7 +26,7 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:nb_utils/nb_utils.dart';
 import 'package:percent_indicator/percent_indicator.dart';
-import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
+import 'package:persistent_bottom_nav_bar_v2/persistent_bottom_nav_bar_v2.dart';
 import 'package:sizer/sizer.dart';
 import '../../../../auth_service.dart';
 import '../../News Feed NavBar/News Feed/Component/report_on_post_comp.dart';
@@ -633,7 +633,7 @@ class _OtherProfileViewState extends State<OtherProfileView>
                                                                         ];
 
                                                                         // Navigate to ChatScreen
-                                                                        pushNewScreen(
+                                                                        pushScreen(
                                                                           context,
                                                                           screen:
                                                                               ChatScreen(
@@ -996,7 +996,7 @@ class _OtherProfileViewState extends State<OtherProfileView>
                                                                     .all(5.0),
                                                             child: InkWell(
                                                               onTap: () {
-                                                                pushNewScreen(
+                                                                pushScreen(
                                                                     context,
                                                                     screen:
                                                                         const AddHomeCourt(),
@@ -1407,7 +1407,7 @@ class _OtherProfileViewState extends State<OtherProfileView>
                                             ];
 
                                             // Navigate to ChatScreen
-                                            pushNewScreen(
+                                            pushScreen(
                                               context,
                                               screen: ChatScreen(
                                                 image: userItems.photoUrl,
@@ -1644,7 +1644,7 @@ class _OtherProfileViewState extends State<OtherProfileView>
                                 padding: const EdgeInsets.all(5.0),
                                 child: InkWell(
                                   onTap: () {
-                                    pushNewScreen(context,
+                                    pushScreen(context,
                                         screen: const AddHomeCourt(),
                                         withNavBar: false);
                                   },

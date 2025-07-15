@@ -10,7 +10,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
+import 'package:persistent_bottom_nav_bar_v2/persistent_bottom_nav_bar_v2.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../utils/colors.dart';
@@ -49,12 +49,12 @@ class _LoginViewState extends State<LoginView> {
         backgroundColor: appWhiteColor,
         leading: Row(
           children: [
-             SizedBox(
+            SizedBox(
               width: 2.5.w,
             ),
             GestureDetector(
               onTap: () {
-                pushNewScreen(context,
+                pushScreen(context,
                     screen: StartView(isBack: false), withNavBar: false);
               },
               child: SizedBox(
@@ -168,7 +168,7 @@ class _LoginViewState extends State<LoginView> {
                         children: [
                           GestureDetector(
                             onTap: () {
-                              pushNewScreen(context,
+                              pushScreen(context,
                                   screen: const ForgotPassword(),
                                   withNavBar: false);
                             },
@@ -185,23 +185,30 @@ class _LoginViewState extends State<LoginView> {
                           ),
                         ],
                       ),
-                      Obx( () {
-                        return Padding(
-                            padding: EdgeInsets.only(top: 3.6.h),
-                            child: isLoading.value ? const Center(child: CircularProgressIndicator()) : fullWidthButton(TempLanguage.logInSpaced, () async {
-                              if (password != "" && email != "") {
-                                isLoading.value = true;
-                                await login(email, password, context);
-                                isLoading.value = false;
-                              } else if (password == "") {
-                                Get.snackbar(TempLanguage.error, TempLanguage.enterPassword,
-                                    snackPosition: SnackPosition.TOP);
-                              } else if (email == "") {
-                                Get.snackbar(TempLanguage.error, TempLanguage.enterEmail,
-                                    snackPosition: SnackPosition.TOP);
-                              }
-                            }));
-                      },
+                      Obx(
+                        () {
+                          return Padding(
+                              padding: EdgeInsets.only(top: 3.6.h),
+                              child: isLoading.value
+                                  ? const Center(
+                                      child: CircularProgressIndicator())
+                                  : fullWidthButton(TempLanguage.logInSpaced,
+                                      () async {
+                                      if (password != "" && email != "") {
+                                        isLoading.value = true;
+                                        await login(email, password, context);
+                                        isLoading.value = false;
+                                      } else if (password == "") {
+                                        Get.snackbar(TempLanguage.error,
+                                            TempLanguage.enterPassword,
+                                            snackPosition: SnackPosition.TOP);
+                                      } else if (email == "") {
+                                        Get.snackbar(TempLanguage.error,
+                                            TempLanguage.enterEmail,
+                                            snackPosition: SnackPosition.TOP);
+                                      }
+                                    }));
+                        },
                       ),
                     ],
                   ),

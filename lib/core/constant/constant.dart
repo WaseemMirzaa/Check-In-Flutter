@@ -1,6 +1,10 @@
 class Collections {
   static const USER = 'USER';
   static const GOLDEN_LOCATIONS = 'goldenLocations';
+  // static const COURTS = 'courts';
+  static const GALLERY = 'gallery';
+  static const REVIEWS = 'reviews';
+  static const COURT_COMMENTS = 'comments';
   static const String MESSAGES = 'messages';
   static const String CHAT = 'chat';
   static const String NEWSFEED = 'newsFeed';
@@ -28,6 +32,7 @@ class UserKey {
   static const BLOCK_PROFILES = "blockProfiles";
   static const PARAMS = "params";
   static const IS_TERMS_VERIFIED = "isTermsVerified";
+  static const IS_PREMIUM = "isPremium";
 }
 
 class CourtKey {
@@ -41,6 +46,32 @@ class CourtKey {
   static const GOLDEN = 'golden';
   static const NAME = 'name';
   static const ID = 'id';
+}
+
+class GalleryKey {
+  static const IMAGE_URL = 'imageUrl';
+  static const UPLOADED_BY = 'uploadedBy';
+  static const UPLOADED_BY_NAME = 'uploadedByName';
+  static const UPLOADED_BY_PHOTO = 'uploadedByPhoto';
+  static const UPLOADED_AT = 'uploadedAt';
+  static const DESCRIPTION = 'description';
+}
+
+class ReviewKey {
+  static const USER_ID = 'userId';
+  static const USER_NAME = 'userName';
+  static const USER_PHOTO_URL = 'userPhotoUrl';
+  static const RATING = 'rating';
+  static const REVIEW_TEXT = 'reviewText';
+  static const CREATED_AT = 'createdAt';
+}
+
+class CommentKey {
+  static const USER_ID = 'userId';
+  static const USER_NAME = 'userName';
+  static const USER_PHOTO_URL = 'userPhotoUrl';
+  static const COMMENT_TEXT = 'commentText';
+  static const CREATED_AT = 'createdAt';
 }
 
 class MessageField {

@@ -13,7 +13,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:nb_utils/nb_utils.dart';
-import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
+import 'package:persistent_bottom_nav_bar_v2/persistent_bottom_nav_bar_v2.dart';
 import 'package:sizer/sizer.dart';
 
 class SubCommentAllLikesView extends StatelessWidget {
@@ -68,12 +68,12 @@ class SubCommentAllLikesView extends StatelessWidget {
                         onTap: () {
                           if (snapshot.data![index].uid ==
                               FirebaseAuth.instance.currentUser!.uid) {
-                            pushNewScreen(context,
+                            pushScreen(context,
                                 screen: ProfileScreen(
                                   isNavBar: false,
                                 ));
                           } else {
-                            pushNewScreen(context,
+                            pushScreen(context,
                                 screen: OtherProfileView(
                                     uid: snapshot.data![index].uid!));
                           }

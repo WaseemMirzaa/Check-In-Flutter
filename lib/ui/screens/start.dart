@@ -1,4 +1,3 @@
-
 import 'package:check_in/core/constant/app_assets.dart';
 import 'package:check_in/core/constant/temp_language.dart';
 import 'package:check_in/ui/screens/login.dart';
@@ -6,7 +5,7 @@ import 'package:check_in/ui/screens/signup.dart';
 import 'package:check_in/ui/widgets/common_button.dart';
 import 'package:check_in/utils/gaps.dart';
 import 'package:flutter/material.dart';
-import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
+import 'package:persistent_bottom_nav_bar_v2/persistent_bottom_nav_bar_v2.dart';
 import 'package:sizer/sizer.dart';
 import 'package:app_tracking_transparency/app_tracking_transparency.dart';
 
@@ -63,7 +62,7 @@ class _StartViewState extends State<StartView> {
               backgroundColor: appWhiteColor,
               leading: Row(
                 children: [
-                    SizedBox(
+                  SizedBox(
                     width: 2.5.w,
                   ),
                   GestureDetector(
@@ -98,17 +97,13 @@ class _StartViewState extends State<StartView> {
               ),
               Column(
                 children: [
-
-
                   Padding(
                     padding: EdgeInsets.only(top: 0.9.h, bottom: 0.9.h),
                     child: fullWidthButton(TempLanguage.logInSpaced, () {
-                      pushNewScreen(context,
+                      pushScreen(context,
                           screen: const LoginView(), withNavBar: false);
                     }),
                   ),
-
-
 
                   Padding(
                     padding: EdgeInsets.only(top: 0.9.h, bottom: 0.9.h),
@@ -117,8 +112,7 @@ class _StartViewState extends State<StartView> {
                       decoration: BoxDecoration(
                         color: appWhiteColor,
                         borderRadius: BorderRadius.circular(11.0),
-                        border: Border.all(
-                            width: 1.0, color: greyColor),
+                        border: Border.all(width: 1.0, color: greyColor),
                         boxShadow: [
                           BoxShadow(
                             color: blackTranslucentColor,
@@ -132,7 +126,7 @@ class _StartViewState extends State<StartView> {
                         child: InkWell(
                           borderRadius: BorderRadius.circular(11),
                           onTap: () {
-                            pushNewScreen(context,
+                            pushScreen(context,
                                 screen: const SignupView(), withNavBar: false);
                           },
                           child: Center(
@@ -292,5 +286,4 @@ class _StartViewState extends State<StartView> {
   //
   //   print("User search parameters updated."); // Optional: Notify when complete
   // }
-
 }

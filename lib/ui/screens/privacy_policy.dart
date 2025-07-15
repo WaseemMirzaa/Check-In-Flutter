@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:check_in/core/constant/app_assets.dart';
 import 'package:check_in/core/constant/temp_language.dart';
 import 'package:flutter/material.dart';
@@ -17,8 +15,35 @@ class PrivacyPolicy extends StatefulWidget {
 }
 
 class _PrivacyPolicyState extends State<PrivacyPolicy> {
-  final Completer<WebViewController> _controller =
-      Completer<WebViewController>();
+  late WebViewController controller;
+
+  @override
+  void initState() {
+    super.initState();
+    controller = WebViewController()
+      ..setJavaScriptMode(JavaScriptMode.unrestricted)
+      ..setNavigationDelegate(
+        NavigationDelegate(
+          onNavigationRequest: (NavigationRequest request) {
+            if (request.url.startsWith('https://www.youtube.com/')) {
+              print('blocking navigation to ${request.url}');
+              return NavigationDecision.prevent;
+            }
+            print('allowing navigation to ${request.url}');
+            return NavigationDecision.navigate;
+          },
+          onPageStarted: (String url) {
+            print('Page started loading: $url');
+          },
+          onPageFinished: (String url) {
+            print('Page finished loading: $url');
+          },
+        ),
+      )
+      ..loadRequest(
+          Uri.parse("https://sites.google.com/view/checkinhoops-privacy"));
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -31,7 +56,7 @@ class _PrivacyPolicyState extends State<PrivacyPolicy> {
             GestureDetector(
               onTap: () {
                 Navigator.pop(context);
-                // pushNewScreen(context, screen: Home(), withNavBar: false);
+                // pushScreen(context, screen: Home(), withNavBar: false);
               },
               child: SizedBox(
                 height: 2.1.h,
@@ -44,7 +69,8 @@ class _PrivacyPolicyState extends State<PrivacyPolicy> {
         elevation: 0,
         centerTitle: true,
         backgroundColor: appWhiteColor,
-        title: poppinsText(TempLanguage.privacyPolicy, 20, FontWeight.bold, appBlackColor),
+        title: poppinsText(
+            TempLanguage.privacyPolicy, 20, FontWeight.bold, appBlackColor),
       ),
       body: Container(
         margin: const EdgeInsets.only(top: 10),
@@ -65,31 +91,7 @@ class _PrivacyPolicyState extends State<PrivacyPolicy> {
           ],
         ),
         child: Builder(builder: (BuildContext context) {
-          return WebView(
-            initialUrl:
-                // "https://www.freeprivacypolicy.com/live/fc6c8c08-7126-407d-b16b-5ac249c71a80",
-                // "https://docs.google.com/document/d/1ILdrqJL3AYxTZ7zA-QQoPJbFafoE3FscMrKROymN4y0/edit?usp=sharing",
-                "https://sites.google.com/view/checkinhoops-privacy",
-            javascriptMode: JavascriptMode.unrestricted,
-            onWebViewCreated: (WebViewController webViewController) {
-              _controller.complete(webViewController);
-            },
-            navigationDelegate: (NavigationRequest request) {
-              if (request.url.startsWith('https://www.youtube.com/')) {
-                print('blocking navigation to $request}');
-                return NavigationDecision.prevent;
-              }
-              print('allowing navigation to $request');
-              return NavigationDecision.navigate;
-            },
-            onPageStarted: (String url) {
-              print('Page started loading: $url');
-            },
-            onPageFinished: (String url) {
-              print('Page finished loading: $url');
-            },
-            gestureNavigationEnabled: true,
-          );
+          return WebViewWidget(controller: controller);
         }),
       ),
       // Container(

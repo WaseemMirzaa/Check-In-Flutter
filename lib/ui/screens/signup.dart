@@ -10,7 +10,7 @@ import 'package:check_in/val.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
+import 'package:persistent_bottom_nav_bar_v2/persistent_bottom_nav_bar_v2.dart';
 import 'package:sizer/sizer.dart';
 import 'package:get/get.dart';
 
@@ -60,7 +60,7 @@ class _SignupViewState extends State<SignupView> {
             ),
             GestureDetector(
               onTap: () {
-                pushNewScreen(context,
+                pushScreen(context,
                     screen: StartView(isBack: false), withNavBar: false);
               },
               child: SizedBox(
@@ -208,7 +208,10 @@ class _SignupViewState extends State<SignupView> {
                         Checkbox(
                           value: agreeToTerms,
                           onChanged: (value) async {
-                            final res = await Get.to(const TermsAndConditions(fromSignup: true, showButtons: true,));
+                            final res = await Get.to(const TermsAndConditions(
+                              fromSignup: true,
+                              showButtons: true,
+                            ));
                             if (res ?? false) {
                               setState(() {
                                 agreeToTerms = value ?? false;
@@ -232,7 +235,7 @@ class _SignupViewState extends State<SignupView> {
                         // ),
                         GestureDetector(
                           onTap: () {
-                            pushNewScreen(context,
+                            pushScreen(context,
                                 screen: const PrivacyPolicy(),
                                 withNavBar: false);
                           },
@@ -257,11 +260,14 @@ class _SignupViewState extends State<SignupView> {
                         ),
                         GestureDetector(
                           onTap: () async {
-                            // pushNewScreen(context,
+                            // pushScreen(context,
                             //     screen: const TermsAndConditions(),
                             //     withNavBar:
                             //         false); // Handle the action to open the Terms & Conditions screen
-                            final res = await Get.to(const TermsAndConditions(fromSignup: true, showButtons: true,));
+                            final res = await Get.to(const TermsAndConditions(
+                              fromSignup: true,
+                              showButtons: true,
+                            ));
                             if (res ?? false) {
                               setState(() {
                                 agreeToTerms = true;
@@ -282,28 +288,35 @@ class _SignupViewState extends State<SignupView> {
                     ),
                     SizedBox(height: 2.0.h),
                     // Add some spacing between the checkbox and the sign-up button
-                    Obx( () {
-                      return Padding(
-                          padding: EdgeInsets.only(top: 3.6.h),
-                          child: isLoading.value ? const Center(child: CircularProgressIndicator()) : fullWidthButton(TempLanguage.signUp, () async {
-                            if (!isSignUpButtonEnabled) {
-                              Get.snackbar(
-                                  TempLanguage.error, TempLanguage.agreeToTerms);
-                            } else if (userName != '') {
-                              if (Validate(email)) {
-                                isLoading.value = true;
-                                bool isSuccess = await signUp(email, password, userName, context);
+                    Obx(
+                      () {
+                        return Padding(
+                            padding: EdgeInsets.only(top: 3.6.h),
+                            child: isLoading.value
+                                ? const Center(
+                                    child: CircularProgressIndicator())
+                                : fullWidthButton(TempLanguage.signUp,
+                                    () async {
+                                    if (!isSignUpButtonEnabled) {
+                                      Get.snackbar(TempLanguage.error,
+                                          TempLanguage.agreeToTerms);
+                                    } else if (userName != '') {
+                                      if (Validate(email)) {
+                                        isLoading.value = true;
+                                        bool isSuccess = await signUp(
+                                            email, password, userName, context);
 
-                                isLoading.value = false;
-                              } else {
-                                Get.snackbar(TempLanguage.error, TempLanguage.enterValidEmail);
-
-                              }
-                            } else if (userName == '') {
-                              Get.snackbar(TempLanguage.error, TempLanguage.enterUserName);
-                            }
-                          }));
-                    },
+                                        isLoading.value = false;
+                                      } else {
+                                        Get.snackbar(TempLanguage.error,
+                                            TempLanguage.enterValidEmail);
+                                      }
+                                    } else if (userName == '') {
+                                      Get.snackbar(TempLanguage.error,
+                                          TempLanguage.enterUserName);
+                                    }
+                                  }));
+                      },
                     ),
                   ],
                 ),

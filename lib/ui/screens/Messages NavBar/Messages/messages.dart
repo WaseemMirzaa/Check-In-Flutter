@@ -16,7 +16,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:get/get.dart';
 import 'package:nb_utils/nb_utils.dart';
-import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
+import 'package:persistent_bottom_nav_bar_v2/persistent_bottom_nav_bar_v2.dart';
 import '../../../../utils/Constants/global_variable.dart';
 import '../../../../utils/loader.dart';
 import '../../../../controllers/Messages/messages_controller.dart';
@@ -230,7 +230,7 @@ class MessageScreen extends GetView<MessageController> {
 
                                                   //...............
                                                   // chatcontroller.updateLastSeenMethod();
-                                                  pushNewScreen(
+                                                  pushScreen(
                                                     context,
                                                     screen: ChatScreen(
                                                       //image: userSnap.data?.photoUrl ?? '',
@@ -319,7 +319,7 @@ class MessageScreen extends GetView<MessageController> {
 
                                                   //...............
                                                   // chatcontroller.updateLastSeenMethod();
-                                                  pushNewScreen(
+                                                  pushScreen(
                                                     context,
                                                     screen: ChatScreen(
                                                         //   name: message.name!.obs,isGroup: message.isgroup,

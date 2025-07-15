@@ -29,7 +29,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:loader_overlay/loader_overlay.dart';
 import 'package:nb_utils/nb_utils.dart';
-import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
+import 'package:persistent_bottom_nav_bar_v2/persistent_bottom_nav_bar_v2.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:sizer/sizer.dart';
 
@@ -123,7 +123,7 @@ class _ListTileContainerState extends State<ListTileContainer> {
                                           if (userController
                                                   .userModel.value.uid ==
                                               widget.data!.userId) {
-                                            pushNewScreen(context,
+                                            pushScreen(context,
                                                 screen: ProfileScreen(
                                                   isNavBar: false,
                                                 ));
@@ -139,7 +139,7 @@ class _ListTileContainerState extends State<ListTileContainer> {
                                                                 uid: widget
                                                                     .data!
                                                                     .userId!)))
-                                                : pushNewScreen(context,
+                                                : pushScreen(context,
                                                     screen: OtherProfileView(
                                                         uid: widget
                                                             .data!.userId!));
@@ -189,7 +189,7 @@ class _ListTileContainerState extends State<ListTileContainer> {
                                   : () {
                                       if (userController.userModel.value.uid ==
                                           widget.data!.userId) {
-                                        pushNewScreen(context,
+                                        pushScreen(context,
                                             screen: ProfileScreen(
                                               isNavBar: false,
                                             ));
@@ -204,7 +204,7 @@ class _ListTileContainerState extends State<ListTileContainer> {
                                                         OtherProfileView(
                                                             uid: widget.data!
                                                                 .userId!)))
-                                            : pushNewScreen(context,
+                                            : pushScreen(context,
                                                 screen: OtherProfileView(
                                                     uid: widget.data!.userId!));
                                       }
@@ -356,7 +356,7 @@ class _ListTileContainerState extends State<ListTileContainer> {
                             widget.data!.postUrl!.isNotEmpty
                         ? GestureDetector(
                             onTap: () {
-                              pushNewScreen(context,
+                              pushScreen(context,
                                   screen: FullScreenImage(
                                     newsFeedModel: widget.data!,
                                   ));
@@ -595,7 +595,7 @@ class _ListTileContainerState extends State<ListTileContainer> {
                                     horizontalGap(3.w),
                                     GestureDetector(
                                       onTap: () async {
-                                        pushNewScreen(context,
+                                        pushScreen(context,
                                             screen: SharePostScreen(
                                                 data: widget.data!));
                                       },
@@ -620,7 +620,7 @@ class _ListTileContainerState extends State<ListTileContainer> {
                                     Expanded(
                                       child: GestureDetector(
                                           onTap: () {
-                                            pushNewScreen(context,
+                                            pushScreen(context,
                                                 screen: PostAllLikesView(
                                                   postId: widget.data!.id!,
                                                   isFromProfile:
@@ -652,7 +652,7 @@ class _ListTileContainerState extends State<ListTileContainer> {
                                     horizontalGap(2.w),
                                     GestureDetector(
                                       onTap: () {
-                                        pushNewScreen(context,
+                                        pushScreen(context,
                                             screen: PostAllLikesView(
                                               postId: widget.data!.id!,
                                             ));
@@ -808,7 +808,7 @@ class _ListTileContainerState extends State<ListTileContainer> {
                                               ? const SizedBox()
                                               : GestureDetector(
                                                   onTap: () {
-                                                    pushNewScreen(context,
+                                                    pushScreen(context,
                                                         screen:
                                                             AllCommentsScreen(
                                                           docId: snapshot

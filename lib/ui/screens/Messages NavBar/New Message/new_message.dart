@@ -15,7 +15,7 @@ import 'package:check_in/utils/styles.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:nb_utils/nb_utils.dart';
-import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
+import 'package:persistent_bottom_nav_bar_v2/persistent_bottom_nav_bar_v2.dart';
 import 'package:sizer/sizer.dart';
 
 import '../Chat/chat_screen.dart';
@@ -77,7 +77,7 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
                         groupDetailController.aboutController.clear();
                         groupDetailController.fileImage.value = null;
 
-                        pushNewScreen(context,
+                        pushScreen(context,
                             screen: AddGroupDetails(
                               image: '',
                               memberId: controller.memberIds,
@@ -120,7 +120,7 @@ class _NewMessageScreenState extends State<NewMessageScreen> {
 
                         // clear map mydata
                         controller.mydata.clear();
-                        pushNewScreen(context,
+                        pushScreen(context,
                             screen: ChatScreen(
                               // name: model.userName!.obs,
                               // isGroup: false,

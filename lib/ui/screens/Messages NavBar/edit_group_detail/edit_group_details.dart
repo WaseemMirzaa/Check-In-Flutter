@@ -19,7 +19,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:nb_utils/nb_utils.dart';
-import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
+import 'package:persistent_bottom_nav_bar_v2/persistent_bottom_nav_bar_v2.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../../../controllers/user_controller.dart';
@@ -111,7 +111,7 @@ class _EditGroupDetailsState extends State<EditGroupDetails> {
                                     .leftGroup(
                                         userController.userModel.value.uid!,
                                         widget.docId!)
-                                    .then((value) => pushNewScreen(context,
+                                    .then((value) => pushScreen(context,
                                         screen: const Home()));
                               },
                               child: const Text('Yes')),
@@ -124,7 +124,7 @@ class _EditGroupDetailsState extends State<EditGroupDetails> {
             GestureDetector(
                 onTap: () {
                   groupmemberController.docid = widget.docId!;
-                  pushNewScreen(context,
+                  pushScreen(context,
                       screen: GroupMember(
                         isAdmin: controller.groupDetailModel!.isAdmin ?? false,
                       ));

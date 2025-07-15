@@ -10,7 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:nb_utils/nb_utils.dart';
-import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
+import 'package:persistent_bottom_nav_bar_v2/persistent_bottom_nav_bar_v2.dart';
 import 'package:sizer/sizer.dart';
 import '../../../../utils/loader.dart';
 import '../../../../utils/styles.dart';
@@ -33,7 +33,7 @@ class GroupMember extends GetView<GroupmemberController> {
               onPressed: () {
                 print('dd');
                 print(controller.memberIds);
-                pushNewScreen(context,
+                pushScreen(context,
                     screen: AddNewGroupMember(
                         docId: controller.docid,
                         memberIds: controller.memberIds));

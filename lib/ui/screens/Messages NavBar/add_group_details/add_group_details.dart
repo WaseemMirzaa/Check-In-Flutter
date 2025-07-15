@@ -16,7 +16,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:nb_utils/nb_utils.dart';
-import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
+import 'package:persistent_bottom_nav_bar_v2/persistent_bottom_nav_bar_v2.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../../../utils/common.dart';
@@ -83,7 +83,7 @@ class AddGroupDetails extends GetView<GroupDetailController> {
                   controller.loadNewGroup.value = false;
                   chatcontroller.sendNotificationMethod('',
                       '${userController.userModel.value.userName!} created a new group with you');
-                  pushNewScreen(context, screen: ChatScreen()).then((_) {
+                  pushScreen(context, screen: ChatScreen()).then((_) {
                     Get.back();
                     Get.back();
                   });

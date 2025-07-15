@@ -46,7 +46,8 @@ class _PlayerScreenState extends State<PlayerScreen> {
         elevation: 0,
         centerTitle: true,
         backgroundColor: appWhiteColor,
-        title: poppinsText(TempLanguage.player, 20, FontWeight.bold, appBlackColor),
+        title: poppinsText(
+            TempLanguage.player, 20, FontWeight.bold, appBlackColor),
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -112,10 +113,13 @@ class _PlayerScreenState extends State<PlayerScreen> {
                     appBlackColor),
               ],
             ),
-            SizedBox(height: MediaQuery.sizeOf(context).height * 0.24,),
+            SizedBox(
+              height: MediaQuery.sizeOf(context).height * 0.24,
+            ),
             Column(
               children: [
-                poppinsText(TempLanguage.homeCourt, 14, semiBold, appGreenColor),
+                poppinsText(
+                    TempLanguage.homeCourt, 14, semiBold, appGreenColor),
                 verticalGap(0.8.h),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 30),
@@ -125,15 +129,13 @@ class _PlayerScreenState extends State<PlayerScreen> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           poppinsText(
-                              widget.user.court == ""
-                                  ? ""
-                                  : widget.user.court,
+                              widget.user.court == "" ? "" : widget.user.court,
                               14,
                               semiBold,
                               appBlackColor),
                           // InkWell(
                           //   onTap: () {
-                          //     pushNewScreen(context,
+                          //     pushScreen(context,
                           //         screen: const AddHomeCourt(isMyProfile: false,),
                           //         withNavBar: false);
                           //   },
@@ -141,8 +143,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
                           SizedBox(
                             height: 2.3.h,
                             width: 4.47.w,
-                            child: Image.asset(
-                                AppAssets.MAP_PIN),
+                            child: Image.asset(AppAssets.MAP_PIN),
                           ),
                           // )
                         ],
@@ -161,7 +162,6 @@ class _PlayerScreenState extends State<PlayerScreen> {
                 Stack(
                   alignment: Alignment.topCenter,
                   children: [
-        
                     Container(
                       padding:
                           const EdgeInsets.only(left: 30, right: 30, top: 30),
@@ -185,8 +185,8 @@ class _PlayerScreenState extends State<PlayerScreen> {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              poppinsText(
-                                  TempLanguage.aboutMe, 14, semiBold, appBlackColor),
+                              poppinsText(TempLanguage.aboutMe, 14, semiBold,
+                                  appBlackColor),
                             ],
                           ),
                           TextFormField(

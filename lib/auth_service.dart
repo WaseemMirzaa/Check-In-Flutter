@@ -14,14 +14,15 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:nb_utils/nb_utils.dart';
-import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
+import 'package:persistent_bottom_nav_bar_v2/persistent_bottom_nav_bar_v2.dart';
 
 import 'Services/follower_and_following_service.dart';
 
 UserController userController = Get.put(UserController(UserServices()));
 final auth = FirebaseAuth.instance;
 final snap = FirebaseFirestore.instance;
-NewsFeedController newsFeedController = Get.put(NewsFeedController(NewsFeedService()));
+NewsFeedController newsFeedController =
+    Get.put(NewsFeedController(NewsFeedService()));
 
 Future<bool> signUp(
   email,
@@ -36,13 +37,15 @@ Future<bool> signUp(
         //     await addUserData(email: email, fullName: userName))
         .then((value) => auth.currentUser?.updateDisplayName(userName))
         .then((value) async {
-
-      FollowerAndFollowingService followingService = FollowerAndFollowingService();
-      followingService.addFollower(auth.currentUser!.uid, 'u19X1PhO6LNyEOa3skVtKU07hir2');
+      FollowerAndFollowingService followingService =
+          FollowerAndFollowingService();
+      followingService.addFollower(
+          auth.currentUser!.uid, 'u19X1PhO6LNyEOa3skVtKU07hir2');
 
       List<String> nameSearchParams = setSearchParam(userName);
       String token = await FCMManager.getFCMToken();
-      String customerId = await PaymentService.createStripeCustomer(email: email);
+      String customerId =
+          await PaymentService.createStripeCustomer(email: email);
       snap.collection(Collections.USER).doc(auth.currentUser!.uid).set({
         UserKey.USER_NAME: auth.currentUser!.displayName,
         UserKey.EMAIL: auth.currentUser!.email,
@@ -56,12 +59,16 @@ Future<bool> signUp(
         // UserKey.DEVICE_TOKEN:
         // FieldValue.arrayUnion([token])
         UserKey.DEVICE_TOKEN: [token]
-      }).then((value){
-        snap.collection(Collections.USER).doc(auth.currentUser!.uid).get().then((value){
-          userController.userModel.value = UserModel.fromMap(value.data() ?? {});
-                  pushNewScreen(context, screen: const Home(), withNavBar: false);
+      }).then((value) {
+        snap
+            .collection(Collections.USER)
+            .doc(auth.currentUser!.uid)
+            .get()
+            .then((value) {
+          userController.userModel.value =
+              UserModel.fromMap(value.data() ?? {});
+          pushScreen(context, screen: const Home(), withNavBar: false);
         });
-
       });
     });
   } on FirebaseAuthException catch (e) {
@@ -76,7 +83,9 @@ Future<bool> signUp(
 
 Future<void> login(email, password, context) async {
   try {
-    await auth.signInWithEmailAndPassword(email: email, password: password).then((value) async {
+    await auth
+        .signInWithEmailAndPassword(email: email, password: password)
+        .then((value) async {
       // print(FCMManager.fcmToken!);
       final token = await FCMManager.getFCMToken();
       List<String> tokens = [];
@@ -85,9 +94,7 @@ Future<void> login(email, password, context) async {
       print('========> toeken');
       if (token.isNotEmpty) {
         snap.collection(Collections.USER).doc(value.user!.uid).update(
-          {
-            UserKey.DEVICE_TOKEN: FieldValue.arrayUnion(tokens)
-          },
+          {UserKey.DEVICE_TOKEN: FieldValue.arrayUnion(tokens)},
         );
       }
       // Temporary --Save userid in global userid for chat
@@ -95,12 +102,15 @@ Future<void> login(email, password, context) async {
       await toModal(context);
       SharedPreferences prefs = await SharedPreferences.getInstance();
       prefs.setString('email', 'useremail@gmail.com');
-      userController.userModel.value.uid.isEmptyOrNull ? null : pushNewScreen(context, screen: const Home());
+      userController.userModel.value.uid.isEmptyOrNull
+          ? null
+          : pushScreen(context, screen: const Home());
     });
   } on FirebaseAuthException catch (e) {
     print('error message ${e.message}');
     // Get.snackbar('Error', e.message ?? '', snackPosition: SnackPosition.BOTTOM);
-    Get.snackbar('Error', "Invalid username or password", snackPosition: SnackPosition.TOP);
+    Get.snackbar('Error', "Invalid username or password",
+        snackPosition: SnackPosition.TOP);
     print('Failed with error code: ${e.code}');
     print(e.message);
   }
@@ -126,7 +136,7 @@ Future<void> logout(context) async {
 
   auth.signOut().then(
         (value) =>
-            // pushNewScreen(context, screen: const StartView(), withNavBar: false)
+            // pushScreen(context, screen: const StartView(), withNavBar: false)
             Get.offAll(StartView(
           isBack: false,
         )),
@@ -176,15 +186,20 @@ Future<void> delAcc(context) async {
                             User? user = FirebaseAuth.instance.currentUser;
 
                             // Prompt the user to reauthenticate
-                            AuthCredential credential = EmailAuthProvider.credential(
+                            AuthCredential credential =
+                                EmailAuthProvider.credential(
                               email: user!.email ?? "",
                               password: pass.text,
                             );
 
                             try {
-                              await user.reauthenticateWithCredential(credential);
+                              await user
+                                  .reauthenticateWithCredential(credential);
 
-                              snap.collection(Collections.USER).doc(auth.currentUser!.uid).delete();
+                              snap
+                                  .collection(Collections.USER)
+                                  .doc(auth.currentUser!.uid)
+                                  .delete();
 
                               await user.delete().then((value) {
                                 Get.offAll(StartView(isBack: false));
@@ -215,7 +230,7 @@ Future<void> delAcc(context) async {
             //     .doc(auth.currentUser!.uid)
             //     .delete()
             //     .then((value) => auth.currentUser!.delete().then((value) {
-            //           // pushNewScreen(
+            //           // pushScreen(
             //           //   context,
             //           //   screen: const StartView(),
             //           //   withNavBar: false,
@@ -233,10 +248,12 @@ Future<void> delAcc(context) async {
 }
 
 toModal(BuildContext context) async {
-  DocumentSnapshot snap =
-      await FirebaseFirestore.instance.collection(Collections.USER).doc(auth.currentUser?.uid ?? "").get();
+  DocumentSnapshot snap = await FirebaseFirestore.instance
+      .collection(Collections.USER)
+      .doc(auth.currentUser?.uid ?? "")
+      .get();
   UserModel userModel = UserModel.fromMap(snap.data() as Map<String, dynamic>);
-  userController.userModel.value =userModel;
+  userController.userModel.value = userModel;
   print("user model:.. ${userController.userModel.value.uid}");
 }
 
@@ -248,7 +265,8 @@ Future<void> resetPassword({required String emailText}) async {
     await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
 
     // Display a success message and navigate back
-    Fluttertoast.showToast(msg: "Password reset link sent via Email").then((value) {
+    Fluttertoast.showToast(msg: "Password reset link sent via Email")
+        .then((value) {
       Get.back(); // Navigate back to the previous screen
     });
   } on FirebaseAuthException catch (e) {

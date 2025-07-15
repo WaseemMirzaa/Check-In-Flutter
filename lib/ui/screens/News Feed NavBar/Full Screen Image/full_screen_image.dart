@@ -10,10 +10,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
-import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
+import 'package:persistent_bottom_nav_bar_v2/persistent_bottom_nav_bar_v2.dart';
 
 class FullScreenImage extends StatelessWidget {
-  FullScreenImage({super.key,required this.newsFeedModel, this.postId = ''});
+  FullScreenImage({super.key, required this.newsFeedModel, this.postId = ''});
   NewsFeedModel newsFeedModel;
   String formatTimestamp(Timestamp timestamp) {
     final DateTime dateTime = timestamp.toDate();
@@ -25,11 +25,11 @@ class FullScreenImage extends StatelessWidget {
     }
     return parts.join(' ');
   }
+
   String postId;
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       backgroundColor: appBlackColor,
       appBar: CustomAppbar(
@@ -63,25 +63,27 @@ class FullScreenImage extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      poppinsText(
-                          newsFeedModel.name!, 14, bold, appWhiteColor),
+                      poppinsText(newsFeedModel.name!, 14, bold, appWhiteColor),
                       verticalGap(8),
                       poppinsText(
-                          newsFeedModel.description!,
-                          10,
-                          medium,
-                          appWhiteColor,
+                          newsFeedModel.description!, 10, medium, appWhiteColor,
                           maxlines: 3),
                       verticalGap(6),
-                      poppinsText(formatTimestamp(newsFeedModel.timestamp!), 10, medium, appWhiteColor)
+                      poppinsText(formatTimestamp(newsFeedModel.timestamp!), 10,
+                          medium, appWhiteColor)
                     ],
                   ),
                 ),
                 Row(
                   children: [
                     GestureDetector(
-                      onTap: (){
-                        pushNewScreen(context, screen: PostAllLikesView(postId: newsFeedModel.isOriginal! ? newsFeedModel.id! : newsFeedModel.shareID!,));
+                      onTap: () {
+                        pushScreen(context,
+                            screen: PostAllLikesView(
+                              postId: newsFeedModel.isOriginal!
+                                  ? newsFeedModel.id!
+                                  : newsFeedModel.shareID!,
+                            ));
                       },
                       child: SvgPicture.asset(
                         AppImage.like1,
@@ -89,19 +91,28 @@ class FullScreenImage extends StatelessWidget {
                       ),
                     ),
                     horizontalGap(5),
-                    poppinsText(newsFeedModel.noOfLike.toString(), 12, medium, appWhiteColor),
+                    poppinsText(newsFeedModel.noOfLike.toString(), 12, medium,
+                        appWhiteColor),
                     const Spacer(),
                     GestureDetector(
-                        onTap: (){
-                          newsFeedModel.isOriginal! ? pushNewScreen(context,
-                              screen: AllCommentsScreen(
-                              docId: newsFeedModel.id!,
-                              newsFeedModel: newsFeedModel,)) : pushNewScreen(context,
-                              screen: AllCommentsScreen(
-                                docId: newsFeedModel.shareID!,
-                                newsFeedModel: newsFeedModel,));
+                        onTap: () {
+                          newsFeedModel.isOriginal!
+                              ? pushScreen(context,
+                                  screen: AllCommentsScreen(
+                                    docId: newsFeedModel.id!,
+                                    newsFeedModel: newsFeedModel,
+                                  ))
+                              : pushScreen(context,
+                                  screen: AllCommentsScreen(
+                                    docId: newsFeedModel.shareID!,
+                                    newsFeedModel: newsFeedModel,
+                                  ));
                         },
-                        child: poppinsText("${newsFeedModel.noOfComment} Comments", 12, medium, appWhiteColor)),
+                        child: poppinsText(
+                            "${newsFeedModel.noOfComment} Comments",
+                            12,
+                            medium,
+                            appWhiteColor)),
                   ],
                 )
               ],

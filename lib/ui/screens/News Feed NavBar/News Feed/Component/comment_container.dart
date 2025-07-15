@@ -18,7 +18,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:nb_utils/nb_utils.dart';
-import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
+import 'package:persistent_bottom_nav_bar_v2/persistent_bottom_nav_bar_v2.dart';
 import 'package:sizer/sizer.dart';
 
 import 'package:check_in/Services/user_services.dart';
@@ -99,7 +99,7 @@ class _CommentContainerState extends State<CommentContainer> {
                                           isNavBar: false,
                                         )));
                           } else {
-                            pushNewScreen(context,
+                            pushScreen(context,
                                 screen: ProfileScreen(
                                   isNavBar: false,
                                 ));
@@ -112,7 +112,7 @@ class _CommentContainerState extends State<CommentContainer> {
                                     builder: (index) => OtherProfileView(
                                         uid: widget.commentModel.userId!)));
                           } else {
-                            pushNewScreen(context,
+                            pushScreen(context,
                                 screen: OtherProfileView(
                                     uid: widget.commentModel.userId!));
                           }
@@ -136,7 +136,7 @@ class _CommentContainerState extends State<CommentContainer> {
                                           isNavBar: false,
                                         )));
                           } else {
-                            pushNewScreen(context,
+                            pushScreen(context,
                                 screen: ProfileScreen(
                                   isNavBar: false,
                                 ));
@@ -149,7 +149,7 @@ class _CommentContainerState extends State<CommentContainer> {
                                     builder: (index) => OtherProfileView(
                                         uid: widget.commentModel.userId!)));
                           } else {
-                            pushNewScreen(context,
+                            pushScreen(context,
                                 screen: OtherProfileView(
                                     uid: widget.commentModel.userId!));
                           }
@@ -229,7 +229,7 @@ class _CommentContainerState extends State<CommentContainer> {
                     horizontalGap(5),
                     GestureDetector(
                       onTap: () {
-                        pushNewScreen(context,
+                        pushScreen(context,
                             screen: CommentAllLikesView(
                                 postId: widget.commentModel.parentId!,
                                 commentId: widget.commentModel.commentId!));

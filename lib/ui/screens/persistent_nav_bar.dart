@@ -17,7 +17,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:nb_utils/nb_utils.dart';
 
-import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
+import 'package:persistent_bottom_nav_bar_v2/persistent_bottom_nav_bar_v2.dart';
 
 import 'History.dart';
 import '../../controllers/nav_bar_controller.dart';
@@ -59,8 +59,8 @@ class BottomNav {
 
 class CustomNavBarWidget extends StatelessWidget {
   final int selectedIndex;
-  final List<PersistentBottomNavBarItem>
-      items; // NOTE: You CAN declare your own model here instead of `PersistentBottomNavBarItem`.
+  final List<ItemConfig>
+      items; // NOTE: You CAN declare your own model here instead of `ItemConfig`.
   final ValueChanged<int> onItemSelected;
 
   const CustomNavBarWidget({
@@ -70,7 +70,7 @@ class CustomNavBarWidget extends StatelessWidget {
     required this.onItemSelected,
   });
 
-  Widget _buildItem(PersistentBottomNavBarItem item, bool isSelected) {
+  Widget _buildItem(ItemConfig item, bool isSelected) {
     return Container(
       alignment: Alignment.center,
       decoration: const BoxDecoration(
@@ -85,9 +85,9 @@ class CustomNavBarWidget extends StatelessWidget {
               data: IconThemeData(
                   size: 26.0,
                   color: isSelected
-                      ? (item.activeColorSecondary ?? item.activeColorPrimary)
-                      : item.inactiveColorPrimary ?? item.activeColorPrimary),
-              child: item.icon,
+                      ? item.activeForegroundColor
+                      : item.inactiveForegroundColor),
+              child: isSelected ? item.icon : item.inactiveIcon,
             ),
           ),
         ],
@@ -165,12 +165,11 @@ class _HomeState extends State<Home> with AutomaticKeepAliveClientMixin {
       if (FirebaseAuth.instance.currentUser != null) {
         // Set default tab to index 2 (NewsFeed tab) if the user is logged in
         navBarController.currentIndex.value = 2;
-        navBarController.controller.index =
-            2; // Optional, if using tab controller
+        navBarController.controller.jumpToTab(2); // Updated to use jumpToTab
       } else {
         // Set default tab to index 0 (Home tab) if user is not logged in
         navBarController.currentIndex.value = 0;
-        navBarController.controller.index = 0;
+        navBarController.controller.jumpToTab(0); // Updated to use jumpToTab
       }
     });
 
@@ -208,7 +207,7 @@ class _HomeState extends State<Home> with AutomaticKeepAliveClientMixin {
 
     FirebaseDynamicLinks.instance.onLink.listen(
       (PendingDynamicLinkData dynamicLinkData) {
-        _handleDeepLink(context, dynamicLinkData?.link);
+        _handleDeepLink(context, dynamicLinkData.link);
       },
       onError: (error) async {
         developer.log('Dynamic Link Failed: ${error.toString()}');
@@ -248,21 +247,21 @@ class _HomeState extends State<Home> with AutomaticKeepAliveClientMixin {
     return [
       BottomNav(
         label: 'Home',
-        boxColor: navBarController.controller.index == 0
+        boxColor: navBarController.currentIndex.value == 0
             ? appGreenColor
             : appWhiteColor,
         icon: "Group 12548",
-        iconColor: navBarController.controller.index == 0
+        iconColor: navBarController.currentIndex.value == 0
             ? appWhiteColor
             : appBlackColor,
       ).getBottomNavItem(),
       BottomNav(
         label: 'Chat',
-        boxColor: navBarController.controller.index == 1
+        boxColor: navBarController.currentIndex.value == 1
             ? appGreenColor
             : appWhiteColor,
         icon: "Path 28661",
-        iconColor: navBarController.controller.index == 1
+        iconColor: navBarController.currentIndex.value == 1
             ? appWhiteColor
             : appBlackColor,
       ).getBottomNavItem(),
@@ -270,31 +269,31 @@ class _HomeState extends State<Home> with AutomaticKeepAliveClientMixin {
       //.......................... News Feed
       BottomNav(
         label: 'NewsFeed',
-        boxColor: navBarController.controller.index == 2
+        boxColor: navBarController.currentIndex.value == 2
             ? appGreenColor
             : appWhiteColor,
         icon: "calendar",
-        iconColor: navBarController.controller.index == 2
+        iconColor: navBarController.currentIndex.value == 2
             ? appWhiteColor
             : appBlackColor,
       ).getBottomNavItem(),
       BottomNav(
         label: 'History',
-        boxColor: navBarController.controller.index == 3
+        boxColor: navBarController.currentIndex.value == 3
             ? appGreenColor
             : appWhiteColor,
         icon: "Icon awesome-history",
-        iconColor: navBarController.controller.index == 3
+        iconColor: navBarController.currentIndex.value == 3
             ? appWhiteColor
             : appBlackColor,
       ).getBottomNavItem(),
       BottomNav(
         label: 'Profile',
-        boxColor: navBarController.controller.index == 4
+        boxColor: navBarController.currentIndex.value == 4
             ? appGreenColor
             : appWhiteColor,
         icon: "Icon material-person",
-        iconColor: navBarController.controller.index == 4
+        iconColor: navBarController.currentIndex.value == 4
             ? appWhiteColor
             : appBlackColor,
       ).getBottomNavItem(),
@@ -323,6 +322,7 @@ class _HomeState extends State<Home> with AutomaticKeepAliveClientMixin {
   bool get wantKeepAlive => true;
   @override
   Widget build(BuildContext context) {
+    super.build(context); // Required by AutomaticKeepAliveClientMixin
     return WillPopScope(
       onWillPop: _onWillPop,
       child: Obx(() {
@@ -358,7 +358,8 @@ class _HomeState extends State<Home> with AutomaticKeepAliveClientMixin {
                         ));
               } else {
                 navBarController.currentIndex.value = index;
-                navBarController.controller.index = index;
+                navBarController.controller
+                    .jumpToTab(index); // Updated to use jumpToTab
               }
             },
           ),

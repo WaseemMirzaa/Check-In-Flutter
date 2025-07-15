@@ -17,7 +17,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
+import 'package:persistent_bottom_nav_bar_v2/persistent_bottom_nav_bar_v2.dart';
 import 'package:sizer/sizer.dart';
 import 'package:check_in/Services/user_services.dart';
 
@@ -81,12 +81,12 @@ class _SubCommentCompState extends State<SubCommentComp> {
                     onTap: () {
                       if (widget.commentModel.userId ==
                           FirebaseAuth.instance.currentUser!.uid) {
-                        pushNewScreen(context,
+                        pushScreen(context,
                             screen: ProfileScreen(
                               isNavBar: false,
                             ));
                       } else {
-                        pushNewScreen(context,
+                        pushScreen(context,
                             screen: OtherProfileView(
                                 uid: widget.commentModel.userId!));
                       }
@@ -100,12 +100,12 @@ class _SubCommentCompState extends State<SubCommentComp> {
                     onTap: () {
                       if (widget.commentModel.userId ==
                           FirebaseAuth.instance.currentUser!.uid) {
-                        pushNewScreen(context,
+                        pushScreen(context,
                             screen: ProfileScreen(
                               isNavBar: false,
                             ));
                       } else {
-                        pushNewScreen(context,
+                        pushScreen(context,
                             screen: OtherProfileView(
                                 uid: widget.commentModel.userId!));
                       }
@@ -175,7 +175,7 @@ class _SubCommentCompState extends State<SubCommentComp> {
                   horizontalGap(5),
                   GestureDetector(
                     onTap: () {
-                      pushNewScreen(context,
+                      pushScreen(context,
                           screen: SubCommentAllLikesView(
                             postId: widget.commentModel.postId!,
                             parentId: widget.commentModel.parentId!,

@@ -15,7 +15,9 @@ import '../../utils/colors.dart';
 import '../../utils/styles.dart';
 
 class TermsAndConditions extends StatefulWidget {
-  const TermsAndConditions({Key? key, this.showButtons = false, this.fromSignup = false}) : super(key: key);
+  const TermsAndConditions(
+      {Key? key, this.showButtons = false, this.fromSignup = false})
+      : super(key: key);
   final bool showButtons;
   final bool fromSignup;
 
@@ -26,6 +28,44 @@ class TermsAndConditions extends StatefulWidget {
 class _TermsAndConditionsState extends State<TermsAndConditions> {
   late WebViewController _controller;
   bool _reachBottom = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = WebViewController()
+      ..setJavaScriptMode(JavaScriptMode.unrestricted)
+      ..addJavaScriptChannel(
+        'ScrollDetector',
+        onMessageReceived: (JavaScriptMessage message) {
+          if (message.message == 'bottom') {
+            setState(() {
+              _reachBottom = true;
+            });
+          }
+        },
+      )
+      ..setNavigationDelegate(
+        NavigationDelegate(
+          onNavigationRequest: (NavigationRequest request) {
+            if (request.url.startsWith('https://www.youtube.com/')) {
+              print('blocking navigation to ${request.url}');
+              return NavigationDecision.prevent;
+            }
+            print('allowing navigation to ${request.url}');
+            return NavigationDecision.navigate;
+          },
+          onPageStarted: (String url) {
+            print('Page started loading: $url');
+          },
+          onPageFinished: (String url) {
+            _injectScrollDetectionJS();
+            print('Page finished loading: $url');
+          },
+        ),
+      )
+      ..loadRequest(
+          Uri.parse("https://sites.google.com/view/checkin-hoops-terms"));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -45,7 +85,7 @@ class _TermsAndConditionsState extends State<TermsAndConditions> {
                 } else {
                   Navigator.pop(context);
                 }
-                // pushNewScreen(context, screen: Home(), withNavBar: false);
+                // pushScreen(context, screen: Home(), withNavBar: false);
               },
               child: SizedBox(
                 height: 2.1.h,
@@ -58,8 +98,8 @@ class _TermsAndConditionsState extends State<TermsAndConditions> {
         elevation: 0,
         centerTitle: true,
         backgroundColor: appWhiteColor,
-        title: poppinsText(
-            TempLanguage.termsAndConditions, 20, FontWeight.bold, appBlackColor),
+        title: poppinsText(TempLanguage.termsAndConditions, 20, FontWeight.bold,
+            appBlackColor),
       ),
       body: Stack(
         children: [
@@ -82,117 +122,90 @@ class _TermsAndConditionsState extends State<TermsAndConditions> {
               ],
             ),
             child: Builder(builder: (BuildContext context) {
-              return WebView(
-                initialUrl:
-                    // "https://www.freeprivacypolicy.com/live/0ccc6661-8efc-4732-b790-0663f523ed4a",
-                    // "https://docs.google.com/document/d/12-ZJ7JYdvXfObKDzwxPn5G9Ca0xaWOM4/edit?usp=sharing&ouid=106501373238887852973&rtpof=true&sd=true",
-                    "https://sites.google.com/view/checkin-hoops-terms",
-                javascriptMode: JavascriptMode.unrestricted,
-                onWebViewCreated: (WebViewController webViewController) {
-                  _controller = webViewController;
-                },
-                javascriptChannels: {
-                  JavascriptChannel(
-                    name: 'ScrollDetector',
-                    onMessageReceived: (JavascriptMessage message) {
-                      if (message.message == 'bottom') {
-                        setState(() {
-                          _reachBottom = true;
-                        });
-                      }
-                    },
-                  ),
-                },
-                navigationDelegate: (NavigationRequest request) {
-                  if (request.url.startsWith('https://www.youtube.com/')) {
-                    print('blocking navigation to $request}');
-                    return NavigationDecision.prevent;
-                  }
-                  print('allowing navigation to $request');
-                  return NavigationDecision.navigate;
-                },
-                onPageStarted: (String url) {
-                  print('Page started loading: $url');
-                },
-                onPageFinished: (String url) {
-                  _injectScrollDetectionJS();
-                  print('Page finished loading: $url');
-                },
-                gestureNavigationEnabled: true,
-              );
+              return WebViewWidget(controller: _controller);
             }),
           ),
           widget.showButtons
               ? Positioned(
-            bottom: 10,
-            left: 20,
-            right: 20,
-            child: Row(
-              children: [
-                Expanded(
-                 child: InkWell(
-                  onTap: _reachBottom
-                      ? () {
-                    if (widget.fromSignup && widget.showButtons) {
-                      Get.back(result: false);
-                    } else if (widget.showButtons) {
-                      closeApp();
-                    } else {
-                      Navigator.pop(context);
-                    }
-                  }
-                      : null,
-                  child: Container(
-                    height: 45,
-                    decoration: BoxDecoration(
-                        color: _reachBottom ? Colors.red : Colors.grey,
-                      borderRadius: const BorderRadius.only(topLeft: Radius.circular(10), bottomLeft: Radius.circular(10))
-                    ),
-                    alignment: Alignment.center,
-                    child: const Text(
-                      'Cancel',
-                      style: TextStyle(color: Colors.white, fontSize: 16),
-                    ),
+                  bottom: 10,
+                  left: 20,
+                  right: 20,
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: InkWell(
+                          onTap: _reachBottom
+                              ? () {
+                                  if (widget.fromSignup && widget.showButtons) {
+                                    Get.back(result: false);
+                                  } else if (widget.showButtons) {
+                                    closeApp();
+                                  } else {
+                                    Navigator.pop(context);
+                                  }
+                                }
+                              : null,
+                          child: Container(
+                            height: 45,
+                            decoration: BoxDecoration(
+                                color: _reachBottom ? Colors.red : Colors.grey,
+                                borderRadius: const BorderRadius.only(
+                                    topLeft: Radius.circular(10),
+                                    bottomLeft: Radius.circular(10))),
+                            alignment: Alignment.center,
+                            child: const Text(
+                              'Cancel',
+                              style:
+                                  TextStyle(color: Colors.white, fontSize: 16),
+                            ),
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        child: InkWell(
+                          onTap: _reachBottom
+                              ? () async {
+                                  if (widget.fromSignup && widget.showButtons) {
+                                    Get.back(result: true);
+                                  } else if (widget.showButtons) {
+                                    await FirebaseFirestore.instance
+                                        .collection(Collections.USER)
+                                        .doc(userController.userModel.value.uid)
+                                        .update(
+                                            {UserKey.IS_TERMS_VERIFIED: true});
+                                    DocumentSnapshot snapshot =
+                                        await FirebaseFirestore.instance
+                                            .collection(Collections.USER)
+                                            .doc(userController
+                                                .userModel.value.uid)
+                                            .get();
+                                    userController.userModel.value =
+                                        UserModel.fromMap(snapshot.data()
+                                            as Map<String, dynamic>);
+                                    Get.back();
+                                  } else {
+                                    Navigator.pop(context);
+                                  }
+                                }
+                              : null,
+                          child: Container(
+                            height: 45,
+                            decoration: BoxDecoration(
+                                color:
+                                    _reachBottom ? Colors.green : Colors.grey,
+                                borderRadius: const BorderRadius.only(
+                                    topRight: Radius.circular(10),
+                                    bottomRight: Radius.circular(10))),
+                            alignment: Alignment.center,
+                            child: const Text('Agree',
+                                style: TextStyle(
+                                    color: Colors.white, fontSize: 16)),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                 ),
-                ),
-                Expanded(
-                  child: InkWell(
-                  onTap: _reachBottom
-                      ? () async {
-                    if (widget.fromSignup && widget.showButtons) {
-                      Get.back(result: true);
-                    } else if (widget.showButtons) {
-                      await FirebaseFirestore.instance
-                          .collection(Collections.USER)
-                          .doc(userController.userModel.value.uid)
-                          .update({UserKey.IS_TERMS_VERIFIED: true});
-                      DocumentSnapshot snapshot = await FirebaseFirestore.instance
-                          .collection(Collections.USER)
-                          .doc(userController.userModel.value.uid)
-                          .get();
-                      userController.userModel.value = UserModel.fromMap(snapshot.data() as Map<String, dynamic>);
-                      Get.back();
-                    } else {
-                      Navigator.pop(context);
-                    }
-                  }
-                      : null,
-                   child: Container(
-                    height: 45,
-                     decoration: BoxDecoration(
-                         color: _reachBottom ? Colors.green : Colors.grey,
-                         borderRadius: const BorderRadius.only(topRight: Radius.circular(10), bottomRight: Radius.circular(10))
-                     ),
-                    alignment: Alignment.center,
-                    child: const Text('Agree',
-                        style: TextStyle(color: Colors.white, fontSize: 16)),
-                  ),
-                 ),
-                ),
-              ],
-            ),
-          )
+                )
               : const SizedBox.shrink(),
         ],
       ),
@@ -200,7 +213,7 @@ class _TermsAndConditionsState extends State<TermsAndConditions> {
   }
 
   void _injectScrollDetectionJS() {
-    _controller.runJavascript('''
+    _controller.runJavaScript('''
       console.log('Injecting scroll detection script');
       function isScrolledToBottom() {
         const scrollPosition = window.pageYOffset;
@@ -227,7 +240,6 @@ class _TermsAndConditionsState extends State<TermsAndConditions> {
         console.log('Page is not scrollable or already at bottom');
         ScrollDetector.postMessage('bottom');
       }
-
       console.log('Scroll detection script injected successfully');
     ''');
   }
