@@ -518,15 +518,14 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
-  flutter_app_badger:
+  flutter_badge_manager:
     dependency: "direct main"
     description:
-      path: "."
-      ref: "33cbee6"
-      resolved-ref: "33cbee625e279b77ad80c6486f93fc154f1bb04a"
-      url: "https://github.com/g123k/flutter_app_badger.git"
-    source: git
-    version: "1.5.0"
+      name: flutter_badge_manager
+      sha256: e3d5854838e5940b00cb7c896d1c74cce9bccc49112747431276ff1afc891466
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.0.1"
   flutter_bloc_pattern:
     dependency: transitive
     description:

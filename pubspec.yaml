@@ -68,11 +68,11 @@ dependencies:
   emoji_picker_flutter: ^4.3.0
   firebase_messaging: ^15.2.9
   flutter_local_notifications: ^19.3.0
-  # flutter_app_badger: ^1.5.0
-  flutter_app_badger:
-    git:
-      url: https://github.com/g123k/flutter_app_badger.git
-      ref: 33cbee6
+  flutter_badge_manager: ^0.0.1
+  # flutter_app_badger:
+  #   git:
+  #     url: https://github.com/g123k/flutter_app_badger.git
+  #     ref: 33cbee6
   rxdart: ^0.28.0
   flutter_image_compress: ^2.4.0
   dartz: ^0.10.1

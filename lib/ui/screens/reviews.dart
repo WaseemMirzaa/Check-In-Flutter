@@ -12,12 +12,14 @@ class ReviewsScreen extends StatefulWidget {
   final String courtName;
   final bool isPremium;
   final String courtId;
+  final bool isCheckedIn;
 
   const ReviewsScreen({
     super.key,
     required this.courtName,
     required this.courtId,
     required this.isPremium,
+    required this.isCheckedIn,
   });
 
   @override
@@ -226,7 +228,7 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
             child: reviews.isEmpty && !isLoading
                 ? Center(
                     child: Text(
-                      "No reviews yet. Be the first to review this court!",
+                      "No reviews yet.",
                       style: TextStyle(
                         fontFamily: TempLanguage.poppins,
                         fontSize: 16,
@@ -376,7 +378,7 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
           ),
 
           // Rate This Court Button
-          if (widget.isPremium)
+          if (widget.isPremium && widget.isCheckedIn)
             Container(
               padding: const EdgeInsets.all(20),
               child: Row(

@@ -9,8 +9,10 @@ import 'package:check_in/ui/screens/player.dart';
 import 'package:check_in/ui/screens/gallery.dart';
 import 'package:check_in/ui/screens/reviews.dart';
 import 'package:check_in/ui/screens/comments.dart';
+import 'package:check_in/ui/widgets/upload_dialog.dart';
 import 'package:check_in/utils/colors.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -231,12 +233,14 @@ class CustomButton extends StatelessWidget {
 
 class GallerySection extends StatelessWidget {
   final bool isPremium;
+  final bool isCheckedIn;
   final String courtName;
   final String courtId;
 
   const GallerySection({
     super.key,
-    this.isPremium = false,
+    required this.isPremium,
+    required this.isCheckedIn,
     required this.courtName,
     required this.courtId,
   });
@@ -254,7 +258,9 @@ class GallerySection extends StatelessWidget {
                 MaterialPageRoute(
                   builder: (context) => GalleryScreen(
                     courtName: courtName,
+                    courtId: courtId,
                     isPremium: isPremium,
+                    isCheckedIn: isCheckedIn,
                   ),
                 ),
               );
@@ -306,7 +312,9 @@ class GallerySection extends StatelessWidget {
                         MaterialPageRoute(
                           builder: (context) => GalleryScreen(
                             courtName: courtName,
+                            courtId: courtId,
                             isPremium: isPremium,
+                            isCheckedIn: isCheckedIn,
                           ),
                         ),
                       );
@@ -348,17 +356,14 @@ class GallerySection extends StatelessWidget {
           },
         ),
         const SizedBox(height: 20),
-        if (isPremium)
+        if (isPremium && isCheckedIn)
           CustomButton(
             text: "Upload Gallery Images",
             onTap: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (context) => GalleryScreen(
-                    courtName: courtName,
-                    isPremium: isPremium,
-                  ),
-                ),
+              UploadDialog.showUploadDialog(
+                context: context,
+                courtId: courtId,
+                courtName: courtName,
               );
             },
           ),
@@ -481,12 +486,14 @@ class ReviewCard extends StatelessWidget {
 
 class ReviewsSection extends StatefulWidget {
   final bool isPremium;
+  final bool isCheckedIn;
   final String courtName;
   final String courtId;
 
   const ReviewsSection({
     super.key,
     required this.isPremium,
+    required this.isCheckedIn,
     required this.courtName,
     required this.courtId,
   });
@@ -555,6 +562,7 @@ class _ReviewsSectionState extends State<ReviewsSection> {
                         courtId: widget.courtId, // Using courtId as document ID
                         courtName: widget.courtName,
                         isPremium: widget.isPremium,
+                        isCheckedIn: widget.isCheckedIn,
                       ),
                     ),
                   );
@@ -606,7 +614,7 @@ class _ReviewsSectionState extends State<ReviewsSection> {
                 ),
                 child: Center(
                   child: Text(
-                    "No reviews yet. Be the first to review this court!",
+                    "No reviews yet.",
                     style: TextStyle(
                       fontFamily: TempLanguage.poppins,
                       fontSize: 14,
@@ -639,7 +647,7 @@ class _ReviewsSectionState extends State<ReviewsSection> {
           },
         ),
         const SizedBox(height: 20),
-        if (widget.isPremium)
+        if (widget.isPremium && widget.isCheckedIn)
           CustomButton(
             text: "Rate this court",
             onTap: () {
@@ -759,17 +767,189 @@ class CommentCard extends StatelessWidget {
   }
 }
 
-class CommentsSection extends StatelessWidget {
+class CommentsSection extends StatefulWidget {
   final bool isPremium;
+  final bool isCheckedIn;
   final String courtName;
   final String courtId;
 
   const CommentsSection({
     super.key,
-    this.isPremium = false,
+    required this.isPremium,
+    required this.isCheckedIn,
     required this.courtName,
     required this.courtId,
   });
+
+  @override
+  State<CommentsSection> createState() => _CommentsSectionState();
+}
+
+class _CommentsSectionState extends State<CommentsSection> {
+  void _showCommentDialog() {
+    TextEditingController commentController = TextEditingController();
+    bool isFormValid = false;
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            isFormValid = commentController.text.trim().isNotEmpty;
+
+            return AlertDialog(
+              title: Text(
+                "Write a Comment",
+                style: TextStyle(
+                  fontFamily: TempLanguage.poppins,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    "Share your thoughts about ${widget.courtName}",
+                    style: TextStyle(
+                      fontFamily: TempLanguage.poppins,
+                      fontSize: 14,
+                      color: Colors.grey.shade600,
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  TextField(
+                    controller: commentController,
+                    maxLines: 4,
+                    onChanged: (value) {
+                      setDialogState(() {
+                        // Trigger rebuild to update button state
+                      });
+                    },
+                    decoration: InputDecoration(
+                      hintText: "Write your comment...",
+                      hintStyle: TextStyle(
+                        fontFamily: TempLanguage.poppins,
+                        color: Colors.grey.shade500,
+                      ),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: BorderSide(color: Colors.grey.shade300),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        borderSide: BorderSide(color: appGreenColor),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: Text(
+                    "Cancel",
+                    style: TextStyle(
+                      color: Colors.red,
+                      fontFamily: TempLanguage.poppins,
+                    ),
+                  ),
+                ),
+                TextButton(
+                  onPressed: isFormValid
+                      ? () {
+                          if (commentController.text.trim().isEmpty) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  "Please write a comment",
+                                  style: TextStyle(
+                                      fontFamily: TempLanguage.poppins),
+                                ),
+                                backgroundColor: Colors.red,
+                              ),
+                            );
+                            return;
+                          }
+                          Navigator.pop(context);
+                          _submitComment(commentController.text);
+                        }
+                      : null,
+                  child: Text(
+                    "Post",
+                    style: TextStyle(
+                      color: isFormValid ? appGreenColor : Colors.grey,
+                      fontFamily: TempLanguage.poppins,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
+  void _submitComment(String commentText) async {
+    try {
+      final currentUser = FirebaseAuth.instance.currentUser;
+      if (currentUser == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              "Please login to post a comment",
+              style: TextStyle(fontFamily: TempLanguage.poppins),
+            ),
+            backgroundColor: Colors.red,
+          ),
+        );
+        return;
+      }
+
+      final userController = Get.find<UserController>();
+      final user = userController.userModel.value;
+
+      await FirebaseFirestore.instance
+          .collection(Collections.GOLDEN_LOCATIONS)
+          .doc(widget.courtId)
+          .collection(Collections.COURT_COMMENTS)
+          .add({
+        CommentKey.USER_ID: currentUser.uid,
+        CommentKey.USER_NAME: user.userName,
+        CommentKey.USER_PHOTO_URL: user.photoUrl,
+        CommentKey.COMMENT_TEXT: commentText,
+        CommentKey.CREATED_AT: FieldValue.serverTimestamp(),
+      });
+
+      // Show success message
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              "Comment posted successfully!",
+              style: TextStyle(fontFamily: TempLanguage.poppins),
+            ),
+            backgroundColor: appGreenColor,
+            duration: const Duration(seconds: 2),
+          ),
+        );
+      }
+    } catch (e) {
+      debugPrint("Error submitting comment: $e");
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              "Failed to post comment. Please try again.",
+              style: TextStyle(fontFamily: TempLanguage.poppins),
+            ),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -783,8 +963,10 @@ class CommentsSection extends StatelessWidget {
               Navigator.of(context).push(
                 MaterialPageRoute(
                   builder: (context) => CommentsScreen(
-                    courtName: courtName,
-                    isPremium: isPremium,
+                    courtName: widget.courtName,
+                    courtId: widget.courtId,
+                    isPremium: widget.isPremium,
+                    isCheckedIn: widget.isCheckedIn,
                   ),
                 ),
               );
@@ -793,7 +975,7 @@ class CommentsSection extends StatelessWidget {
         ),
         const SizedBox(height: 15),
         StreamBuilder<List<Comment>>(
-          stream: CourtDataService(courtId: courtId).comments,
+          stream: CourtDataService(courtId: widget.courtId).comments,
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const SizedBox(
@@ -811,7 +993,7 @@ class CommentsSection extends StatelessWidget {
                 ),
                 child: Center(
                   child: Text(
-                    "No comments yet. Be the first to comment!",
+                    "No comments yet.",
                     style: TextStyle(
                       fontFamily: TempLanguage.poppins,
                       fontSize: 14,
@@ -836,19 +1018,10 @@ class CommentsSection extends StatelessWidget {
           },
         ),
         const SizedBox(height: 20),
-        if (isPremium)
+        if (widget.isPremium && widget.isCheckedIn)
           CustomButton(
             text: "Write a comment",
-            onTap: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (context) => CommentsScreen(
-                    courtName: courtName,
-                    isPremium: isPremium,
-                  ),
-                ),
-              );
-            },
+            onTap: _showCommentDialog,
           ),
       ],
     );
@@ -1221,18 +1394,21 @@ class _PlayersViewState extends State<PlayersView> {
                       children: [
                         GallerySection(
                           isPremium: isCurrentUserPremium,
+                          isCheckedIn: widget.isCheckedIn,
                           courtName: widget.courtName,
                           courtId: widget.courtId,
                         ),
                         const SizedBox(height: 30),
                         ReviewsSection(
                           isPremium: isCurrentUserPremium,
+                          isCheckedIn: widget.isCheckedIn,
                           courtName: widget.courtName,
                           courtId: widget.courtId,
                         ),
                         const SizedBox(height: 30),
                         CommentsSection(
                           isPremium: isCurrentUserPremium,
+                          isCheckedIn: widget.isCheckedIn,
                           courtName: widget.courtName,
                           courtId: widget.courtId,
                         ),
