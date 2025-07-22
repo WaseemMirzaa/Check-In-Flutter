@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:check_in/Services/user_services.dart';
 import 'package:check_in/Services/court_data_service.dart';
 import 'package:check_in/Services/review_service.dart';
@@ -10,6 +11,7 @@ import 'package:check_in/ui/screens/gallery.dart';
 import 'package:check_in/ui/screens/reviews.dart';
 import 'package:check_in/ui/screens/comments.dart';
 import 'package:check_in/ui/widgets/upload_dialog.dart';
+import 'package:check_in/ui/widgets/dialog_widgets.dart';
 import 'package:check_in/utils/colors.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -300,14 +302,14 @@ class GallerySection extends StatelessWidget {
               );
             }
 
-            final galleryItems = snapshot.data!;
+            final List<GalleryItem> galleryItems = snapshot.data!;
             return SizedBox(
               height: 120,
               child: ListView.builder(
                 scrollDirection: Axis.horizontal,
                 itemCount: galleryItems.length,
                 itemBuilder: (context, index) {
-                  final item = galleryItems[index];
+                  GalleryItem item = galleryItems[index];
                   final currentUserId = FirebaseAuth.instance.currentUser?.uid;
                   final isOwner = currentUserId == item.uploadedBy;
 
@@ -335,18 +337,21 @@ class GallerySection extends StatelessWidget {
                         children: [
                           ClipRRect(
                             borderRadius: BorderRadius.circular(10),
-                            child: Image.network(
-                              item.imageUrl,
+                            child: CachedNetworkImage(
+                              imageUrl: item.imageUrl,
                               width: 120,
                               height: 120,
                               fit: BoxFit.cover,
-                              loadingBuilder:
-                                  (context, child, loadingProgress) {
-                                if (loadingProgress == null) return child;
-                                return const Center(
-                                    child: CircularProgressIndicator());
-                              },
-                              errorBuilder: (context, error, stackTrace) {
+                              placeholder: (context, url) => Center(
+                                child: SizedBox(
+                                  width: 30,
+                                  height: 30,
+                                  child:
+                                      CircularProgressIndicator(strokeWidth: 3),
+                                ),
+                              ),
+                              errorWidget: (context, url, error) {
+                                print('Error loading image: $error');
                                 return Container(
                                   width: 120,
                                   height: 120,
@@ -488,9 +493,7 @@ class GallerySection extends StatelessWidget {
 
       // Delete the image from Firestore
       await FirebaseFirestore.instance
-          .collection(Collections.GOLDEN_LOCATIONS)
-          .doc(courtId)
-          .collection(Collections.GALLERY)
+          .collection(Collections.COURT_GALLERY)
           .doc(item.id)
           .delete();
 
@@ -539,128 +542,276 @@ class ReviewCard extends StatelessWidget {
     final currentUserId = FirebaseAuth.instance.currentUser?.uid;
     final isOwner = currentUserId == review.userId;
 
-    return Container(
-      width: 300,
-      margin: const EdgeInsets.only(right: 15),
-      padding: const EdgeInsets.all(15),
-      decoration: BoxDecoration(
-        color: appWhiteColor,
-        borderRadius: BorderRadius.circular(10),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.15),
-            offset: const Offset(0, 4),
-            blurRadius: 12,
-            spreadRadius: 1,
-          ),
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.05),
-            offset: const Offset(0, 1),
-            blurRadius: 4,
-            spreadRadius: 0,
-          ),
-        ],
-        border: Border.all(
-          color: Colors.grey.shade100,
-          width: 1,
-        ),
-      ),
-      child: Row(
-        children: [
-          Container(
-            height: 50,
-            width: 50,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: Colors.grey.shade200,
+    return GestureDetector(
+      onTap: () => _showReviewDetailDialog(context),
+      child: Container(
+        width: 300,
+        margin: const EdgeInsets.only(right: 15),
+        padding: const EdgeInsets.all(15),
+        decoration: BoxDecoration(
+          color: appWhiteColor,
+          borderRadius: BorderRadius.circular(10),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.15),
+              offset: const Offset(0, 4),
+              blurRadius: 12,
+              spreadRadius: 1,
             ),
-            child: ClipOval(
-              child: review.userPhotoUrl.isNotEmpty &&
-                      review.userPhotoUrl.startsWith('http')
-                  ? Image.network(
-                      review.userPhotoUrl,
-                      fit: BoxFit.cover,
-                      loadingBuilder: (context, child, loadingProgress) {
-                        if (loadingProgress == null) return child;
-                        return const Center(child: CircularProgressIndicator());
-                      },
-                      errorBuilder: (context, error, stackTrace) {
-                        return Icon(
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.05),
+              offset: const Offset(0, 1),
+              blurRadius: 4,
+              spreadRadius: 0,
+            ),
+          ],
+          border: Border.all(
+            color: Colors.grey.shade100,
+            width: 1,
+          ),
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              height: 50,
+              width: 50,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.grey.shade200,
+              ),
+              child: ClipOval(
+                child: review.userPhotoUrl.isNotEmpty
+                    ? CachedNetworkImage(
+                        imageUrl: review.userPhotoUrl,
+                        fit: BoxFit.cover,
+                        placeholder: (context, url) => Center(
+                          child: SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          ),
+                        ),
+                        errorWidget: (context, url, error) => Icon(
                           Icons.person,
                           size: 25,
                           color: Colors.grey.shade500,
-                        );
-                      },
-                    )
-                  : review.userPhotoUrl.isNotEmpty
-                      ? Image.asset(
-                          review.userPhotoUrl,
+                        ),
+                      )
+                    : Icon(
+                        Icons.person,
+                        size: 25,
+                        color: Colors.grey.shade500,
+                      ),
+              ),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: Text(
+                          review.userName,
+                          style: TextStyle(
+                            fontFamily: TempLanguage.poppins,
+                            fontSize: 14,
+                            color: appBlackColor,
+                            fontWeight: FontWeight.w600,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      if (isOwner)
+                        GestureDetector(
+                          onTap: () => _showDeleteReviewConfirmation(
+                              context, review, courtId),
+                          child: Icon(
+                            Icons.delete_outline,
+                            size: 16,
+                            color: Colors.red.shade600,
+                          ),
+                        ),
+                    ],
+                  ),
+                  const SizedBox(height: 5),
+                  Text(
+                    review.reviewText,
+                    style: TextStyle(
+                      fontFamily: TempLanguage.poppins,
+                      fontSize: 11,
+                      color: Colors.grey.shade600,
+                      height: 1.3,
+                    ),
+                    maxLines: 3,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 5),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: RatingWidget(
+                          averageRating: review.rating.toDouble(),
+                          totalRatings: "",
+                          starSize: 12,
+                          fontSize: 12,
+                        ),
+                      ),
+                      Text(
+                        _formatDate(review.createdAt),
+                        style: TextStyle(
+                          fontFamily: TempLanguage.poppins,
+                          fontSize: 12,
+                          color: Colors.grey.shade500,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ), // closing Container (child of GestureDetector)
+    ); // closing GestureDetector
+  } // closing build method of ReviewCard
+
+  String _formatDate(DateTime date) {
+    final now = DateTime.now();
+    final difference = now.difference(date);
+
+    if (difference.inDays > 7) {
+      return "${date.day}/${date.month}/${date.year}";
+    } else if (difference.inDays > 0) {
+      return "${difference.inDays} day${difference.inDays > 1 ? 's' : ''} ago";
+    } else if (difference.inHours > 0) {
+      return "${difference.inHours} hour${difference.inHours > 1 ? 's' : ''} ago";
+    } else if (difference.inMinutes > 0) {
+      return "${difference.inMinutes} minute${difference.inMinutes > 1 ? 's' : ''} ago";
+    } else {
+      return "Just now";
+    }
+  }
+
+  void _showReviewDetailDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: appWhiteColor,
+          contentPadding: const EdgeInsets.all(20),
+          title: Row(
+            children: [
+              Container(
+                height: 40,
+                width: 40,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.grey.shade200,
+                ),
+                child: ClipOval(
+                  child: review.userPhotoUrl.isNotEmpty
+                      ? CachedNetworkImage(
+                          imageUrl: review.userPhotoUrl,
                           fit: BoxFit.cover,
+                          placeholder: (context, url) => Icon(
+                            Icons.person,
+                            size: 20,
+                            color: Colors.grey.shade500,
+                          ),
+                          errorWidget: (context, url, error) => Icon(
+                            Icons.person,
+                            size: 20,
+                            color: Colors.grey.shade500,
+                          ),
                         )
                       : Icon(
                           Icons.person,
-                          size: 25,
+                          size: 20,
                           color: Colors.grey.shade500,
                         ),
-            ),
-          ),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Expanded(
-                      child: Text(
-                        review.userName,
-                        style: TextStyle(
-                          fontFamily: TempLanguage.poppins,
-                          fontSize: 14,
-                          color: appBlackColor,
-                          fontWeight: FontWeight.w600,
-                        ),
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                    if (isOwner)
-                      GestureDetector(
-                        onTap: () => _showDeleteReviewConfirmation(
-                            context, review, courtId),
-                        child: Icon(
-                          Icons.delete_outline,
-                          size: 16,
-                          color: Colors.red.shade600,
-                        ),
-                      ),
-                  ],
                 ),
-                const SizedBox(height: 5),
-                Text(
-                  review.reviewText,
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  review.userName,
                   style: TextStyle(
                     fontFamily: TempLanguage.poppins,
-                    fontSize: 11,
-                    color: Colors.grey.shade600,
-                    height: 1.3,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
                   ),
-                  maxLines: 3,
-                  overflow: TextOverflow.ellipsis,
                 ),
-                const SizedBox(height: 5),
-                RatingWidget(
-                  averageRating: review.rating.toDouble(),
-                  totalRatings: "",
-                  starSize: 12,
-                  fontSize: 12,
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
-        ],
-      ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: RatingWidget(
+                      averageRating: review.rating.toDouble(),
+                      totalRatings: "",
+                      starSize: 16,
+                      fontSize: 14,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    _formatDate(review.createdAt),
+                    style: TextStyle(
+                      fontFamily: TempLanguage.poppins,
+                      fontSize: 12,
+                      color: Colors.grey.shade600,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 15),
+              Text(
+                "Review:",
+                style: TextStyle(
+                  fontFamily: TempLanguage.poppins,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: appBlackColor,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                review.reviewText,
+                style: TextStyle(
+                  fontFamily: TempLanguage.poppins,
+                  fontSize: 13,
+                  color: Colors.grey.shade700,
+                  height: 1.4,
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text(
+                "Close",
+                style: TextStyle(
+                  color: appGreenColor,
+                  fontFamily: TempLanguage.poppins,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -670,6 +821,7 @@ class ReviewCard extends StatelessWidget {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
+          backgroundColor: appWhiteColor,
           title: Text(
             "Delete Review",
             style: TextStyle(
@@ -746,9 +898,7 @@ class ReviewCard extends StatelessWidget {
 
       // Delete the review from Firestore
       await FirebaseFirestore.instance
-          .collection(Collections.GOLDEN_LOCATIONS)
-          .doc(courtId)
-          .collection(Collections.REVIEWS)
+          .collection(Collections.COURT_REVIEWS)
           .doc(review.id)
           .delete();
 
@@ -782,7 +932,7 @@ class ReviewCard extends StatelessWidget {
   }
 }
 
-class ReviewsSection extends StatefulWidget {
+class ReviewsSection extends StatelessWidget {
   final bool isPremium;
   final bool isCheckedIn;
   final String courtName;
@@ -796,44 +946,11 @@ class ReviewsSection extends StatefulWidget {
     required this.courtId,
   });
 
-  @override
-  State<ReviewsSection> createState() => _ReviewsSectionState();
-}
-
-class _ReviewsSectionState extends State<ReviewsSection> {
-  late Future<Map<String, dynamic>> reviewStats;
-  late Future<List<Review>> reviews;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadData();
-  }
-
-  void _loadData() {
-    reviewStats = _getReviewStats();
-    reviews = _getReviews();
-  }
-
   Future<Map<String, dynamic>> _getReviewStats() async {
     return ReviewService.getReviewStats(
-      targetId: widget.courtId, // Using courtId as document ID
+      targetId: courtId, // Using courtId as document ID
       reviewType: ReviewType.court,
     );
-  }
-
-  Future<List<Review>> _getReviews() async {
-    return ReviewService.getReviews(
-      targetId: widget.courtId, // Using courtId as document ID
-      reviewType: ReviewType.court,
-      limit: 5, // Show only first 5 reviews in this preview
-    );
-  }
-
-  void _refreshReviewStats() {
-    setState(() {
-      _loadData();
-    });
   }
 
   @override
@@ -842,7 +959,7 @@ class _ReviewsSectionState extends State<ReviewsSection> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         FutureBuilder<Map<String, dynamic>>(
-          future: reviewStats,
+          future: _getReviewStats(),
           builder: (context, statsSnapshot) {
             final stats =
                 statsSnapshot.data ?? {'averageRating': 0.0, 'totalReviews': 0};
@@ -857,10 +974,10 @@ class _ReviewsSectionState extends State<ReviewsSection> {
                   Navigator.of(context).push(
                     MaterialPageRoute(
                       builder: (context) => ReviewsScreen(
-                        courtId: widget.courtId, // Using courtId as document ID
-                        courtName: widget.courtName,
-                        isPremium: widget.isPremium,
-                        isCheckedIn: widget.isCheckedIn,
+                        courtId: courtId, // Using courtId as document ID
+                        courtName: courtName,
+                        isPremium: isPremium,
+                        isCheckedIn: isCheckedIn,
                       ),
                     ),
                   );
@@ -870,8 +987,8 @@ class _ReviewsSectionState extends State<ReviewsSection> {
           },
         ),
         const SizedBox(height: 15),
-        FutureBuilder<List<Review>>(
-          future: reviews,
+        StreamBuilder<List<Review>>(
+          stream: CourtDataService(courtId: courtId).reviews,
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const SizedBox(
@@ -924,19 +1041,21 @@ class _ReviewsSectionState extends State<ReviewsSection> {
               );
             }
 
-            final reviews = snapshot.data!;
+            final reviews =
+                snapshot.data!.take(5).toList(); // Show only first 5 reviews
             return SizedBox(
-              height: 130,
+              height: 140,
               child: ListView.builder(
                 scrollDirection: Axis.horizontal,
                 itemCount: reviews.length,
+                padding: EdgeInsets.only(bottom: 10),
                 shrinkWrap: true,
                 itemBuilder: (context, index) {
                   final review = reviews[index];
 
                   return ReviewCard(
                     review: review,
-                    courtId: widget.courtId,
+                    courtId: courtId,
                   );
                 },
               ),
@@ -944,18 +1063,29 @@ class _ReviewsSectionState extends State<ReviewsSection> {
           },
         ),
         const SizedBox(height: 20),
-        if (widget.isPremium && widget.isCheckedIn)
+        if (isPremium && isCheckedIn)
           CustomButton(
             text: "Rate this court",
             onTap: () {
               ReviewService.showReviewDialog(
                 context: context,
-                name: widget.courtName,
+                name: courtName,
                 location: "Brooklyn", // You can make this dynamic too
                 imageUrl: AppAssets.LOGO_NEW, // You can pass actual court image
-                targetId: widget.courtId, // Using courtId as document ID
+                targetId: courtId, // Using courtId as document ID
                 reviewType: ReviewType.court,
-                onReviewSubmitted: _refreshReviewStats,
+                onReviewSubmitted: () {
+                  // The StreamBuilder will automatically update the UI
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        "Review submitted successfully!",
+                        style: TextStyle(fontFamily: TempLanguage.poppins),
+                      ),
+                      backgroundColor: appGreenColor,
+                    ),
+                  );
+                },
               );
             },
           ),
@@ -979,118 +1109,237 @@ class CommentCard extends StatelessWidget {
     final currentUserId = FirebaseAuth.instance.currentUser?.uid;
     final isOwner = currentUserId == comment.userId;
 
-    return Container(
-      margin: const EdgeInsets.only(bottom: 15),
-      padding: const EdgeInsets.all(15),
-      decoration: BoxDecoration(
-        color: appWhiteColor,
-        borderRadius: BorderRadius.circular(10),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.15),
-            offset: const Offset(0, 4),
-            blurRadius: 12,
-            spreadRadius: 1,
-          ),
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.05),
-            offset: const Offset(0, 1),
-            blurRadius: 4,
-            spreadRadius: 0,
-          ),
-        ],
-        border: Border.all(
-          color: Colors.grey.shade100,
-          width: 1,
-        ),
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            height: 40,
-            width: 40,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: Colors.grey.shade200,
+    return GestureDetector(
+      onTap: () => _showCommentDetailDialog(context),
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 15),
+        padding: const EdgeInsets.all(15),
+        decoration: BoxDecoration(
+          color: appWhiteColor,
+          borderRadius: BorderRadius.circular(10),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.15),
+              offset: const Offset(0, 4),
+              blurRadius: 12,
+              spreadRadius: 1,
             ),
-            child: ClipOval(
-              child: comment.userPhotoUrl.isNotEmpty &&
-                      comment.userPhotoUrl.startsWith('http')
-                  ? Image.network(
-                      comment.userPhotoUrl,
-                      fit: BoxFit.cover,
-                      loadingBuilder: (context, child, loadingProgress) {
-                        if (loadingProgress == null) return child;
-                        return const Center(child: CircularProgressIndicator());
-                      },
-                      errorBuilder: (context, error, stackTrace) {
-                        return Icon(
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.05),
+              offset: const Offset(0, 1),
+              blurRadius: 4,
+              spreadRadius: 0,
+            ),
+          ],
+          border: Border.all(
+            color: Colors.grey.shade100,
+            width: 1,
+          ),
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              height: 40,
+              width: 40,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.grey.shade200,
+              ),
+              child: ClipOval(
+                child: comment.userPhotoUrl.isNotEmpty
+                    ? CachedNetworkImage(
+                        imageUrl: comment.userPhotoUrl,
+                        fit: BoxFit.cover,
+                        placeholder: (context, url) => Center(
+                          child: SizedBox(
+                            width: 15,
+                            height: 15,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          ),
+                        ),
+                        errorWidget: (context, url, error) => Icon(
                           Icons.person,
                           size: 20,
                           color: Colors.grey.shade500,
-                        );
-                      },
-                    )
-                  : comment.userPhotoUrl.isNotEmpty
-                      ? Image.asset(
-                          comment.userPhotoUrl,
+                        ),
+                      )
+                    : Icon(
+                        Icons.person,
+                        size: 20,
+                        color: Colors.grey.shade500,
+                      ),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: Text(
+                          comment.userName,
+                          style: TextStyle(
+                            fontFamily: TempLanguage.poppins,
+                            fontSize: 14,
+                            color: appBlackColor,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                      if (isOwner)
+                        GestureDetector(
+                          onTap: () => _showDeleteCommentConfirmation(
+                              context, comment, courtId),
+                          child: Icon(
+                            Icons.delete_outline,
+                            size: 16,
+                            color: Colors.red.shade600,
+                          ),
+                        ),
+                    ],
+                  ),
+                  Text(
+                    _formatDate(comment.createdAt),
+                    style: TextStyle(
+                      fontFamily: TempLanguage.poppins,
+                      fontSize: 12,
+                      color: Colors.grey.shade500,
+                    ),
+                  ),
+                  const SizedBox(height: 5),
+                  Text(
+                    comment.commentText,
+                    style: TextStyle(
+                      fontFamily: TempLanguage.poppins,
+                      fontSize: 12,
+                      color: Colors.grey.shade600,
+                      height: 1.4,
+                    ),
+                    maxLines: 3,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ), // closing Container (child of GestureDetector)
+    ); // closing GestureDetector
+  } // closing build method of CommentCard
+
+  void _showCommentDetailDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: appWhiteColor,
+          contentPadding: const EdgeInsets.all(20),
+          title: Row(
+            children: [
+              Container(
+                height: 40,
+                width: 40,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.grey.shade200,
+                ),
+                child: ClipOval(
+                  child: comment.userPhotoUrl.isNotEmpty
+                      ? CachedNetworkImage(
+                          imageUrl: comment.userPhotoUrl,
                           fit: BoxFit.cover,
+                          placeholder: (context, url) => Icon(
+                            Icons.person,
+                            size: 20,
+                            color: Colors.grey.shade500,
+                          ),
+                          errorWidget: (context, url, error) => Icon(
+                            Icons.person,
+                            size: 20,
+                            color: Colors.grey.shade500,
+                          ),
                         )
                       : Icon(
                           Icons.person,
                           size: 20,
                           color: Colors.grey.shade500,
                         ),
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Expanded(
-                      child: Text(
-                        comment.userName,
-                        style: TextStyle(
-                          fontFamily: TempLanguage.poppins,
-                          fontSize: 14,
-                          color: appBlackColor,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                    if (isOwner)
-                      GestureDetector(
-                        onTap: () => _showDeleteCommentConfirmation(
-                            context, comment, courtId),
-                        child: Icon(
-                          Icons.delete_outline,
-                          size: 16,
-                          color: Colors.red.shade600,
-                        ),
-                      ),
-                  ],
                 ),
-                const SizedBox(height: 5),
-                Text(
-                  comment.commentText,
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  comment.userName,
                   style: TextStyle(
                     fontFamily: TempLanguage.poppins,
-                    fontSize: 12,
-                    color: Colors.grey.shade600,
-                    height: 1.4,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
-        ],
-      ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                _formatDate(comment.createdAt),
+                style: TextStyle(
+                  fontFamily: TempLanguage.poppins,
+                  fontSize: 12,
+                  color: Colors.grey.shade500,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                comment.commentText,
+                style: TextStyle(
+                  fontFamily: TempLanguage.poppins,
+                  fontSize: 13,
+                  color: Colors.grey.shade700,
+                  height: 1.4,
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text(
+                "Close",
+                style: TextStyle(
+                  color: appGreenColor,
+                  fontFamily: TempLanguage.poppins,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ],
+        );
+      },
     );
+  }
+
+  String _formatDate(DateTime date) {
+    final now = DateTime.now();
+    final difference = now.difference(date);
+
+    if (difference.inDays > 7) {
+      return "${date.day}/${date.month}/${date.year}";
+    } else if (difference.inDays > 0) {
+      return "${difference.inDays} day${difference.inDays > 1 ? 's' : ''} ago";
+    } else if (difference.inHours > 0) {
+      return "${difference.inHours} hour${difference.inHours > 1 ? 's' : ''} ago";
+    } else if (difference.inMinutes > 0) {
+      return "${difference.inMinutes} minute${difference.inMinutes > 1 ? 's' : ''} ago";
+    } else {
+      return "Just now";
+    }
   }
 
   void _showDeleteCommentConfirmation(
@@ -1099,6 +1348,7 @@ class CommentCard extends StatelessWidget {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
+          backgroundColor: appWhiteColor,
           title: Text(
             "Delete Comment",
             style: TextStyle(
@@ -1518,25 +1768,25 @@ class PlayerCard extends StatelessWidget {
                   ),
                 ),
                 child: ClipOval(
-                  child: user.photoUrl != ""
-                      ? Image.network(
-                          user.photoUrl,
+                  child: user.photoUrl.isNotEmpty
+                      ? CachedNetworkImage(
+                          imageUrl: user.photoUrl,
                           fit: BoxFit.cover,
-                          loadingBuilder: (context, child, loadingProgress) {
-                            if (loadingProgress == null) return child;
-                            return const Center(
-                                child: CircularProgressIndicator());
-                          },
-                          errorBuilder: (context, error, stackTrace) {
-                            return Container(
-                              color: Colors.grey.shade200,
-                              child: Icon(
-                                Icons.person,
-                                size: 30,
-                                color: Colors.grey.shade500,
-                              ),
-                            );
-                          },
+                          placeholder: (context, url) => Center(
+                            child: SizedBox(
+                              width: 30,
+                              height: 30,
+                              child: CircularProgressIndicator(strokeWidth: 3),
+                            ),
+                          ),
+                          errorWidget: (context, url, error) => Container(
+                            color: Colors.grey.shade200,
+                            child: Icon(
+                              Icons.person,
+                              size: 30,
+                              color: Colors.grey.shade500,
+                            ),
+                          ),
                         )
                       : Container(
                           color: Colors.grey.shade200,

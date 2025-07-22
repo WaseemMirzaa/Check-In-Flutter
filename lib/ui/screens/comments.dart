@@ -1,7 +1,9 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:check_in/core/constant/app_assets.dart';
 import 'package:check_in/core/constant/constant.dart';
 import 'package:check_in/core/constant/temp_language.dart';
 import 'package:check_in/model/court_data_models.dart';
+import 'package:check_in/ui/widgets/dialog_widgets.dart';
 import 'package:check_in/utils/colors.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -119,14 +121,9 @@ class _CommentsScreenState extends State<CommentsScreen> {
     } catch (e) {
       debugPrint("Error loading comments: $e");
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              "Error loading comments. Please try again.",
-              style: TextStyle(fontFamily: TempLanguage.poppins),
-            ),
-            backgroundColor: Colors.red,
-          ),
+        AppDialogs.showErrorSnackbar(
+          context: context,
+          message: "Error loading comments. Please try again.",
         );
       }
     } finally {
@@ -159,23 +156,6 @@ class _CommentsScreenState extends State<CommentsScreen> {
   Future<void> _refreshComments() async {
     await _loadInitialComments();
     await _loadCommentsCount();
-  }
-
-  String _formatDate(DateTime date) {
-    final now = DateTime.now();
-    final difference = now.difference(date);
-
-    if (difference.inDays > 7) {
-      return "${date.day}/${date.month}/${date.year}";
-    } else if (difference.inDays > 0) {
-      return "${difference.inDays} day${difference.inDays > 1 ? 's' : ''} ago";
-    } else if (difference.inHours > 0) {
-      return "${difference.inHours} hour${difference.inHours > 1 ? 's' : ''} ago";
-    } else if (difference.inMinutes > 0) {
-      return "${difference.inMinutes} minute${difference.inMinutes > 1 ? 's' : ''} ago";
-    } else {
-      return "Just now";
-    }
   }
 
   @override
@@ -278,132 +258,136 @@ class _CommentsScreenState extends State<CommentsScreen> {
                                 FirebaseAuth.instance.currentUser?.uid;
                             final isOwner = currentUserId == comment.userId;
 
-                            return Container(
-                              margin: const EdgeInsets.only(bottom: 15),
-                              padding: const EdgeInsets.all(20),
-                              decoration: BoxDecoration(
-                                color: appWhiteColor,
-                                borderRadius: BorderRadius.circular(12),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.grey.withOpacity(0.1),
-                                    offset: const Offset(0, 2),
-                                    blurRadius: 8,
-                                  ),
-                                ],
+                            return GestureDetector(
+                              onTap: () => AppDialogs.showCommentDetailDialog(
+                                context: context,
+                                comment: comment,
                               ),
-                              child: Row(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Container(
-                                    height: 50,
-                                    width: 50,
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      color: Colors.grey.shade200,
+                              child: Container(
+                                margin: const EdgeInsets.only(bottom: 15),
+                                padding: const EdgeInsets.all(20),
+                                decoration: BoxDecoration(
+                                  color: appWhiteColor,
+                                  borderRadius: BorderRadius.circular(12),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.grey.withOpacity(0.1),
+                                      offset: const Offset(0, 2),
+                                      blurRadius: 8,
                                     ),
-                                    child: ClipOval(
-                                      child: comment.userPhotoUrl.isNotEmpty
-                                          ? Image.network(
-                                              comment.userPhotoUrl,
-                                              fit: BoxFit.cover,
-                                              loadingBuilder: (context, child,
-                                                  loadingProgress) {
-                                                if (loadingProgress == null)
-                                                  return child;
-                                                return const Center(
-                                                    child:
-                                                        CircularProgressIndicator());
-                                              },
-                                              errorBuilder:
-                                                  (context, error, stackTrace) {
-                                                return Icon(
+                                  ],
+                                ),
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Container(
+                                      height: 50,
+                                      width: 50,
+                                      decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        color: Colors.grey.shade200,
+                                      ),
+                                      child: ClipOval(
+                                        child: comment.userPhotoUrl.isNotEmpty
+                                            ? CachedNetworkImage(
+                                                imageUrl: comment.userPhotoUrl,
+                                                fit: BoxFit.cover,
+                                                placeholder: (context, url) =>
+                                                    const Center(
+                                                  child:
+                                                      CircularProgressIndicator(),
+                                                ),
+                                                errorWidget:
+                                                    (context, url, error) =>
+                                                        Icon(
                                                   Icons.person,
                                                   size: 25,
                                                   color: Colors.grey.shade500,
-                                                );
-                                              },
-                                            )
-                                          : Icon(
-                                              Icons.person,
-                                              size: 25,
-                                              color: Colors.grey.shade500,
-                                            ),
-                                    ),
-                                  ),
-                                  const SizedBox(width: 15),
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            Expanded(
-                                              child: Row(
-                                                children: [
-                                                  Flexible(
-                                                    child: Text(
-                                                      comment.userName,
-                                                      style: TextStyle(
-                                                        fontFamily: TempLanguage
-                                                            .poppins,
-                                                        fontSize: 16,
-                                                        color: appBlackColor,
-                                                        fontWeight:
-                                                            FontWeight.w600,
-                                                      ),
-                                                      overflow:
-                                                          TextOverflow.ellipsis,
-                                                    ),
-                                                  ),
-                                                  if (isOwner)
-                                                    Padding(
-                                                      padding:
-                                                          const EdgeInsets.only(
-                                                              left: 8),
-                                                      child: GestureDetector(
-                                                        onTap: () =>
-                                                            _showDeleteConfirmation(
-                                                                comment),
-                                                        child: Icon(
-                                                          Icons.delete_outline,
-                                                          size: 18,
-                                                          color: Colors
-                                                              .red.shade600,
-                                                        ),
-                                                      ),
-                                                    ),
-                                                ],
-                                              ),
-                                            ),
-                                            Text(
-                                              _formatDate(comment.createdAt),
-                                              style: TextStyle(
-                                                fontFamily:
-                                                    TempLanguage.poppins,
-                                                fontSize: 12,
+                                                ),
+                                              )
+                                            : Icon(
+                                                Icons.person,
+                                                size: 25,
                                                 color: Colors.grey.shade500,
                                               ),
-                                            ),
-                                          ],
-                                        ),
-                                        const SizedBox(height: 5),
-                                        Text(
-                                          comment.commentText,
-                                          style: TextStyle(
-                                            fontFamily: TempLanguage.poppins,
-                                            fontSize: 13,
-                                            color: Colors.grey.shade600,
-                                            height: 1.4,
-                                          ),
-                                        ),
-                                      ],
+                                      ),
                                     ),
-                                  ),
-                                ],
+                                    const SizedBox(width: 15),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Flexible(
+                                                child: Text(
+                                                  comment.userName,
+                                                  style: TextStyle(
+                                                    fontFamily:
+                                                        TempLanguage.poppins,
+                                                    fontSize: 16,
+                                                    color: appBlackColor,
+                                                    fontWeight: FontWeight.w600,
+                                                  ),
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                ),
+                                              ),
+                                              if (isOwner)
+                                                Padding(
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                          left: 8),
+                                                  child: GestureDetector(
+                                                    onTap: () => AppDialogs
+                                                        .showDeleteConfirmationDialog(
+                                                      context: context,
+                                                      title: 'Delete Comment',
+                                                      content:
+                                                          'Are you sure you want to delete this comment?',
+                                                      onConfirm: () =>
+                                                          _deleteComment(
+                                                              comment),
+                                                    ),
+                                                    child: Icon(
+                                                      Icons.delete_outline,
+                                                      size: 18,
+                                                      color:
+                                                          Colors.red.shade600,
+                                                    ),
+                                                  ),
+                                                ),
+                                            ],
+                                          ),
+                                          Text(
+                                            AppDateUtils.formatDate(
+                                                comment.createdAt),
+                                            style: TextStyle(
+                                              fontFamily: TempLanguage.poppins,
+                                              fontSize: 12,
+                                              color: Colors.grey.shade500,
+                                            ),
+                                          ),
+                                          const SizedBox(height: 5),
+                                          Text(
+                                            comment.commentText,
+                                            style: TextStyle(
+                                              fontFamily: TempLanguage.poppins,
+                                              fontSize: 13,
+                                              color: Colors.grey.shade600,
+                                              height: 1.4,
+                                            ),
+                                            maxLines: 4,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
                             );
                           },
@@ -621,82 +605,12 @@ class _CommentsScreenState extends State<CommentsScreen> {
     }
   }
 
-  void _showDeleteConfirmation(Comment comment) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(
-            "Delete Comment",
-            style: TextStyle(
-              fontFamily: TempLanguage.poppins,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          content: Text(
-            "Are you sure you want to delete this comment? This action cannot be undone.",
-            style: TextStyle(
-              fontFamily: TempLanguage.poppins,
-              fontSize: 14,
-              color: Colors.grey.shade600,
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text(
-                "Cancel",
-                style: TextStyle(
-                  color: Colors.grey.shade600,
-                  fontFamily: TempLanguage.poppins,
-                ),
-              ),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-                _deleteComment(comment);
-              },
-              child: Text(
-                "Delete",
-                style: TextStyle(
-                  color: Colors.red,
-                  fontFamily: TempLanguage.poppins,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
   void _deleteComment(Comment comment) async {
     try {
       // Show loading indicator
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Row(
-            children: [
-              const SizedBox(
-                width: 20,
-                height: 20,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                ),
-              ),
-              const SizedBox(width: 16),
-              Text(
-                "Deleting comment...",
-                style: TextStyle(fontFamily: TempLanguage.poppins),
-              ),
-            ],
-          ),
-          backgroundColor: Colors.orange,
-          duration: const Duration(seconds: 2),
-        ),
+      AppDialogs.showLoadingSnackbar(
+        context: context,
+        message: "Deleting comment...",
       );
 
       // Delete the comment from Firestore - using new separate collection
@@ -713,28 +627,17 @@ class _CommentsScreenState extends State<CommentsScreen> {
 
       // Show success message
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              "Comment deleted successfully!",
-              style: TextStyle(fontFamily: TempLanguage.poppins),
-            ),
-            backgroundColor: appGreenColor,
-            duration: const Duration(seconds: 2),
-          ),
+        AppDialogs.showSuccessSnackbar(
+          context: context,
+          message: "Comment deleted successfully!",
         );
       }
     } catch (e) {
       debugPrint("Error deleting comment: $e");
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              "Failed to delete comment. Please try again.",
-              style: TextStyle(fontFamily: TempLanguage.poppins),
-            ),
-            backgroundColor: Colors.red,
-          ),
+        AppDialogs.showErrorSnackbar(
+          context: context,
+          message: "Failed to delete comment. Please try again.",
         );
       }
     }

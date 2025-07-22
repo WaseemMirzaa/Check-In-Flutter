@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:check_in/core/constant/app_assets.dart';
 import 'package:check_in/core/constant/constant.dart';
 import 'package:check_in/core/constant/temp_language.dart';
@@ -451,34 +452,27 @@ class _GalleryScreenState extends State<GalleryScreen> {
                                   borderRadius: BorderRadius.circular(12),
                                   child: Stack(
                                     children: [
-                                      Image.network(
-                                        item.imageUrl,
+                                      CachedNetworkImage(
+                                        imageUrl: item.imageUrl,
                                         fit: BoxFit.cover,
                                         width: double.infinity,
                                         height: double.infinity,
-                                        loadingBuilder:
-                                            (context, child, loadingProgress) {
-                                          if (loadingProgress == null)
-                                            return child;
-                                          return Container(
-                                            color: Colors.grey.shade200,
-                                            child: const Center(
-                                              child:
-                                                  CircularProgressIndicator(),
-                                            ),
-                                          );
-                                        },
-                                        errorBuilder:
-                                            (context, error, stackTrace) {
-                                          return Container(
-                                            color: Colors.grey.shade200,
-                                            child: Icon(
-                                              Icons.image_not_supported,
-                                              color: Colors.grey.shade500,
-                                              size: 40,
-                                            ),
-                                          );
-                                        },
+                                        placeholder: (context, url) =>
+                                            Container(
+                                          color: Colors.grey.shade200,
+                                          child: const Center(
+                                            child: CircularProgressIndicator(),
+                                          ),
+                                        ),
+                                        errorWidget: (context, url, error) =>
+                                            Container(
+                                          color: Colors.grey.shade200,
+                                          child: Icon(
+                                            Icons.image_not_supported,
+                                            color: Colors.grey.shade500,
+                                            size: 40,
+                                          ),
+                                        ),
                                       ),
                                       // Delete icon for owners
                                       if (isOwner)
@@ -654,32 +648,27 @@ class _GalleryScreenState extends State<GalleryScreen> {
                   ),
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(12),
-                    child: Image.network(
-                      item.imageUrl,
+                    child: CachedNetworkImage(
+                      imageUrl: item.imageUrl,
                       fit: BoxFit.contain,
-                      loadingBuilder: (context, child, loadingProgress) {
-                        if (loadingProgress == null) return child;
-                        return Container(
-                          width: 200,
-                          height: 200,
-                          color: Colors.grey.shade200,
-                          child: const Center(
-                            child: CircularProgressIndicator(),
-                          ),
-                        );
-                      },
-                      errorBuilder: (context, error, stackTrace) {
-                        return Container(
-                          width: 200,
-                          height: 200,
-                          color: Colors.grey.shade200,
-                          child: Icon(
-                            Icons.image_not_supported,
-                            color: Colors.grey.shade500,
-                            size: 40,
-                          ),
-                        );
-                      },
+                      placeholder: (context, url) => Container(
+                        width: 200,
+                        height: 200,
+                        color: Colors.grey.shade200,
+                        child: const Center(
+                          child: CircularProgressIndicator(),
+                        ),
+                      ),
+                      errorWidget: (context, url, error) => Container(
+                        width: 200,
+                        height: 200,
+                        color: Colors.grey.shade200,
+                        child: Icon(
+                          Icons.image_not_supported,
+                          color: Colors.grey.shade500,
+                          size: 40,
+                        ),
+                      ),
                     ),
                   ),
                 ),
