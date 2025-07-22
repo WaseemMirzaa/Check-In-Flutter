@@ -26,7 +26,12 @@ class CustomAppbar extends StatelessWidget implements PreferredSizeWidget {
             ? IconButton(
                 icon: Icon(Icons.arrow_back_ios, color: iconColor),
                 onPressed: () {
-                  isOnbard ? Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>const Home()), (route) => false) : Navigator.of(context).pop();
+                  isOnbard
+                      ? Navigator.pushAndRemoveUntil(
+                          context,
+                          MaterialPageRoute(builder: (context) => const Home()),
+                          (route) => false)
+                      : Navigator.of(context).pop();
                 },
               )
             : const SizedBox(),

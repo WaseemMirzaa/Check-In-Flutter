@@ -286,13 +286,11 @@ class UploadDialog {
         uploadedUrls.add(downloadUrl);
       }
 
-      // Save metadata to Firestore
+      // Save metadata to Firestore using new separate collection approach
       final batch = FirebaseFirestore.instance.batch();
       for (final url in uploadedUrls) {
         final docRef = FirebaseFirestore.instance
-            .collection(Collections.GOLDEN_LOCATIONS)
-            .doc(courtId)
-            .collection(Collections.GALLERY)
+            .collection(Collections.COURT_GALLERY)
             .doc();
 
         batch.set(docRef, {
@@ -302,6 +300,8 @@ class UploadDialog {
           GalleryKey.UPLOADED_BY_PHOTO: user.photoUrl,
           GalleryKey.UPLOADED_AT: FieldValue.serverTimestamp(),
           GalleryKey.DESCRIPTION: "",
+          GalleryKey.COURT_ID:
+              courtId, // Add courtId field for separate collection
         });
       }
 

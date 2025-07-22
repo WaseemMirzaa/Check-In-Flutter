@@ -65,14 +65,13 @@ class ReviewService {
       CollectionReference reviewsCollection;
 
       if (reviewType == ReviewType.court) {
-        reviewsCollection = FirebaseFirestore.instance
-            .collection(Collections.GOLDEN_LOCATIONS)
-            .doc(targetId)
-            .collection(Collections.REVIEWS);
+        // Use the new separate collection for court reviews
+        reviewsCollection =
+            FirebaseFirestore.instance.collection(Collections.COURT_REVIEWS);
       } else {
-        // For players - you may need to adjust this path based on your Firestore structure
+        // For players - keep using subcollections
         reviewsCollection = FirebaseFirestore.instance
-            .collection(Collections.USER) // Using USER instead of USERS
+            .collection(Collections.USER)
             .doc(targetId)
             .collection(Collections.REVIEWS);
       }
@@ -84,6 +83,9 @@ class ReviewService {
         ReviewKey.USER_NAME: user.userName,
         ReviewKey.USER_PHOTO_URL: user.photoUrl,
         ReviewKey.CREATED_AT: FieldValue.serverTimestamp(),
+        ReviewKey.COURT_ID: reviewType == ReviewType.court
+            ? targetId
+            : null, // Add courtId for court reviews
         'review_type': reviewType.name, // Track what type of review this is
         'target_id': targetId, // Store the ID of what's being reviewed
       });
@@ -109,21 +111,22 @@ class ReviewService {
     required ReviewType reviewType,
   }) async {
     try {
-      CollectionReference reviewsCollection;
+      Query reviewsQuery;
 
       if (reviewType == ReviewType.court) {
-        reviewsCollection = FirebaseFirestore.instance
-            .collection(Collections.GOLDEN_LOCATIONS)
-            .doc(targetId)
-            .collection(Collections.REVIEWS);
+        // Query the separate court reviews collection
+        reviewsQuery = FirebaseFirestore.instance
+            .collection(Collections.COURT_REVIEWS)
+            .where(ReviewKey.COURT_ID, isEqualTo: targetId);
       } else {
-        reviewsCollection = FirebaseFirestore.instance
+        // For players - keep using subcollections
+        reviewsQuery = FirebaseFirestore.instance
             .collection(Collections.USER)
             .doc(targetId)
             .collection(Collections.REVIEWS);
       }
 
-      final snapshot = await reviewsCollection.get();
+      final snapshot = await reviewsQuery.get();
 
       if (snapshot.docs.isEmpty) {
         return {'averageRating': 0.0, 'totalReviews': 0};
@@ -153,23 +156,24 @@ class ReviewService {
     int limit = 10,
   }) async {
     try {
-      CollectionReference reviewsCollection;
+      Query query;
 
       if (reviewType == ReviewType.court) {
-        reviewsCollection = FirebaseFirestore.instance
-            .collection(Collections.GOLDEN_LOCATIONS)
-            .doc(targetId)
-            .collection(Collections.REVIEWS);
+        // Query the separate court reviews collection
+        query = FirebaseFirestore.instance
+            .collection(Collections.COURT_REVIEWS)
+            .where(ReviewKey.COURT_ID, isEqualTo: targetId)
+            .orderBy(ReviewKey.CREATED_AT, descending: true)
+            .limit(limit);
       } else {
-        reviewsCollection = FirebaseFirestore.instance
+        // For players - keep using subcollections
+        query = FirebaseFirestore.instance
             .collection(Collections.USER)
             .doc(targetId)
-            .collection(Collections.REVIEWS);
+            .collection(Collections.REVIEWS)
+            .orderBy(ReviewKey.CREATED_AT, descending: true)
+            .limit(limit);
       }
-
-      Query query = reviewsCollection
-          .orderBy(ReviewKey.CREATED_AT, descending: true)
-          .limit(limit);
 
       if (lastDocument != null) {
         query = query.startAfterDocument(lastDocument);

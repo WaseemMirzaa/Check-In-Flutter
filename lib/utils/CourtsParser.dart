@@ -15,46 +15,68 @@ class CourtsParser {
 
   Future<List<CourtModel>> getCourtsFromCSVFileAndFirestore() async {
     final List<CourtModel> filteredLocations = [];
-    final currentLocation = await getCurrentLocation();
+
+    print('Starting to get courts from CSV and Firestore');
+
+    Position currentLocation;
+    try {
+      currentLocation = await getCurrentLocation();
+      print('Got current location successfully');
+    } catch (e) {
+      print('Error getting current location: $e');
+      return filteredLocations; // Return empty list if location fails
+    }
 
     try {
       var csvString = await loadAsset();
+      print('Loaded CSV file successfully, length: ${csvString.length}');
 
       var csvData = const CsvToListConverter().convert(csvString, eol: "\n");
+      print('Parsed CSV data, found ${csvData.length} rows');
 
+      int addedCount = 0;
       for (var i = 1; i < csvData.length; i++) {
-        final location = CourtModel(
-          city: csvData[i][0].toString(),
-          street: csvData[i][1].toString(),
-          placeId: csvData[i][2].toString(),
-          latitude: double.parse(csvData[i][3].toString()),
-          longitude: double.parse(csvData[i][4].toString()),
-          url: csvData[i][5].toString(),
-          state: csvData[i][6].toString(),
-          address: csvData[i][7].toString(),
-          title: csvData[i][8].toString(),
-        );
+        try {
+          final location = CourtModel(
+            city: csvData[i][0].toString(),
+            street: csvData[i][1].toString(),
+            placeId: csvData[i][2].toString(),
+            latitude: double.parse(csvData[i][3].toString()),
+            longitude: double.parse(csvData[i][4].toString()),
+            state: csvData[i][5].toString(), // Fixed: state is column 5
+            url: csvData[i][6].toString(), // Fixed: url is column 6
+            address: csvData[i][7].toString(),
+            title: csvData[i][8].toString(),
+          );
 
-        final court = LatLng(location.latitude, location.longitude);
-        var isInRadius = checkIfWithinRadius(currentLocation, court);
-        // final distance = Geodesy().distanceBetweenTwoGeoPoints(
-        //   currentPosition,
-        //   locationPosition,
-        // );
+          final court = LatLng(location.latitude, location.longitude);
+          var isInRadius = checkIfWithinRadius(currentLocation, court);
+          // final distance = Geodesy().distanceBetweenTwoGeoPoints(
+          //   currentPosition,
+          //   locationPosition,
+          // );
 
-        if (isInRadius) {
-          // Distance in meters (50km = 50000m)
-          filteredLocations.add(location);
+          if (isInRadius) {
+            // Distance in meters (50km = 50000m)
+            filteredLocations.add(location);
+            addedCount++;
+          }
+        } catch (e) {
+          print('Error parsing CSV row $i: $e');
         }
       }
+      print('Added $addedCount courts from CSV within radius');
     } catch (e) {
-      print(e);
+      print('Error processing CSV file: $e');
     }
 
     final snap = FirebaseFirestore.instance;
 
     try {
+      print('Fetching additional locations from Firestore');
       await snap.collection('AdditionalLocations').get().then((querySnapshot) {
+        print(
+            'Found ${querySnapshot.docs.length} additional locations in Firestore');
         for (var doc in querySnapshot.docs) {
           try {
             final location = CourtModel(
@@ -79,15 +101,16 @@ class CourtsParser {
               filteredLocations.add(location);
             }
           } catch (e) {
+            print('Error processing Firestore document ${doc.id}: $e');
             print(doc.toString());
-            print(e);
           }
         }
       });
     } catch (e) {
-      print(e);
+      print('Error fetching from Firestore: $e');
     }
 
+    print('Total courts found within radius: ${filteredLocations.length}');
     return filteredLocations;
   }
 
@@ -97,10 +120,6 @@ class CourtsParser {
 
     try {
       final currentLocation = await getCurrentLocation();
-      final currentPosition = LatLng(
-        currentLocation.latitude,
-        currentLocation.longitude,
-      );
 
       var csvString = await loadAsset();
 
@@ -113,8 +132,8 @@ class CourtsParser {
           placeId: csvData[i][2].toString(),
           latitude: double.parse(csvData[i][3].toString()),
           longitude: double.parse(csvData[i][4].toString()),
-          url: csvData[i][5].toString(),
-          state: csvData[i][6].toString(),
+          state: csvData[i][5].toString(), // Fixed: state is column 5
+          url: csvData[i][6].toString(), // Fixed: url is column 6
           address: csvData[i][7].toString(),
           title: csvData[i][8].toString(),
         );
@@ -163,19 +182,28 @@ class CourtsParser {
   }
 
   Future<Position> getCurrentLocation() async {
-    final permission = await Geolocator.requestPermission();
-    if (permission != LocationPermission.whileInUse &&
-        permission != LocationPermission.always) {
-      throw Exception('Location permission denied');
+    try {
+      final permission = await Geolocator.requestPermission();
+      if (permission != LocationPermission.whileInUse &&
+          permission != LocationPermission.always) {
+        print('Location permission denied: $permission');
+        throw Exception('Location permission denied');
+      }
+
+      final currentLocation = await Geolocator.getCurrentPosition(
+        locationSettings: const LocationSettings(
+          accuracy: LocationAccuracy.best,
+          distanceFilter:
+              10, // Minimum distance for location updates (in meters)
+        ),
+      );
+
+      print(
+          'Current location: ${currentLocation.latitude}, ${currentLocation.longitude}');
+      return currentLocation;
+    } catch (e) {
+      print('Error getting current location: $e');
+      rethrow;
     }
-
-    final currentLocation = await Geolocator.getCurrentPosition(
-      locationSettings: const LocationSettings(
-        accuracy: LocationAccuracy.best,
-        distanceFilter: 10, // Minimum distance for location updates (in meters)
-      ),
-    );
-
-    return currentLocation;
   }
 }

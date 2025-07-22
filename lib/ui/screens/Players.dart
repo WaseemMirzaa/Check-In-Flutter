@@ -14,6 +14,8 @@ import 'package:check_in/utils/colors.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'dart:ui';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:sizer/sizer.dart';
@@ -306,6 +308,9 @@ class GallerySection extends StatelessWidget {
                 itemCount: galleryItems.length,
                 itemBuilder: (context, index) {
                   final item = galleryItems[index];
+                  final currentUserId = FirebaseAuth.instance.currentUser?.uid;
+                  final isOwner = currentUserId == item.uploadedBy;
+
                   return GestureDetector(
                     onTap: () {
                       Navigator.of(context).push(
@@ -326,27 +331,57 @@ class GallerySection extends StatelessWidget {
                         borderRadius: BorderRadius.circular(10),
                         color: Colors.grey.shade200,
                       ),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(10),
-                        child: Image.network(
-                          item.imageUrl,
-                          fit: BoxFit.cover,
-                          loadingBuilder: (context, child, loadingProgress) {
-                            if (loadingProgress == null) return child;
-                            return const Center(
-                                child: CircularProgressIndicator());
-                          },
-                          errorBuilder: (context, error, stackTrace) {
-                            return Container(
-                              color: Colors.grey.shade200,
-                              child: Icon(
-                                Icons.image_not_supported,
-                                color: Colors.grey.shade500,
-                                size: 40,
+                      child: Stack(
+                        children: [
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(10),
+                            child: Image.network(
+                              item.imageUrl,
+                              width: 120,
+                              height: 120,
+                              fit: BoxFit.cover,
+                              loadingBuilder:
+                                  (context, child, loadingProgress) {
+                                if (loadingProgress == null) return child;
+                                return const Center(
+                                    child: CircularProgressIndicator());
+                              },
+                              errorBuilder: (context, error, stackTrace) {
+                                return Container(
+                                  width: 120,
+                                  height: 120,
+                                  color: Colors.grey.shade200,
+                                  child: Icon(
+                                    Icons.image_not_supported,
+                                    color: Colors.grey.shade500,
+                                    size: 40,
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                          if (isOwner)
+                            Positioned(
+                              top: 8,
+                              right: 8,
+                              child: GestureDetector(
+                                onTap: () => _showDeleteGalleryConfirmation(
+                                    context, item, courtId),
+                                child: Container(
+                                  padding: const EdgeInsets.all(4),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white.withOpacity(0.8),
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: Icon(
+                                    Icons.delete_outline,
+                                    size: 16,
+                                    color: Colors.red.shade600,
+                                  ),
+                                ),
                               ),
-                            );
-                          },
-                        ),
+                            ),
+                        ],
                       ),
                     ),
                   );
@@ -370,26 +405,142 @@ class GallerySection extends StatelessWidget {
       ],
     );
   }
+
+  void _showDeleteGalleryConfirmation(
+      BuildContext context, GalleryItem item, String courtId) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(
+            "Delete Image",
+            style: TextStyle(
+              fontFamily: TempLanguage.poppins,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          content: Text(
+            "Are you sure you want to delete this image? This action cannot be undone.",
+            style: TextStyle(
+              fontFamily: TempLanguage.poppins,
+              fontSize: 14,
+              color: Colors.grey.shade600,
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text(
+                "Cancel",
+                style: TextStyle(
+                  color: Colors.grey.shade600,
+                  fontFamily: TempLanguage.poppins,
+                ),
+              ),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+                _deleteGalleryItem(context, item, courtId);
+              },
+              child: Text(
+                "Delete",
+                style: TextStyle(
+                  color: Colors.red,
+                  fontFamily: TempLanguage.poppins,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _deleteGalleryItem(
+      BuildContext context, GalleryItem item, String courtId) async {
+    try {
+      // Show loading indicator
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Row(
+            children: [
+              const SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                ),
+              ),
+              const SizedBox(width: 16),
+              Text(
+                "Deleting image...",
+                style: TextStyle(fontFamily: TempLanguage.poppins),
+              ),
+            ],
+          ),
+          backgroundColor: Colors.orange,
+          duration: const Duration(seconds: 2),
+        ),
+      );
+
+      // Delete the image from Firestore
+      await FirebaseFirestore.instance
+          .collection(Collections.GOLDEN_LOCATIONS)
+          .doc(courtId)
+          .collection(Collections.GALLERY)
+          .doc(item.id)
+          .delete();
+
+      // Show success message
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              "Image deleted successfully!",
+              style: TextStyle(fontFamily: TempLanguage.poppins),
+            ),
+            backgroundColor: appGreenColor,
+            duration: const Duration(seconds: 2),
+          ),
+        );
+      }
+    } catch (e) {
+      debugPrint("Error deleting gallery item: $e");
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              "Failed to delete image. Please try again.",
+              style: TextStyle(fontFamily: TempLanguage.poppins),
+            ),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
 }
 
 class ReviewCard extends StatelessWidget {
-  final String userName;
-  final String reviewText;
-  final int rating;
-  final String userImage;
+  final Review review;
+  final String courtId;
 
   const ReviewCard({
     super.key,
-    required this.userName,
-    required this.reviewText,
-    required this.rating,
-    required this.userImage,
+    required this.review,
+    required this.courtId,
   });
 
   @override
   Widget build(BuildContext context) {
+    final currentUserId = FirebaseAuth.instance.currentUser?.uid;
+    final isOwner = currentUserId == review.userId;
+
     return Container(
-      width: 250,
+      width: 300,
       margin: const EdgeInsets.only(right: 15),
       padding: const EdgeInsets.all(15),
       decoration: BoxDecoration(
@@ -397,11 +548,22 @@ class ReviewCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(10),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
-            offset: const Offset(0, 2),
-            blurRadius: 8,
+            color: Colors.grey.withOpacity(0.15),
+            offset: const Offset(0, 4),
+            blurRadius: 12,
+            spreadRadius: 1,
+          ),
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.05),
+            offset: const Offset(0, 1),
+            blurRadius: 4,
+            spreadRadius: 0,
           ),
         ],
+        border: Border.all(
+          color: Colors.grey.shade100,
+          width: 1,
+        ),
       ),
       child: Row(
         children: [
@@ -413,9 +575,10 @@ class ReviewCard extends StatelessWidget {
               color: Colors.grey.shade200,
             ),
             child: ClipOval(
-              child: userImage.isNotEmpty && userImage.startsWith('http')
+              child: review.userPhotoUrl.isNotEmpty &&
+                      review.userPhotoUrl.startsWith('http')
                   ? Image.network(
-                      userImage,
+                      review.userPhotoUrl,
                       fit: BoxFit.cover,
                       loadingBuilder: (context, child, loadingProgress) {
                         if (loadingProgress == null) return child;
@@ -429,9 +592,9 @@ class ReviewCard extends StatelessWidget {
                         );
                       },
                     )
-                  : userImage.isNotEmpty
+                  : review.userPhotoUrl.isNotEmpty
                       ? Image.asset(
-                          userImage,
+                          review.userPhotoUrl,
                           fit: BoxFit.cover,
                         )
                       : Icon(
@@ -447,18 +610,36 @@ class ReviewCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text(
-                  userName,
-                  style: TextStyle(
-                    fontFamily: TempLanguage.poppins,
-                    fontSize: 14,
-                    color: appBlackColor,
-                    fontWeight: FontWeight.w600,
-                  ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Text(
+                        review.userName,
+                        style: TextStyle(
+                          fontFamily: TempLanguage.poppins,
+                          fontSize: 14,
+                          color: appBlackColor,
+                          fontWeight: FontWeight.w600,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    if (isOwner)
+                      GestureDetector(
+                        onTap: () => _showDeleteReviewConfirmation(
+                            context, review, courtId),
+                        child: Icon(
+                          Icons.delete_outline,
+                          size: 16,
+                          color: Colors.red.shade600,
+                        ),
+                      ),
+                  ],
                 ),
                 const SizedBox(height: 5),
                 Text(
-                  reviewText,
+                  review.reviewText,
                   style: TextStyle(
                     fontFamily: TempLanguage.poppins,
                     fontSize: 11,
@@ -470,7 +651,7 @@ class ReviewCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 5),
                 RatingWidget(
-                  averageRating: rating.toDouble(),
+                  averageRating: review.rating.toDouble(),
                   totalRatings: "",
                   starSize: 12,
                   fontSize: 12,
@@ -481,6 +662,123 @@ class ReviewCard extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  void _showDeleteReviewConfirmation(
+      BuildContext context, Review review, String courtId) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(
+            "Delete Review",
+            style: TextStyle(
+              fontFamily: TempLanguage.poppins,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          content: Text(
+            "Are you sure you want to delete this review? This action cannot be undone.",
+            style: TextStyle(
+              fontFamily: TempLanguage.poppins,
+              fontSize: 14,
+              color: Colors.grey.shade600,
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text(
+                "Cancel",
+                style: TextStyle(
+                  color: Colors.grey.shade600,
+                  fontFamily: TempLanguage.poppins,
+                ),
+              ),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+                _deleteReview(context, review, courtId);
+              },
+              child: Text(
+                "Delete",
+                style: TextStyle(
+                  color: Colors.red,
+                  fontFamily: TempLanguage.poppins,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _deleteReview(
+      BuildContext context, Review review, String courtId) async {
+    try {
+      // Show loading indicator
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Row(
+            children: [
+              const SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                ),
+              ),
+              const SizedBox(width: 16),
+              Text(
+                "Deleting review...",
+                style: TextStyle(fontFamily: TempLanguage.poppins),
+              ),
+            ],
+          ),
+          backgroundColor: Colors.orange,
+          duration: const Duration(seconds: 2),
+        ),
+      );
+
+      // Delete the review from Firestore
+      await FirebaseFirestore.instance
+          .collection(Collections.GOLDEN_LOCATIONS)
+          .doc(courtId)
+          .collection(Collections.REVIEWS)
+          .doc(review.id)
+          .delete();
+
+      // Show success message
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              "Review deleted successfully!",
+              style: TextStyle(fontFamily: TempLanguage.poppins),
+            ),
+            backgroundColor: appGreenColor,
+            duration: const Duration(seconds: 2),
+          ),
+        );
+      }
+    } catch (e) {
+      debugPrint("Error deleting review: $e");
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              "Failed to delete review. Please try again.",
+              style: TextStyle(fontFamily: TempLanguage.poppins),
+            ),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
   }
 }
 
@@ -628,18 +926,17 @@ class _ReviewsSectionState extends State<ReviewsSection> {
 
             final reviews = snapshot.data!;
             return SizedBox(
-              height: 120,
+              height: 130,
               child: ListView.builder(
                 scrollDirection: Axis.horizontal,
                 itemCount: reviews.length,
+                shrinkWrap: true,
                 itemBuilder: (context, index) {
                   final review = reviews[index];
 
                   return ReviewCard(
-                    userName: review.userName,
-                    reviewText: review.reviewText,
-                    rating: review.rating,
-                    userImage: review.userPhotoUrl,
+                    review: review,
+                    courtId: widget.courtId,
                   );
                 },
               ),
@@ -668,19 +965,20 @@ class _ReviewsSectionState extends State<ReviewsSection> {
 }
 
 class CommentCard extends StatelessWidget {
-  final String userName;
-  final String commentText;
-  final String userImage;
+  final Comment comment;
+  final String courtId;
 
   const CommentCard({
     super.key,
-    required this.userName,
-    required this.commentText,
-    required this.userImage,
+    required this.comment,
+    required this.courtId,
   });
 
   @override
   Widget build(BuildContext context) {
+    final currentUserId = FirebaseAuth.instance.currentUser?.uid;
+    final isOwner = currentUserId == comment.userId;
+
     return Container(
       margin: const EdgeInsets.only(bottom: 15),
       padding: const EdgeInsets.all(15),
@@ -689,11 +987,22 @@ class CommentCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(10),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
-            offset: const Offset(0, 2),
-            blurRadius: 8,
+            color: Colors.grey.withOpacity(0.15),
+            offset: const Offset(0, 4),
+            blurRadius: 12,
+            spreadRadius: 1,
+          ),
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.05),
+            offset: const Offset(0, 1),
+            blurRadius: 4,
+            spreadRadius: 0,
           ),
         ],
+        border: Border.all(
+          color: Colors.grey.shade100,
+          width: 1,
+        ),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -706,9 +1015,10 @@ class CommentCard extends StatelessWidget {
               color: Colors.grey.shade200,
             ),
             child: ClipOval(
-              child: userImage.isNotEmpty && userImage.startsWith('http')
+              child: comment.userPhotoUrl.isNotEmpty &&
+                      comment.userPhotoUrl.startsWith('http')
                   ? Image.network(
-                      userImage,
+                      comment.userPhotoUrl,
                       fit: BoxFit.cover,
                       loadingBuilder: (context, child, loadingProgress) {
                         if (loadingProgress == null) return child;
@@ -722,9 +1032,9 @@ class CommentCard extends StatelessWidget {
                         );
                       },
                     )
-                  : userImage.isNotEmpty
+                  : comment.userPhotoUrl.isNotEmpty
                       ? Image.asset(
-                          userImage,
+                          comment.userPhotoUrl,
                           fit: BoxFit.cover,
                         )
                       : Icon(
@@ -739,18 +1049,35 @@ class CommentCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  userName,
-                  style: TextStyle(
-                    fontFamily: TempLanguage.poppins,
-                    fontSize: 14,
-                    color: appBlackColor,
-                    fontWeight: FontWeight.w600,
-                  ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Text(
+                        comment.userName,
+                        style: TextStyle(
+                          fontFamily: TempLanguage.poppins,
+                          fontSize: 14,
+                          color: appBlackColor,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                    if (isOwner)
+                      GestureDetector(
+                        onTap: () => _showDeleteCommentConfirmation(
+                            context, comment, courtId),
+                        child: Icon(
+                          Icons.delete_outline,
+                          size: 16,
+                          color: Colors.red.shade600,
+                        ),
+                      ),
+                  ],
                 ),
                 const SizedBox(height: 5),
                 Text(
-                  commentText,
+                  comment.commentText,
                   style: TextStyle(
                     fontFamily: TempLanguage.poppins,
                     fontSize: 12,
@@ -764,6 +1091,121 @@ class CommentCard extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  void _showDeleteCommentConfirmation(
+      BuildContext context, Comment comment, String courtId) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(
+            "Delete Comment",
+            style: TextStyle(
+              fontFamily: TempLanguage.poppins,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          content: Text(
+            "Are you sure you want to delete this comment? This action cannot be undone.",
+            style: TextStyle(
+              fontFamily: TempLanguage.poppins,
+              fontSize: 14,
+              color: Colors.grey.shade600,
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text(
+                "Cancel",
+                style: TextStyle(
+                  color: Colors.grey.shade600,
+                  fontFamily: TempLanguage.poppins,
+                ),
+              ),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+                _deleteComment(context, comment, courtId);
+              },
+              child: Text(
+                "Delete",
+                style: TextStyle(
+                  color: Colors.red,
+                  fontFamily: TempLanguage.poppins,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _deleteComment(
+      BuildContext context, Comment comment, String courtId) async {
+    try {
+      // Show loading indicator
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Row(
+            children: [
+              const SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                ),
+              ),
+              const SizedBox(width: 16),
+              Text(
+                "Deleting comment...",
+                style: TextStyle(fontFamily: TempLanguage.poppins),
+              ),
+            ],
+          ),
+          backgroundColor: Colors.orange,
+          duration: const Duration(seconds: 2),
+        ),
+      );
+
+      // Delete the comment from Firestore
+      await FirebaseFirestore.instance
+          .collection(Collections.COURT_COMMENTS_COLLECTION)
+          .doc(comment.id)
+          .delete();
+
+      // Show success message
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              "Comment deleted successfully!",
+              style: TextStyle(fontFamily: TempLanguage.poppins),
+            ),
+            backgroundColor: appGreenColor,
+            duration: const Duration(seconds: 2),
+          ),
+        );
+      }
+    } catch (e) {
+      debugPrint("Error deleting comment: $e");
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              "Failed to delete comment. Please try again.",
+              style: TextStyle(fontFamily: TempLanguage.poppins),
+            ),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
   }
 }
 
@@ -911,14 +1353,14 @@ class _CommentsSectionState extends State<CommentsSection> {
       final user = userController.userModel.value;
 
       await FirebaseFirestore.instance
-          .collection(Collections.GOLDEN_LOCATIONS)
-          .doc(widget.courtId)
-          .collection(Collections.COURT_COMMENTS)
+          .collection(Collections.COURT_COMMENTS_COLLECTION)
           .add({
         CommentKey.USER_ID: currentUser.uid,
         CommentKey.USER_NAME: user.userName,
         CommentKey.USER_PHOTO_URL: user.photoUrl,
         CommentKey.COMMENT_TEXT: commentText,
+        CommentKey.COURT_ID: widget
+            .courtId, // Add courtId field for separate collection architecture
         CommentKey.CREATED_AT: FieldValue.serverTimestamp(),
       });
 
@@ -1009,9 +1451,8 @@ class _CommentsSectionState extends State<CommentsSection> {
             return Column(
               children: comments.take(3).map((comment) {
                 return CommentCard(
-                  userName: comment.userName,
-                  commentText: comment.commentText,
-                  userImage: comment.userPhotoUrl,
+                  comment: comment,
+                  courtId: widget.courtId,
                 );
               }).toList(),
             );
@@ -1387,34 +1828,153 @@ class _PlayersViewState extends State<PlayersView> {
                     ],
                   ),
                   // Court Info Tab
-                  SingleChildScrollView(
-                    padding: const EdgeInsets.all(20),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        GallerySection(
-                          isPremium: isCurrentUserPremium,
-                          isCheckedIn: widget.isCheckedIn,
-                          courtName: widget.courtName,
-                          courtId: widget.courtId,
+                  Stack(
+                    children: [
+                      // Apply blur effect when user is not premium
+                      Container(
+                        child: !isCurrentUserPremium
+                            ? ImageFiltered(
+                                imageFilter:
+                                    ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+                                child: SingleChildScrollView(
+                                  padding: const EdgeInsets.all(20),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      GallerySection(
+                                        isPremium: isCurrentUserPremium,
+                                        isCheckedIn: widget.isCheckedIn,
+                                        courtName: widget.courtName,
+                                        courtId: widget.courtId,
+                                      ),
+                                      const SizedBox(height: 30),
+                                      ReviewsSection(
+                                        isPremium: isCurrentUserPremium,
+                                        isCheckedIn: widget.isCheckedIn,
+                                        courtName: widget.courtName,
+                                        courtId: widget.courtId,
+                                      ),
+                                      const SizedBox(height: 30),
+                                      CommentsSection(
+                                        isPremium: isCurrentUserPremium,
+                                        isCheckedIn: widget.isCheckedIn,
+                                        courtName: widget.courtName,
+                                        courtId: widget.courtId,
+                                      ),
+                                      const SizedBox(height: 20),
+                                    ],
+                                  ),
+                                ),
+                              )
+                            : SingleChildScrollView(
+                                padding: const EdgeInsets.all(20),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    GallerySection(
+                                      isPremium: isCurrentUserPremium,
+                                      isCheckedIn: widget.isCheckedIn,
+                                      courtName: widget.courtName,
+                                      courtId: widget.courtId,
+                                    ),
+                                    const SizedBox(height: 30),
+                                    ReviewsSection(
+                                      isPremium: isCurrentUserPremium,
+                                      isCheckedIn: widget.isCheckedIn,
+                                      courtName: widget.courtName,
+                                      courtId: widget.courtId,
+                                    ),
+                                    const SizedBox(height: 30),
+                                    CommentsSection(
+                                      isPremium: isCurrentUserPremium,
+                                      isCheckedIn: widget.isCheckedIn,
+                                      courtName: widget.courtName,
+                                      courtId: widget.courtId,
+                                    ),
+                                    const SizedBox(height: 20),
+                                  ],
+                                ),
+                              ),
+                      ),
+                      // Show upgrade message when user is not premium
+                      if (!isCurrentUserPremium)
+                        Positioned.fill(
+                          child: Container(
+                            color: Colors.black54,
+                            child: Center(
+                              child: Container(
+                                margin: const EdgeInsets.all(20),
+                                padding: const EdgeInsets.all(24),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(16),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black26,
+                                      blurRadius: 10,
+                                      offset: const Offset(0, 4),
+                                    ),
+                                  ],
+                                ),
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(
+                                      Icons.lock,
+                                      size: 48,
+                                      color: appGreenColor,
+                                    ),
+                                    const SizedBox(height: 16),
+                                    Text(
+                                      "Premium Feature",
+                                      style: TextStyle(
+                                        fontFamily: TempLanguage.poppins,
+                                        fontSize: 20,
+                                        color: appBlackColor,
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                    const SizedBox(height: 12),
+                                    Text(
+                                      "Upgrade to Premium to unlock court information, gallery, reviews, and comments",
+                                      style: TextStyle(
+                                        fontFamily: TempLanguage.poppins,
+                                        fontSize: 14,
+                                        color: Colors.grey.shade600,
+                                        height: 1.4,
+                                      ),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                    const SizedBox(height: 20),
+                                    CustomButton(
+                                      text: "Upgrade to Premium",
+                                      onTap: () {
+                                        // Handle premium upgrade navigation
+                                        // You can navigate to your premium upgrade screen here
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
+                                          SnackBar(
+                                            content: Text(
+                                              "Coming soon",
+                                              style: TextStyle(
+                                                  fontFamily:
+                                                      TempLanguage.poppins),
+                                            ),
+                                            backgroundColor: appGreenColor,
+                                          ),
+                                        );
+                                      },
+                                      width: double.infinity,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
                         ),
-                        const SizedBox(height: 30),
-                        ReviewsSection(
-                          isPremium: isCurrentUserPremium,
-                          isCheckedIn: widget.isCheckedIn,
-                          courtName: widget.courtName,
-                          courtId: widget.courtId,
-                        ),
-                        const SizedBox(height: 30),
-                        CommentsSection(
-                          isPremium: isCurrentUserPremium,
-                          isCheckedIn: widget.isCheckedIn,
-                          courtName: widget.courtName,
-                          courtId: widget.courtId,
-                        ),
-                        const SizedBox(height: 20),
-                      ],
-                    ),
+                    ],
                   ),
                 ],
               ),

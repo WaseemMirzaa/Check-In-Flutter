@@ -4,11 +4,14 @@ class Collections {
   // static const COURTS = 'courts';
   static const GALLERY = 'gallery';
   static const REVIEWS = 'reviews';
-  static const COURT_COMMENTS = 'comments';
+  // New separate collections for court data
+  static const COURT_GALLERY = 'courtGallery';
+  static const COURT_REVIEWS = 'courtReviews';
+  static const COURT_COMMENTS_COLLECTION = 'courtComments';
   static const String MESSAGES = 'messages';
   static const String CHAT = 'chat';
   static const String NEWSFEED = 'newsFeed';
-  static const String COMMENTS = 'comments';
+  static const String COMMENTS = 'comments'; // For newsfeed post comments
   static const String REPORTPOSTS = 'reportPosts';
   static const String REPORTPROFILES = 'reportProfiles';
   static const String REPORT_MESSAGE = 'reportMessage';
@@ -55,6 +58,7 @@ class GalleryKey {
   static const UPLOADED_BY_PHOTO = 'uploadedByPhoto';
   static const UPLOADED_AT = 'uploadedAt';
   static const DESCRIPTION = 'description';
+  static const COURT_ID = 'courtId'; // Add courtId field
 }
 
 class ReviewKey {
@@ -64,6 +68,7 @@ class ReviewKey {
   static const RATING = 'rating';
   static const REVIEW_TEXT = 'reviewText';
   static const CREATED_AT = 'createdAt';
+  static const COURT_ID = 'courtId'; // Add courtId field
 }
 
 class CommentKey {
@@ -72,6 +77,7 @@ class CommentKey {
   static const USER_PHOTO_URL = 'userPhotoUrl';
   static const COMMENT_TEXT = 'commentText';
   static const CREATED_AT = 'createdAt';
+  static const COURT_ID = 'courtId'; // Add courtId field
 }
 
 class MessageField {

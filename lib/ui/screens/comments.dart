@@ -85,10 +85,10 @@ class _CommentsScreenState extends State<CommentsScreen> {
     });
 
     try {
+      debugPrint("🔵 Loading comments for courtId: ${widget.courtId}");
       Query query = FirebaseFirestore.instance
-          .collection(Collections.GOLDEN_LOCATIONS)
-          .doc(widget.courtId)
-          .collection(Collections.COURT_COMMENTS)
+          .collection(Collections.COURT_COMMENTS_COLLECTION)
+          .where(CommentKey.COURT_ID, isEqualTo: widget.courtId)
           .orderBy(CommentKey.CREATED_AT, descending: true)
           .limit(pageSize);
 
@@ -97,17 +97,21 @@ class _CommentsScreenState extends State<CommentsScreen> {
       }
 
       final snapshot = await query.get();
+      debugPrint(
+          "🔵 Comments query returned ${snapshot.docs.length} documents");
 
       if (snapshot.docs.isNotEmpty) {
         final newComments =
             snapshot.docs.map((doc) => Comment.fromFirestore(doc)).toList();
 
+        debugPrint("🔵 Parsed ${newComments.length} comments successfully");
         setState(() {
           comments.addAll(newComments);
           lastDocument = snapshot.docs.last;
           hasMoreData = snapshot.docs.length == pageSize;
         });
       } else {
+        debugPrint("🔵 No comments found");
         setState(() {
           hasMoreData = false;
         });
@@ -137,9 +141,8 @@ class _CommentsScreenState extends State<CommentsScreen> {
   Future<void> _loadCommentsCount() async {
     try {
       final snapshot = await FirebaseFirestore.instance
-          .collection(Collections.GOLDEN_LOCATIONS)
-          .doc(widget.courtId)
-          .collection(Collections.COURT_COMMENTS)
+          .collection(Collections.COURT_COMMENTS_COLLECTION)
+          .where(CommentKey.COURT_ID, isEqualTo: widget.courtId)
           .count()
           .get();
 
@@ -271,6 +274,10 @@ class _CommentsScreenState extends State<CommentsScreen> {
                             }
 
                             final comment = comments[index];
+                            final currentUserId =
+                                FirebaseAuth.instance.currentUser?.uid;
+                            final isOwner = currentUserId == comment.userId;
+
                             return Container(
                               margin: const EdgeInsets.only(bottom: 15),
                               padding: const EdgeInsets.all(20),
@@ -334,14 +341,42 @@ class _CommentsScreenState extends State<CommentsScreen> {
                                           mainAxisAlignment:
                                               MainAxisAlignment.spaceBetween,
                                           children: [
-                                            Text(
-                                              comment.userName,
-                                              style: TextStyle(
-                                                fontFamily:
-                                                    TempLanguage.poppins,
-                                                fontSize: 16,
-                                                color: appBlackColor,
-                                                fontWeight: FontWeight.w600,
+                                            Expanded(
+                                              child: Row(
+                                                children: [
+                                                  Flexible(
+                                                    child: Text(
+                                                      comment.userName,
+                                                      style: TextStyle(
+                                                        fontFamily: TempLanguage
+                                                            .poppins,
+                                                        fontSize: 16,
+                                                        color: appBlackColor,
+                                                        fontWeight:
+                                                            FontWeight.w600,
+                                                      ),
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
+                                                    ),
+                                                  ),
+                                                  if (isOwner)
+                                                    Padding(
+                                                      padding:
+                                                          const EdgeInsets.only(
+                                                              left: 8),
+                                                      child: GestureDetector(
+                                                        onTap: () =>
+                                                            _showDeleteConfirmation(
+                                                                comment),
+                                                        child: Icon(
+                                                          Icons.delete_outline,
+                                                          size: 18,
+                                                          color: Colors
+                                                              .red.shade600,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                ],
                                               ),
                                             ),
                                             Text(
@@ -519,8 +554,10 @@ class _CommentsScreenState extends State<CommentsScreen> {
 
   void _submitComment(String commentText) async {
     try {
+      debugPrint("🔵 Submitting comment for courtId: ${widget.courtId}");
       final currentUser = FirebaseAuth.instance.currentUser;
       if (currentUser == null) {
+        debugPrint("🔴 No current user found");
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
@@ -536,17 +573,20 @@ class _CommentsScreenState extends State<CommentsScreen> {
       final userController = Get.find<UserController>();
       final user = userController.userModel.value;
 
+      debugPrint("🔵 User data: ${user.userName}");
+
       await FirebaseFirestore.instance
-          .collection(Collections.GOLDEN_LOCATIONS)
-          .doc(widget.courtId)
-          .collection(Collections.COURT_COMMENTS)
+          .collection(Collections.COURT_COMMENTS_COLLECTION)
           .add({
         CommentKey.USER_ID: currentUser.uid,
         CommentKey.USER_NAME: user.userName,
         CommentKey.USER_PHOTO_URL: user.photoUrl,
         CommentKey.COMMENT_TEXT: commentText,
         CommentKey.CREATED_AT: FieldValue.serverTimestamp(),
+        CommentKey.COURT_ID: widget.courtId, // Add courtId field
       });
+
+      debugPrint("🔵 Comment added successfully to collection");
 
       // Show success message
       if (mounted) {
@@ -562,15 +602,135 @@ class _CommentsScreenState extends State<CommentsScreen> {
         );
 
         // Refresh comments to show the new comment
+        debugPrint("🔵 Refreshing comments list");
         await _refreshComments();
       }
     } catch (e) {
-      debugPrint("Error submitting comment: $e");
+      debugPrint("🔴 Error submitting comment: $e");
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
               "Failed to post comment. Please try again.",
+              style: TextStyle(fontFamily: TempLanguage.poppins),
+            ),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
+  void _showDeleteConfirmation(Comment comment) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(
+            "Delete Comment",
+            style: TextStyle(
+              fontFamily: TempLanguage.poppins,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          content: Text(
+            "Are you sure you want to delete this comment? This action cannot be undone.",
+            style: TextStyle(
+              fontFamily: TempLanguage.poppins,
+              fontSize: 14,
+              color: Colors.grey.shade600,
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text(
+                "Cancel",
+                style: TextStyle(
+                  color: Colors.grey.shade600,
+                  fontFamily: TempLanguage.poppins,
+                ),
+              ),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+                _deleteComment(comment);
+              },
+              child: Text(
+                "Delete",
+                style: TextStyle(
+                  color: Colors.red,
+                  fontFamily: TempLanguage.poppins,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _deleteComment(Comment comment) async {
+    try {
+      // Show loading indicator
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Row(
+            children: [
+              const SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                ),
+              ),
+              const SizedBox(width: 16),
+              Text(
+                "Deleting comment...",
+                style: TextStyle(fontFamily: TempLanguage.poppins),
+              ),
+            ],
+          ),
+          backgroundColor: Colors.orange,
+          duration: const Duration(seconds: 2),
+        ),
+      );
+
+      // Delete the comment from Firestore - using new separate collection
+      await FirebaseFirestore.instance
+          .collection(Collections.COURT_COMMENTS_COLLECTION)
+          .doc(comment.id)
+          .delete();
+
+      // Remove from local list
+      setState(() {
+        comments.removeWhere((c) => c.id == comment.id);
+        totalComments = totalComments > 0 ? totalComments - 1 : 0;
+      });
+
+      // Show success message
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              "Comment deleted successfully!",
+              style: TextStyle(fontFamily: TempLanguage.poppins),
+            ),
+            backgroundColor: appGreenColor,
+            duration: const Duration(seconds: 2),
+          ),
+        );
+      }
+    } catch (e) {
+      debugPrint("Error deleting comment: $e");
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              "Failed to delete comment. Please try again.",
               style: TextStyle(fontFamily: TempLanguage.poppins),
             ),
             backgroundColor: Colors.red,

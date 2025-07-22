@@ -172,6 +172,8 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
   }
 
   Future courtNames() async {
+    print('courtNames() method called');
+
     // Golden Location
     try {
       if (courtlist.isEmpty) {
@@ -240,7 +242,8 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
         if (mounted) setState(() {});
       }
     } catch (e) {
-      print(e);
+      print('Error in courtNames() golden locations: $e');
+      print('Error stacktrace: ${e.toString()}');
     }
 
     // ADDING PLACCES API COURTS LOCATION MARKER
@@ -256,6 +259,7 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
     // );
 
     final courts = await CourtsParser().getCourtsFromCSVFileAndFirestore();
+    print('Loaded ${courts.length} courts from CSV/Firestore');
 
     // final placesResponse = await getBasketballCourts();
 

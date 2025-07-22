@@ -5,6 +5,7 @@ import 'package:check_in/model/court_data_models.dart';
 import 'package:check_in/Services/review_service.dart';
 import 'package:check_in/utils/colors.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
 
@@ -83,9 +84,8 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
 
     try {
       Query query = FirebaseFirestore.instance
-          .collection(Collections.GOLDEN_LOCATIONS)
-          .doc(widget.courtId)
-          .collection(Collections.REVIEWS)
+          .collection(Collections.COURT_REVIEWS)
+          .where(ReviewKey.COURT_ID, isEqualTo: widget.courtId)
           .orderBy(ReviewKey.CREATED_AT, descending: true)
           .limit(pageSize);
 
@@ -256,6 +256,10 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
                         }
 
                         final review = reviews[index];
+                        final currentUserId =
+                            FirebaseAuth.instance.currentUser?.uid;
+                        final isOwner = currentUserId == review.userId;
+
                         return Container(
                           margin: const EdgeInsets.only(bottom: 15),
                           padding: const EdgeInsets.all(20),
@@ -320,16 +324,36 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: [
-                                        Text(
-                                          review.userName.isNotEmpty
-                                              ? review.userName
-                                              : 'Anonymous',
-                                          style: TextStyle(
-                                            fontFamily: TempLanguage.poppins,
-                                            fontSize: 16,
-                                            color: appBlackColor,
-                                            fontWeight: FontWeight.w600,
-                                          ),
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Expanded(
+                                              child: Text(
+                                                review.userName.isNotEmpty
+                                                    ? review.userName
+                                                    : 'Anonymous',
+                                                style: TextStyle(
+                                                  fontFamily:
+                                                      TempLanguage.poppins,
+                                                  fontSize: 16,
+                                                  color: appBlackColor,
+                                                  fontWeight: FontWeight.w600,
+                                                ),
+                                              ),
+                                            ),
+                                            if (isOwner)
+                                              GestureDetector(
+                                                onTap: () =>
+                                                    _showDeleteReviewConfirmation(
+                                                        review),
+                                                child: Icon(
+                                                  Icons.delete_outline,
+                                                  size: 18,
+                                                  color: Colors.red.shade600,
+                                                ),
+                                              ),
+                                          ],
                                         ),
                                         const SizedBox(height: 4),
                                         Text(
@@ -427,6 +451,125 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
       return "${difference.inMinutes} minute${difference.inMinutes > 1 ? 's' : ''} ago";
     } else {
       return "Just now";
+    }
+  }
+
+  void _showDeleteReviewConfirmation(Review review) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(
+            "Delete Review",
+            style: TextStyle(
+              fontFamily: TempLanguage.poppins,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          content: Text(
+            "Are you sure you want to delete this review? This action cannot be undone.",
+            style: TextStyle(
+              fontFamily: TempLanguage.poppins,
+              fontSize: 14,
+              color: Colors.grey.shade600,
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text(
+                "Cancel",
+                style: TextStyle(
+                  color: Colors.grey.shade600,
+                  fontFamily: TempLanguage.poppins,
+                ),
+              ),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+                _deleteReview(review);
+              },
+              child: Text(
+                "Delete",
+                style: TextStyle(
+                  color: Colors.red,
+                  fontFamily: TempLanguage.poppins,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _deleteReview(Review review) async {
+    try {
+      // Show loading indicator
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Row(
+            children: [
+              const SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                ),
+              ),
+              const SizedBox(width: 16),
+              Text(
+                "Deleting review...",
+                style: TextStyle(fontFamily: TempLanguage.poppins),
+              ),
+            ],
+          ),
+          backgroundColor: Colors.orange,
+          duration: const Duration(seconds: 2),
+        ),
+      );
+
+      // Delete the review from Firestore - using new separate collection
+      await FirebaseFirestore.instance
+          .collection(Collections.COURT_REVIEWS)
+          .doc(review.id)
+          .delete();
+
+      // Remove from local list and refresh stats
+      setState(() {
+        reviews.removeWhere((r) => r.id == review.id);
+        reviewStats = _getReviewStats();
+      });
+
+      // Show success message
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              "Review deleted successfully!",
+              style: TextStyle(fontFamily: TempLanguage.poppins),
+            ),
+            backgroundColor: appGreenColor,
+            duration: const Duration(seconds: 2),
+          ),
+        );
+      }
+    } catch (e) {
+      debugPrint("Error deleting review: $e");
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              "Failed to delete review. Please try again.",
+              style: TextStyle(fontFamily: TempLanguage.poppins),
+            ),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
     }
   }
 

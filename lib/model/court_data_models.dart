@@ -10,6 +10,7 @@ class Review {
   final int rating;
   final String reviewText;
   final DateTime createdAt;
+  final String courtId; // Add courtId field
 
   Review({
     required this.id,
@@ -19,6 +20,7 @@ class Review {
     required this.rating,
     required this.reviewText,
     required this.createdAt,
+    required this.courtId,
   });
 
   factory Review.fromFirestore(DocumentSnapshot doc) {
@@ -32,7 +34,21 @@ class Review {
       reviewText: data[ReviewKey.REVIEW_TEXT] ?? '',
       createdAt: (data[ReviewKey.CREATED_AT] as Timestamp?)?.toDate() ??
           DateTime.now(),
+      courtId: data[ReviewKey.COURT_ID] ?? '',
     );
+  }
+
+  // Convert to Map for Firestore
+  Map<String, dynamic> toMap() {
+    return {
+      ReviewKey.USER_ID: userId,
+      ReviewKey.USER_NAME: userName,
+      ReviewKey.USER_PHOTO_URL: userPhotoUrl,
+      ReviewKey.RATING: rating,
+      ReviewKey.REVIEW_TEXT: reviewText,
+      ReviewKey.CREATED_AT: Timestamp.fromDate(createdAt),
+      ReviewKey.COURT_ID: courtId,
+    };
   }
 }
 
@@ -45,6 +61,7 @@ class GalleryItem {
   final String uploadedByPhoto;
   final DateTime uploadedAt;
   final String description;
+  final String courtId; // Add courtId field
 
   GalleryItem({
     required this.id,
@@ -54,6 +71,7 @@ class GalleryItem {
     required this.uploadedByPhoto,
     required this.uploadedAt,
     required this.description,
+    required this.courtId,
   });
 
   factory GalleryItem.fromFirestore(DocumentSnapshot doc) {
@@ -67,7 +85,21 @@ class GalleryItem {
       uploadedAt: (data[GalleryKey.UPLOADED_AT] as Timestamp?)?.toDate() ??
           DateTime.now(),
       description: data[GalleryKey.DESCRIPTION] ?? '',
+      courtId: data[GalleryKey.COURT_ID] ?? '',
     );
+  }
+
+  // Convert to Map for Firestore
+  Map<String, dynamic> toMap() {
+    return {
+      GalleryKey.IMAGE_URL: imageUrl,
+      GalleryKey.UPLOADED_BY: uploadedBy,
+      GalleryKey.UPLOADED_BY_NAME: uploadedByName,
+      GalleryKey.UPLOADED_BY_PHOTO: uploadedByPhoto,
+      GalleryKey.UPLOADED_AT: Timestamp.fromDate(uploadedAt),
+      GalleryKey.DESCRIPTION: description,
+      GalleryKey.COURT_ID: courtId,
+    };
   }
 }
 
@@ -79,6 +111,7 @@ class Comment {
   final String userPhotoUrl;
   final String commentText;
   final DateTime createdAt;
+  final String courtId; // Add courtId field
 
   Comment({
     required this.id,
@@ -87,6 +120,7 @@ class Comment {
     required this.userPhotoUrl,
     required this.commentText,
     required this.createdAt,
+    required this.courtId,
   });
 
   factory Comment.fromFirestore(DocumentSnapshot doc) {
@@ -99,6 +133,19 @@ class Comment {
       commentText: data[CommentKey.COMMENT_TEXT] ?? '',
       createdAt: (data[CommentKey.CREATED_AT] as Timestamp?)?.toDate() ??
           DateTime.now(),
+      courtId: data[CommentKey.COURT_ID] ?? '',
     );
+  }
+
+  // Convert to Map for Firestore
+  Map<String, dynamic> toMap() {
+    return {
+      CommentKey.USER_ID: userId,
+      CommentKey.USER_NAME: userName,
+      CommentKey.USER_PHOTO_URL: userPhotoUrl,
+      CommentKey.COMMENT_TEXT: commentText,
+      CommentKey.CREATED_AT: Timestamp.fromDate(createdAt),
+      CommentKey.COURT_ID: courtId,
+    };
   }
 }

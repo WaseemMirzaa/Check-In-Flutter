@@ -246,11 +246,9 @@ class GalleryScreen extends StatefulWidget {
           final snapshot = await uploadTask;
           final downloadUrl = await snapshot.ref.getDownloadURL();
 
-          // Save to Firestore
+          // Save to Firestore - using new separate collection
           await FirebaseFirestore.instance
-              .collection(Collections.GOLDEN_LOCATIONS)
-              .doc(courtId)
-              .collection(Collections.GALLERY)
+              .collection(Collections.COURT_GALLERY)
               .add({
             GalleryKey.IMAGE_URL: downloadUrl,
             GalleryKey.UPLOADED_BY: currentUser.uid,
@@ -258,6 +256,7 @@ class GalleryScreen extends StatefulWidget {
             GalleryKey.UPLOADED_BY_PHOTO: user.photoUrl,
             GalleryKey.UPLOADED_AT: FieldValue.serverTimestamp(),
             GalleryKey.DESCRIPTION: '',
+            GalleryKey.COURT_ID: courtId, // Add courtId field
           });
 
           successCount++;
@@ -429,16 +428,14 @@ class _GalleryScreenState extends State<GalleryScreen> {
                           itemCount: galleryItems.length,
                           itemBuilder: (context, index) {
                             final item = galleryItems[index];
+                            final currentUserId =
+                                FirebaseAuth.instance.currentUser?.uid;
+                            final isOwner = currentUserId == item.uploadedBy;
+
                             return GestureDetector(
                               onTap: () {
                                 _showImagePreview(context, item);
                               },
-                              onLongPress:
-                                  widget.isPremium && widget.isCheckedIn
-                                      ? () {
-                                          _showDeleteConfirmation(item);
-                                        }
-                                      : null,
                               child: Container(
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(12),
@@ -483,6 +480,37 @@ class _GalleryScreenState extends State<GalleryScreen> {
                                           );
                                         },
                                       ),
+                                      // Delete icon for owners
+                                      if (isOwner)
+                                        Positioned(
+                                          top: 8,
+                                          right: 8,
+                                          child: GestureDetector(
+                                            onTap: () =>
+                                                _showDeleteConfirmation(item),
+                                            child: Container(
+                                              padding: const EdgeInsets.all(6),
+                                              decoration: BoxDecoration(
+                                                color: Colors.white
+                                                    .withOpacity(0.9),
+                                                shape: BoxShape.circle,
+                                                boxShadow: [
+                                                  BoxShadow(
+                                                    color: Colors.black
+                                                        .withOpacity(0.1),
+                                                    offset: const Offset(0, 1),
+                                                    blurRadius: 3,
+                                                  ),
+                                                ],
+                                              ),
+                                              child: Icon(
+                                                Icons.delete_outline,
+                                                size: 18,
+                                                color: Colors.red.shade600,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
                                       Positioned(
                                         bottom: 0,
                                         left: 0,
@@ -539,7 +567,7 @@ class _GalleryScreenState extends State<GalleryScreen> {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Text(
-                "Long press on your uploaded images to delete them.",
+                "Tap the delete icon on your uploaded images to remove them.",
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontFamily: TempLanguage.poppins,
@@ -751,11 +779,9 @@ class _GalleryScreenState extends State<GalleryScreen> {
       final storageRef = FirebaseStorage.instance.refFromURL(item.imageUrl);
       await storageRef.delete();
 
-      // Delete from Firestore
+      // Delete from Firestore - using new separate collection
       await FirebaseFirestore.instance
-          .collection(Collections.GOLDEN_LOCATIONS)
-          .doc(widget.courtId)
-          .collection(Collections.GALLERY)
+          .collection(Collections.COURT_GALLERY)
           .doc(item.id)
           .delete();
 
