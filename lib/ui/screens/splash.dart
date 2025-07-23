@@ -5,10 +5,12 @@ import 'package:check_in/controllers/user_controller.dart';
 import 'package:check_in/core/constant/app_assets.dart';
 import 'package:check_in/core/constant/temp_language.dart';
 import 'package:check_in/ui/screens/Messages%20NavBar/Chat/chat_screen.dart';
+import 'package:check_in/ui/screens/onboarding.dart';
 import 'package:check_in/ui/screens/persistent_nav_bar.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../controllers/Messages/chat_controller.dart';
 import '../../model/notification_model.dart';
@@ -24,7 +26,6 @@ class Splash extends StatefulWidget {
 }
 
 class _SplashState extends State<Splash> {
-
   UserController userController = Get.put(UserController(UserServices()));
   final ChatController chatcontroller = Get.find<ChatController>();
 
@@ -35,25 +36,37 @@ class _SplashState extends State<Splash> {
     //   Navigator.push(context, MaterialPageRoute(builder: (context)=>MyHomePage()));
     // });
 
-      _navigatetohome();
+    _navigatetohome();
   }
-
 
   _navigatetohome() async {
     await userController.getUserData();
+
+    // Check if onboarding has been completed
+    final prefs = await SharedPreferences.getInstance();
+    final bool onboardingCompleted =
+        prefs.getBool('onboarding_completed') ?? false;
+
     // Get any messages which caused the application to open from
     // a terminated state.
-    RemoteMessage? initialMessage = await FirebaseMessaging.instance.getInitialMessage();
+    RemoteMessage? initialMessage =
+        await FirebaseMessaging.instance.getInitialMessage();
     if (initialMessage != null) {
       _handleMessage(initialMessage);
     } else {
       await Future.delayed(const Duration(milliseconds: 1500), () {
-        Navigator.pushReplacement(
-            context, MaterialPageRoute(builder: (context) => const Home()));
+        if (onboardingCompleted) {
+          Navigator.pushReplacement(
+              context, MaterialPageRoute(builder: (context) => const Home()));
+        } else {
+          Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => const OnboardingScreen()));
+        }
       });
     }
   }
-
 
   void _handleMessage(RemoteMessage message) {
     /// Navigate to detail
@@ -63,9 +76,11 @@ class _SplashState extends State<Splash> {
     chatcontroller.image.value = message.data['image'];
     List<dynamic> memberIdsList = jsonDecode(message.data['memberIds']);
     chatcontroller.memberId.value = memberIdsList;
-    
+
     message.data['notificationType'] == 'newsFeed'
-        ? Get.to(() => OpenPost(postId: message.data['docId'],))
+        ? Get.to(() => OpenPost(
+              postId: message.data['docId'],
+            ))
         : Get.to(() => ChatScreen());
 
     String notificationType = message.data['notificationType'];
