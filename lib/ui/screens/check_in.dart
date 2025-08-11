@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:app_tracking_transparency/app_tracking_transparency.dart';
+import 'package:check_in/controllers/subscription_controller.dart';
+import 'package:check_in/ui/screens/manage_subscription_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:check_in/Services/payment_service.dart';
 import 'package:check_in/auth_service.dart';
@@ -835,6 +837,18 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
                             //     userController.userModel.value.homeCourt ?? "");
                           },
                         ),
+              if (Get.put(SubscriptionController())
+                  .hasActivePremiumSubscription()) ...[
+                ListTile(
+                  leading: Icon(Icons.workspace_premium),
+                  onTap: () {
+                    Get.to(() => ManageSubscriptionScreen());
+                  },
+                  title: Text(
+                    "Manage Subscription",
+                  ),
+                ),
+              ],
               FirebaseAuth.instance.currentUser == null
                   ? const SizedBox()
                   : ListTile(

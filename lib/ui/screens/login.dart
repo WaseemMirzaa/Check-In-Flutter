@@ -94,6 +94,7 @@ class _LoginViewState extends State<LoginView> {
                           enableSuggestions: false,
                           autocorrect: false,
                           textInputAction: TextInputAction.next,
+                          keyboardType: TextInputType.emailAddress,
                           onEditingComplete: () =>
                               FocusScope.of(context).nextFocus(),
                           validator: (v) {

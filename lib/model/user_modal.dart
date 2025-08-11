@@ -1,3 +1,5 @@
+import 'package:check_in/model/subscription.dart';
+
 import '../core/constant/constant.dart';
 
 class UserModel {
@@ -17,6 +19,7 @@ class UserModel {
   List? blockProfiles;
   bool? isTermsVerified;
   bool? isPremium;
+  Subscription? subscription;
 
   UserModel(
       {this.userName,
@@ -33,7 +36,8 @@ class UserModel {
       this.deviceTokes,
       this.isTermsVerified,
       this.blockProfiles,
-      this.isPremium});
+      this.isPremium,
+      this.subscription});
 
   Map<String, dynamic> toMap() {
     return <String, dynamic>{

@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:check_in/Services/user_services.dart';
 import 'package:check_in/Services/court_data_service.dart';
 import 'package:check_in/Services/review_service.dart';
+import 'package:check_in/controllers/subscription_controller.dart';
 import 'package:check_in/controllers/user_controller.dart';
 import 'package:check_in/core/constant/app_assets.dart';
 import 'package:check_in/core/constant/temp_language.dart';
@@ -10,6 +11,7 @@ import 'package:check_in/ui/screens/player.dart';
 import 'package:check_in/ui/screens/gallery.dart';
 import 'package:check_in/ui/screens/reviews.dart';
 import 'package:check_in/ui/screens/comments.dart';
+import 'package:check_in/ui/screens/subscription_screen.dart';
 import 'package:check_in/ui/widgets/upload_dialog.dart';
 import 'package:check_in/ui/widgets/dialog_widgets.dart';
 import 'package:check_in/utils/colors.dart';
@@ -1938,8 +1940,9 @@ class _PlayersViewState extends State<PlayersView> {
     // }
 
     // For now, setting a default value - replace with actual implementation
-    isCurrentUserPremium = userController.userModel.value.isPremium ??
-        false; // Replace with actual user premium status check
+    isCurrentUserPremium =
+        (Get.put(SubscriptionController()).hasActivePremiumSubscription());
+    // Replace with actual user premium status check
     setState(() {});
   }
 
@@ -2201,20 +2204,19 @@ class _PlayersViewState extends State<PlayersView> {
                                     CustomButton(
                                       text: "Upgrade to Premium",
                                       onTap: () {
-                                        // Handle premium upgrade navigation
-                                        // You can navigate to your premium upgrade screen here
-                                        ScaffoldMessenger.of(context)
-                                            .showSnackBar(
-                                          SnackBar(
-                                            content: Text(
-                                              "Coming soon",
-                                              style: TextStyle(
-                                                  fontFamily:
-                                                      TempLanguage.poppins),
-                                            ),
-                                            backgroundColor: appGreenColor,
-                                          ),
-                                        );
+                                        Get.to(() => SubscriptionScreen());
+                                        // ScaffoldMessenger.of(context)
+                                        //     .showSnackBar(
+                                        //   SnackBar(
+                                        //     content: Text(
+                                        //       "Coming soon",
+                                        //       style: TextStyle(
+                                        //           fontFamily:
+                                        //               TempLanguage.poppins),
+                                        //     ),
+                                        //     backgroundColor: appGreenColor,
+                                        //   ),
+                                        // );
                                       },
                                       width: double.infinity,
                                     ),

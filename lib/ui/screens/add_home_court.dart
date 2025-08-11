@@ -2,6 +2,7 @@
 
 import 'dart:async';
 import 'package:check_in/auth_service.dart';
+import 'package:check_in/controllers/subscription_controller.dart';
 import 'package:check_in/core/constant/app_assets.dart';
 import 'package:check_in/core/constant/temp_language.dart';
 import 'package:check_in/model/user_modal.dart';
@@ -16,6 +17,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_google_places_hoc081098/google_maps_webservice_places.dart';
+import 'package:purchases_flutter/models/customer_info_wrapper.dart';
+import 'package:purchases_flutter/models/entitlement_info_wrapper.dart';
 
 // import 'package:flutter_heat_map/flutter_heat_map.dart';
 //import 'package:flutter_typeahead/flutter_typeahead.dart';
@@ -152,7 +155,7 @@ class _AddHomeCourtState extends State<AddHomeCourt>
 
     // final placesResponse = await getBasketballCourts();
 
-    // placesResponse?.results.forEach((place) {
+    // placesResponse?esults.forEach((place) {
     for (var place in courts) {
       LatLng location = LatLng(
         place.latitude,
@@ -326,19 +329,7 @@ class _AddHomeCourtState extends State<AddHomeCourt>
                           zoomGesturesEnabled: true,
                           myLocationButtonEnabled: false,
                           myLocationEnabled: true,
-                          // onTap: (LatLng latLng) {
-                          //   setState(() {
-                          //     _selectedLocation = latLng;
-                          //     // markers = {
-                          //     //   // Update the markers set with the selected location
-                          //     //   Marker(
-                          //     //     markerId: MarkerId('selectedLocation'),
-                          //     //     position: _selectedLocation!,
-                          //     //   ),
-                          //     // };
-                          //   });
-                          // },
-                          // tileOverlays: ,
+
                           initialCameraPosition: CameraPosition(
                             target: LatLng(currentLocation!.latitude,
                                 currentLocation!.longitude),
@@ -465,7 +456,7 @@ class _AddHomeCourtState extends State<AddHomeCourt>
                                   //   keyword: pattern,
                                   // );
 
-                                  // return placesResponse.results;
+                                  // return placesResponseesults;
                                   return courts;
                                 },
                                 itemBuilder: (context, prediction) {
@@ -487,7 +478,7 @@ class _AddHomeCourtState extends State<AddHomeCourt>
                                   // var detail = await _places
                                   //     .getDetailsByPlaceId(placeId as String);
                                   // var location =
-                                  //     detail.result.geometry!.location;
+                                  //     detailesult.geometry!.location;
                                   var lat = prediction.latitude;
                                   var lng = prediction.longitude;
 
@@ -622,5 +613,16 @@ class _AddHomeCourtState extends State<AddHomeCourt>
 
     // Cancel the location stream subscription
     _positionStreamSubscription?.cancel();
+  }
+
+  bool hasAnySubscription(CustomerInfo? customerInfo) {
+    // return true;
+    if (customerInfo == null) {
+      return false;
+    } else {
+      List<EntitlementInfo> activeEntitlements =
+          customerInfo.entitlements.active.values.toList();
+      return activeEntitlements.isNotEmpty;
+    }
   }
 }

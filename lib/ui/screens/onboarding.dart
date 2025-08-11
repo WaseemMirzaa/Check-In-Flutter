@@ -98,7 +98,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                             ),
                           ),
                           TextSpan(
-                            text: "to\nCheck In Hoops Courts Page",
+                            text: "to\nCheck In Hoops Courts Report",
                             style: TextStyle(
                               fontFamily: TempLanguage.poppins,
                               fontSize: 24,
@@ -112,7 +112,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
                     // Feature titles - tight spacing
                     Text(
-                      "View the Court Images",
+                      "Share photos and videos",
                       style: TextStyle(
                         fontFamily: TempLanguage.poppins,
                         fontSize: 26,
@@ -122,7 +122,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     ),
 
                     Text(
-                      "Rate The Court",
+                      "Leave ratings and reviews",
                       style: TextStyle(
                         fontFamily: TempLanguage.poppins,
                         fontSize: 20,
@@ -135,7 +135,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
                     // Description - compact
                     Text(
-                      "Fill Up Court Gallery with your amazing photos and get a chance to win Hoop of the month for the court.",
+                      "Explore court side views from other hoopers",
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontFamily: TempLanguage.poppins,
@@ -155,8 +155,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) =>
-                                    const SubscriptionScreen()),
+                                builder: (context) => SubscriptionScreen()),
                           );
                         },
                         style: ElevatedButton.styleFrom(

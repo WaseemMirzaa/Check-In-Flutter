@@ -1,4 +1,5 @@
 import 'package:check_in/Services/user_services.dart';
+import 'package:check_in/controllers/subscription_controller.dart';
 import 'package:check_in/model/user_modal.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
@@ -18,10 +19,12 @@ class UserController extends GetxController {
 
   Future<void> getUserData() async {
     if (FirebaseAuth.instance.currentUser != null) {
-      UserModel? userData = await userServices.getUserData(
-          FirebaseAuth.instance.currentUser?.uid ?? '');
+      UserModel? userData = await userServices
+          .getUserData(FirebaseAuth.instance.currentUser?.uid ?? '');
       if (userData != null) {
         userModel.value = userData;
+        userModel.value.isPremium =
+            (Get.put(SubscriptionController()).hasActivePremiumSubscription());
         blockProfiles.addAll(userData.blockProfiles ?? []);
       }
     }
@@ -37,6 +40,4 @@ class UserController extends GetxController {
       return false;
     }
   }
-
-
 }

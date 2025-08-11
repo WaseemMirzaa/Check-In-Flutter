@@ -4,6 +4,7 @@ import 'package:check_in/Services/newfeed_service.dart';
 import 'package:check_in/Services/push_notification_service.dart';
 import 'package:check_in/binding.dart';
 import 'package:check_in/controllers/News%20Feed/news_feed_controller.dart';
+import 'package:check_in/core/constant/subscription_constants.dart';
 import 'package:check_in/model/notification_model.dart';
 import 'package:check_in/ui/screens/News%20Feed%20NavBar/followers_and_following/controller/followers_and_following_controller.dart';
 import 'package:check_in/ui/screens/splash.dart';
@@ -18,6 +19,8 @@ import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:get/get.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:nb_utils/nb_utils.dart';
+import 'package:purchases_flutter/models/purchases_configuration.dart';
+import 'package:purchases_flutter/purchases_flutter.dart';
 import 'package:sizer/sizer.dart';
 import 'package:firebase_app_check/firebase_app_check.dart';
 import 'firebase_options.dart';
@@ -84,6 +87,9 @@ void main() async {
   //   await Firebase.initializeApp();
   // }
   await Firebase.initializeApp();
+  PurchasesConfiguration configuration =
+      PurchasesConfiguration(SubscriptionConstants.revenueCatApiKey);
+  await Purchases.configure(configuration);
   _messaging = FirebaseMessaging.instance;
   if (Platform.isIOS) {
     await _messaging.requestPermission();
