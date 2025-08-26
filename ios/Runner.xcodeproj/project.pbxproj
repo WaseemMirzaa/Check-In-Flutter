@@ -416,7 +416,7 @@
 				DEVELOPMENT_TEAM = N4WKQQL833;
 				ENABLE_BITCODE = NO;
 				FLUTTER_BUILD_NAME = 3.2.1;
-				FLUTTER_BUILD_NUMBER = 323;
+				FLUTTER_BUILD_NUMBER = 325;
 				INFOPLIST_FILE = Runner/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Check In";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.sports";
@@ -558,7 +558,7 @@
 				DEVELOPMENT_TEAM = N4WKQQL833;
 				ENABLE_BITCODE = NO;
 				FLUTTER_BUILD_NAME = 3.2.1;
-				FLUTTER_BUILD_NUMBER = 323;
+				FLUTTER_BUILD_NUMBER = 325;
 				INFOPLIST_FILE = Runner/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Check In";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.sports";
@@ -592,7 +592,7 @@
 				DEVELOPMENT_TEAM = N4WKQQL833;
 				ENABLE_BITCODE = NO;
 				FLUTTER_BUILD_NAME = 3.2.1;
-				FLUTTER_BUILD_NUMBER = 323;
+				FLUTTER_BUILD_NUMBER = 325;
 				INFOPLIST_FILE = Runner/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Check In";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.sports";

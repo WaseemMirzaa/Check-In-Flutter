@@ -91,13 +91,11 @@ void main() async {
       PurchasesConfiguration(SubscriptionConstants.revenueCatApiKey);
   await Purchases.configure(configuration);
   _messaging = FirebaseMessaging.instance;
-  if (Platform.isIOS) {
-    await _messaging.requestPermission();
-  }
+
   final PushNotificationServices pushNotificationService =
       PushNotificationServices();
   FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
-  pushNotificationService.init();
+  await pushNotificationService.init();
   FCMManager.getFCMToken();
 
   // Initialize your controller here

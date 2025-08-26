@@ -98,7 +98,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                             ),
                           ),
                           TextSpan(
-                            text: "to\nCheck In Hoops Courts Report",
+                            text: "to\nthe Check In Hoops Courts Report",
                             style: TextStyle(
                               fontFamily: TempLanguage.poppins,
                               fontSize: 24,

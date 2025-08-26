@@ -77,6 +77,7 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
 
   var courtN;
   bool? isCheckedIn = false;
+  bool isLoading = false;
   String checkedInCourtName = '';
   Map<String, dynamic> courtInfo = {};
 
@@ -109,27 +110,35 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
   ];
 
   Future indexValue() async {
-    if (FirebaseAuth.instance.currentUser != null) {
-      final document = FirebaseFirestore.instance
-          .collection(Collections.USER)
-          .doc(FirebaseAuth.instance.currentUser!.uid);
-      document.get().then((DocumentSnapshot snapshot) {
-        if (snapshot.exists) {
-          dynamic data = snapshot.data();
-          isCheckedIn = data[UserKey.CHECKED_IN];
-          // print("${pata['checkedIn']}Siuuu");
-          // print(isCheckedIn);
-          if (isCheckedIn == false) {
-            index = 0;
-          } else if (isCheckedIn == true) {
-            checkedInCourtName = data[UserKey.CHECKED_IN_COURT_NAME] ?? "";
-            index = 1;
+    try {
+      if (FirebaseAuth.instance.currentUser != null) {
+        final document = FirebaseFirestore.instance
+            .collection(Collections.USER)
+            .doc(FirebaseAuth.instance.currentUser!.uid);
+        document.get().then((DocumentSnapshot snapshot) {
+          if (snapshot.exists) {
+            dynamic data = snapshot.data();
+            isCheckedIn = data[UserKey.CHECKED_IN];
+            // print("${pata['checkedIn']}Siuuu");
+            // print(isCheckedIn);
+            if (isCheckedIn == false) {
+              index = 0;
+            } else if (isCheckedIn == true) {
+              checkedInCourtName = data[UserKey.CHECKED_IN_COURT_NAME] ?? "";
+              index = 1;
+            }
+            mounted ? setState(() {}) : null;
+            // print("${index} is index");
+          } else {
+            print('Document does not exist!');
           }
-          mounted ? setState(() {}) : null;
-          // print("${index} is index");
-        } else {
-          print('Document does not exist!');
-        }
+        });
+      }
+    } catch (e) {
+      print(e);
+    } finally {
+      setState(() {
+        isLoading = false;
       });
     }
   }
@@ -146,6 +155,9 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
 
   Future<Position?> getCurrentLocation() async {
     try {
+      setState(() {
+        isLoading = true;
+      });
       LocationPermission permission;
       permission = await Geolocator.checkPermission();
       if (permission == LocationPermission.denied) {
@@ -170,6 +182,10 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
     } catch (e) {
       log('Enable location');
       nbutils.toast('Enable your location');
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
     }
   }
 
@@ -631,14 +647,23 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
   }
 
   getUser() async {
-    if (FirebaseAuth.instance.currentUser != null) {
-      DocumentSnapshot snapshot = await FirebaseFirestore.instance
-          .collection(Collections.USER)
-          .doc(FirebaseAuth.instance.currentUser?.uid ?? "")
-          .get();
-      userController.userModel.value =
-          UserModel.fromMap(snapshot.data() as Map<String, dynamic>);
-      print(userController.userModel.value);
+    try {
+      isLoading = true;
+      setState(() {});
+      if (FirebaseAuth.instance.currentUser != null) {
+        DocumentSnapshot snapshot = await FirebaseFirestore.instance
+            .collection(Collections.USER)
+            .doc(FirebaseAuth.instance.currentUser?.uid ?? "")
+            .get();
+        userController.userModel.value =
+            UserModel.fromMap(snapshot.data() as Map<String, dynamic>);
+        print(userController.userModel.value);
+      }
+    } catch (e) {
+      print(e);
+    } finally {
+      isLoading = false;
+      setState(() {});
     }
     // UserModel currentUser = UserModel.fromMap(snapshot.data() as Map<String, dynamic>);
   }
@@ -885,82 +910,88 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
               child: GestureDetector(
                 child: currentLocation == null
                     ? Center(child: Text(TempLanguage.loading))
-                    : GoogleMap(
-                        mapToolbarEnabled: false,
-                        zoomControlsEnabled: true,
-                        zoomGesturesEnabled: true,
-                        myLocationButtonEnabled: false,
-                        myLocationEnabled: true,
+                    : isLoading
+                        ? Center(
+                            child: CircularProgressIndicator(
+                              color: appGreenColor,
+                            ),
+                          )
+                        : GoogleMap(
+                            mapToolbarEnabled: false,
+                            zoomControlsEnabled: true,
+                            zoomGesturesEnabled: true,
+                            myLocationButtonEnabled: false,
+                            myLocationEnabled: true,
 
-                        // tileOverlays: ,
-                        initialCameraPosition: CameraPosition(
-                          target: LatLng(currentLocation!.latitude,
-                              currentLocation!.longitude
-                              // 42.3878,
-                              // -71.1105
-                              ),
-                          zoom: ZOOM_LEVEL_INITIAL,
-                        ),
-                        markers: markers,
-                        onMapCreated: (mapController) {
-                          _mapController = mapController;
-                          _googleMapController.complete(mapController);
-                        },
-                        onCameraMove: (CameraPosition position) {
-                          int currentZoomLevel = position.zoom.toInt();
-                          if (currentZoomLevel != _previousZoomLevel) {
-                            // Zoom level changed
-                            setHeatMapSize(currentZoomLevel);
-                            // print(
-                            //     'Zoom level changed: $_previousZoomLevel -> $currentZoomLevel');
-                          }
-                          _previousZoomLevel = currentZoomLevel;
-                        },
-                        heatmaps: <Heatmap>{
-                            Heatmap(
-                              heatmapId: const HeatmapId('test'),
-                              data: heatmapPoints,
-                              gradient: HeatmapGradient(
-                                <HeatmapGradientColor>[
-                                  // Web needs a first color with 0 alpha
-                                  // if (kIsWeb)
-                                  //   HeatmapGradientColor(
-                                  //     Color.fromARGB(0, 0, 255, 255),
-                                  //     0,
-                                  //   ),
-                                  HeatmapGradientColor(
-                                    yellowColor,
-                                    0.2,
+                            // tileOverlays: ,
+                            initialCameraPosition: CameraPosition(
+                              target: LatLng(currentLocation!.latitude,
+                                  currentLocation!.longitude
+                                  // 42.3878,
+                                  // -71.1105
                                   ),
-                                  HeatmapGradientColor(
-                                    appRedColor,
-                                    0.6,
+                              zoom: ZOOM_LEVEL_INITIAL,
+                            ),
+                            markers: markers,
+                            onMapCreated: (mapController) {
+                              _mapController = mapController;
+                              _googleMapController.complete(mapController);
+                            },
+                            onCameraMove: (CameraPosition position) {
+                              int currentZoomLevel = position.zoom.toInt();
+                              if (currentZoomLevel != _previousZoomLevel) {
+                                // Zoom level changed
+                                setHeatMapSize(currentZoomLevel);
+                                // print(
+                                //     'Zoom level changed: $_previousZoomLevel -> $currentZoomLevel');
+                              }
+                              _previousZoomLevel = currentZoomLevel;
+                            },
+                            heatmaps: <Heatmap>{
+                                Heatmap(
+                                  heatmapId: const HeatmapId('test'),
+                                  data: heatmapPoints,
+                                  gradient: HeatmapGradient(
+                                    <HeatmapGradientColor>[
+                                      // Web needs a first color with 0 alpha
+                                      // if (kIsWeb)
+                                      //   HeatmapGradientColor(
+                                      //     Color.fromARGB(0, 0, 255, 255),
+                                      //     0,
+                                      //   ),
+                                      HeatmapGradientColor(
+                                        yellowColor,
+                                        0.2,
+                                      ),
+                                      HeatmapGradientColor(
+                                        appRedColor,
+                                        0.6,
+                                      ),
+                                      // HeatmapGradientColor(
+                                      //   Colors.green,
+                                      //   0.6,
+                                      // ),
+                                      // HeatmapGradientColor(
+                                      //   Colors.purple,
+                                      //   0.8,
+                                      // ),
+                                      HeatmapGradientColor(
+                                        appBlueColor,
+                                        1,
+                                      ),
+                                    ],
                                   ),
-                                  // HeatmapGradientColor(
-                                  //   Colors.green,
-                                  //   0.6,
-                                  // ),
-                                  // HeatmapGradientColor(
-                                  //   Colors.purple,
-                                  //   0.8,
-                                  // ),
-                                  HeatmapGradientColor(
-                                    appBlueColor,
-                                    1,
-                                  ),
-                                ],
-                              ),
-                              maxIntensity: 1,
-                              // Radius behaves differently on web and Android/iOS.
-                              // For Android: According to documentation, radius should be between 10 to 50
-                              radius: HeatmapRadius.fromPixels(kIsWeb
-                                  ? 10
-                                  : defaultTargetPlatform ==
-                                          TargetPlatform.android
-                                      ? heatMapRadius.value
-                                      : heatMapRadius.value),
-                            )
-                          }),
+                                  maxIntensity: 1,
+                                  // Radius behaves differently on web and Android/iOS.
+                                  // For Android: According to documentation, radius should be between 10 to 50
+                                  radius: HeatmapRadius.fromPixels(kIsWeb
+                                      ? 10
+                                      : defaultTargetPlatform ==
+                                              TargetPlatform.android
+                                          ? heatMapRadius.value
+                                          : heatMapRadius.value),
+                                )
+                              }),
               ),
             ),
             Positioned(
@@ -996,22 +1027,22 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
                               ),
                             ),
                             InkWell(
-                              onTap: () {
+                              onTap: () async {
                                 courtlist.clear();
-                                // Add your refresh button functionality here
-                                // Get.offAll(CheckIn());
-                                //....................
-                                Navigator.pushAndRemoveUntil(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => const Home()),
-                                    (route) => false);
-                                //...................
-                                // setState(() {});
-                                // Navigator.pushReplacement(
-                                //   context,
-                                //   MaterialPageRoute(builder: (context) => CheckIn()),
-                                // );
+
+                                // Refresh the page by reloading all data
+                                setState(() {
+                                  // You can add any loading states here if needed
+                                });
+
+                                // Reload all the data that's loaded in initState
+                                await getUser();
+                                await getCurrentLocation();
+                                await indexValue();
+
+                                setState(() {
+                                  // Update UI after data refresh
+                                });
                               },
                               child: Container(
                                 height: 40,

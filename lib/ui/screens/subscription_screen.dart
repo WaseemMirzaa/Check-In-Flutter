@@ -129,7 +129,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                           height: 10,
                         ),
                         Text(
-                          "Subscribe now to get",
+                          "Subscribers now get to",
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             fontFamily: TempLanguage.poppins,
@@ -267,7 +267,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                                                     ?.identifier ??
                                                 "")
                                             .contains('monthly')
-                                        ? "Monthly Reset"
+                                        ? "Monthly Reset - Perfect For Starter"
                                         : "Yearly Reset",
                                     style: TextStyle(
                                       fontFamily: TempLanguage.poppins,
@@ -277,26 +277,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                                   ),
                                 ],
                               ),
-                              SizedBox(height: 0.5.h),
-                              if ((subscriptionController.selectedPremiumProduct
-                                          .value?.identifier ??
-                                      "")
-                                  .contains('monthly'))
-                                Row(
-                                  children: [
-                                    Icon(Icons.check,
-                                        color: Colors.white, size: 20),
-                                    SizedBox(width: 2.w),
-                                    Text(
-                                      "Perfect For Starter",
-                                      style: TextStyle(
-                                        fontFamily: TempLanguage.poppins,
-                                        fontSize: 14,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                  ],
-                                ),
+
                               SizedBox(height: 2.h),
 
                               // Buy Now button
@@ -326,7 +307,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                                     elevation: 0,
                                   ),
                                   child: Text(
-                                    "Buy now for ${subscriptionController.selectedPremiumProduct.value?.currencyCode == 'USD' ? '\$ ' : '${subscriptionController.selectedPremiumProduct.value?.currencyCode ?? ""}${subscriptionController.selectedPremiumProduct.value?.price.toString() ?? ""} '}",
+                                    "Buy now",
                                     style: TextStyle(
                                       fontFamily: TempLanguage.poppins,
                                       fontSize: 16,
@@ -344,7 +325,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                             height: 5,
                           ),
                           TextButton(
-                              child: const Text('restore-purchase'),
+                              child: const Text('Restore Purchase'),
                               onPressed: () async {
                                 try {
                                   CustomerInfo customerInfo =
