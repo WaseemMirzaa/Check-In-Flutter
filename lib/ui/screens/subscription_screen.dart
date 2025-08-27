@@ -7,9 +7,9 @@ import 'package:check_in/ui/screens/persistent_nav_bar.dart';
 import 'package:check_in/utils/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:nb_utils/nb_utils.dart';
-import 'package:purchases_flutter/models/customer_info_wrapper.dart';
 import 'package:purchases_flutter/models/purchase_result.dart';
 import 'package:purchases_flutter/models/store_product_wrapper.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
@@ -24,6 +24,8 @@ class SubscriptionScreen extends StatefulWidget {
 
 class _SubscriptionScreenState extends State<SubscriptionScreen> {
   // bool isMonthlySelected = true;
+  bool _isBuyingNow = false;
+  bool _isRestoringPurchases = false;
 
   SubscriptionController subscriptionController =
       Get.put(SubscriptionController());
@@ -285,20 +287,37 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                                 width: double.infinity,
                                 height: 50,
                                 child: ElevatedButton(
-                                  onPressed: () async {
-                                    if (subscriptionController
-                                        .hasSelectedPremiumProduct) {
-                                      PurchaseResult? data =
-                                          await subscriptionController
-                                              .purchaseProduct(
-                                                  subscriptionController
-                                                      .selectedPremiumProduct
-                                                      .value!);
-                                      if (data != null) {
-                                        Get.to(() => Home());
-                                      }
-                                    }
-                                  },
+                                  onPressed: _isBuyingNow
+                                      ? null
+                                      : () async {
+                                          setState(() {
+                                            _isBuyingNow = true;
+                                          });
+
+                                          try {
+                                            if (subscriptionController
+                                                .hasSelectedPremiumProduct) {
+                                              PurchaseResult? data =
+                                                  await subscriptionController
+                                                      .purchaseProduct(
+                                                          subscriptionController
+                                                              .selectedPremiumProduct
+                                                              .value!);
+                                              if (data != null) {
+                                                Get.to(() => Home());
+                                              }
+                                            }
+                                          } catch (e) {
+                                            // Handle any errors
+                                            print('Purchase error: $e');
+                                          } finally {
+                                            if (mounted) {
+                                              setState(() {
+                                                _isBuyingNow = false;
+                                              });
+                                            }
+                                          }
+                                        },
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: Colors.white,
                                     shape: RoundedRectangleBorder(
@@ -306,15 +325,26 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                                     ),
                                     elevation: 0,
                                   ),
-                                  child: Text(
-                                    "Buy now",
-                                    style: TextStyle(
-                                      fontFamily: TempLanguage.poppins,
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w700,
-                                      color: Colors.black87,
-                                    ),
-                                  ),
+                                  child: _isBuyingNow
+                                      ? SizedBox(
+                                          height: 20,
+                                          width: 20,
+                                          child: CircularProgressIndicator(
+                                            strokeWidth: 2,
+                                            valueColor:
+                                                AlwaysStoppedAnimation<Color>(
+                                                    Colors.white),
+                                          ),
+                                        )
+                                      : Text(
+                                          "Buy now",
+                                          style: TextStyle(
+                                            fontFamily: TempLanguage.poppins,
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w700,
+                                            color: Colors.black87,
+                                          ),
+                                        ),
                                 ),
                               ),
                             ],
@@ -325,21 +355,54 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                             height: 5,
                           ),
                           TextButton(
-                              child: const Text('Restore Purchase'),
-                              onPressed: () async {
-                                try {
-                                  CustomerInfo customerInfo =
-                                      await Purchases.restorePurchases();
-                                } on PlatformException catch (e) {
-                                  Fluttertoast.showToast(
-                                      msg: e.message ??
-                                          'Error restoring purchases');
-                                  // Error restoring purchases
-                                } catch (e) {
-                                  Fluttertoast.showToast(
-                                      msg: 'Error restoring purchases');
-                                } finally {}
-                              }),
+                              onPressed: _isRestoringPurchases
+                                  ? null
+                                  : () async {
+                                      setState(() {
+                                        _isRestoringPurchases = true;
+                                      });
+
+                                      try {
+                                        await Purchases.restorePurchases();
+                                        // Fluttertoast.showToast(
+                                        //     msg:
+                                        //         'Purchases restored successfully!');
+                                      } on PlatformException catch (e) {
+                                        Fluttertoast.showToast(
+                                            msg: e.message ??
+                                                'Error restoring purchases');
+                                        // Error restoring purchases
+                                      } catch (e) {
+                                        Fluttertoast.showToast(
+                                            msg: 'Error restoring purchases');
+                                      } finally {
+                                        if (mounted) {
+                                          setState(() {
+                                            _isRestoringPurchases = false;
+                                          });
+                                        }
+                                      }
+                                    },
+                              child: _isRestoringPurchases
+                                  ? Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        SizedBox(
+                                          height: 16,
+                                          width: 16,
+                                          child: CircularProgressIndicator(
+                                            strokeWidth: 2,
+                                            valueColor:
+                                                AlwaysStoppedAnimation<Color>(
+                                                    Colors.blue),
+                                          ),
+                                        ),
+                                        SizedBox(width: 8),
+                                        Text('Restoring...'),
+                                      ],
+                                    )
+                                  : const Text(
+                                      'Already Purchased? Restore Here!')),
                         ],
                         SizedBox(
                             height: 4.h), // Extra bottom padding for scrolling

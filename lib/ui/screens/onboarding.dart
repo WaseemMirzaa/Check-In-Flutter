@@ -32,159 +32,171 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     return Scaffold(
       backgroundColor: Colors.grey.shade50,
       body: SafeArea(
-        child: Column(
-          children: [
-            // Skip button
-
-            // Main illustration area - Larger, minimal margin
-            Expanded(
-              flex: 7,
-              child: Stack(
-                children: [
-                  SizedBox(
-                    width: double.infinity,
-                    child: Padding(
-                      padding: const EdgeInsets.only(top: 12.0),
-                      child: Image.asset(
-                        'assets/images/onboarding_bg.png',
-                        fit: BoxFit.cover,
-                        width: double.infinity,
-                        height: double.infinity,
-                      ),
-                    ),
-                  ),
-                  Align(
-                    alignment: Alignment.topRight,
-                    child: Padding(
-                      padding: EdgeInsets.only(right: 4.w),
-                      child: TextButton(
-                        onPressed: _completeOnboarding,
-                        child: Text(
-                          "Skip",
-                          style: TextStyle(
-                            fontFamily: TempLanguage.poppins,
-                            fontSize: 18,
-                            color: Colors.black,
-                            fontWeight: FontWeight.w400,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-            // Text content section - Compact spacing
-            Expanded(
-              flex: 4,
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 4.w),
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            return SingleChildScrollView(
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  minHeight: constraints.maxHeight,
+                ),
                 child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
                   children: [
-                    // Welcome text - compact
-                    RichText(
-                      textAlign: TextAlign.center,
-                      text: TextSpan(
+                    // Main illustration area - Responsive height
+                    Container(
+                      height:
+                          constraints.maxHeight * 0.56, // 56% of screen height
+                      child: Stack(
                         children: [
-                          TextSpan(
-                            text: "Welcome ",
-                            style: TextStyle(
-                              fontFamily: TempLanguage.poppins,
-                              fontSize: 28,
-                              fontWeight: FontWeight.bold,
-                              color: appGreenColor,
+                          SizedBox(
+                            width: double.infinity,
+                            child: Padding(
+                              padding: const EdgeInsets.only(top: 12.0),
+                              child: Image.asset(
+                                'assets/images/onboarding_bg.png',
+                                fit: BoxFit.cover,
+                                width: double.infinity,
+                                height: double.infinity,
+                              ),
                             ),
                           ),
-                          TextSpan(
-                            text: "to\nthe Check In Hoops Courts Report",
-                            style: TextStyle(
-                              fontFamily: TempLanguage.poppins,
-                              fontSize: 24,
-                              fontWeight: FontWeight.w500,
-                              color: Colors.black87,
+                          Align(
+                            alignment: Alignment.topRight,
+                            child: Padding(
+                              padding: EdgeInsets.only(right: 4.w, top: 1.h),
+                              child: TextButton(
+                                onPressed: _completeOnboarding,
+                                child: Text(
+                                  "Skip",
+                                  style: TextStyle(
+                                    fontFamily: TempLanguage.poppins,
+                                    fontSize: 16,
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.w400,
+                                  ),
+                                ),
+                              ),
                             ),
                           ),
                         ],
                       ),
                     ),
 
-                    // Feature titles - tight spacing
-                    Text(
-                      "Share photos and videos",
-                      style: TextStyle(
-                        fontFamily: TempLanguage.poppins,
-                        fontSize: 26,
-                        fontWeight: FontWeight.w500,
-                        color: appGreenColor,
-                      ),
-                    ),
-
-                    Text(
-                      "Leave ratings and reviews",
-                      style: TextStyle(
-                        fontFamily: TempLanguage.poppins,
-                        fontSize: 20,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.black87,
-                      ),
-                    ),
-
-                    SizedBox(height: 1.h),
-
-                    // Description - compact
-                    Text(
-                      "Explore court side views from other hoopers",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontFamily: TempLanguage.poppins,
-                        fontSize: 18,
-                        color: Colors.black,
-                      ),
-                    ),
-
-                    SizedBox(height: 2.h),
-
-                    // Get Started button
+                    // Text content section - Responsive
                     Container(
-                      width: double.infinity,
-                      height: 50,
-                      child: ElevatedButton(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => SubscriptionScreen()),
-                          );
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: appGreenColor,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(30),
+                      padding: EdgeInsets.symmetric(horizontal: 4.w),
+                      child: Column(
+                        children: [
+                          SizedBox(height: 2.h),
+
+                          // Welcome text - responsive
+                          RichText(
+                            textAlign: TextAlign.center,
+                            text: TextSpan(
+                              children: [
+                                TextSpan(
+                                  text: "Welcome ",
+                                  style: TextStyle(
+                                    fontFamily: TempLanguage.poppins,
+                                    fontSize: 28,
+                                    fontWeight: FontWeight.bold,
+                                    color: appGreenColor,
+                                  ),
+                                ),
+                                TextSpan(
+                                  text: "to\nthe Check In Hoops Courts Report",
+                                  style: TextStyle(
+                                    fontFamily: TempLanguage.poppins,
+                                    fontSize: 24,
+                                    fontWeight: FontWeight.w500,
+                                    color: Colors.black87,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
-                          elevation: 0,
-                          shadowColor: Colors.transparent,
-                        ),
-                        child: Text(
-                          "Buy Premium and Get Started",
-                          style: TextStyle(
-                            fontFamily: TempLanguage.poppins,
-                            fontSize: 15,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.white,
+
+                          SizedBox(height: 1.h),
+
+                          // Feature titles - compact
+                          Text(
+                            "Share photos and videos",
+                            style: TextStyle(
+                              fontFamily: TempLanguage.poppins,
+                              fontSize: 26,
+                              fontWeight: FontWeight.w500,
+                              color: appGreenColor,
+                            ),
                           ),
-                        ),
+
+                          SizedBox(height: 0.5.h),
+
+                          Text(
+                            "Leave ratings and reviews",
+                            style: TextStyle(
+                              fontFamily: TempLanguage.poppins,
+                              fontSize: 20,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.black87,
+                            ),
+                          ),
+
+                          SizedBox(height: 1.h),
+
+                          // Description - compact
+                          Text(
+                            "Explore court side views from other hoopers",
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontFamily: TempLanguage.poppins,
+                              fontSize: 18,
+                              color: Colors.black,
+                            ),
+                          ),
+
+                          SizedBox(height: 2.h),
+
+                          // Get Started button
+                          Container(
+                            width: double.infinity,
+                            height: 50,
+                            child: ElevatedButton(
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          SubscriptionScreen()),
+                                );
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: appGreenColor,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(30),
+                                ),
+                                elevation: 0,
+                                shadowColor: Colors.transparent,
+                              ),
+                              child: Text(
+                                "Buy Premium and Get Started",
+                                style: TextStyle(
+                                  fontFamily: TempLanguage.poppins,
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                          ),
+
+                          SizedBox(height: 2.h),
+                        ],
                       ),
                     ),
                   ],
                 ),
               ),
-            ),
-
-            // Minimal bottom spacing
-            SizedBox(height: 1.h),
-          ],
+            );
+          },
         ),
       ),
     );
