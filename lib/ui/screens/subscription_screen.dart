@@ -5,6 +5,7 @@ import 'package:check_in/controllers/subscription_controller.dart';
 import 'package:check_in/core/constant/temp_language.dart';
 import 'package:check_in/ui/screens/persistent_nav_bar.dart';
 import 'package:check_in/utils/colors.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -14,6 +15,7 @@ import 'package:purchases_flutter/models/purchase_result.dart';
 import 'package:purchases_flutter/models/store_product_wrapper.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 import 'package:sizer/sizer.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class SubscriptionScreen extends StatefulWidget {
   SubscriptionScreen({super.key, this.isFromOnboarding = false});
@@ -225,7 +227,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                "Selected Plan: ${getProductTitle(subscriptionController.selectedPremiumProduct.value?.identifier ?? "")}",
+                                "Selected Plan: ${getProductTitle(subscriptionController.selectedPremiumProduct.value?.identifier ?? "")} - \$${subscriptionController.selectedPremiumProduct.value?.price ?? 0}",
                                 style: TextStyle(
                                   fontFamily: TempLanguage.poppins,
                                   fontSize: 18,
@@ -404,8 +406,73 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                                   : const Text(
                                       'Already Purchased? Restore Here!')),
                         ],
-                        SizedBox(
-                            height: 4.h), // Extra bottom padding for scrolling
+                        ...[
+                          SizedBox(
+                            height: 10,
+                          ),
+                          RichText(
+                            textAlign: TextAlign.center,
+                            text: TextSpan(
+                                text: 'If you have any questions, please ',
+                                style: TextStyle(
+                                  color: Color(0xffC5C5C5),
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w400,
+                                ),
+                                children: [
+                                  TextSpan(
+                                      text: 'Contact Us',
+                                      style: TextStyle(
+                                          color: appGreenColor,
+                                          decoration: TextDecoration.underline,
+                                          fontWeight: FontWeight.w400),
+                                      recognizer: TapGestureRecognizer()
+                                        ..onTap = () {
+                                          launchUrl(Uri.parse(
+                                              "https://docs.google.com/document/d/1YdyGmt09mIR7CgqvzO-2iWPCfmbz75g490QnMvGRisM/edit?usp=sharing"));
+                                        }),
+                                  TextSpan(
+                                    text:
+                                        '. For more information, please read our',
+                                  ),
+                                  TextSpan(
+                                      text: ', ',
+                                      style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 11,
+                                          fontWeight: FontWeight.w400)),
+                                  TextSpan(
+                                      text: 'Privacy Policy',
+                                      style: TextStyle(
+                                          color: appGreenColor,
+                                          decoration: TextDecoration.underline,
+                                          fontWeight: FontWeight.w400),
+                                      recognizer: TapGestureRecognizer()
+                                        ..onTap = () {
+                                          launchUrl(Uri.parse(
+                                              "https://docs.google.com/document/d/1ILdrqJL3AYxTZ7zA-QQoPJbFafoE3FscMrKROymN4y0/edit?usp=sharing"));
+
+                                          // Get.to(TermsAndConditionsScreen());
+                                        }),
+                                  TextSpan(
+                                    text: ' and ',
+                                  ),
+                                  TextSpan(
+                                      text: 'EULA (End User License Agreement)',
+                                      style: TextStyle(
+                                          color: appGreenColor,
+                                          decoration: TextDecoration.underline,
+                                          fontWeight: FontWeight.w400),
+                                      recognizer: TapGestureRecognizer()
+                                        ..onTap = () {
+                                          launchUrl(Uri.parse(
+                                              "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/"));
+                                        }),
+                                ]),
+                          ),
+                        ],
+                        SizedBox(height: 4.h),
+                        // Extra bottom padding for scrolling
                       ],
                     ),
                   ),
