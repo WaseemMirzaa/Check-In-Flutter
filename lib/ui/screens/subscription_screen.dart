@@ -227,7 +227,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                "Selected Plan: ${getProductTitle(subscriptionController.selectedPremiumProduct.value?.identifier ?? "")} - \$${subscriptionController.selectedPremiumProduct.value?.price ?? 0}",
+                                "Selected Plan: ${getProductTitle(subscriptionController.selectedPremiumProduct.value?.identifier ?? "")} - \$${(subscriptionController.selectedPremiumProduct.value?.price ?? 0).toStringAsFixed(2)}",
                                 style: TextStyle(
                                   fontFamily: TempLanguage.poppins,
                                   fontSize: 18,

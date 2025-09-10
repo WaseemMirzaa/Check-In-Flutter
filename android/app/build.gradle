@@ -37,7 +37,7 @@ if (keystorePropertiesFile.exists()) {
 
 android {
     namespace "com.developlogix.checkinapp"
-    compileSdkVersion 35
+    compileSdkVersion 36
     ndkVersion flutter.ndkVersion
 
     compileOptions {
@@ -57,7 +57,7 @@ android {
     defaultConfig {
         applicationId "com.developlogix.checkinapp"
         minSdkVersion 24
-        targetSdkVersion 35
+        targetSdkVersion 36
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
     }
