@@ -32,12 +32,15 @@ class PlayersView extends StatefulWidget {
   final bool isCheckedIn;
   final String courtId;
 
+  final String courtAddress;
+
   const PlayersView({
     super.key,
     required this.courtLatLng,
     required this.courtName,
     required this.isCheckedIn,
     required this.courtId,
+    required this.courtAddress,
   });
 
   @override
@@ -939,6 +942,7 @@ class ReviewsSection extends StatelessWidget {
   final bool isCheckedIn;
   final String courtName;
   final String courtId;
+  final String courtAddress;
 
   const ReviewsSection({
     super.key,
@@ -946,6 +950,7 @@ class ReviewsSection extends StatelessWidget {
     required this.isCheckedIn,
     required this.courtName,
     required this.courtId,
+    required this.courtAddress,
   });
 
   Future<Map<String, dynamic>> _getReviewStats() async {
@@ -1072,7 +1077,7 @@ class ReviewsSection extends StatelessWidget {
               ReviewService.showReviewDialog(
                 context: context,
                 name: courtName,
-                location: "Brooklyn", // You can make this dynamic too
+                location: courtAddress, // You can make this dynamic too
                 imageUrl: AppAssets.LOGO_NEW, // You can pass actual court image
                 targetId: courtId, // Using courtId as document ID
                 reviewType: ReviewType.court,
@@ -2047,7 +2052,7 @@ class _PlayersViewState extends State<PlayersView> {
                       ),
                       const SizedBox(height: 20),
                       StreamBuilder<List<User>>(
-                        stream: !widget.isCheckedIn
+                        stream: widget.isCheckedIn
                             ? UserService(court: widget.courtLatLng).users
                             : UserService(court: widget.courtLatLng).emptyUsers,
                         builder: (context, snapshot) {
@@ -2107,6 +2112,7 @@ class _PlayersViewState extends State<PlayersView> {
                                         isCheckedIn: widget.isCheckedIn,
                                         courtName: widget.courtName,
                                         courtId: widget.courtId,
+                                        courtAddress: widget.courtAddress,
                                       ),
                                       const SizedBox(height: 30),
                                       CommentsSection(
@@ -2137,6 +2143,7 @@ class _PlayersViewState extends State<PlayersView> {
                                       isCheckedIn: widget.isCheckedIn,
                                       courtName: widget.courtName,
                                       courtId: widget.courtId,
+                                      courtAddress: widget.courtAddress,
                                     ),
                                     const SizedBox(height: 30),
                                     CommentsSection(
