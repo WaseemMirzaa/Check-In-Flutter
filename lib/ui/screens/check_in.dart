@@ -1022,18 +1022,18 @@ class _CheckInState extends State<CheckIn> with SingleTickerProviderStateMixin {
                             //     userController.userModel.value.homeCourt ?? "");
                           },
                         ),
-              if (Get.put(SubscriptionController())
-                  .hasActivePremiumSubscription()) ...[
-                ListTile(
-                  leading: Icon(Icons.workspace_premium),
-                  onTap: () {
-                    Get.to(() => ManageSubscriptionScreen());
-                  },
-                  title: Text(
-                    "Manage Subscription",
-                  ),
-                ),
-              ],
+              // if (!Get.put(SubscriptionController())
+              //     .hasActivePremiumSubscription()) ...[
+              //   ListTile(
+              //     leading: Icon(Icons.workspace_premium),
+              //     onTap: () {
+              //       Get.to(() => ManageSubscriptionScreen());
+              //     },
+              //     title: Text(
+              //       "Manage Subscription",
+              //     ),
+              //   ),
+              // ],
               FirebaseAuth.instance.currentUser == null
                   ? const SizedBox()
                   : ListTile(

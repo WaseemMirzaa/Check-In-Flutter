@@ -99,7 +99,7 @@ class SubscriptionController extends GetxController {
     try {
       isLoading.value = true;
       PurchaseResult purchaseInfo =
-          await Purchases.purchaseStoreProduct(product);
+          await Purchases.purchase(PurchaseParams.storeProduct(product));
       return purchaseInfo;
     } on PlatformException catch (e) {
       var errorCode = PurchasesErrorHelper.getErrorCode(e);

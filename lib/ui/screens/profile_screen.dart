@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:check_in/Services/newfeed_service.dart';
 import 'package:check_in/controllers/News%20Feed/news_feed_controller.dart';
+import 'package:check_in/controllers/subscription_controller.dart';
 import 'package:check_in/controllers/user_controller.dart';
 import 'package:check_in/core/constant/app_assets.dart';
 import 'package:check_in/core/constant/constant.dart';
@@ -11,7 +12,9 @@ import 'package:check_in/ui/screens/News%20Feed%20NavBar/News%20Feed/Component/s
 import 'package:check_in/ui/screens/News%20Feed%20NavBar/followers_and_following/controller/followers_and_following_controller.dart';
 import 'package:check_in/ui/screens/News%20Feed%20NavBar/followers_and_following/followers_and_following.dart';
 import 'package:check_in/ui/screens/add_home_court.dart';
+import 'package:check_in/ui/screens/manage_subscription_screen.dart';
 import 'package:check_in/ui/screens/persistent_nav_bar.dart';
+import 'package:check_in/ui/screens/subscription_screen.dart';
 import 'package:check_in/ui/screens/terms_conditions.dart';
 import 'package:check_in/ui/screens/unique_courts_screen.dart';
 import 'package:check_in/utils/colors.dart';
@@ -351,10 +354,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
         title: poppinsText(
             TempLanguage.profile, 20, FontWeight.bold, appBlackColor),
       ),
-      body: Column(
-        children: [
-          Expanded(
-            child: FutureBuilder<List<UserModel>?>(
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            FutureBuilder<List<UserModel>?>(
               // Fetch users list
               future: userServices.getUsersList(),
               builder: (context, snapshot) {
@@ -391,704 +394,745 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         }
 
                         return ListView.builder(
-                          physics: const AlwaysScrollableScrollPhysics(),
+                          physics: NeverScrollableScrollPhysics(),
+                          shrinkWrap: true,
                           itemCount:
                               posts.length + 1, // Add one for the red container
                           itemBuilder: (context, index) {
                             if (index == 0) {
-                              return Column(children: [
-                                Column(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    Column(
-                                      children: [
-                                        SizedBox(
-                                          width: 30.9.w,
-                                          //   padding: EdgeInsets.all(10),
-                                          child: GestureDetector(
-                                            onTap: _selectImage,
-                                            child: Stack(
-                                              //  clipBehavior: Clip.antiAliasWithSaveLayer,
-                                              alignment: Alignment.bottomCenter,
-                                              children: [
-                                                isUploading
-                                                    ? Container(
-                                                        height: 20.h,
-                                                        width: 35.h,
-                                                        decoration:
-                                                            const BoxDecoration(
-                                                          shape:
-                                                              BoxShape.circle,
-                                                          color: Colors
-                                                              .white, // White background
-                                                        ),
-                                                        child: const Center(
-                                                          child:
-                                                              CircularProgressIndicator(),
-                                                        ),
-                                                      )
-                                                    : (_downloadUrl != null)
-                                                        ? Container(
-                                                            height: 20.h,
-                                                            width: 35.h,
-                                                            decoration: BoxDecoration(
-                                                                shape: BoxShape
-                                                                    .circle,
-                                                                image: DecorationImage(
-                                                                    image: NetworkImage(
-                                                                        _downloadUrl
-                                                                            as String),
-                                                                    fit: BoxFit
-                                                                        .contain)))
-                                                        : (!userController
-                                                                .userModel
-                                                                .value
-                                                                .photoUrl
-                                                                .isEmptyOrNull)
-                                                            ? Container(
-                                                                height: 20.h,
-                                                                width: 35.h,
-                                                                decoration: BoxDecoration(
-                                                                    shape: BoxShape
-                                                                        .circle,
-                                                                    image: DecorationImage(
-                                                                        image: NetworkImage(userController.userModel.value.photoUrl ??
-                                                                            ""),
-                                                                        fit: BoxFit
-                                                                            .contain)))
-                                                            : Container(
-                                                                height: 20.h,
-                                                                width: 35.h,
-                                                                decoration: BoxDecoration(
-                                                                    shape: BoxShape
-                                                                        .circle,
-                                                                    border: Border.all(
-                                                                        width:
-                                                                            2,
-                                                                        color:
-                                                                            appGreenColor),
-                                                                    image: const DecorationImage(
-                                                                        image: AssetImage(AppAssets
-                                                                            .LOGO_NEW),
-                                                                        fit: BoxFit
-                                                                            .fill)),
-                                                              ),
-                                                if (userController.userModel
-                                                            .value.isVerified ==
-                                                        null ||
-                                                    userController.userModel
-                                                            .value.isVerified ==
-                                                        true)
-                                                  Align(
-                                                    alignment:
-                                                        Alignment.bottomRight,
-                                                    child: Container(
-                                                      height: 5.5.h,
-                                                      width: 12.1.w,
-                                                      decoration: const BoxDecoration(
-                                                          shape:
-                                                              BoxShape.circle,
-                                                          image: DecorationImage(
-                                                              image: AssetImage(
-                                                                  AppAssets
-                                                                      .INSTAGRAM_VERIFICATION))),
-                                                    ),
-                                                  )
-                                                else
-                                                  const SizedBox(),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                        poppinsText(
-                                            // FirebaseAuth.instance.currentUser?.displayName
-                                            //     as String,
-                                            userController
-                                                    .userModel.value.userName ??
-                                                "",
-                                            24,
-                                            FontWeight.bold,
-                                            appBlackColor),
-                                        // poppinsText(
-                                        //     "@${userController.userModel.value.email.substring(0, userController.userModel.value.email.indexOf('@'))}",
-                                        //     12,
-                                        //     FontWeight.normal,
-                                        //     blackColor),
-
-                                        // poppinsText(
-                                        //   // FirebaseAuth.insztance.currentUser?.displayName
-                                        //   //     as String,
-                                        //     userController.userModel.value.email ?? "",
-                                        //     12,
-                                        //     FontWeight.normal,
-                                        //     appBlackColor),
-                                        // poppinsText(
-                                        //     "@${userController.userModel.value.email.substring(0, userController.userModel.value.email.indexOf('@'))}",
-                                        //     12,
-                                        //     FontWeight.normal,
-                                        //     blackColor),
-                                        const SizedBox(
-                                          height: 15,
-                                        ),
-
-                                        //added by asjad
-
-                                        Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: [
-                                            GestureDetector(
-                                              onTap: () {
-                                                Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        FollowersAndFollowingScreen(
-                                                      showFollowers: true,
-                                                      count: followerCountController
-                                                          .profileFollowersCount
-                                                          .value
-                                                          .toString(),
-                                                    ),
-                                                  ),
-                                                );
-                                              },
-                                              child: Column(
-                                                children: [
-                                                  Obx(() {
-                                                    return poppinsText(
-                                                      followerCountController
-                                                          .profileFollowersCount
-                                                          .value
-                                                          .toString(),
-                                                      16,
-                                                      underline: true,
-                                                      bold,
-                                                      appBlackColor,
-                                                    );
-                                                  }),
-                                                  const SizedBox(height: 4),
-                                                  poppinsText('Followers', 16,
-                                                      medium, appBlackColor),
-                                                ],
-                                              ),
-                                            ),
-                                            const SizedBox(
-                                                width:
-                                                    20), // Space before the divider
-                                            Container(
-                                              height:
-                                                  38, // Adjust to fit the height of your text
-                                              child: const VerticalDivider(
-                                                width:
-                                                    20, // Adjust width if needed
-                                                thickness:
-                                                    2, // Adjust thickness if needed
-                                                color: Colors
-                                                    .grey, // Adjust color if needed
-                                              ),
-                                            ),
-                                            const SizedBox(
-                                                width:
-                                                    20), // Space after the divider
-                                            GestureDetector(
-                                              onTap: () {
-                                                Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        FollowersAndFollowingScreen(
-                                                      showFollowers: false,
-                                                      count: followerCountController
-                                                          .profileFollowingCount
-                                                          .value
-                                                          .toString(),
-                                                    ),
-                                                  ),
-                                                );
-                                              },
-                                              child: Column(
-                                                children: [
-                                                  Obx(() {
-                                                    return poppinsText(
-                                                      followerCountController
-                                                          .profileFollowingCount
-                                                          .value
-                                                          .toString(),
-                                                      16,
-                                                      underline: true,
-                                                      bold,
-                                                      appBlackColor,
-                                                    );
-                                                  }),
-                                                  const SizedBox(height: 4),
-                                                  poppinsText('Following', 16,
-                                                      medium, appBlackColor),
-                                                ],
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-
-                                        const SizedBox(
-                                          height: 15,
-                                        ),
-
-                                        Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: [
-                                            Container(
-                                              decoration: BoxDecoration(
-                                                shape: BoxShape.circle,
-                                                border: Border.all(
-                                                  color: offWhiteColor,
-                                                  width: 8.0,
-                                                ),
-                                              ),
-                                              child: FutureBuilder<
-                                                  List<UserModel>?>(
-                                                future:
-                                                    getUniqueCourtNameMaps(),
-                                                builder: (context, snapshot) {
-                                                  if (snapshot
-                                                          .connectionState ==
-                                                      ConnectionState.waiting) {
-                                                    return const SizedBox(
-                                                        height: 110,
-                                                        width: 110,
-                                                        child: Center(
-                                                            child:
-                                                                CircularProgressIndicator()));
-                                                  } else if (snapshot.hasData &&
-                                                      snapshot.data != null) {
-                                                    return InkWell(
-                                                      onTap: () {
-                                                        Navigator.push(
-                                                            context,
-                                                            MaterialPageRoute(
-                                                                builder:
-                                                                    (context) =>
-                                                                        const UniqueCourtsScreen()));
-                                                      },
-                                                      child:
-                                                          CircularPercentIndicator(
-                                                        radius: 50.0,
-                                                        lineWidth: 8.0,
-                                                        animation: true,
-                                                        percent: ((snapshot.data
-                                                                        ?.length ??
-                                                                    0) /
-                                                                (totalCount ??
-                                                                    10))
-                                                            .clamp(0.0, 1.0),
-                                                        center: Text(
-                                                          "${snapshot.data?.length ?? 0}\nCheck ins",
-                                                          textAlign:
-                                                              TextAlign.center,
-                                                          style:
-                                                              const TextStyle(
-                                                            fontWeight:
-                                                                FontWeight.bold,
-                                                            fontSize: 14.0,
-                                                          ),
-                                                        ),
-                                                        circularStrokeCap:
-                                                            CircularStrokeCap
-                                                                .round,
-                                                        progressColor:
-                                                            darkYellowColor,
+                              return Column(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Column(
+                                    children: [
+                                      SizedBox(
+                                        width: 30.9.w,
+                                        //   padding: EdgeInsets.all(10),
+                                        child: GestureDetector(
+                                          onTap: _selectImage,
+                                          child: Stack(
+                                            //  clipBehavior: Clip.antiAliasWithSaveLayer,
+                                            alignment: Alignment.bottomCenter,
+                                            children: [
+                                              isUploading
+                                                  ? Container(
+                                                      height: 20.h,
+                                                      width: 35.h,
+                                                      decoration:
+                                                          const BoxDecoration(
+                                                        shape: BoxShape.circle,
+                                                        color: Colors
+                                                            .white, // White background
                                                       ),
-                                                    );
-                                                  } else if (snapshot
-                                                      .hasError) {
-                                                    return Center(
-                                                      child: Text(TempLanguage
-                                                          .wentWrong),
-                                                    );
-                                                  } else {
-                                                    return InkWell(
-                                                      onTap: () {
-                                                        Navigator.push(
-                                                            context,
-                                                            MaterialPageRoute(
-                                                                builder:
-                                                                    (context) =>
-                                                                        const UniqueCourtsScreen()));
-                                                      },
-                                                      child:
-                                                          CircularPercentIndicator(
-                                                        radius: 50.0,
-                                                        lineWidth: 8.0,
-                                                        animation: true,
-                                                        percent: (0 /
-                                                                (totalCount ??
-                                                                    10))
-                                                            .clamp(0.0, 1.0),
-                                                        center: const Text(
-                                                          "0\nCheck ins",
-                                                          textAlign:
-                                                              TextAlign.center,
-                                                          style: TextStyle(
-                                                            fontWeight:
-                                                                FontWeight.bold,
-                                                            fontSize: 14.0,
-                                                          ),
-                                                        ),
-                                                        circularStrokeCap:
-                                                            CircularStrokeCap
-                                                                .round,
-                                                        progressColor:
-                                                            darkYellowColor,
+                                                      child: const Center(
+                                                        child:
+                                                            CircularProgressIndicator(),
                                                       ),
-                                                    );
-                                                  }
-                                                },
-                                              ),
-                                            ),
-                                            const SizedBox(
-                                              width: 15,
-                                            ),
-                                            InkWell(
-                                              onTap: () {
-                                                Navigator.push(
-                                                    context,
-                                                    MaterialPageRoute(
-                                                        builder: (context) =>
-                                                            const UniqueCourtsScreen()));
-                                              },
-                                              child: Column(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.center,
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  poppinsText(
-                                                      "Golden",
-                                                      22,
-                                                      FontWeight.bold,
-                                                      appBlackColor),
-                                                  poppinsText(
-                                                      "Courts",
-                                                      22,
-                                                      FontWeight.bold,
-                                                      appBlackColor),
-                                                  FutureBuilder<
-                                                      List<UserModel>?>(
-                                                    future:
-                                                        getUniqueCourtNameMaps(),
-                                                    builder:
-                                                        (context, snapshot) {
-                                                      if (snapshot
-                                                              .connectionState ==
-                                                          ConnectionState
-                                                              .waiting) {
-                                                        // return const Center(child: CircularProgressIndicator());
-                                                        return const Center(
-                                                            child:
-                                                                CircularProgressIndicator());
-                                                      } else if (snapshot
-                                                              .hasData &&
-                                                          snapshot.data !=
-                                                              null) {
-                                                        return poppinsText(
-                                                            "${snapshot.data?.length ?? 0} Check ins",
-                                                            12,
-                                                            FontWeight.normal,
-                                                            appBlackColor);
-                                                      } else if (snapshot
-                                                          .hasError) {
-                                                        return Center(
-                                                          child: Text(
-                                                              TempLanguage
-                                                                  .wentWrong),
-                                                        );
-                                                      } else {
-                                                        return poppinsText(
-                                                            "0 Check ins",
-                                                            12,
-                                                            FontWeight.normal,
-                                                            appBlackColor);
-                                                      }
-                                                    },
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ],
-                                    ),
-                                    const SizedBox(
-                                      height: 25,
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 12),
-                                      child: Stack(
-                                        clipBehavior: Clip.none,
-                                        alignment: Alignment.topCenter,
-                                        children: [
-                                          Container(
-                                            width: 100.w,
-                                            padding: const EdgeInsets.symmetric(
-                                                horizontal: 10, vertical: 4),
-                                            decoration: BoxDecoration(
-                                                borderRadius:
-                                                    BorderRadius.circular(8),
-                                                color: appGreyColor1),
-                                            child: TextField(
-                                              controller: aboutMeController,
-                                              textInputAction:
-                                                  TextInputAction.done,
-                                              onSubmitted: (value) {
-                                                // setState(() {
-                                                //   // userController.userModel.value.
-                                                //   //..........
-                                                //   aboutMe = value;
-                                                //   widget.userController.userModel.value.aboutMe = value;
-                                                //   FirebaseFirestore.instance
-                                                //       .collection(Collections.USER)
-                                                //       .doc(FirebaseAuth.instance.currentUser!.uid)
-                                                //       .update({UserKey.ABOUT_ME: aboutMe});
-                                                // });
-                                              },
-                                              maxLines: userController
-                                                      .userModel
-                                                      .value
-                                                      .aboutMe
-                                                      .isEmptyOrNull
-                                                  ? 1
-                                                  : 3,
-                                              onChanged: (val) {},
-                                              decoration: InputDecoration(
-                                                  border: InputBorder.none,
-                                                  enabled: tapped,
-                                                  enabledBorder:
-                                                      InputBorder.none,
-                                                  disabledBorder:
-                                                      InputBorder.none,
-                                                  errorBorder: InputBorder.none,
-                                                  focusedBorder:
-                                                      InputBorder.none,
-                                                  focusedErrorBorder:
-                                                      InputBorder.none,
-                                                  hintText: TempLanguage
-                                                      .tellUsAboutGame,
-                                                  helperStyle:
-                                                      GoogleFonts.poppins(
-                                                          fontSize: 14,
-                                                          fontWeight: regular,
-                                                          color: silverColor)),
-                                            ),
-                                          ),
-
-                                          //   child: poppinsText(userController.userModel.value.aboutMe.isEmptyOrNull
-                                          // ? TempLanguage.tellUsAboutGame
-                                          // : userController.userModel.value.aboutMe ?? TempLanguage.tellUsAboutGame, 12, FontWeight.normal, appBlackColor),),
-                                          Align(
-                                            alignment: Alignment.topRight,
-                                            child: Padding(
-                                              padding:
-                                                  const EdgeInsets.all(5.0),
-                                              child: InkWell(
-                                                onTap: () => setState(() {
-                                                  if (tapped) {
-                                                    setState(() {
-                                                      // userController.userModel.value.
-                                                      //..........
-                                                      aboutMe =
-                                                          aboutMeController
-                                                              .text;
-                                                      userController
-                                                          .userModel
-                                                          .value
-                                                          .aboutMe = aboutMe;
-                                                      FirebaseFirestore.instance
-                                                          .collection(
-                                                              Collections.USER)
-                                                          .doc(FirebaseAuth
-                                                              .instance
-                                                              .currentUser!
-                                                              .uid)
-                                                          .update({
-                                                        UserKey.ABOUT_ME:
-                                                            aboutMe
-                                                      });
-                                                    });
-                                                  }
-                                                  tapped = !tapped;
-                                                }),
-                                                child: Padding(
-                                                    padding:
-                                                        const EdgeInsets.all(4),
-                                                    child: tapped
-                                                        ? poppinsText(
-                                                            TempLanguage.save,
-                                                            14,
-                                                            semiBold,
-                                                            appGreenColor)
-                                                        : const ImageIcon(
-                                                            AssetImage(
-                                                              AppAssets
-                                                                  .EDIT_ICON,
+                                                    )
+                                                  : (_downloadUrl != null)
+                                                      ? Container(
+                                                          height: 20.h,
+                                                          width: 35.h,
+                                                          decoration: BoxDecoration(
+                                                              shape: BoxShape
+                                                                  .circle,
+                                                              image: DecorationImage(
+                                                                  image: NetworkImage(
+                                                                      _downloadUrl
+                                                                          as String),
+                                                                  fit: BoxFit
+                                                                      .contain)))
+                                                      : (!userController
+                                                              .userModel
+                                                              .value
+                                                              .photoUrl
+                                                              .isEmptyOrNull)
+                                                          ? Container(
+                                                              height: 20.h,
+                                                              width: 35.h,
+                                                              decoration: BoxDecoration(
+                                                                  shape: BoxShape
+                                                                      .circle,
+                                                                  image: DecorationImage(
+                                                                      image: NetworkImage(userController
+                                                                              .userModel
+                                                                              .value
+                                                                              .photoUrl ??
+                                                                          ""),
+                                                                      fit: BoxFit
+                                                                          .contain)))
+                                                          : Container(
+                                                              height: 20.h,
+                                                              width: 35.h,
+                                                              decoration: BoxDecoration(
+                                                                  shape: BoxShape
+                                                                      .circle,
+                                                                  border: Border
+                                                                      .all(
+                                                                          width:
+                                                                              2,
+                                                                          color:
+                                                                              appGreenColor),
+                                                                  image: const DecorationImage(
+                                                                      image: AssetImage(
+                                                                          AppAssets
+                                                                              .LOGO_NEW),
+                                                                      fit: BoxFit
+                                                                          .fill)),
                                                             ),
-                                                            size: 20,
-                                                          )),
-                                              ),
-                                            ),
-                                          ),
-                                          Positioned(
-                                              top: -10,
-                                              child: Center(
-                                                child: Container(
-                                                  padding: const EdgeInsets
-                                                      .symmetric(
-                                                      horizontal: 12,
-                                                      vertical: 3),
-                                                  decoration: BoxDecoration(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              30),
-                                                      color: appGreenColor),
-                                                  child: poppinsText(
-                                                      'About Me',
-                                                      12,
-                                                      FontWeight.w400,
-                                                      appWhiteColor),
-                                                ),
-                                              ))
-                                        ],
-                                      ),
-                                    ),
-                                    const SizedBox(
-                                      height: 25,
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 12),
-                                      child: Stack(
-                                        clipBehavior: Clip.none,
-                                        alignment: Alignment.topCenter,
-                                        children: [
-                                          Container(
-                                            width: 100.w,
-                                            padding: const EdgeInsets.symmetric(
-                                                horizontal: 12, vertical: 10),
-                                            decoration: BoxDecoration(
-                                                borderRadius:
-                                                    BorderRadius.circular(8),
-                                                color: appGreyColor1),
-                                            child: Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment
-                                                      .spaceBetween,
-                                              children: [
-                                                poppinsText(
-                                                    userController
-                                                            .userModel
-                                                            .value
-                                                            .homeCourt
-                                                            .isEmptyOrNull
-                                                        ? ''
-                                                        : userController
-                                                                .userModel
-                                                                .value
-                                                                .homeCourt ??
-                                                            '',
-                                                    14,
-                                                    FontWeight.w500,
-                                                    silverColor),
+                                              if (userController.userModel.value
+                                                          .isVerified ==
+                                                      null ||
+                                                  userController.userModel.value
+                                                          .isVerified ==
+                                                      true)
                                                 Align(
                                                   alignment:
-                                                      Alignment.centerRight,
-                                                  child: Padding(
-                                                    padding:
-                                                        const EdgeInsets.all(
-                                                            5.0),
-                                                    child: InkWell(
-                                                      onTap: () {
-                                                        pushScreen(context,
-                                                            screen:
-                                                                const AddHomeCourt(),
-                                                            withNavBar: false);
-                                                      },
-                                                      child: SizedBox(
-                                                        height: 2.3.h,
-                                                        width: 4.47.w,
-                                                        child: Image.asset(
-                                                            AppAssets.MAP_PIN),
-                                                      ),
-                                                    ),
+                                                      Alignment.bottomRight,
+                                                  child: Container(
+                                                    height: 5.5.h,
+                                                    width: 12.1.w,
+                                                    decoration: const BoxDecoration(
+                                                        shape: BoxShape.circle,
+                                                        image: DecorationImage(
+                                                            image: AssetImage(
+                                                                AppAssets
+                                                                    .INSTAGRAM_VERIFICATION))),
                                                   ),
+                                                )
+                                              else
+                                                const SizedBox(),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                      poppinsText(
+                                          // FirebaseAuth.instance.currentUser?.displayName
+                                          //     as String,
+                                          userController
+                                                  .userModel.value.userName ??
+                                              "",
+                                          24,
+                                          FontWeight.bold,
+                                          appBlackColor),
+                                      // poppinsText(
+                                      //     "@${userController.userModel.value.email.substring(0, userController.userModel.value.email.indexOf('@'))}",
+                                      //     12,
+                                      //     FontWeight.normal,
+                                      //     blackColor),
+
+                                      // poppinsText(
+                                      //   // FirebaseAuth.insztance.currentUser?.displayName
+                                      //   //     as String,
+                                      //     userController.userModel.value.email ?? "",
+                                      //     12,
+                                      //     FontWeight.normal,
+                                      //     appBlackColor),
+                                      // poppinsText(
+                                      //     "@${userController.userModel.value.email.substring(0, userController.userModel.value.email.indexOf('@'))}",
+                                      //     12,
+                                      //     FontWeight.normal,
+                                      //     blackColor),
+                                      const SizedBox(
+                                        height: 15,
+                                      ),
+
+                                      //added by asjad
+
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          GestureDetector(
+                                            onTap: () {
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      FollowersAndFollowingScreen(
+                                                    showFollowers: true,
+                                                    count: followerCountController
+                                                        .profileFollowersCount
+                                                        .value
+                                                        .toString(),
+                                                  ),
+                                                ),
+                                              );
+                                            },
+                                            child: Column(
+                                              children: [
+                                                Obx(() {
+                                                  return poppinsText(
+                                                    followerCountController
+                                                        .profileFollowersCount
+                                                        .value
+                                                        .toString(),
+                                                    16,
+                                                    underline: true,
+                                                    bold,
+                                                    appBlackColor,
+                                                  );
+                                                }),
+                                                const SizedBox(height: 4),
+                                                poppinsText('Followers', 16,
+                                                    medium, appBlackColor),
+                                              ],
+                                            ),
+                                          ),
+                                          const SizedBox(
+                                              width:
+                                                  20), // Space before the divider
+                                          Container(
+                                            height:
+                                                38, // Adjust to fit the height of your text
+                                            child: const VerticalDivider(
+                                              width:
+                                                  20, // Adjust width if needed
+                                              thickness:
+                                                  2, // Adjust thickness if needed
+                                              color: Colors
+                                                  .grey, // Adjust color if needed
+                                            ),
+                                          ),
+                                          const SizedBox(
+                                              width:
+                                                  20), // Space after the divider
+                                          GestureDetector(
+                                            onTap: () {
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      FollowersAndFollowingScreen(
+                                                    showFollowers: false,
+                                                    count: followerCountController
+                                                        .profileFollowingCount
+                                                        .value
+                                                        .toString(),
+                                                  ),
+                                                ),
+                                              );
+                                            },
+                                            child: Column(
+                                              children: [
+                                                Obx(() {
+                                                  return poppinsText(
+                                                    followerCountController
+                                                        .profileFollowingCount
+                                                        .value
+                                                        .toString(),
+                                                    16,
+                                                    underline: true,
+                                                    bold,
+                                                    appBlackColor,
+                                                  );
+                                                }),
+                                                const SizedBox(height: 4),
+                                                poppinsText('Following', 16,
+                                                    medium, appBlackColor),
+                                              ],
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+
+                                      const SizedBox(
+                                        height: 15,
+                                      ),
+
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Container(
+                                            decoration: BoxDecoration(
+                                              shape: BoxShape.circle,
+                                              border: Border.all(
+                                                color: offWhiteColor,
+                                                width: 8.0,
+                                              ),
+                                            ),
+                                            child:
+                                                FutureBuilder<List<UserModel>?>(
+                                              future: getUniqueCourtNameMaps(),
+                                              builder: (context, snapshot) {
+                                                if (snapshot.connectionState ==
+                                                    ConnectionState.waiting) {
+                                                  return const SizedBox(
+                                                      height: 110,
+                                                      width: 110,
+                                                      child: Center(
+                                                          child:
+                                                              CircularProgressIndicator()));
+                                                } else if (snapshot.hasData &&
+                                                    snapshot.data != null) {
+                                                  return InkWell(
+                                                    onTap: () {
+                                                      Navigator.push(
+                                                          context,
+                                                          MaterialPageRoute(
+                                                              builder: (context) =>
+                                                                  const UniqueCourtsScreen()));
+                                                    },
+                                                    child:
+                                                        CircularPercentIndicator(
+                                                      radius: 50.0,
+                                                      lineWidth: 8.0,
+                                                      animation: true,
+                                                      percent: ((snapshot.data
+                                                                      ?.length ??
+                                                                  0) /
+                                                              (totalCount ??
+                                                                  10))
+                                                          .clamp(0.0, 1.0),
+                                                      center: Text(
+                                                        "${snapshot.data?.length ?? 0}\nCheck ins",
+                                                        textAlign:
+                                                            TextAlign.center,
+                                                        style: const TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          fontSize: 14.0,
+                                                        ),
+                                                      ),
+                                                      circularStrokeCap:
+                                                          CircularStrokeCap
+                                                              .round,
+                                                      progressColor:
+                                                          darkYellowColor,
+                                                    ),
+                                                  );
+                                                } else if (snapshot.hasError) {
+                                                  return Center(
+                                                    child: Text(
+                                                        TempLanguage.wentWrong),
+                                                  );
+                                                } else {
+                                                  return InkWell(
+                                                    onTap: () {
+                                                      Navigator.push(
+                                                          context,
+                                                          MaterialPageRoute(
+                                                              builder: (context) =>
+                                                                  const UniqueCourtsScreen()));
+                                                    },
+                                                    child:
+                                                        CircularPercentIndicator(
+                                                      radius: 50.0,
+                                                      lineWidth: 8.0,
+                                                      animation: true,
+                                                      percent: (0 /
+                                                              (totalCount ??
+                                                                  10))
+                                                          .clamp(0.0, 1.0),
+                                                      center: const Text(
+                                                        "0\nCheck ins",
+                                                        textAlign:
+                                                            TextAlign.center,
+                                                        style: TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          fontSize: 14.0,
+                                                        ),
+                                                      ),
+                                                      circularStrokeCap:
+                                                          CircularStrokeCap
+                                                              .round,
+                                                      progressColor:
+                                                          darkYellowColor,
+                                                    ),
+                                                  );
+                                                }
+                                              },
+                                            ),
+                                          ),
+                                          const SizedBox(
+                                            width: 15,
+                                          ),
+                                          InkWell(
+                                            onTap: () {
+                                              Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          const UniqueCourtsScreen()));
+                                            },
+                                            child: Column(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                poppinsText(
+                                                    "Golden",
+                                                    22,
+                                                    FontWeight.bold,
+                                                    appBlackColor),
+                                                poppinsText(
+                                                    "Courts",
+                                                    22,
+                                                    FontWeight.bold,
+                                                    appBlackColor),
+                                                FutureBuilder<List<UserModel>?>(
+                                                  future:
+                                                      getUniqueCourtNameMaps(),
+                                                  builder: (context, snapshot) {
+                                                    if (snapshot
+                                                            .connectionState ==
+                                                        ConnectionState
+                                                            .waiting) {
+                                                      // return const Center(child: CircularProgressIndicator());
+                                                      return const Center(
+                                                          child:
+                                                              CircularProgressIndicator());
+                                                    } else if (snapshot
+                                                            .hasData &&
+                                                        snapshot.data != null) {
+                                                      return poppinsText(
+                                                          "${snapshot.data?.length ?? 0} Check ins",
+                                                          12,
+                                                          FontWeight.normal,
+                                                          appBlackColor);
+                                                    } else if (snapshot
+                                                        .hasError) {
+                                                      return Center(
+                                                        child: Text(TempLanguage
+                                                            .wentWrong),
+                                                      );
+                                                    } else {
+                                                      return poppinsText(
+                                                          "0 Check ins",
+                                                          12,
+                                                          FontWeight.normal,
+                                                          appBlackColor);
+                                                    }
+                                                  },
                                                 ),
                                               ],
                                             ),
                                           ),
-                                          Positioned(
-                                              top: -10,
-                                              child: Center(
-                                                child: Container(
-                                                  padding: const EdgeInsets
-                                                      .symmetric(
-                                                      horizontal: 12,
-                                                      vertical: 3),
-                                                  decoration: BoxDecoration(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              20),
-                                                      color: appGreenColor),
-                                                  child: poppinsText(
-                                                      'Home Court',
-                                                      12,
-                                                      FontWeight.w400,
-                                                      appWhiteColor),
-                                                ),
-                                              ))
                                         ],
                                       ),
-                                    ),
-                                    const SizedBox(
-                                      height: 10,
-                                    ),
-                                    Center(
-                                      child: Container(
-                                        width: 90,
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 10,
-                                          vertical: 4,
-                                        ),
-                                        decoration: BoxDecoration(
-                                            color: appGreyColor1,
-                                            borderRadius:
-                                                BorderRadius.circular(30)),
-                                        child: Center(
-                                            child: poppinsText(
-                                                'My Posts',
-                                                12,
-                                                FontWeight.normal,
-                                                appBlackColor)),
-                                      ),
-                                    ),
-                                    const SizedBox(
-                                      height: 10,
-                                    ),
-                                    controller.myPostLoader.value
-                                        ? const Center(
-                                            key: ValueKey('Loader'),
-                                            child: CircularProgressIndicator(),
-                                          )
-                                        : const SizedBox(
-                                            key: ValueKey('Empty'),
+                                    ],
+                                  ),
+                                  const SizedBox(
+                                    height: 25,
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 12),
+                                    child: Stack(
+                                      clipBehavior: Clip.none,
+                                      alignment: Alignment.topCenter,
+                                      children: [
+                                        Container(
+                                          width: 100.w,
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 10, vertical: 4),
+                                          decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(8),
+                                              color: appGreyColor1),
+                                          child: TextField(
+                                            controller: aboutMeController,
+                                            textInputAction:
+                                                TextInputAction.done,
+                                            onSubmitted: (value) {
+                                              // setState(() {
+                                              //   // userController.userModel.value.
+                                              //   //..........
+                                              //   aboutMe = value;
+                                              //   widget.userController.userModel.value.aboutMe = value;
+                                              //   FirebaseFirestore.instance
+                                              //       .collection(Collections.USER)
+                                              //       .doc(FirebaseAuth.instance.currentUser!.uid)
+                                              //       .update({UserKey.ABOUT_ME: aboutMe});
+                                              // });
+                                            },
+                                            maxLines: userController.userModel
+                                                    .value.aboutMe.isEmptyOrNull
+                                                ? 1
+                                                : 3,
+                                            onChanged: (val) {},
+                                            decoration: InputDecoration(
+                                                border: InputBorder.none,
+                                                enabled: tapped,
+                                                enabledBorder: InputBorder.none,
+                                                disabledBorder:
+                                                    InputBorder.none,
+                                                errorBorder: InputBorder.none,
+                                                focusedBorder: InputBorder.none,
+                                                focusedErrorBorder:
+                                                    InputBorder.none,
+                                                hintText: TempLanguage
+                                                    .tellUsAboutGame,
+                                                helperStyle:
+                                                    GoogleFonts.poppins(
+                                                        fontSize: 14,
+                                                        fontWeight: regular,
+                                                        color: silverColor)),
                                           ),
-                                    SizedBox(
-                                      height: 10,
-                                    )
-                                  ],
-                                ),
-                              ]);
+                                        ),
+
+                                        //   child: poppinsText(userController.userModel.value.aboutMe.isEmptyOrNull
+                                        // ? TempLanguage.tellUsAboutGame
+                                        // : userController.userModel.value.aboutMe ?? TempLanguage.tellUsAboutGame, 12, FontWeight.normal, appBlackColor),),
+                                        Align(
+                                          alignment: Alignment.topRight,
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(5.0),
+                                            child: InkWell(
+                                              onTap: () => setState(() {
+                                                if (tapped) {
+                                                  setState(() {
+                                                    // userController.userModel.value.
+                                                    //..........
+                                                    aboutMe =
+                                                        aboutMeController.text;
+                                                    userController
+                                                        .userModel
+                                                        .value
+                                                        .aboutMe = aboutMe;
+                                                    FirebaseFirestore.instance
+                                                        .collection(
+                                                            Collections.USER)
+                                                        .doc(FirebaseAuth
+                                                            .instance
+                                                            .currentUser!
+                                                            .uid)
+                                                        .update({
+                                                      UserKey.ABOUT_ME: aboutMe
+                                                    });
+                                                  });
+                                                }
+                                                tapped = !tapped;
+                                              }),
+                                              child: Padding(
+                                                  padding:
+                                                      const EdgeInsets.all(4),
+                                                  child: tapped
+                                                      ? poppinsText(
+                                                          TempLanguage.save,
+                                                          14,
+                                                          semiBold,
+                                                          appGreenColor)
+                                                      : const ImageIcon(
+                                                          AssetImage(
+                                                            AppAssets.EDIT_ICON,
+                                                          ),
+                                                          size: 20,
+                                                        )),
+                                            ),
+                                          ),
+                                        ),
+                                        Positioned(
+                                            top: -10,
+                                            child: Center(
+                                              child: Container(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                        horizontal: 12,
+                                                        vertical: 3),
+                                                decoration: BoxDecoration(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            30),
+                                                    color: appGreenColor),
+                                                child: poppinsText(
+                                                    'About Me',
+                                                    12,
+                                                    FontWeight.w400,
+                                                    appWhiteColor),
+                                              ),
+                                            ))
+                                      ],
+                                    ),
+                                  ),
+                                  const SizedBox(
+                                    height: 25,
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 12),
+                                    child: Stack(
+                                      clipBehavior: Clip.none,
+                                      alignment: Alignment.topCenter,
+                                      children: [
+                                        Container(
+                                          width: 100.w,
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 12, vertical: 10),
+                                          decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(8),
+                                              color: appGreyColor1),
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              poppinsText(
+                                                  userController
+                                                          .userModel
+                                                          .value
+                                                          .homeCourt
+                                                          .isEmptyOrNull
+                                                      ? ''
+                                                      : userController
+                                                              .userModel
+                                                              .value
+                                                              .homeCourt ??
+                                                          '',
+                                                  14,
+                                                  FontWeight.w500,
+                                                  silverColor),
+                                              Align(
+                                                alignment:
+                                                    Alignment.centerRight,
+                                                child: Padding(
+                                                  padding:
+                                                      const EdgeInsets.all(5.0),
+                                                  child: InkWell(
+                                                    onTap: () {
+                                                      pushScreen(context,
+                                                          screen:
+                                                              const AddHomeCourt(),
+                                                          withNavBar: false);
+                                                    },
+                                                    child: SizedBox(
+                                                      height: 2.3.h,
+                                                      width: 4.47.w,
+                                                      child: Image.asset(
+                                                          AppAssets.MAP_PIN),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        Positioned(
+                                            top: -10,
+                                            child: Center(
+                                              child: Container(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                        horizontal: 12,
+                                                        vertical: 3),
+                                                decoration: BoxDecoration(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            20),
+                                                    color: appGreenColor),
+                                                child: poppinsText(
+                                                    'Home Court',
+                                                    12,
+                                                    FontWeight.w400,
+                                                    appWhiteColor),
+                                              ),
+                                            ))
+                                      ],
+                                    ),
+                                  ),
+                                  const SizedBox(
+                                    height: 20,
+                                  ),
+                                  // Premium Subscription Card
+                                  Obx(() {
+                                    final subscriptionController =
+                                        Get.put(SubscriptionController());
+                                    final hasSubscription =
+                                        subscriptionController
+                                            .hasActivePremiumSubscription();
+
+                                    return Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 12),
+                                      child: GestureDetector(
+                                        onTap: () {
+                                          if (hasSubscription) {
+                                            Get.to(() =>
+                                                ManageSubscriptionScreen());
+                                          } else {
+                                            Get.to(() => SubscriptionScreen());
+                                          }
+                                        },
+                                        child: Container(
+                                          width: 100.w,
+                                          padding: const EdgeInsets.all(16),
+                                          decoration: BoxDecoration(
+                                            gradient: LinearGradient(
+                                              colors: hasSubscription
+                                                  ? [
+                                                      Colors.green.shade400,
+                                                      Colors.green.shade600
+                                                    ]
+                                                  : [
+                                                      Colors.amber.shade400,
+                                                      Colors.orange.shade600
+                                                    ],
+                                              begin: Alignment.topLeft,
+                                              end: Alignment.bottomRight,
+                                            ),
+                                            borderRadius:
+                                                BorderRadius.circular(12),
+                                            boxShadow: [
+                                              BoxShadow(
+                                                color: (hasSubscription
+                                                        ? Colors.green
+                                                        : Colors.orange)
+                                                    .withOpacity(0.3),
+                                                blurRadius: 8,
+                                                offset: const Offset(0, 4),
+                                              ),
+                                            ],
+                                          ),
+                                          child: hasSubscription
+                                              ? _buildActiveSubscriptionContent()
+                                              : _buildUpgradeContent(),
+                                        ),
+                                      ),
+                                    );
+                                  }),
+                                  const SizedBox(
+                                    height: 20,
+                                  ),
+                                  Center(
+                                    child: Container(
+                                      width: 90,
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 10,
+                                        vertical: 4,
+                                      ),
+                                      decoration: BoxDecoration(
+                                          color: appGreyColor1,
+                                          borderRadius:
+                                              BorderRadius.circular(30)),
+                                      child: Center(
+                                          child: poppinsText(
+                                              'My Posts',
+                                              12,
+                                              FontWeight.normal,
+                                              appBlackColor)),
+                                    ),
+                                  ),
+                                  const SizedBox(
+                                    height: 10,
+                                  ),
+                                  controller.myPostLoader.value
+                                      ? const Center(
+                                          key: ValueKey('Loader'),
+                                          child: CircularProgressIndicator(),
+                                        )
+                                      : const SizedBox(
+                                          key: ValueKey('Empty'),
+                                        ),
+                                  SizedBox(
+                                    height: 10,
+                                  )
+                                ],
+                              );
                             } else {
                               final data =
                                   posts[index - 1]; // Adjust index for posts
@@ -1142,8 +1186,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 }
               },
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
     // });
@@ -1657,6 +1701,63 @@ class _ProfileScreenState extends State<ProfileScreen> {
           const SizedBox(
             height: 10,
           ),
+          // Premium Subscription Card
+          if (!widget.isOther)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+              child: Obx(() {
+                final subscriptionController =
+                    Get.put(SubscriptionController());
+                final isActive =
+                    subscriptionController.hasActivePremiumSubscription();
+
+                return Container(
+                  width: 100.w,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: isActive
+                          ? [Color(0xFF4CAF50), Color(0xFF45a049)]
+                          : [Color(0xFFFFB300), Color(0xFFFF6F00)],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.1),
+                        blurRadius: 8,
+                        offset: Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(12),
+                      onTap: () {
+                        if (isActive) {
+                          pushScreen(context,
+                              screen: ManageSubscriptionScreen(),
+                              withNavBar: false);
+                        } else {
+                          pushScreen(context,
+                              screen: SubscriptionScreen(), withNavBar: false);
+                        }
+                      },
+                      child: Padding(
+                        padding: EdgeInsets.all(16),
+                        child: isActive
+                            ? _buildActiveSubscriptionContent()
+                            : _buildUpgradeContent(),
+                      ),
+                    ),
+                  ),
+                );
+              }),
+            ),
+          const SizedBox(
+            height: 10,
+          ),
           Center(
             child: Container(
               width: 90,
@@ -1689,5 +1790,170 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ],
       ),
     ]);
+  }
+
+  // Premium Subscription Card Helper Methods
+  Widget _buildActiveSubscriptionContent() {
+    final subscriptionController = Get.put(SubscriptionController());
+
+    return Row(
+      children: [
+        Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.2),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: const Icon(
+            Icons.verified,
+            color: Colors.white,
+            size: 32,
+          ),
+        ),
+        const SizedBox(width: 16),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  poppinsText(
+                    'Premium Active',
+                    16,
+                    FontWeight.bold,
+                    appWhiteColor,
+                  ),
+                  const SizedBox(width: 8),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 2,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.3),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: poppinsText(
+                      'PRO',
+                      10,
+                      FontWeight.bold,
+                      appWhiteColor,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 4),
+              Obx(() {
+                final info = subscriptionController.customerInfo.value;
+                if (info != null && info.entitlements.active.isNotEmpty) {
+                  final activeEntitlement =
+                      info.entitlements.active.values.first;
+                  if (activeEntitlement.expirationDate != null) {
+                    final expiryDate =
+                        DateTime.parse(activeEntitlement.expirationDate!);
+                    final daysLeft =
+                        expiryDate.difference(DateTime.now()).inDays;
+
+                    return poppinsText(
+                      daysLeft > 7
+                          ? 'Expires ${_formatDate(expiryDate)}'
+                          : '⚠️ Expires in $daysLeft days',
+                      12,
+                      FontWeight.w400,
+                      Colors.white.withOpacity(0.9),
+                    );
+                  }
+                }
+                return poppinsText(
+                  'Tap to manage subscription',
+                  12,
+                  FontWeight.w400,
+                  Colors.white.withOpacity(0.9),
+                );
+              }),
+            ],
+          ),
+        ),
+        Icon(
+          Icons.arrow_forward_ios,
+          color: Colors.white.withOpacity(0.7),
+          size: 20,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildUpgradeContent() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.2),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: const Icon(
+                Icons.workspace_premium,
+                color: Colors.white,
+                size: 32,
+              ),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  poppinsText(
+                    'Upgrade to Premium',
+                    16,
+                    FontWeight.bold,
+                    appWhiteColor,
+                  ),
+                  const SizedBox(height: 4),
+                  poppinsText(
+                    'Unlock all premium features',
+                    12,
+                    FontWeight.w400,
+                    Colors.white.withOpacity(0.9),
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(width: 8),
+            Icon(
+              Icons.arrow_forward_ios,
+              color: Colors.white.withOpacity(0.7),
+              size: 20,
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildFeatureItem(String text) {
+    return Row(
+      children: [
+        Icon(
+          Icons.check_circle,
+          color: Colors.white.withOpacity(0.9),
+          size: 16,
+        ),
+        const SizedBox(width: 8),
+        poppinsText(
+          text,
+          11,
+          FontWeight.w400,
+          Colors.white.withOpacity(0.9),
+        ),
+      ],
+    );
+  }
+
+  String _formatDate(DateTime date) {
+    return '${date.day}/${date.month}/${date.year}';
   }
 }
